@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.IBinder
 import androidx.lifecycle.MutableLiveData
+import go.Seq
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.PlatformInterface
 import io.nekohasekai.libbox.TunInterface
@@ -73,7 +74,10 @@ class ProxyService : Service(), PlatformInterface {
             receiverRegistered = false
         }
         notification.close()
-        boxService?.close()
+        boxService?.apply {
+            close()
+            Seq.destroyRef(refnum)
+        }
         boxService = null
         status.value = Status.Stopped
         stopSelf()

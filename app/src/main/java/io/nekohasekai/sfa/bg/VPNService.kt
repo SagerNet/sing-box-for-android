@@ -1,29 +1,18 @@
 package io.nekohasekai.sfa.bg
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.VpnService
-import android.os.Build
 import android.os.IBinder
-import android.os.RemoteCallbackList
-import android.util.Log
-import androidx.core.app.NotificationCompat
-import androidx.core.app.ServiceCompat
 import androidx.lifecycle.MutableLiveData
+import go.Seq
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.PlatformInterface
 import io.nekohasekai.libbox.Service
 import io.nekohasekai.libbox.TunInterface
 import io.nekohasekai.libbox.TunOptions
-import io.nekohasekai.sfa.Application
-import io.nekohasekai.sfa.R
-import io.nekohasekai.sfa.aidl.IVPNService
-import io.nekohasekai.sfa.aidl.IVPNServiceCallback
 import io.nekohasekai.sfa.constant.Action
 import io.nekohasekai.sfa.constant.Alert
 import io.nekohasekai.sfa.constant.Status
@@ -31,8 +20,6 @@ import io.nekohasekai.sfa.db.Settings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 class VPNService : VpnService(), PlatformInterface {
@@ -89,7 +76,10 @@ class VPNService : VpnService(), PlatformInterface {
             receiverRegistered = false
         }
         notification.close()
-        boxService?.close()
+        boxService?.apply {
+            close()
+            Seq.destroyRef(refnum)
+        }
         boxService = null
         status.value = Status.Stopped
         stopSelf()
@@ -165,6 +155,8 @@ class VPNService : VpnService(), PlatformInterface {
         }
 
         if (options.autoRoute) {
+            builder.addDnsServer(options.dnsServerAddress)
+
             val inet4RouteAddress = options.inet4RouteAddress
             if (inet4RouteAddress.hasNext()) {
                 while (inet4RouteAddress.hasNext()) {
