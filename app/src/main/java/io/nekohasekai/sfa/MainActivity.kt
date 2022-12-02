@@ -23,9 +23,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blacksquircle.ui.language.json.JsonLanguage
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import io.nekohasekai.libbox.PProfServer
 import io.nekohasekai.sfa.aidl.IVPNService
 import io.nekohasekai.sfa.aidl.IVPNServiceCallback
-import io.nekohasekai.sfa.bg.VPNService
 import io.nekohasekai.sfa.constant.Action
 import io.nekohasekai.sfa.constant.Alert
 import io.nekohasekai.sfa.constant.ServiceMode
@@ -35,7 +35,6 @@ import io.nekohasekai.sfa.databinding.ViewLogTextItemBinding
 import io.nekohasekai.sfa.db.Settings
 import io.nekohasekai.sfa.utils.ColorUtils
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -44,9 +43,12 @@ import java.util.LinkedList
 class MainActivity : AppCompatActivity(), ServiceConnection {
 
     private lateinit var binding: ActivityMainBinding
-    private var boxStatus = MutableLiveData(Status.Stopped)
+    private val boxStatus = MutableLiveData(Status.Stopped)
     private val logManager = LogManager()
     private val callback = VPNCallback()
+
+    private val pprofStatus = MutableLiveData(false)
+    private var pprofServer: PProfServer? = null
 
     private fun showText(content: String) {
         runOnUiThread {
@@ -121,6 +123,34 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
                 }
 
                 else -> {}
+            }
+        }
+
+        val pprofButton = binding.pprofButton
+        pprofStatus.observe(this) {
+            it!!
+            if (it) {
+                pprofButton.text = "Stop pprof server"
+            } else {
+                pprofButton.text = "Start pprof server"
+            }
+        }
+        pprofButton.setOnClickListener {
+            if (pprofStatus.value != true) {
+                pprofServer = PProfServer(8090)
+                try {
+                    pprofServer?.start()
+                } catch (e: Exception) {
+                    showText(e.message!!)
+                }
+                pprofStatus.value = true
+            } else {
+                try {
+                    pprofServer?.close()
+                } catch (_: Exception) {
+                }
+                pprofServer = null
+                pprofStatus.value = false
             }
         }
 

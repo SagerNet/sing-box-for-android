@@ -16,6 +16,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <Button
+            android:id="@+id/pprof_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
         <com.blacksquircle.ui.editorkit.widget.TextProcessor
             android:id="@+id/editor"
             android:layout_width="match_parent"
