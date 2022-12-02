@@ -56,13 +56,13 @@ class ProxyService : Service(), PlatformInterface {
         withContext(Dispatchers.IO) {
             runCatching {
                 newService.start()
-                boxService = newService
-                status.postValue(Status.Started)
             }.onFailure {
                 launch(Dispatchers.Main) {
                     stopAndAlert(Alert.StartService, it.message)
                 }
             }
+            boxService = newService
+            status.postValue(Status.Started)
         }
     }
 
@@ -84,6 +84,8 @@ class ProxyService : Service(), PlatformInterface {
     }
 
     private fun stopAndAlert(type: Alert, message: String? = null) {
+        unregisterReceiver(receiver)
+        notification.close()
         binder.broadcast { callback ->
             callback.alert(type.ordinal, message)
         }
