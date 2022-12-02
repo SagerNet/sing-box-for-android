@@ -14,7 +14,6 @@ class VPNService : VpnService(), PlatformInterface {
         commonService.onStartCommand(intent, flags, startId)
 
     override fun onBind(intent: Intent) = commonService.onBind(intent)
-
     override fun onDestroy() = commonService.onDestroy()
     override fun onRevoke() = commonService.onRevoke()
 

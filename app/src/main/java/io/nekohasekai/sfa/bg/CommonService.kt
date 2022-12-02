@@ -34,6 +34,7 @@ open class CommonService(
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
                 Action.SERVICE_CLOSE -> {
+                    stopService()
                 }
             }
         }
