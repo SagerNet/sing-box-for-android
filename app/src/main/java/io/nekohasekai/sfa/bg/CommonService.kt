@@ -41,31 +41,27 @@ open class CommonService(
     }
 
     private suspend fun startService() {
-        var configContent: String
-        withContext(Dispatchers.IO) {
-            configContent = Settings.configurationContent
-        }
+        val configContent = Settings.configurationContent
         if (configContent.isBlank()) {
             stopAndAlert(Alert.EmptyConfiguration)
             return
         }
+
         val newService = try {
             Libbox.newService(configContent, platformInterface)
         } catch (e: Exception) {
             stopAndAlert(Alert.CreateService, e.message)
             return
         }
-        withContext(Dispatchers.IO) {
-            runCatching {
-                newService.start()
-            }.onFailure {
-                launch(Dispatchers.Main) {
-                    stopAndAlert(Alert.StartService, it.message)
-                }
-            }
-            boxService = newService
-            status.postValue(Status.Started)
+
+        try {
+            newService.start()
+        } catch (e: Exception) {
+            stopAndAlert(Alert.StartService, e.message)
         }
+
+        boxService = newService
+        status.postValue(Status.Started)
     }
 
     private fun stopService() {
@@ -85,13 +81,15 @@ open class CommonService(
         service.stopSelf()
     }
 
-    private fun stopAndAlert(type: Alert, message: String? = null) {
-        service.unregisterReceiver(receiver)
-        notification.close()
-        binder.broadcast { callback ->
-            callback.alert(type.ordinal, message)
+    private suspend fun stopAndAlert(type: Alert, message: String? = null) {
+        withContext(Dispatchers.Main) {
+            service.unregisterReceiver(receiver)
+            notification.close()
+            binder.broadcast { callback ->
+                callback.alert(type.ordinal, message)
+            }
+            status.value = Status.Stopped
         }
-        status.value = Status.Stopped
     }
 
     fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
@@ -106,7 +104,7 @@ open class CommonService(
         }
 
         notification.show()
-        GlobalScope.launch(Dispatchers.Main) {
+        GlobalScope.launch(Dispatchers.IO) {
             startService()
         }
         return Service.START_NOT_STICKY
