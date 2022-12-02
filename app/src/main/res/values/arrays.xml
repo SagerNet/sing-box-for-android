@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="profile_type">
+        <item>@string/profile_type_local</item>
+        <item>@string/profile_type_remote</item>
+    </array>
+    <array name="profile_source">
+        <item>@string/profile_source_create_new</item>
+        <item>@string/profile_source_import</item>
+    </array>
+    <array name="enabled">
+        <item>@string/enabled</item>
+        <item>@string/disabled</item>
+    </array>
+</resources>

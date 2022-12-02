@@ -1,0 +1,83 @@
+<resources>
+    <string name="app_name">sing-box</string>
+
+    <string name="stop">Stop</string>
+
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_configuration">Profiles</string>
+    <string name="title_log">Logs</string>
+    <string name="title_settings">Settings</string>
+    <string name="title_new_profile">New Profile</string>
+    <string name="title_edit_profile">Edit Profile</string>
+    <string name="title_edit_configuration">Edit Configuration</string>
+
+    <string name="quick_toggle">Toggle</string>
+    <string name="profile_name">Name</string>
+    <string name="profile_type">Type</string>
+    <string name="profile_source">Source</string>
+    <string name="profile_url">URL</string>
+    <string name="profile_import_file">Import File</string>
+    <string name="profile_create">Create</string>
+    <string name="profile_edit_content">Edit Content</string>
+    <string name="profile_check">Check</string>
+    <string name="profile_input_required">Required</string>
+    <string name="profile_empty">Empty profiles</string>
+    <string name="profile_last_updated">Last Updated</string>
+    <string name="profile_update">Update</string>
+    <string name="profile_auto_update">Auto Update</string>
+    <string name="profile_auto_update_interval">Auto Update Interval (Minutes)</string>
+    <string name="profile_auto_update_interval_minimum_hint">Minimum value is 15</string>
+
+    <string name="profile_type_local">Local</string>
+    <string name="profile_type_remote">Remote</string>
+    <string name="profile_source_create_new">Create New</string>
+    <string name="profile_source_import">Import</string>
+
+    <string name="menu_undo">Undo</string>
+    <string name="menu_redo">Redo</string>
+    <string name="menu_format">Format</string>
+    <string name="menu_delete">Delete</string>
+
+    <string name="status_default">Service not started</string>
+    <string name="status_starting">Service starting…</string>
+    <string name="status_stopping">Service stopping…</string>
+    <string name="status_started">Service started</string>
+
+    <string name="enabled">Enabled</string>
+    <string name="disabled">Disabled</string>
+
+    <string name="settings_clear_working_directory">Clear Working Directory</string>
+
+    <string name="error_title">Error</string>
+    <string name="file_manager_missing">Your device lacks an Android standard file selector, please install one, such as Material Files.</string>
+    <string name="loading">Loading…</string>
+
+    <string name="service_error_missing_permission">Failed to request VPN permission</string>
+    <string name="service_error_missing_notification_permission">Failed to request notification permission</string>
+    <string name="service_error_empty_configuration">Empty configuration</string>
+    <string name="service_error_title_start_command_server">Start command server</string>
+    <string name="service_error_title_create_service">Create service</string>
+    <string name="service_error_title_start_service">Start service</string>
+    <string name="profile_status">Status</string>
+    <string name="status_memory">Memory</string>
+    <string name="status_goroutines">Goroutines</string>
+    <string name="profile">Profile</string>
+    <string name="core_version">Version</string>
+    <string name="core">Core</string>
+    <string name="core_data_size">Data Size</string>
+    <string name="analytics_title">Analytics</string>
+    <string name="analytics_message">Would you like to give SFA permission to collect analytics, send crash reports, and check update through AppCenter?</string>
+    <string name="no_thanks">No, thanks</string>
+    <string name="ok">Ok</string>
+    <string name="check_update">Check Update</string>
+    <string name="title_app_center">App Center</string>
+    <string name="title_feedback">Feedback</string>
+    <string name="message">Message</string>
+    <string name="send">Send</string>
+    <string name="send_feedback">Send Feedback</string>
+    <string name="about_title">About</string>
+    <string name="app_description">Android client for sing-box, the universal proxy platform.</string>
+    <string name="documentation_button">Documentation</string>
+    <string name="community_button">Community</string>
+
+</resources>
