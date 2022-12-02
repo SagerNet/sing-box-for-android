@@ -1,0 +1,128 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-parcelize'
+    id 'com.google.devtools.ksp'
+}
+
+android {
+    namespace 'io.nekohasekai.sfa'
+    compileSdk 33
+
+    ksp {
+        arg("room.incremental", "true")
+        arg("room.schemaLocation", "$projectDir/schemas")
+    }
+
+    defaultConfig {
+        applicationId "io.nekohasekai.sfa"
+        minSdk 21
+        targetSdk 33
+        versionCode 5
+        versionName "1.0"
+    }
+
+    signingConfigs {
+        release {
+            storeFile file("release.keystore")
+            storePassword getProps("KEYSTORE_PASS")
+            keyAlias getProps("ALIAS_NAME")
+            keyPassword getProps("ALIAS_PASS")
+        }
+    }
+
+    buildTypes {
+        debug {
+            if (getProps("KEYSTORE_PASS") != "") {
+                signingConfig signingConfigs.release
+            }
+            buildConfigField("String", "APPCENTER_SECRET", "\"" + getProps("APPCENTER_SECRET") + "\"")
+        }
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+            buildConfigField("String", "APPCENTER_SECRET", "\"" + getProps("APPCENTER_SECRET") + "\"")
+        }
+    }
+
+    splits {
+        abi {
+            enable true
+            universalApk true
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildFeatures {
+        viewBinding true
+    }
+}
+
+dependencies {
+    implementation(fileTree('libs'))
+
+    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
+    implementation 'androidx.room:room-runtime:2.5.1'
+    implementation 'androidx.coordinatorlayout:coordinatorlayout:1.2.0'
+    implementation 'androidx.preference:preference-ktx:1.2.0'
+    ksp 'androidx.room:room-compiler:2.5.1'
+    implementation 'androidx.work:work-runtime-ktx:2.8.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+
+    // DO NOT UPDATE (minSdkVersion updated)
+    implementation 'com.blacksquircle.ui:editorkit:2.2.0'
+    implementation 'com.blacksquircle.ui:language-json:2.2.0'
+
+    implementation 'com.microsoft.appcenter:appcenter-analytics:5.0.1'
+    implementation 'com.microsoft.appcenter:appcenter-crashes:5.0.1'
+    implementation 'com.microsoft.appcenter:appcenter-distribute:5.0.1'
+}
+
+if (getProps("APPCENTER_TOKEN") != "") {
+    apply plugin: "com.betomorrow.appcenter"
+    appcenter {
+        apiToken = getProps("APPCENTER_TOKEN")
+        ownerName = getProps("APPCENTER_OWNER")
+        distributionGroups = [getProps("APPCENTER_GROUP")]
+        notifyTesters = true
+        apps {
+            release {
+                appName = getProps("APPCENTER_APP_NAME")
+            }
+        }
+    }
+}
+
+tasks.withType(KotlinCompile.class).configureEach {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+def getProps(String propName) {
+    def propsFile = rootProject.file('local.properties')
+    if (propsFile.exists()) {
+        def props = new Properties()
+        props.load(new FileInputStream(propsFile))
+        String value = props[propName]
+        if (value == null) {
+            return "";
+        }
+        return value
+    } else {
+        return "";
+    }
+}
