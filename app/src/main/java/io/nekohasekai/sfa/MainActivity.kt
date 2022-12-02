@@ -14,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.MutableLiveData
@@ -24,15 +25,19 @@ import com.blacksquircle.ui.language.json.JsonLanguage
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.nekohasekai.sfa.aidl.IVPNService
 import io.nekohasekai.sfa.aidl.IVPNServiceCallback
+import io.nekohasekai.sfa.bg.VPNService
 import io.nekohasekai.sfa.constant.Action
 import io.nekohasekai.sfa.constant.Alert
+import io.nekohasekai.sfa.constant.ServiceMode
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.databinding.ActivityMainBinding
 import io.nekohasekai.sfa.databinding.ViewLogTextItemBinding
 import io.nekohasekai.sfa.db.Settings
 import io.nekohasekai.sfa.utils.ColorUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.util.LinkedList
 
@@ -106,29 +111,86 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
         }
 
         button.setOnClickListener {
-            if (prepareVPN()) {
-                return@setOnClickListener
-            }
             when (boxStatus.value) {
                 Status.Stopped -> {
-                    Application.startService()
+                    startService()
                 }
 
                 Status.Started -> {
-                    Application.stopService()
+                    stopService()
                 }
 
                 else -> {}
             }
         }
 
-        val intent = Intent(this, VPNService::class.java).setAction(Action.SERVICE)
-        bindService(intent, this, Context.BIND_AUTO_CREATE)
+        lifecycleScope.launch(Dispatchers.IO) {
+            connect()
+        }
+    }
+
+    private fun startService() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            if (Settings.rebuildServiceMode()) {
+                disconnect()
+                connect()
+            }
+            if (Settings.serviceMode == ServiceMode.VPN) {
+                try {
+                    val intent = VpnService.prepare(this@MainActivity)
+                    if (intent != null) {
+                        prepare.launch(intent)
+                        return@launch
+                    }
+                } catch (e: Exception) {
+                    showText("Failed to request VPN permission: ${e.message}")
+                }
+            }
+            val intent = Intent(Application.application, Settings.serviceClass())
+            withContext(Dispatchers.Main) {
+                ContextCompat.startForegroundService(Application.application, intent)
+            }
+        }
+
+    }
+
+    private suspend fun connect() {
+        val intent = withContext(Dispatchers.IO) {
+            Intent(this@MainActivity, Settings.serviceClass()).setAction(Action.SERVICE)
+        }
+        withContext(Dispatchers.Main) {
+            bindService(intent, this@MainActivity, Context.BIND_AUTO_CREATE)
+        }
+    }
+
+    private suspend fun disconnect() {
+        withContext(Dispatchers.Main) {
+            sendBroadcast(
+                Intent(Action.SERVICE_CLOSE).setPackage(
+                    Application.application.packageName
+                )
+            )
+            try {
+                unbindService(this@MainActivity)
+            } catch (_: IllegalArgumentException) {
+            }
+        }
+    }
+
+    override fun onBindingDied(name: ComponentName?) {
+        runBlocking {
+            disconnect()
+            connect()
+        }
+    }
+
+    private fun stopService() {
+        application.sendBroadcast(Intent(Action.SERVICE_CLOSE).setPackage(Application.application.packageName))
     }
 
     private val prepare = registerForActivityResult(PrepareService()) {
         if (it) {
-            Application.startService()
+            startService()
         } else {
             showText("failed to request VPN permission")
         }
@@ -164,17 +226,6 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
         } catch (e: RemoteException) {
             Log.e("sing-box", "cleanup service connection", e)
         }
-    }
-
-    private fun prepareVPN(): Boolean {
-        try {
-            val intent = VpnService.prepare(this) ?: return false
-            prepare.launch(intent)
-            return true
-        } catch (e: Exception) {
-            showText("Failed to request VPN permission: ${e.message}")
-        }
-        return false
     }
 
     inner class VPNCallback : IVPNServiceCallback.Stub() {
