@@ -23,100 +23,14 @@ import kotlinx.coroutines.withContext
 
 class ProxyService : Service(), PlatformInterface {
 
-    private val status = MutableLiveData(Status.Stopped)
-    private val binder = ServiceBinder(status)
-    private val notification = ServiceNotification(this)
-    private var boxService: io.nekohasekai.libbox.Service? = null
-    private var receiverRegistered = false
-    private val receiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            when (intent.action) {
-                Action.SERVICE_CLOSE -> {
-                    stopService()
-                }
-            }
-        }
-    }
+    private val commonService = CommonService(this, this)
 
-    private suspend fun startService() {
-        var configContent: String
-        withContext(Dispatchers.IO) {
-            configContent = Settings.configurationContent
-        }
-        if (configContent.isBlank()) {
-            stopAndAlert(Alert.EmptyConfiguration)
-            return
-        }
-        val newService = try {
-            Libbox.newService(configContent, this)
-        } catch (e: Exception) {
-            stopAndAlert(Alert.CreateService, e.message)
-            return
-        }
-        withContext(Dispatchers.IO) {
-            runCatching {
-                newService.start()
-            }.onFailure {
-                launch(Dispatchers.Main) {
-                    stopAndAlert(Alert.StartService, it.message)
-                }
-            }
-            boxService = newService
-            status.postValue(Status.Started)
-        }
-    }
+    override fun onStartCommand(intent: Intent, flags: Int, startId: Int) =
+        commonService.onStartCommand(intent, flags, startId)
 
-    fun stopService() {
-        if (status.value != Status.Started) return
-        status.value = Status.Stopping
-        if (receiverRegistered) {
-            unregisterReceiver(receiver)
-            receiverRegistered = false
-        }
-        notification.close()
-        boxService?.apply {
-            close()
-            Seq.destroyRef(refnum)
-        }
-        boxService = null
-        status.value = Status.Stopped
-        stopSelf()
-    }
+    override fun onBind(intent: Intent) = commonService.onBind(intent)
 
-    private fun stopAndAlert(type: Alert, message: String? = null) {
-        unregisterReceiver(receiver)
-        notification.close()
-        binder.broadcast { callback ->
-            callback.alert(type.ordinal, message)
-        }
-        status.value = Status.Stopped
-    }
-
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        if (status.value != Status.Stopped) return START_NOT_STICKY
-        status.value = Status.Starting
-
-        if (!receiverRegistered) {
-            registerReceiver(receiver, IntentFilter().apply {
-                addAction(Action.SERVICE_CLOSE)
-            })
-            receiverRegistered = true
-        }
-
-        notification.show()
-        GlobalScope.launch(Dispatchers.Main) {
-            startService()
-        }
-        return START_NOT_STICKY
-    }
-
-    override fun onBind(intent: Intent): IBinder {
-        return binder
-    }
-
-    override fun onDestroy() {
-        binder.close()
-    }
+    override fun onDestroy() = commonService.onDestroy()
 
     override fun autoDetectInterfaceControl(fd: Int) {
     }
@@ -125,9 +39,6 @@ class ProxyService : Service(), PlatformInterface {
         error("bad state: create tun in normal service")
     }
 
-    override fun writeLog(message: String?) {
-        binder.broadcast {
-            it.writeLog(message)
-        }
-    }
+    override fun writeLog(message: String?) = commonService.writeLog(message)
+
 }

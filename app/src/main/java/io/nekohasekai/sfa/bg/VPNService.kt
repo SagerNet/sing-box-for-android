@@ -1,126 +1,22 @@
 package io.nekohasekai.sfa.bg
 
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.net.VpnService
-import android.os.IBinder
-import androidx.lifecycle.MutableLiveData
-import go.Seq
-import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.PlatformInterface
-import io.nekohasekai.libbox.Service
 import io.nekohasekai.libbox.TunInterface
 import io.nekohasekai.libbox.TunOptions
-import io.nekohasekai.sfa.constant.Action
-import io.nekohasekai.sfa.constant.Alert
-import io.nekohasekai.sfa.constant.Status
-import io.nekohasekai.sfa.db.Settings
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class VPNService : VpnService(), PlatformInterface {
 
-    private var status = MutableLiveData(Status.Stopped)
-    private val binder = ServiceBinder(status)
-    private val notification = ServiceNotification(this)
-    private var boxService: Service? = null
+    private val commonService = CommonService(this, this)
 
-    private var receiverRegistered = false
-    private val receiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            when (intent.action) {
-                Action.SERVICE_CLOSE -> {
-                    stopService()
-                }
-            }
-        }
-    }
+    override fun onStartCommand(intent: Intent, flags: Int, startId: Int) =
+        commonService.onStartCommand(intent, flags, startId)
 
-    private suspend fun startService() {
-        var configContent: String
-        withContext(Dispatchers.IO) {
-            configContent = Settings.configurationContent
-        }
-        if (configContent.isBlank()) {
-            stopAndAlert(Alert.EmptyConfiguration)
-            return
-        }
-        val newService = try {
-            Libbox.newService(configContent, this)
-        } catch (e: Exception) {
-            stopAndAlert(Alert.CreateService, e.message)
-            return
-        }
-        withContext(Dispatchers.IO) {
-            runCatching {
-                newService.start()
-                boxService = newService
-                status.postValue(Status.Started)
-            }.onFailure {
-                launch(Dispatchers.Main) {
-                    stopAndAlert(Alert.StartService, it.message)
-                }
-            }
-        }
-    }
+    override fun onBind(intent: Intent) = commonService.onBind(intent)
 
-    fun stopService() {
-        if (status.value != Status.Started) return
-        status.value = Status.Stopping
-        if (receiverRegistered) {
-            unregisterReceiver(receiver)
-            receiverRegistered = false
-        }
-        notification.close()
-        boxService?.apply {
-            close()
-            Seq.destroyRef(refnum)
-        }
-        boxService = null
-        status.value = Status.Stopped
-        stopSelf()
-    }
-
-    private fun stopAndAlert(type: Alert, message: String? = null) {
-        binder.broadcast { callback ->
-            callback.alert(type.ordinal, message)
-        }
-        status.value = Status.Stopped
-    }
-
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        if (status.value != Status.Stopped) return START_NOT_STICKY
-        status.value = Status.Starting
-
-        if (!receiverRegistered) {
-            registerReceiver(receiver, IntentFilter().apply {
-                addAction(Action.SERVICE_CLOSE)
-            })
-            receiverRegistered = true
-        }
-
-        notification.show()
-        GlobalScope.launch(Dispatchers.Main) {
-            startService()
-        }
-        return START_NOT_STICKY
-    }
-
-    override fun onBind(intent: Intent): IBinder {
-        return binder
-    }
-
-    override fun onRevoke() {
-        stopService()
-    }
-
-    override fun onDestroy() {
-        binder.close()
-    }
+    override fun onDestroy() = commonService.onDestroy()
+    override fun onRevoke() = commonService.onRevoke()
 
     override fun autoDetectInterfaceControl(fd: Int) {
         if (!vpnStarted) {
@@ -208,10 +104,6 @@ class VPNService : VpnService(), PlatformInterface {
         }
     }
 
-    override fun writeLog(message: String) {
-        binder.broadcast {
-            it.writeLog(message)
-        }
-    }
+    override fun writeLog(message: String) = commonService.writeLog(message)
 
 }
