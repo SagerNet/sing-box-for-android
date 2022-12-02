@@ -258,6 +258,15 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        runBlocking {
+            disconnect()
+        }
+        pprofServer?.close()
+        pprofServer = null
+    }
+
     inner class VPNCallback : IVPNServiceCallback.Stub() {
         override fun onStatusChanged(status: Int) {
             this@MainActivity.boxStatus.postValue(Status.values()[status])
