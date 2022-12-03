@@ -83,7 +83,10 @@ open class CommonService(
 
     private suspend fun stopAndAlert(type: Alert, message: String? = null) {
         withContext(Dispatchers.Main) {
-            service.unregisterReceiver(receiver)
+            if (receiverRegistered) {
+                service.unregisterReceiver(receiver)
+                receiverRegistered = false
+            }
             notification.close()
             binder.broadcast { callback ->
                 callback.alert(type.ordinal, message)
