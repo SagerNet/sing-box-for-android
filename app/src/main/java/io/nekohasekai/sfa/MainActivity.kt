@@ -36,7 +36,6 @@ import io.nekohasekai.sfa.db.Settings
 import io.nekohasekai.sfa.utils.ColorUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.util.LinkedList
 
@@ -208,7 +207,7 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
     }
 
     override fun onBindingDied(name: ComponentName?) {
-        runBlocking {
+        lifecycleScope.launch(Dispatchers.IO) {
             disconnect()
             connect()
         }
@@ -260,8 +259,9 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
 
     override fun onDestroy() {
         super.onDestroy()
-        runBlocking {
-            disconnect()
+        try {
+            unbindService(this@MainActivity)
+        } catch (_: IllegalArgumentException) {
         }
         pprofServer?.close()
         pprofServer = null

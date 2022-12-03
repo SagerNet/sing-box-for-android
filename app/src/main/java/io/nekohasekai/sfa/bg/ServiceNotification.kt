@@ -32,7 +32,10 @@ class ServiceNotification(private val service: Service) {
                 PendingIntent.getActivity(
                     service,
                     0,
-                    Intent(service, MainActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT),
+                    Intent(
+                        service,
+                        MainActivity::class.java
+                    ).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT),
                     flags
                 )
             )
