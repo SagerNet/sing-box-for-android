@@ -1,4 +1,4 @@
-package io.nekohasekai.sfa.db
+package io.nekohasekai.sfa.database
 
 import androidx.room.Room
 import io.nekohasekai.sfa.Application
@@ -7,8 +7,8 @@ import io.nekohasekai.sfa.bg.VPNService
 import io.nekohasekai.sfa.constant.Path
 import io.nekohasekai.sfa.constant.ServiceMode
 import io.nekohasekai.sfa.constant.SettingsKey
-import io.nekohasekai.sfa.db.preference.KeyValueDatabase
-import io.nekohasekai.sfa.db.preference.RoomPreferenceDataStore
+import io.nekohasekai.sfa.database.preference.KeyValueDatabase
+import io.nekohasekai.sfa.database.preference.RoomPreferenceDataStore
 import io.nekohasekai.sfa.ktx.string
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch

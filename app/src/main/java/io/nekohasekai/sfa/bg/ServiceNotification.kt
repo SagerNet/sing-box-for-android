@@ -9,9 +9,9 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import io.nekohasekai.sfa.Application
-import io.nekohasekai.sfa.MainActivity
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.constant.Action
+import io.nekohasekai.sfa.ui.MainActivity
 
 class ServiceNotification(private val service: Service) {
     companion object {

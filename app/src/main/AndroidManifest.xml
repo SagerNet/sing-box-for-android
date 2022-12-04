@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
-        android:name="io.nekohasekai.sfa.Application"
+        android:name=".Application"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -15,28 +15,27 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="31">
-
         <activity
-            android:name="io.nekohasekai.sfa.MainActivity"
+            android:name=".ui.MainActivity"
             android:exported="true"
             android:icon="@mipmap/ic_launcher"
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
         <service
-            android:name="io.nekohasekai.sfa.bg.VPNService"
+            android:name=".bg.VPNService"
             android:exported="false"
             android:permission="android.permission.BIND_VPN_SERVICE">
             <intent-filter>
                 <action android:name="android.net.VpnService" />
             </intent-filter>
         </service>
-        <service android:name="io.nekohasekai.sfa.bg.ProxyService" />
-
+        <service android:name=".bg.ProxyService" />
     </application>
 
 </manifest>

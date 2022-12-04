@@ -14,13 +14,13 @@ import io.nekohasekai.libbox.PlatformInterface
 import io.nekohasekai.sfa.constant.Action
 import io.nekohasekai.sfa.constant.Alert
 import io.nekohasekai.sfa.constant.Status
-import io.nekohasekai.sfa.db.Settings
+import io.nekohasekai.sfa.database.Settings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-open class CommonService(
+class CommonService(
     private val service: Service,
     private val platformInterface: PlatformInterface
 ) {
@@ -45,6 +45,12 @@ open class CommonService(
         if (configContent.isBlank()) {
             stopAndAlert(Alert.EmptyConfiguration)
             return
+        }
+
+        withContext(Dispatchers.Main) {
+            binder.broadcast {
+                it.resetLogs(listOf())
+            }
         }
 
         val newService = try {

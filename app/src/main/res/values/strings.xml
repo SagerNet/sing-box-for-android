@@ -2,5 +2,12 @@
     <string name="app_name">sing-box</string>
 
     <string name="stop">Stop</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_configuration">Configuration</string>
+
+    <string name="status_default">Service not started</string>
+    <string name="status_starting">Service starting…</string>
+    <string name="status_stopping">Service stopping…</string>
+    <string name="status_started">Service started</string>
 
 </resources>

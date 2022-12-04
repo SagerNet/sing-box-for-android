@@ -1,4 +1,4 @@
-package io.nekohasekai.sfa.db.preference
+package io.nekohasekai.sfa.database.preference
 
 import android.os.Parcel
 import android.os.Parcelable

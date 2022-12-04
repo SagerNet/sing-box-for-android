@@ -1,4 +1,4 @@
-package io.nekohasekai.sfa.db.preference
+package io.nekohasekai.sfa.database.preference
 
 import android.graphics.Typeface
 import android.text.InputFilter
