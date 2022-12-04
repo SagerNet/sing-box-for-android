@@ -6,11 +6,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.IBinder
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import go.Seq
 import io.nekohasekai.libbox.BoxService
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.PlatformInterface
+import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.constant.Action
 import io.nekohasekai.sfa.constant.Alert
 import io.nekohasekai.sfa.constant.Status
@@ -18,12 +20,32 @@ import io.nekohasekai.sfa.database.Settings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
-class CommonService(
+class BoxService(
     private val service: Service,
     private val platformInterface: PlatformInterface
 ) {
+
+    companion object {
+        fun start() {
+            val intent = runBlocking {
+                withContext(Dispatchers.IO) {
+                    Intent(Application.application, Settings.serviceClass())
+                }
+            }
+            ContextCompat.startForegroundService(Application.application, intent)
+        }
+
+        fun stop() {
+            Application.application.sendBroadcast(
+                Intent(Action.SERVICE_CLOSE).setPackage(
+                    Application.application.packageName
+                )
+            )
+        }
+    }
 
     private val status = MutableLiveData(Status.Stopped)
     private val binder = ServiceBinder(status)
@@ -49,7 +71,7 @@ class CommonService(
 
         withContext(Dispatchers.Main) {
             binder.broadcast {
-                it.resetLogs(listOf())
+                it.onServiceResetLogs(listOf())
             }
         }
 
@@ -95,7 +117,7 @@ class CommonService(
             }
             notification.close()
             binder.broadcast { callback ->
-                callback.alert(type.ordinal, message)
+                callback.onServiceAlert(type.ordinal, message)
             }
             status.value = Status.Stopped
         }
@@ -133,7 +155,7 @@ class CommonService(
 
     fun writeLog(message: String?) {
         binder.broadcast {
-            it.writeLog(message)
+            it.onServiceWriteLog(message)
         }
     }
 

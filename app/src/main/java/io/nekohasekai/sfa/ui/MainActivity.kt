@@ -1,15 +1,13 @@
 package io.nekohasekai.sfa.ui
 
-import android.content.ComponentName
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.ServiceConnection
 import android.net.VpnService
 import android.os.Bundle
-import android.os.IBinder
-import android.os.RemoteException
-import android.util.Log
 import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
@@ -18,13 +16,13 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.color.DynamicColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.elevation.SurfaceColors
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.R
-import io.nekohasekai.sfa.aidl.IService
-import io.nekohasekai.sfa.aidl.IServiceCallback
-import io.nekohasekai.sfa.constant.Action
+import io.nekohasekai.sfa.bg.ServiceConnection
+import io.nekohasekai.sfa.bg.ServiceNotification
 import io.nekohasekai.sfa.constant.Alert
 import io.nekohasekai.sfa.constant.ServiceMode
 import io.nekohasekai.sfa.constant.Status
@@ -32,18 +30,17 @@ import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.databinding.ActivityMainBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.util.LinkedList
 
-class MainActivity : AppCompatActivity(), ServiceConnection {
+class MainActivity : AppCompatActivity(), ServiceConnection.Callback {
 
     companion object {
-        const val TAG = "MyActivity"
+        private const val TAG = "MyActivity"
     }
 
     private lateinit var binding: ActivityMainBinding
-    private val callback = ServiceCallback()
+    private val connection = ServiceConnection(this, this)
 
     val logList = LinkedList<String>()
     var logCallback: ((Boolean) -> Unit)? = null
@@ -52,6 +49,8 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        DynamicColors.applyToActivityIfAvailable(this)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -59,21 +58,53 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
         window.statusBarColor = color
         window.navigationBarColor = color
 
-
         val navController = findNavController(R.id.nav_host_fragment_activity_my)
         val appBarConfiguration =
             AppBarConfiguration(setOf(R.id.navigation_dashboard, R.id.navigation_configuration))
         setupActionBarWithNavController(navController, appBarConfiguration)
         binding.navView.setupWithNavController(navController)
 
-        connect()
+        connection.connect()
     }
 
-    private val prepareIntent = registerForActivityResult(PrepareService()) {
+
+    @SuppressLint("NewApi")
+    fun startService() {
+        if (!ServiceNotification.checkPermission()) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            return
+        }
+        lifecycleScope.launch(Dispatchers.IO) {
+            if (Settings.rebuildServiceMode()) {
+                connection.reconnect()
+            }
+            if (Settings.serviceMode == ServiceMode.VPN) {
+                if (prepare()) {
+                    return@launch
+                }
+            }
+            val intent = Intent(Application.application, Settings.serviceClass())
+            withContext(Dispatchers.Main) {
+                ContextCompat.startForegroundService(Application.application, intent)
+            }
+        }
+    }
+
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) {
         if (it) {
             startService()
         } else {
-            serviceAlert(Alert.CreateService)
+            onServiceAlert(Alert.RequestNotificationPermission, null)
+        }
+    }
+
+    private val prepareLauncher = registerForActivityResult(PrepareService()) {
+        if (it) {
+            startService()
+        } else {
+            onServiceAlert(Alert.RequestVPNPermission, null)
         }
     }
 
@@ -87,101 +118,35 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
         }
     }
 
-    fun startService() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            if (Settings.rebuildServiceMode()) {
-                disconnect()
-                connect()
-            }
-            if (Settings.serviceMode == ServiceMode.VPN) {
-                if (withContext(Dispatchers.Main) {
-                        try {
-                            val intent = VpnService.prepare(this@MainActivity)
-                            if (intent != null) {
-                                prepareIntent.launch(intent)
-                                true
-                            } else {
-                                false
-                            }
-                        } catch (e: Exception) {
-                            serviceAlert(Alert.RequestVPNPermission, e.message)
-                            false
-                        }
-                    }) {
-                    return@launch
-                }
-            }
-            val intent = Intent(Application.application, Settings.serviceClass())
-            withContext(Dispatchers.Main) {
-                ContextCompat.startForegroundService(Application.application, intent)
-            }
-        }
-
-    }
-
-    fun stopService() {
-        application.sendBroadcast(Intent(Action.SERVICE_CLOSE).setPackage(Application.application.packageName))
-    }
-
-
-    private var service: IService? = null
-    private var callbackRegistered = false
-
-    override fun onServiceConnected(name: ComponentName, binder: IBinder) {
-        val service = IService.Stub.asInterface(binder)
-        this.service = service
+    private suspend fun prepare() = withContext(Dispatchers.Main) {
         try {
-            service.registerCallback(callback)
-            callbackRegistered = true
-        } catch (e: RemoteException) {
-            Log.e(TAG, "initialize service connection", e)
-        }
-    }
-
-    override fun onServiceDisconnected(name: ComponentName) {
-        try {
-            service?.unregisterCallback(callback)
-        } catch (e: RemoteException) {
-            Log.e(TAG, "cleanup service connection", e)
-        }
-    }
-
-    override fun onBindingDied(name: ComponentName) {
-        disconnect()
-        connect()
-    }
-
-    private fun connect() {
-        val intent = runBlocking {
-            withContext(Dispatchers.IO) {
-                Intent(this@MainActivity, Settings.serviceClass()).setAction(Action.SERVICE)
+            val intent = VpnService.prepare(this@MainActivity)
+            if (intent != null) {
+                prepareLauncher.launch(intent)
+                true
+            } else {
+                false
             }
-        }
-        bindService(intent, this, BIND_AUTO_CREATE)
-    }
-
-    private fun disconnect() {
-        sendBroadcast(
-            Intent(Action.SERVICE_CLOSE).setPackage(
-                Application.application.packageName
-            )
-        )
-        try {
-            unbindService(this@MainActivity)
-        } catch (_: IllegalArgumentException) {
+        } catch (e: Exception) {
+            onServiceAlert(Alert.RequestVPNPermission, e.message)
+            false
         }
     }
 
-    private fun serviceOnStatusChanged(status: Int) {
-        serviceStatus.postValue(Status.values()[status])
+    override fun onServiceStatusChanged(status: Status) {
+        serviceStatus.postValue(status)
     }
 
-    fun serviceAlert(type: Alert, message: String? = null) {
+    override fun onServiceAlert(type: Alert, message: String?) {
         val builder = MaterialAlertDialogBuilder(this)
         builder.setPositiveButton(resources.getString(android.R.string.ok), null)
         when (type) {
             Alert.RequestVPNPermission -> {
                 builder.setMessage("Failed to request VPN permission")
+            }
+
+            Alert.RequestNotificationPermission -> {
+                builder.setMessage("Failed to request notification permission")
             }
 
             Alert.EmptyConfiguration -> {
@@ -209,27 +174,20 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
         builder.show()
     }
 
-    private fun serviceWriteLog(message: String?) {
+    override fun onServiceWriteLog(message: String?) {
         logList.addLast(message)
         logCallback?.invoke(false)
     }
 
-    private fun serviceResetLog(messages: MutableList<String>) {
+    override fun onServiceResetLogs(messages: MutableList<String>) {
         logList.clear()
         logList.addAll(messages)
         logCallback?.invoke(true)
     }
 
-    inner class ServiceCallback : IServiceCallback.Stub() {
-        override fun onStatusChanged(status: Int) = serviceOnStatusChanged(status)
-
-        override fun alert(type: Int, message: String?) {
-            serviceAlert(Alert.values()[type], message)
-        }
-
-        override fun writeLog(message: String) = serviceWriteLog(message)
-
-        override fun resetLogs(messages: MutableList<String>) = serviceResetLog(messages)
+    override fun onDestroy() {
+        connection.disconnect()
+        super.onDestroy()
     }
 
 

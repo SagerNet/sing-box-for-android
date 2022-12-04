@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.bg.BoxService
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.databinding.FragmentDashboardBinding
 import io.nekohasekai.sfa.databinding.ViewLogTextItemBinding
@@ -74,7 +75,7 @@ class DashboardFragment : Fragment() {
                 }
 
                 Status.Started -> {
-                    activity.stopService()
+                    BoxService.stop()
                 }
 
                 else -> {}

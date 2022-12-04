@@ -19,6 +19,16 @@ class ServiceNotification(private val service: Service) {
         private const val notificationChannel = "service"
         private val flags =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+
+        fun checkPermission(): Boolean {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                return true
+            }
+            if (Application.notification.areNotificationsEnabled()) {
+                return true
+            }
+            return false
+        }
     }
 
 

@@ -18,7 +18,7 @@ class ServiceBinder(private val status: MutableLiveData<Status>) : IService.Stub
     init {
         status.observeForever {
             broadcast { callback ->
-                callback.onStatusChanged(it.ordinal)
+                callback.onServiceStatusChanged(it.ordinal)
             }
         }
     }
@@ -47,7 +47,6 @@ class ServiceBinder(private val status: MutableLiveData<Status>) : IService.Stub
 
     override fun registerCallback(callback: IServiceCallback) {
         callbacks.register(callback)
-        callback.onStatusChanged(getStatus())
     }
 
     override fun unregisterCallback(callback: IServiceCallback?) {

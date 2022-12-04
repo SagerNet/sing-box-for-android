@@ -8,7 +8,7 @@ import io.nekohasekai.libbox.TunOptions
 
 class ProxyService : Service(), PlatformInterface {
 
-    private val commonService = CommonService(this, this)
+    private val commonService = BoxService(this, this)
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int) =
         commonService.onStartCommand(intent, flags, startId)

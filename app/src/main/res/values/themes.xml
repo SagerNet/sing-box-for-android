@@ -2,7 +2,21 @@
 
     <style name="AppTheme" parent="Theme.Material3.DayNight">
         <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
-        <item name="colorPrimaryContainer">@color/blue_grey_600</item>
-        <item name="colorOnPrimaryContainer">?colorOnPrimary</item>
+        <!--        <item name="colorPrimaryContainer">@color/blue_grey_600</item>-->
+        <!--        <item name="colorOnPrimaryContainer">?colorOnPrimary</item>-->
+    </style>
+
+    <style name="AppTheme.FAB" parent="ThemeOverlay.Material3.FloatingActionButton.Primary">
+        <item name="colorContainer">@color/blue_grey_600</item>
+        <item name="colorOnContainer">?attr/colorOnPrimaryContainer</item>
+    </style>
+
+    <style name="AppTheme.Translucent" parent="Theme.Material3.DayNight.Dialog.Alert">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation</item>
     </style>
 </resources>
