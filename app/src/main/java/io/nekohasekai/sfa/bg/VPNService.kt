@@ -8,14 +8,14 @@ import io.nekohasekai.libbox.TunOptions
 
 class VPNService : VpnService(), PlatformInterface {
 
-    private val commonService = BoxService(this, this)
+    private val service = BoxService(this, this)
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int) =
-        commonService.onStartCommand(intent, flags, startId)
+        service.onStartCommand(intent, flags, startId)
 
-    override fun onBind(intent: Intent) = commonService.onBind(intent)
-    override fun onDestroy() = commonService.onDestroy()
-    override fun onRevoke() = commonService.onRevoke()
+    override fun onBind(intent: Intent) = service.onBind(intent)
+    override fun onDestroy() = service.onDestroy()
+    override fun onRevoke() = service.onRevoke()
 
     override fun autoDetectInterfaceControl(fd: Int) {
         if (!vpnStarted) {
@@ -103,6 +103,6 @@ class VPNService : VpnService(), PlatformInterface {
         }
     }
 
-    override fun writeLog(message: String) = commonService.writeLog(message)
+    override fun writeLog(message: String) = service.writeLog(message)
 
 }

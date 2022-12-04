@@ -5,7 +5,6 @@ import android.app.NotificationManager
 import android.content.Context
 import androidx.core.content.getSystemService
 import go.Seq
-import io.nekohasekai.libbox.Libbox
 
 class Application : Application() {
 
@@ -19,10 +18,6 @@ class Application : Application() {
         super.onCreate()
 
         Seq.setContext(this)
-
-        val baseDir = getExternalFilesDir(null) ?: filesDir
-        baseDir.mkdirs()
-        Libbox.setBasePath(baseDir.path)
     }
 
 

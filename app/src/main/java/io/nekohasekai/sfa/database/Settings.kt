@@ -9,6 +9,7 @@ import io.nekohasekai.sfa.constant.ServiceMode
 import io.nekohasekai.sfa.constant.SettingsKey
 import io.nekohasekai.sfa.database.preference.KeyValueDatabase
 import io.nekohasekai.sfa.database.preference.RoomPreferenceDataStore
+import io.nekohasekai.sfa.ktx.boolean
 import io.nekohasekai.sfa.ktx.string
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -28,6 +29,7 @@ object Settings {
 
     var configurationContent by settingsStore.string(SettingsKey.CONFIGURATION_CONTENT)
     var serviceMode by settingsStore.string(SettingsKey.SERVICE_MODE) { ServiceMode.NORMAL }
+    var startedByUser by settingsStore.boolean(SettingsKey.STARTED_BY_USER)
 
     fun serviceClass(): Class<*> {
         return when (serviceMode) {

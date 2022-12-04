@@ -29,6 +29,17 @@ class BoxService(
 ) {
 
     companion object {
+
+        private var initializeOnce = false
+        private fun initialize() {
+            if (initializeOnce) return
+            val baseDir = Application.application.getExternalFilesDir(null) ?: return
+            baseDir.mkdirs()
+            Libbox.setBasePath(baseDir.path)
+            initializeOnce = true
+            return
+        }
+
         fun start() {
             val intent = runBlocking {
                 withContext(Dispatchers.IO) {
@@ -63,6 +74,8 @@ class BoxService(
     }
 
     private suspend fun startService() {
+        initialize()
+
         val configContent = Settings.configurationContent
         if (configContent.isBlank()) {
             stopAndAlert(Alert.EmptyConfiguration)
@@ -100,13 +113,18 @@ class BoxService(
             receiverRegistered = false
         }
         notification.close()
-        boxService?.apply {
-            close()
-            Seq.destroyRef(refnum)
+        GlobalScope.launch(Dispatchers.IO) {
+            boxService?.apply {
+                close()
+                Seq.destroyRef(refnum)
+            }
+            boxService = null
+            Settings.startedByUser = false
+            withContext(Dispatchers.Main) {
+                status.value = Status.Stopped
+                service.stopSelf()
+            }
         }
-        boxService = null
-        status.value = Status.Stopped
-        service.stopSelf()
     }
 
     private suspend fun stopAndAlert(type: Alert, message: String? = null) {
@@ -136,6 +154,7 @@ class BoxService(
 
         notification.show()
         GlobalScope.launch(Dispatchers.IO) {
+            Settings.startedByUser = true
             startService()
         }
         return Service.START_NOT_STICKY
