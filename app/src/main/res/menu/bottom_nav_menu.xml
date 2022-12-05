@@ -10,4 +10,9 @@
         android:id="@+id/navigation_configuration"
         android:icon="@drawable/ic_insert_drive_file_24"
         android:title="@string/title_configuration" />
+
+    <!--<item
+        android:id="@+id/navigation_settings"
+        android:icon="@drawable/ic_settings_24"
+        android:title="@string/title_settings" />-->
 </menu>

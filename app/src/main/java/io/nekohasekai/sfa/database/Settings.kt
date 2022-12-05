@@ -21,15 +21,18 @@ object Settings {
     private val instance by lazy {
         Application.application.getDatabasePath(Path.SETTINGS_DATABASE_PATH).parentFile?.mkdirs()
         Room.databaseBuilder(
-            Application.application, KeyValueDatabase::class.java, Path.SETTINGS_DATABASE_PATH
-        ).fallbackToDestructiveMigration().setQueryExecutor { GlobalScope.launch { it.run() } }
+            Application.application,
+            KeyValueDatabase::class.java,
+            Path.SETTINGS_DATABASE_PATH
+        ).allowMainThreadQueries()
+            .fallbackToDestructiveMigration()
+            .setQueryExecutor { GlobalScope.launch { it.run() } }
             .build()
     }
-    private val settingsStore = RoomPreferenceDataStore(instance.keyValuePairDao())
-
-    var configurationContent by settingsStore.string(SettingsKey.CONFIGURATION_CONTENT)
-    var serviceMode by settingsStore.string(SettingsKey.SERVICE_MODE) { ServiceMode.NORMAL }
-    var startedByUser by settingsStore.boolean(SettingsKey.STARTED_BY_USER)
+    val dataStore = RoomPreferenceDataStore(instance.keyValuePairDao())
+    var configurationContent by dataStore.string(SettingsKey.CONFIGURATION_CONTENT)
+    var serviceMode by dataStore.string(SettingsKey.SERVICE_MODE) { ServiceMode.NORMAL }
+    var startedByUser by dataStore.boolean(SettingsKey.STARTED_BY_USER)
 
     fun serviceClass(): Class<*> {
         return when (serviceMode) {

@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity(), ServiceConnection.Callback {
 
         val navController = findNavController(R.id.nav_host_fragment_activity_my)
         val appBarConfiguration =
-            AppBarConfiguration(setOf(R.id.navigation_dashboard, R.id.navigation_configuration))
+            AppBarConfiguration(setOf(R.id.navigation_dashboard, R.id.navigation_configuration/*,R.id.navigation_settings*/))
         setupActionBarWithNavController(navController, appBarConfiguration)
         binding.navView.setupWithNavController(navController)
 
@@ -174,15 +174,36 @@ class MainActivity : AppCompatActivity(), ServiceConnection.Callback {
         builder.show()
     }
 
+    private var paused = false
+    override fun onPause() {
+        super.onPause()
+
+        paused = true
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        paused = false
+        logCallback?.invoke(true)
+    }
+
     override fun onServiceWriteLog(message: String?) {
+        if (paused) {
+            if (logList.size > 300) {
+                logList.removeFirst()
+            }
+        }
         logList.addLast(message)
-        logCallback?.invoke(false)
+        if (!paused) {
+            logCallback?.invoke(false)
+        }
     }
 
     override fun onServiceResetLogs(messages: MutableList<String>) {
         logList.clear()
         logList.addAll(messages)
-        logCallback?.invoke(true)
+        if (!paused) logCallback?.invoke(true)
     }
 
     override fun onDestroy() {

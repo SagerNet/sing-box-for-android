@@ -99,6 +99,7 @@ class BoxService(
             newService.start()
         } catch (e: Exception) {
             stopAndAlert(Alert.StartService, e.message)
+            return
         }
 
         boxService = newService

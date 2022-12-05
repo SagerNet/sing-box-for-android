@@ -136,7 +136,7 @@ class DashboardFragment : Fragment() {
         }
 
         fun notifyItemInserted(): Int {
-            if (logList.size > 1000) {
+            if (logList.size > 300) {
                 logList.removeFirst()
                 notifyItemRemoved(0)
             }

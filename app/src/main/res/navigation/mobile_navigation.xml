@@ -17,4 +17,9 @@
         android:label="@string/title_configuration"
         tools:layout="@layout/fragment_configuration" />
 
+    <!--<fragment
+        android:id="@+id/navigation_settings"
+        android:name="io.nekohasekai.sfa.ui.main.SettingsFragment"
+        android:label="@string/title_settings" />-->
+
 </navigation>

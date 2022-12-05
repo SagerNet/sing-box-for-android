@@ -2,10 +2,16 @@ package io.nekohasekai.sfa.bg
 
 import android.content.Intent
 import android.net.VpnService
+import android.os.Build
+import android.util.Log
 import io.nekohasekai.libbox.TunInterface
 import io.nekohasekai.libbox.TunOptions
 
 class VPNService : VpnService(), PlatformInterfaceWrapper {
+
+    companion object {
+        private const val TAG = "VPNService"
+    }
 
     private val service = BoxService(this, this)
 
@@ -13,8 +19,13 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
         service.onStartCommand(intent, flags, startId)
 
     override fun onBind(intent: Intent) = service.onBind(intent)
-    override fun onDestroy() = service.onDestroy()
-    override fun onRevoke() = service.onRevoke()
+    override fun onDestroy() {
+        service.onDestroy()
+    }
+
+    override fun onRevoke() {
+        service.onRevoke()
+    }
 
     override fun autoDetectInterfaceControl(fd: Int) {
         if (!vpnStarted) {
@@ -30,7 +41,13 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
     override fun openTun(options: TunOptions): TunInterface {
         if (prepare(this) != null) error("android: missing vpn permission")
 
-        val builder = Builder().setSession("sing-box").setMtu(options.mtu)
+        val builder = Builder()
+            .setSession("sing-box")
+            .setMtu(options.mtu)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            builder.setMetered(false)
+        }
 
         val inet4Address = options.inet4Address
         if (inet4Address.hasNext()) {

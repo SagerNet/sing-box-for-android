@@ -68,6 +68,8 @@ android {
 
 dependencies {
     implementation(fileTree('libs'))
+    implementation(project(':library:preference'))
+
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'com.google.android.material:material:1.7.0'
@@ -80,10 +82,10 @@ dependencies {
     implementation 'com.blacksquircle.ui:language-json:2.2.0'
     implementation 'androidx.room:room-runtime:2.4.3'
     implementation 'androidx.coordinatorlayout:coordinatorlayout:1.2.0'
+    implementation 'androidx.preference:preference-ktx:1.2.0'
     annotationProcessor 'androidx.room:room-compiler:2.4.3'
     kapt 'androidx.room:room-compiler:2.4.3'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
-    implementation 'androidx.preference:preference-ktx:1.2.0'
 //    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 }
 

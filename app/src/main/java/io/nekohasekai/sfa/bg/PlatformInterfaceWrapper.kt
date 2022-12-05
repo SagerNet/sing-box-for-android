@@ -19,7 +19,6 @@ interface PlatformInterfaceWrapper : PlatformInterface {
         error("invalid argument")
     }
 
-
     override fun useProcFS(): Boolean {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
     }
@@ -47,6 +46,7 @@ interface PlatformInterfaceWrapper : PlatformInterface {
         return packages[0]
     }
 
+    @Suppress("DEPRECATION")
     override fun uidByPackageName(packageName: String): Int {
         return try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
