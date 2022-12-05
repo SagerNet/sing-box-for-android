@@ -2,11 +2,10 @@ package io.nekohasekai.sfa.bg
 
 import android.content.Intent
 import android.net.VpnService
-import io.nekohasekai.libbox.PlatformInterface
 import io.nekohasekai.libbox.TunInterface
 import io.nekohasekai.libbox.TunOptions
 
-class VPNService : VpnService(), PlatformInterface {
+class VPNService : VpnService(), PlatformInterfaceWrapper {
 
     private val service = BoxService(this, this)
 

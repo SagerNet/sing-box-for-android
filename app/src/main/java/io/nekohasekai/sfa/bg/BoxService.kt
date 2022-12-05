@@ -172,7 +172,7 @@ class BoxService(
         stopService()
     }
 
-    fun writeLog(message: String?) {
+    fun writeLog(message: String) {
         binder.broadcast {
             it.onServiceWriteLog(message)
         }
