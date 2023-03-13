@@ -15,7 +15,7 @@ interface PlatformInterfaceWrapper : PlatformInterface {
     override fun autoDetectInterfaceControl(fd: Int) {
     }
 
-    override fun openTun(options: TunOptions): TunInterface {
+    override fun openTun(options: TunOptions): Int {
         error("invalid argument")
     }
 

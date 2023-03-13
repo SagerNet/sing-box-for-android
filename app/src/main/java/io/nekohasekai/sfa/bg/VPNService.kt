@@ -3,8 +3,6 @@ package io.nekohasekai.sfa.bg
 import android.content.Intent
 import android.net.VpnService
 import android.os.Build
-import android.util.Log
-import io.nekohasekai.libbox.TunInterface
 import io.nekohasekai.libbox.TunOptions
 
 class VPNService : VpnService(), PlatformInterfaceWrapper {
@@ -36,9 +34,8 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
         }
     }
 
-    var vpnStarted = false
-
-    override fun openTun(options: TunOptions): TunInterface {
+    private var vpnStarted = false
+    override fun openTun(options: TunOptions): Int {
         if (prepare(this) != null) error("android: missing vpn permission")
 
         val builder = Builder()
@@ -105,18 +102,9 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
 
         val pfd =
             builder.establish() ?: error("android: the application is not prepared or is revoked")
-
+        service.fileDescriptor = pfd
         vpnStarted = true
-        return object : TunInterface {
-            override fun fileDescriptor(): Int {
-                return pfd.fd
-            }
-
-            override fun close() {
-                pfd.close()
-                vpnStarted = false
-            }
-        }
+        return pfd.fd
     }
 
     override fun writeLog(message: String) = service.writeLog(message)

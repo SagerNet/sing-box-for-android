@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.IBinder
+import android.os.ParcelFileDescriptor
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import go.Seq
@@ -57,6 +58,8 @@ class BoxService(
             )
         }
     }
+
+    var fileDescriptor: ParcelFileDescriptor? = null
 
     private val status = MutableLiveData(Status.Stopped)
     private val binder = ServiceBinder(status)
@@ -115,6 +118,11 @@ class BoxService(
         }
         notification.close()
         GlobalScope.launch(Dispatchers.IO) {
+            val pfd = fileDescriptor
+            if (pfd != null) {
+                pfd.close()
+                fileDescriptor = null
+            }
             boxService?.apply {
                 close()
                 Seq.destroyRef(refnum)
