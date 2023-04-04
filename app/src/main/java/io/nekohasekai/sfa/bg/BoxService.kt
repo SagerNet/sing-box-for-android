@@ -17,12 +17,14 @@ import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.constant.Action
 import io.nekohasekai.sfa.constant.Alert
 import io.nekohasekai.sfa.constant.Status
+import io.nekohasekai.sfa.database.Profiles
 import io.nekohasekai.sfa.database.Settings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import java.io.File
 
 class BoxService(
     private val service: Service,
@@ -78,35 +80,45 @@ class BoxService(
 
     private suspend fun startService() {
         initialize()
-
-        val configContent = Settings.configurationContent
-        if (configContent.isBlank()) {
-            stopAndAlert(Alert.EmptyConfiguration)
-            return
-        }
-
-        withContext(Dispatchers.Main) {
-            binder.broadcast {
-                it.onServiceResetLogs(listOf())
-            }
-        }
-
-        val newService = try {
-            Libbox.newService(configContent, platformInterface)
-        } catch (e: Exception) {
-            stopAndAlert(Alert.CreateService, e.message)
-            return
-        }
-
         try {
+            val selectedProfileId = Settings.selectedProfile
+            if (selectedProfileId == -1L) {
+                stopAndAlert(Alert.EmptyConfiguration)
+                return
+            }
+
+            val profile = Profiles.getProfile(selectedProfileId)
+            if (profile == null) {
+                stopAndAlert(Alert.EmptyConfiguration)
+                return
+            }
+
+            val content = File(profile.typed.path).readText()
+            if (content.isBlank()) {
+                stopAndAlert(Alert.EmptyConfiguration)
+                return
+            }
+
+            withContext(Dispatchers.Main) {
+                binder.broadcast {
+                    it.onServiceResetLogs(listOf())
+                }
+            }
+
+            val newService = try {
+                Libbox.newService(content, platformInterface)
+            } catch (e: Exception) {
+                stopAndAlert(Alert.CreateService, e.message)
+                return
+            }
+
             newService.start()
+            boxService = newService
+            status.postValue(Status.Started)
         } catch (e: Exception) {
             stopAndAlert(Alert.StartService, e.message)
             return
         }
-
-        boxService = newService
-        status.postValue(Status.Started)
     }
 
     private fun stopService() {

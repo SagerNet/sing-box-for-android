@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="profile_type">
+        <item>Local</item>
+        <item>Remote</item>
+    </array>
+    <array name="profile_source">
+        <item>Create New</item>
+        <item>Import</item>
+    </array>
+</resources>

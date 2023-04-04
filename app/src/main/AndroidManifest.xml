@@ -54,6 +54,15 @@
                 <action android:name="android.intent.action.CREATE_SHORTCUT" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="io.nekohasekai.sfa.ui.profile.NewProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name="io.nekohasekai.sfa.ui.profile.EditProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name="io.nekohasekai.sfa.ui.profile.EditProfileContentActivity"
+            android:exported="false" />
 
         <service
             android:name=".bg.TileService"

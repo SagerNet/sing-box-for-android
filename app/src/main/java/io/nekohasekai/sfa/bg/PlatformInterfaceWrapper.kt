@@ -5,7 +5,6 @@ import android.os.Build
 import android.os.Process
 import androidx.annotation.RequiresApi
 import io.nekohasekai.libbox.PlatformInterface
-import io.nekohasekai.libbox.TunInterface
 import io.nekohasekai.libbox.TunOptions
 import io.nekohasekai.sfa.Application
 import java.net.InetSocketAddress

@@ -2,15 +2,36 @@
     <string name="app_name">sing-box</string>
 
     <string name="stop">Stop</string>
+
     <string name="title_dashboard">Dashboard</string>
     <string name="title_configuration">Configuration</string>
     <string name="title_settings">Settings</string>
+    <string name="title_new_profile">New Profile</string>
+    <string name="title_edit_profile">Edit Profile</string>
+    <string name="title_edit_configuration">Edit Configuration</string>
 
     <string name="quick_toggle">Toggle</string>
+    <string name="profile_name">Name</string>
+    <string name="profile_type">Type</string>
+    <string name="profile_source">Source</string>
+    <string name="profile_url">URL</string>
+    <string name="profile_import_file">Import File</string>
+    <string name="profile_create">Create</string>
+    <string name="profile_edit_content">Edit Content</string>
+    <string name="profile_check">Check</string>
+    <string name="profile_input_required">Required</string>
+    <string name="profile_empty">Empty profiles</string>
+
+    <string name="menu_undo">Undo</string>
+    <string name="menu_redo">Redo</string>
+    <string name="menu_format">Format</string>
 
     <string name="status_default">Service not started</string>
     <string name="status_starting">Service starting…</string>
     <string name="status_stopping">Service stopping…</string>
     <string name="status_started">Service started</string>
+
+    <string name="error_title">Error</string>
+    <string name="file_manager_missing">Your device lacks an Android standard file selector, please install one, such as Material Files.</string>
 
 </resources>

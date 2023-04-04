@@ -18,6 +18,7 @@ import kotlinx.parcelize.Parcelize
 class Profile(
     @PrimaryKey(autoGenerate = true) var id: Long = 0L,
     var userOrder: Long = 0L,
+    var name: String = "",
     var typed: TypedProfile = TypedProfile()
 ) : Parcelable {
 
@@ -30,13 +31,16 @@ class Profile(
         @Update
         fun update(profile: Profile): Int
 
+        @Update
+        fun update(profile: List<Profile>): Int
+
         @Delete
         fun delete(profile: Profile): Int
 
         @Query("SELECT * FROM profiles WHERE id = :profileId")
         fun get(profileId: Long): Profile?
 
-        @Query("select * from profiles")
+        @Query("select * from profiles order by userOrder asc")
         fun list(): List<Profile>
 
         @Query("DELETE FROM profiles")

@@ -2,7 +2,7 @@ package io.nekohasekai.sfa.constant
 
 object SettingsKey {
 
-    const val CONFIGURATION_CONTENT = "configuration_content"
+    const val SELECTED_PROFILE = "selected_profile"
     const val SERVICE_MODE = "service_mode"
 
     // cache

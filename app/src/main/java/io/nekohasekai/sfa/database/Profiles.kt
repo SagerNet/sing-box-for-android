@@ -17,6 +17,28 @@ object Profiles {
             .build()
     }
 
+    suspend fun nextOrder(): Long {
+        return instance.profileDao().nextOrder() ?: 0
+    }
+
+    suspend fun getProfile(id: Long): Profile? {
+        return instance.profileDao().get(id)
+    }
+
+    suspend fun createProfile(profile: Profile): Profile {
+        profile.id = instance.profileDao().insert(profile)
+        return profile
+    }
+
+    suspend fun updateProfile(profile: Profile): Int {
+        return instance.profileDao().update(profile)
+    }
+
+    suspend fun updateProfiles(profiles: List<Profile>): Int {
+        return instance.profileDao().update(profiles)
+    }
+
+
     suspend fun listProfiles(): List<Profile> {
         return instance.profileDao().list()
     }

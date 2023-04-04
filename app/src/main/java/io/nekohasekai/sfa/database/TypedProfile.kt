@@ -5,19 +5,47 @@ import android.os.Parcelable
 import androidx.room.TypeConverter
 import io.nekohasekai.sfa.ktx.marshall
 import io.nekohasekai.sfa.ktx.unmarshall
+import java.util.Date
 
 class TypedProfile() : Parcelable {
 
-    var content = ""
+    enum class Type {
+        Local, Remote;
+
+        companion object {
+            fun valueOf(value: Int): Type {
+                for (it in values()) {
+                    if (it.ordinal == value) {
+                        return it
+                    }
+                }
+                return Local
+            }
+        }
+    }
+
+    var path = ""
+    var type = Type.Local
+    var remoteURL: String = ""
+    var autoUpdate: Boolean = false
+    var lastUpdated: Date = Date(0)
 
     constructor(reader: Parcel) : this() {
         val version = reader.readInt()
-        content = reader.readString() ?: ""
+        path = reader.readString() ?: ""
+        type = Type.valueOf(reader.readInt())
+        remoteURL = reader.readString() ?: ""
+        autoUpdate = reader.readInt() == 1
+        lastUpdated = Date(reader.readLong())
     }
 
     override fun writeToParcel(writer: Parcel, flags: Int) {
         writer.writeInt(0)
-        writer.writeString(content)
+        writer.writeString(path)
+        writer.writeInt(type.ordinal)
+        writer.writeString(remoteURL)
+        writer.writeInt(if (autoUpdate) 1 else 0)
+        writer.writeLong(lastUpdated.time)
     }
 
     override fun describeContents(): Int {

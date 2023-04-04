@@ -10,11 +10,13 @@ import io.nekohasekai.sfa.constant.SettingsKey
 import io.nekohasekai.sfa.database.preference.KeyValueDatabase
 import io.nekohasekai.sfa.database.preference.RoomPreferenceDataStore
 import io.nekohasekai.sfa.ktx.boolean
+import io.nekohasekai.sfa.ktx.long
 import io.nekohasekai.sfa.ktx.string
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.File
 
 object Settings {
 
@@ -30,7 +32,7 @@ object Settings {
             .build()
     }
     val dataStore = RoomPreferenceDataStore(instance.keyValuePairDao())
-    var configurationContent by dataStore.string(SettingsKey.CONFIGURATION_CONTENT)
+    var selectedProfile by dataStore.long(SettingsKey.SELECTED_PROFILE) { -1L }
     var serviceMode by dataStore.string(SettingsKey.SERVICE_MODE) { ServiceMode.NORMAL }
     var startedByUser by dataStore.boolean(SettingsKey.STARTED_BY_USER)
 
@@ -41,7 +43,7 @@ object Settings {
         }
     }
 
-    fun rebuildServiceMode(): Boolean {
+    suspend fun rebuildServiceMode(): Boolean {
         var newMode = ServiceMode.NORMAL
         try {
             if (needVPNService()) {
@@ -56,9 +58,12 @@ object Settings {
         return true
     }
 
-    private fun needVPNService(): Boolean {
-        val configBody = JSONObject(configurationContent)
-        val inbounds = configBody.getJSONArray("inbounds")
+    private suspend fun needVPNService(): Boolean {
+        val selectedProfileId = selectedProfile
+        if (selectedProfileId == -1L) return false
+        val profile = Profiles.getProfile(selectedProfile) ?: return false
+        val content = JSONObject(File(profile.typed.path).readText())
+        val inbounds = content.getJSONArray("inbounds")
         for (index in 0 until inbounds.length()) {
             val inbound = inbounds.getJSONObject(index)
             if (inbound.getString("type") == "tun") {
