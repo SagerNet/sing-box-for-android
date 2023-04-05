@@ -36,14 +36,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:enabled="false"
             android:hint="@string/profile_type">
 
             <AutoCompleteTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="none"
-                android:text="Local"
+                android:text="@string/profile_type_local"
                 app:simpleItems="@array/profile_type" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -66,7 +65,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="none"
-                    android:text="Create New"
+                    android:text="@string/profile_source_create_new"
                     app:simpleItems="@array/profile_source" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -83,12 +82,35 @@
             </Button>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/fileURL"
+                android:id="@+id/sourceURL"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:hint="@string/profile_url"
                 android:visibility="gone">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/remoteFields"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/remoteURL"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="@string/profile_url">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"

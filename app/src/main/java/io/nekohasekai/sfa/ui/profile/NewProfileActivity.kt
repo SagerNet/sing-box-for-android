@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.InputStream
+import java.util.Date
 
 class NewProfileActivity : AbstractActivity() {
     enum class FileSource(val formatted: String) {
@@ -38,7 +39,7 @@ class NewProfileActivity : AbstractActivity() {
     private val importFile =
         registerForActivityResult(ActivityResultContracts.GetContent()) { fileURI ->
             if (fileURI != null) {
-                binding.fileURL.editText?.setText(fileURI.toString())
+                binding.sourceURL.editText?.setText(fileURI.toString())
             }
         }
 
@@ -55,10 +56,12 @@ class NewProfileActivity : AbstractActivity() {
             when (it) {
                 TypedProfile.Type.Local.name -> {
                     binding.localFields.isVisible = true
+                    binding.remoteFields.isVisible = false
                 }
 
                 TypedProfile.Type.Remote.name -> {
                     binding.localFields.isVisible = false
+                    binding.remoteFields.isVisible = true
                 }
             }
         }
@@ -66,12 +69,12 @@ class NewProfileActivity : AbstractActivity() {
             when (it) {
                 FileSource.CreateNew.formatted -> {
                     binding.importFileButton.isVisible = false
-                    binding.fileURL.isVisible = false
+                    binding.sourceURL.isVisible = false
                 }
 
                 FileSource.Import.formatted -> {
                     binding.importFileButton.isVisible = true
-                    binding.fileURL.isVisible = true
+                    binding.sourceURL.isVisible = true
                 }
             }
         }
@@ -89,12 +92,17 @@ class NewProfileActivity : AbstractActivity() {
             TypedProfile.Type.Local.name -> {
                 when (binding.fileSourceMenu.text) {
                     FileSource.Import.formatted -> {
-                        if (binding.fileURL.showErrorIfEmpty()) {
+                        if (binding.sourceURL.showErrorIfEmpty()) {
                             return
                         }
                     }
                 }
+            }
 
+            TypedProfile.Type.Remote.name -> {
+                if (binding.remoteURL.showErrorIfEmpty()) {
+                    return
+                }
             }
         }
         binding.progressView.isVisible = true
@@ -103,6 +111,7 @@ class NewProfileActivity : AbstractActivity() {
                 createProfile0()
             }.onFailure { e ->
                 withContext(Dispatchers.Main) {
+                    binding.progressView.isVisible = false
                     errorDialogBuilder(e).show()
                 }
             }
@@ -113,6 +122,7 @@ class NewProfileActivity : AbstractActivity() {
         val typedProfile = TypedProfile()
         val profile = Profile(name = binding.name.text, typed = typedProfile)
         profile.userOrder = Profiles.nextOrder()
+
         when (binding.type.text) {
             TypedProfile.Type.Local.name -> {
                 typedProfile.type = TypedProfile.Type.Local
@@ -124,16 +134,15 @@ class NewProfileActivity : AbstractActivity() {
                     }
 
                     FileSource.Import.formatted -> {
-                        val sourceURL = binding.fileURL.text
-                        val content: String
-                        if (sourceURL.startsWith("content://")) {
+                        val sourceURL = binding.sourceURL.text
+                        val content = if (sourceURL.startsWith("content://")) {
                             val inputStream =
                                 contentResolver.openInputStream(Uri.parse(sourceURL)) as InputStream
-                            content = inputStream.use { it.bufferedReader().readText() }
+                            inputStream.use { it.bufferedReader().readText() }
                         } else if (sourceURL.startsWith("file://")) {
-                            content = File(sourceURL).readText()
+                            File(sourceURL).readText()
                         } else if (sourceURL.startsWith("http://") || sourceURL.startsWith("https://")) {
-                            content = HTTPClient().use { it.getString(sourceURL) }
+                            HTTPClient().use { it.getString(sourceURL) }
                         } else {
                             error("unsupported source: $sourceURL")
                         }
@@ -143,6 +152,19 @@ class NewProfileActivity : AbstractActivity() {
                     }
                 }
                 typedProfile.path = configFile.path
+            }
+
+            TypedProfile.Type.Remote.name -> {
+                typedProfile.type = TypedProfile.Type.Remote
+                val configDirectory = File(filesDir, "configs").also { it.mkdirs() }
+                val configFile = File(configDirectory, "${profile.userOrder}.json")
+                val remoteURL = binding.remoteURL.text
+                val content = HTTPClient().use { it.getString(remoteURL) }
+                Libbox.checkConfig(content)
+                configFile.writeText(content)
+                typedProfile.path = configFile.path
+                typedProfile.remoteURL = remoteURL
+                typedProfile.lastUpdated = Date()
             }
         }
         Profiles.create(profile)

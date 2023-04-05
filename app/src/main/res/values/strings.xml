@@ -22,6 +22,16 @@
     <string name="profile_check">Check</string>
     <string name="profile_input_required">Required</string>
     <string name="profile_empty">Empty profiles</string>
+    <string name="profile_last_updated">Last Updated</string>
+    <string name="profile_update">Update</string>
+    <string name="profile_auto_update">Auto Update</string>
+    <string name="profile_auto_update_interval">Auto Update Interval (Minutes)</string>
+    <string name="profile_auto_update_interval_minimum_hint">Minimum value is 15</string>
+
+    <string name="profile_type_local">Local</string>
+    <string name="profile_type_remote">Remote</string>
+    <string name="profile_source_create_new">Create New</string>
+    <string name="profile_source_import">Import</string>
 
     <string name="menu_undo">Undo</string>
     <string name="menu_redo">Redo</string>
@@ -32,6 +42,9 @@
     <string name="status_starting">Service starting…</string>
     <string name="status_stopping">Service stopping…</string>
     <string name="status_started">Service started</string>
+
+    <string name="enabled">Enabled</string>
+    <string name="disabled">Disabled</string>
 
     <string name="error_title">Error</string>
     <string name="file_manager_missing">Your device lacks an Android standard file selector, please install one, such as Material Files.</string>

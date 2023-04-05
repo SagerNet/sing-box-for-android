@@ -6,6 +6,10 @@ import android.content.Context
 import android.net.ConnectivityManager
 import androidx.core.content.getSystemService
 import go.Seq
+import io.nekohasekai.sfa.bg.UpdateProfileWork
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import io.nekohasekai.sfa.Application as BoxApplication
 
 class Application : Application() {
@@ -20,8 +24,11 @@ class Application : Application() {
         super.onCreate()
 
         Seq.setContext(this)
-    }
 
+        GlobalScope.launch(Dispatchers.IO) {
+            UpdateProfileWork.reconfigureUpdater()
+        }
+    }
 
     companion object {
         lateinit var application: BoxApplication
