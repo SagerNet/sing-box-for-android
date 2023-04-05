@@ -56,7 +56,8 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
                 setOf(
                     R.id.navigation_dashboard,
                     R.id.navigation_log,
-                    R.id.navigation_configuration
+                    R.id.navigation_configuration,
+                    R.id.navigation_settings,
                 )
             )
         setupActionBarWithNavController(navController, appBarConfiguration)

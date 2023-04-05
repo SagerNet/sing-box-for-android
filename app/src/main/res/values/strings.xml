@@ -46,6 +46,8 @@
     <string name="enabled">Enabled</string>
     <string name="disabled">Disabled</string>
 
+    <string name="settings_clear_working_directory">Clear Working Directory</string>
+
     <string name="error_title">Error</string>
     <string name="file_manager_missing">Your device lacks an Android standard file selector, please install one, such as Material Files.</string>
 
