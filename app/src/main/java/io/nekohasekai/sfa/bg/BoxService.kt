@@ -11,7 +11,10 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import go.Seq
 import io.nekohasekai.libbox.BoxService
+import io.nekohasekai.libbox.CommandServer
+import io.nekohasekai.libbox.CommandServerHandler
 import io.nekohasekai.libbox.Libbox
+import io.nekohasekai.libbox.PProfServer
 import io.nekohasekai.libbox.PlatformInterface
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.constant.Action
@@ -29,7 +32,7 @@ import java.io.File
 class BoxService(
     private val service: Service,
     private val platformInterface: PlatformInterface
-) {
+) : CommandServerHandler {
 
     companion object {
 
@@ -67,6 +70,8 @@ class BoxService(
     private val binder = ServiceBinder(status)
     private val notification = ServiceNotification(service)
     private var boxService: BoxService? = null
+    private var commandServer: CommandServer? = null
+    private var pprofServer: PProfServer? = null
     private var receiverRegistered = false
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -76,6 +81,13 @@ class BoxService(
                 }
             }
         }
+    }
+
+    private fun startCommandServer() {
+        val commandServer =
+            CommandServer(Application.application.filesDir.absolutePath, this)
+        commandServer.start()
+        this.commandServer = commandServer
     }
 
     private suspend fun startService() {
@@ -114,11 +126,32 @@ class BoxService(
 
             newService.start()
             boxService = newService
+
             status.postValue(Status.Started)
         } catch (e: Exception) {
             stopAndAlert(Alert.StartService, e.message)
             return
         }
+    }
+
+    override fun serviceReload() {
+        GlobalScope.launch(Dispatchers.IO) {
+            val pfd = fileDescriptor
+            if (pfd != null) {
+                pfd.close()
+                fileDescriptor = null
+            }
+            boxService?.apply {
+                close()
+                Seq.destroyRef(refnum)
+            }
+            boxService = null
+            startService()
+        }
+    }
+
+    override fun serviceStop() {
+
     }
 
     private fun stopService() {
@@ -140,6 +173,11 @@ class BoxService(
                 Seq.destroyRef(refnum)
             }
             boxService = null
+            commandServer?.apply {
+                close()
+                Seq.destroyRef(refnum)
+            }
+            commandServer = null
             Settings.startedByUser = false
             withContext(Dispatchers.Main) {
                 status.value = Status.Stopped
@@ -177,6 +215,12 @@ class BoxService(
         notification.show()
         GlobalScope.launch(Dispatchers.IO) {
             Settings.startedByUser = true
+            try {
+                startCommandServer()
+            } catch (e: Exception) {
+                stopAndAlert(Alert.StartCommandServer, e.message)
+                return@launch
+            }
             startService()
         }
         return Service.START_NOT_STICKY

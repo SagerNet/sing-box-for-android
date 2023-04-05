@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
-import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -16,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.database.Profile
 import io.nekohasekai.sfa.database.Profiles
-import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.databinding.FragmentConfigurationBinding
 import io.nekohasekai.sfa.databinding.ViewConfigutationItemBinding
 import io.nekohasekai.sfa.ui.profile.EditProfileActivity
@@ -83,26 +81,10 @@ class ConfigurationFragment : Fragment() {
         RecyclerView.Adapter<Holder>() {
 
         internal var items: MutableList<Profile> = mutableListOf()
-        internal var selectedProfileID = -1L
-        internal var lastSelectedIndex: Int? = null
 
         internal fun reload() {
             scope.launch(Dispatchers.IO) {
                 items = Profiles.list().toMutableList()
-                if (items.isNotEmpty()) {
-                    selectedProfileID = Settings.selectedProfile
-                    for ((index, profile) in items.withIndex()) {
-                        if (profile.id == selectedProfileID) {
-                            lastSelectedIndex = index
-                            break
-                        }
-                    }
-                    if (lastSelectedIndex == null) {
-                        lastSelectedIndex = 0
-                        selectedProfileID = items[0].id
-                        Settings.selectedProfile = selectedProfileID
-                    }
-                }
                 withContext(Dispatchers.Main) {
                     if (items.isEmpty()) {
                         parent.statusText.isVisible = true
@@ -164,20 +146,8 @@ class ConfigurationFragment : Fragment() {
         RecyclerView.ViewHolder(binding.root) {
 
         internal fun bind(profile: Profile) {
-            binding.selectedView.isInvisible = adapter.selectedProfileID != profile.id
             binding.profileName.text = profile.name
             binding.root.setOnClickListener {
-                binding.selectedView.isVisible = true
-                adapter.selectedProfileID = profile.id
-                adapter.lastSelectedIndex?.let { index ->
-                    adapter.notifyItemChanged(index)
-                }
-                adapter.lastSelectedIndex = adapterPosition
-                GlobalScope.launch(Dispatchers.IO) {
-                    Settings.selectedProfile = profile.id
-                }
-            }
-            binding.editButton.setOnClickListener {
                 val intent = Intent(binding.root.context, EditProfileActivity::class.java)
                 intent.putExtra("profile_id", profile.id)
                 it.context.startActivity(intent)

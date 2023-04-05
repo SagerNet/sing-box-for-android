@@ -6,21 +6,127 @@
     android:layout_height="match_parent"
     tools:context=".ui.main.DashboardFragment">
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/statusText"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:gravity="center"
+        android:visibility="gone"
+        android:text="@string/profile_empty"
+        android:textSize="20sp" />
 
-        <TextView
-            android:id="@+id/statusText"
+    <LinearLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/statusCard"
+            style="?attr/materialCardViewElevatedStyle"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="@string/status_default"
-            android:textSize="20sp" />
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Status"
+                    android:textAppearance="?attr/textAppearanceTitleLarge">
+
+                </TextView>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp">
+
+                    <TextView
+                        style="?attr/textAppearanceTitleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Memory" />
+
+                    <TextView
+                        android:id="@+id/memoryText"
+                        style="?attr/textAppearanceBodyMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Loading..." />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="?attr/textAppearanceTitleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Goroutines" />
+
+                    <TextView
+                        android:id="@+id/goroutinesText"
+                        style="?attr/textAppearanceBodyMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Loading..." />
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/profileCard"
+            style="?attr/materialCardViewElevatedStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            tools:visibility="visible">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Profile"
+                    android:textAppearance="?attr/textAppearanceTitleLarge">
+
+                </TextView>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/profileList"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="16dp"
+
+                    tools:itemCount="3"
+                    tools:listitem="@layout/view_profile_item" />
+
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
 
     </LinearLayout>
+
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"

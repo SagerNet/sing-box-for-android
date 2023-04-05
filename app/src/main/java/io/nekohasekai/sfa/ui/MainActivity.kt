@@ -62,7 +62,11 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
         setupActionBarWithNavController(navController, appBarConfiguration)
         binding.navView.setupWithNavController(navController)
 
-        connection.connect()
+        reconnect()
+    }
+
+    fun reconnect() {
+        connection.reconnect()
     }
 
 
@@ -74,7 +78,7 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
         }
         lifecycleScope.launch(Dispatchers.IO) {
             if (Settings.rebuildServiceMode()) {
-                connection.reconnect()
+                reconnect()
             }
             if (Settings.serviceMode == ServiceMode.VPN) {
                 if (prepare()) {
@@ -116,7 +120,7 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
         }
     }
 
-    private suspend fun prepare() = withContext(Dispatchers.Main) {
+    suspend fun prepare() = withContext(Dispatchers.Main) {
         try {
             val intent = VpnService.prepare(this@MainActivity)
             if (intent != null) {
@@ -149,6 +153,11 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
 
             Alert.EmptyConfiguration -> {
                 builder.setMessage("Empty configuration")
+            }
+
+            Alert.StartCommandServer -> {
+                builder.setTitle("Start command server")
+                builder.setMessage(message)
             }
 
             Alert.CreateService -> {

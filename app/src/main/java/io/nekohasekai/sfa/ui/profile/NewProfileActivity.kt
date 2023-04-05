@@ -97,6 +97,7 @@ class NewProfileActivity : AbstractActivity() {
 
             }
         }
+        binding.progressView.isVisible = true
         lifecycleScope.launch(Dispatchers.IO) {
             runCatching {
                 createProfile0()
@@ -131,7 +132,7 @@ class NewProfileActivity : AbstractActivity() {
                             content = inputStream.use { it.bufferedReader().readText() }
                         } else if (sourceURL.startsWith("file://")) {
                             content = File(sourceURL).readText()
-                        } else if (sourceURL.startsWith("http://")) {
+                        } else if (sourceURL.startsWith("http://") || sourceURL.startsWith("https://")) {
                             content = HTTPClient().use { it.getString(sourceURL) }
                         } else {
                             error("unsupported source: $sourceURL")
@@ -146,6 +147,7 @@ class NewProfileActivity : AbstractActivity() {
         }
         Profiles.create(profile)
         withContext(Dispatchers.Main) {
+            binding.progressView.isVisible = false
             finish()
         }
     }
