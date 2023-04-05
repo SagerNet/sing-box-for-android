@@ -14,4 +14,3 @@ dependencyResolutionManagement {
 }
 rootProject.name = "sing-box"
 include ':app'
-include ':library:preference'

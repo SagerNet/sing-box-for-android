@@ -3,7 +3,6 @@ package io.nekohasekai.sfa.utils
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.BuildConfig
 import java.io.Closeable
-import java.io.File
 
 class HTTPClient : Closeable {
 

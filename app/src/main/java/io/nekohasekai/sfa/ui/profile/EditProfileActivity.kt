@@ -51,14 +51,14 @@ class EditProfileActivity : AbstractActivity() {
 
         val profileId = intent.getLongExtra("profile_id", -1L)
         if (profileId == -1L) error("invalid arguments")
-        _profile = Profiles.getProfile(profileId) ?: error("invalid arguments")
+        _profile = Profiles.get(profileId) ?: error("invalid arguments")
         withContext(Dispatchers.Main) {
             binding.name.text = profile.name
             binding.name.addTextChangedListener {
                 GlobalScope.launch(Dispatchers.IO) {
                     try {
                         profile.name = it
-                        Profiles.updateProfile(profile)
+                        Profiles.update(profile)
                     } catch (e: Exception) {
                         errorDialogBuilder(e).show()
                     }

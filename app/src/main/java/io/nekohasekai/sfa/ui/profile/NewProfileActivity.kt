@@ -144,7 +144,7 @@ class NewProfileActivity : AbstractActivity() {
                 typedProfile.path = configFile.path
             }
         }
-        Profiles.createProfile(profile)
+        Profiles.create(profile)
         withContext(Dispatchers.Main) {
             finish()
         }

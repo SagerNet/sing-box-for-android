@@ -5,12 +5,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.database.Profile
 import io.nekohasekai.sfa.database.Profiles
 import io.nekohasekai.sfa.database.Settings
@@ -67,16 +69,21 @@ class ConfigurationFragment : Fragment() {
         _adapter?.reload()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _adapter = null
+    }
+
     class Adapter(private val parent: FragmentConfigurationBinding) :
         RecyclerView.Adapter<Holder>() {
 
-        private var items: List<Profile> = listOf()
+        internal var items: MutableList<Profile> = mutableListOf()
         internal var selectedProfileID = -1L
         internal var lastSelectedIndex: Int? = null
 
         internal fun reload() {
             GlobalScope.launch(Dispatchers.IO) {
-                items = Profiles.listProfiles()
+                items = Profiles.list().toMutableList()
                 if (items.isNotEmpty()) {
                     selectedProfileID = Settings.selectedProfile
                     for ((index, profile) in items.withIndex()) {
@@ -122,7 +129,7 @@ class ConfigurationFragment : Fragment() {
             updated.add(first)
             notifyItemMoved(from, to)
             GlobalScope.launch(Dispatchers.IO) {
-                Profiles.updateProfiles(updated)
+                Profiles.update(updated)
             }
             return true
         }
@@ -169,6 +176,28 @@ class ConfigurationFragment : Fragment() {
                 val intent = Intent(binding.root.context, EditProfileActivity::class.java)
                 intent.putExtra("profile_id", profile.id)
                 it.context.startActivity(intent)
+            }
+            binding.moreButton.setOnClickListener { it ->
+                val popup = PopupMenu(it.context, it)
+                popup.setForceShowIcon(true)
+                popup.menuInflater.inflate(R.menu.profile_menu, popup.menu)
+                popup.setOnMenuItemClickListener {
+                    when (it.itemId) {
+                        R.id.action_delete -> {
+                            adapter.items.remove(profile)
+                            adapter.notifyItemRemoved(adapterPosition)
+                            GlobalScope.launch(Dispatchers.IO) {
+                                runCatching {
+                                    Profiles.delete(profile)
+                                }
+                            }
+                            true
+                        }
+
+                        else -> false
+                    }
+                }
+                popup.show()
             }
         }
     }

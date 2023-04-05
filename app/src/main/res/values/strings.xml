@@ -4,7 +4,8 @@
     <string name="stop">Stop</string>
 
     <string name="title_dashboard">Dashboard</string>
-    <string name="title_configuration">Configuration</string>
+    <string name="title_configuration">Profiles</string>
+    <string name="title_log">Logs</string>
     <string name="title_settings">Settings</string>
     <string name="title_new_profile">New Profile</string>
     <string name="title_edit_profile">Edit Profile</string>
@@ -25,6 +26,7 @@
     <string name="menu_undo">Undo</string>
     <string name="menu_redo">Redo</string>
     <string name="menu_format">Format</string>
+    <string name="menu_delete">Delete</string>
 
     <string name="status_default">Service not started</string>
     <string name="status_starting">Service starting…</string>

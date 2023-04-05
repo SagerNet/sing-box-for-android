@@ -37,6 +37,9 @@ class Profile(
         @Delete
         fun delete(profile: Profile): Int
 
+        @Delete
+        fun delete(profile: List<Profile>): Int
+
         @Query("SELECT * FROM profiles WHERE id = :profileId")
         fun get(profileId: Long): Profile?
 

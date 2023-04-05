@@ -52,6 +52,13 @@
                     android:layout_height="wrap_content"
                     app:icon="@drawable/ic_edit_24" />
 
+                <Button
+                    android:id="@+id/moreButton"
+                    style="?attr/materialIconButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:icon="@drawable/ic_more_vert_24" />
+
             </LinearLayout>
         </LinearLayout>
 

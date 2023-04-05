@@ -111,7 +111,7 @@ class EditProfileContentActivity : AbstractActivity() {
 
         val profileId = intent.getLongExtra("profile_id", -1L)
         if (profileId == -1L) error("invalid arguments")
-        _profile = Profiles.getProfile(profileId) ?: error("invalid arguments")
+        _profile = Profiles.get(profileId) ?: error("invalid arguments")
         val content = File(profile.typed.path).readText()
         withContext(Dispatchers.Main) {
             binding.editor.setTextContent(content)

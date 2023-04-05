@@ -87,7 +87,7 @@ class BoxService(
                 return
             }
 
-            val profile = Profiles.getProfile(selectedProfileId)
+            val profile = Profiles.get(selectedProfileId)
             if (profile == null) {
                 stopAndAlert(Alert.EmptyConfiguration)
                 return
