@@ -8,7 +8,7 @@
         <item>@string/profile_source_create_new</item>
         <item>@string/profile_source_import</item>
     </array>
-    <array name="profile_auto_update">
+    <array name="enabled">
         <item>@string/enabled</item>
         <item>@string/disabled</item>
     </array>

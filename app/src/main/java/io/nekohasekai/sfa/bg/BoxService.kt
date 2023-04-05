@@ -201,7 +201,7 @@ class BoxService(
         }
     }
 
-    fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+    fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (status.value != Status.Stopped) return Service.START_NOT_STICKY
         status.value = Status.Starting
 

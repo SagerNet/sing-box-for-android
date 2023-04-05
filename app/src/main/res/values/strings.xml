@@ -65,5 +65,10 @@
     <string name="core_version">Version</string>
     <string name="core">Core</string>
     <string name="core_data_size">Data Size</string>
+    <string name="analytics_title">Analytics</string>
+    <string name="analytics_message">Would you like to give SFA permission to collect analytics, send crash reports, and check update through AppCenter?</string>
+    <string name="no_thanks">No, thanks</string>
+    <string name="ok">Ok</string>
+    <string name="check_update">Check Update</string>
 
 </resources>

@@ -17,6 +17,7 @@ import io.nekohasekai.sfa.ktx.errorDialogBuilder
 import io.nekohasekai.sfa.ktx.setSimpleItems
 import io.nekohasekai.sfa.ktx.text
 import io.nekohasekai.sfa.ui.shared.AbstractActivity
+import io.nekohasekai.sfa.ui.shared.EnabledType
 import io.nekohasekai.sfa.utils.HTTPClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -28,16 +29,6 @@ import java.text.DateFormat
 import java.util.Date
 
 class EditProfileActivity : AbstractActivity() {
-
-    enum class AutoUpdateType(val boolValue: Boolean) {
-        Enabled(true), Disabled(false);
-
-        companion object {
-            fun from(value: Boolean): AutoUpdateType {
-                return if (value) Enabled else Disabled
-            }
-        }
-    }
 
     private var _binding: ActivityEditProfileBinding? = null
     private val binding get() = _binding!!
@@ -102,8 +93,8 @@ class EditProfileActivity : AbstractActivity() {
                     binding.remoteURL.text = profile.typed.remoteURL
                     binding.lastUpdated.text =
                         DateFormat.getDateTimeInstance().format(profile.typed.lastUpdated)
-                    binding.autoUpdate.text = AutoUpdateType.from(profile.typed.autoUpdate).name
-                    binding.autoUpdate.setSimpleItems(R.array.profile_auto_update)
+                    binding.autoUpdate.text = EnabledType.from(profile.typed.autoUpdate).name
+                    binding.autoUpdate.setSimpleItems(R.array.enabled)
                     binding.autoUpdateInterval.text = profile.typed.autoUpdateInterval.toString()
                 }
             }
@@ -124,7 +115,7 @@ class EditProfileActivity : AbstractActivity() {
     }
 
     private fun updateAutoUpdate(newValue: String) {
-        val boolValue = AutoUpdateType.valueOf(newValue).boolValue
+        val boolValue = EnabledType.valueOf(newValue).boolValue
         if (profile.typed.autoUpdate == boolValue) {
             return
         }

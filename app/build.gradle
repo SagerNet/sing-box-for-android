@@ -22,7 +22,7 @@ android {
         applicationId "io.nekohasekai.sfa"
         minSdk 21
         targetSdk 33
-        versionCode 1
+        versionCode 3
         versionName "1.0"
     }
 
@@ -40,17 +40,20 @@ android {
             if (getProps("KEYSTORE_PASS") != "") {
                 signingConfig signingConfigs.release
             }
+            buildConfigField("String", "APPCENTER_SECRET", "\"" + getProps("APPCENTER_SECRET") + "\"")
         }
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
+            buildConfigField("String", "APPCENTER_SECRET", "\"" + getProps("APPCENTER_SECRET") + "\"")
         }
     }
 
     splits {
         abi {
             enable true
+            universalApk true
         }
     }
 
@@ -86,6 +89,11 @@ dependencies {
     kapt 'androidx.room:room-compiler:2.5.0'
     implementation("androidx.work:work-runtime-ktx:2.8.1")
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+
+    implementation "com.microsoft.appcenter:appcenter-analytics:4.4.5"
+    implementation "com.microsoft.appcenter:appcenter-crashes:4.4.5"
+    implementation "com.microsoft.appcenter:appcenter-distribute:4.4.5"
+
 //    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 }
 

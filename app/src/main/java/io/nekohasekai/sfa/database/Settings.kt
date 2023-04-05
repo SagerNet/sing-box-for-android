@@ -10,6 +10,7 @@ import io.nekohasekai.sfa.constant.SettingsKey
 import io.nekohasekai.sfa.database.preference.KeyValueDatabase
 import io.nekohasekai.sfa.database.preference.RoomPreferenceDataStore
 import io.nekohasekai.sfa.ktx.boolean
+import io.nekohasekai.sfa.ktx.int
 import io.nekohasekai.sfa.ktx.long
 import io.nekohasekai.sfa.ktx.string
 import kotlinx.coroutines.GlobalScope
@@ -35,6 +36,13 @@ object Settings {
     var selectedProfile by dataStore.long(SettingsKey.SELECTED_PROFILE) { -1L }
     var serviceMode by dataStore.string(SettingsKey.SERVICE_MODE) { ServiceMode.NORMAL }
     var startedByUser by dataStore.boolean(SettingsKey.STARTED_BY_USER)
+
+    const val ANALYSIS_UNKNOWN = -1
+    const val ANALYSIS_ALLOWED = 0
+    const val ANALYSIS_DISALLOWED = 1
+
+    var analyticsAllowed by dataStore.int(SettingsKey.ANALYTICS_ALLOWED) { ANALYSIS_UNKNOWN }
+    var checkUpdateEnabled by dataStore.boolean(SettingsKey.CHECK_UPDATE_ENABLED) { true }
 
     fun serviceClass(): Class<*> {
         return when (serviceMode) {

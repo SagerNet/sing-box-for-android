@@ -16,7 +16,12 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.microsoft.appcenter.AppCenter
+import com.microsoft.appcenter.analytics.Analytics
+import com.microsoft.appcenter.crashes.Crashes
+import com.microsoft.appcenter.distribute.Distribute
 import io.nekohasekai.sfa.Application
+import io.nekohasekai.sfa.BuildConfig
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.bg.ServiceConnection
 import io.nekohasekai.sfa.bg.ServiceNotification
@@ -25,6 +30,7 @@ import io.nekohasekai.sfa.constant.ServiceMode
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.databinding.ActivityMainBinding
+import io.nekohasekai.sfa.ktx.errorDialogBuilder
 import io.nekohasekai.sfa.ui.shared.AbstractActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -64,12 +70,65 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
         binding.navView.setupWithNavController(navController)
 
         reconnect()
+        startAnalysis()
     }
 
     fun reconnect() {
         connection.reconnect()
     }
 
+    private fun startAnalysis() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            when (Settings.analyticsAllowed) {
+                Settings.ANALYSIS_UNKNOWN -> {
+                    withContext(Dispatchers.Main) {
+                        showAnalysisDialog()
+                    }
+                }
+
+                Settings.ANALYSIS_ALLOWED -> {
+                    startAnalysisInternal()
+                }
+            }
+        }
+    }
+
+    private fun showAnalysisDialog() {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.analytics_title))
+            .setMessage(getString(R.string.analytics_message))
+            .setPositiveButton(getString(R.string.ok)) { _, _ ->
+                lifecycleScope.launch(Dispatchers.IO) {
+                    Settings.analyticsAllowed = Settings.ANALYSIS_ALLOWED
+                    startAnalysisInternal()
+                }
+            }
+            .setNegativeButton(getString(R.string.no_thanks)) { _, _ ->
+                lifecycleScope.launch(Dispatchers.IO) {
+                    Settings.analyticsAllowed = Settings.ANALYSIS_DISALLOWED
+                }
+            }
+            .show()
+    }
+
+    private suspend fun startAnalysisInternal() {
+        runCatching {
+            AppCenter.start(
+                application,
+                BuildConfig.APPCENTER_SECRET,
+                Analytics::class.java,
+                Crashes::class.java,
+                Distribute::class.java,
+            )
+            if (!Settings.checkUpdateEnabled) {
+                Distribute.disableAutomaticCheckForUpdate()
+            }
+        }.onFailure {
+            withContext(Dispatchers.Main) {
+                errorDialogBuilder(it).show()
+            }
+        }
+    }
 
     @SuppressLint("NewApi")
     fun startService() {

@@ -93,7 +93,7 @@
                     android:layout_height="wrap_content"
                     android:inputType="none"
                     android:text="@string/disabled"
-                    app:simpleItems="@array/profile_auto_update" />
+                    app:simpleItems="@array/enabled" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
