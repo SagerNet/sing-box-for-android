@@ -16,6 +16,8 @@
         android:layout_height="match_parent"
         android:background="@null"
         android:gravity="top|start"
-        android:padding="8dp" />
+        android:padding="8dp"
+        android:textSize="14sp"
+        android:typeface="monospace" />
 
 </LinearLayout>
