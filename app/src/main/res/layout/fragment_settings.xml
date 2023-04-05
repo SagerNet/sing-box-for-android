@@ -6,7 +6,6 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/statusCard"
         style="?attr/materialCardViewElevatedStyle"
@@ -22,7 +21,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Core"
+                android:text="@string/core"
                 android:textAppearance="?attr/textAppearanceTitleLarge">
 
             </TextView>
@@ -34,17 +33,17 @@
 
                 <TextView
                     style="?attr/textAppearanceTitleSmall"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Version" />
+                    android:text="@string/core_version" />
 
                 <TextView
                     android:id="@+id/versionText"
                     style="?attr/textAppearanceBodyMedium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    tools:text="Loading..." />
+                    tools:text="@string/loading" />
 
             </LinearLayout>
 
@@ -54,17 +53,17 @@
 
                 <TextView
                     style="?attr/textAppearanceTitleSmall"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Data Size" />
+                    android:text="@string/core_data_size" />
 
                 <TextView
                     android:id="@+id/dataSizeText"
                     style="?attr/textAppearanceBodyMedium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    tools:text="Loading..." />
+                    tools:text="@string/loading" />
 
             </LinearLayout>
 

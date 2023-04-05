@@ -50,5 +50,20 @@
 
     <string name="error_title">Error</string>
     <string name="file_manager_missing">Your device lacks an Android standard file selector, please install one, such as Material Files.</string>
+    <string name="loading">Loading…</string>
+
+    <string name="service_error_missing_permission">Failed to request VPN permission</string>
+    <string name="service_error_missing_notification_permission">Failed to request notification permission</string>
+    <string name="service_error_empty_configuration">Empty configuration</string>
+    <string name="service_error_title_start_command_server">Start command server</string>
+    <string name="service_error_title_create_service">Create service</string>
+    <string name="service_error_title_start_service">Start service</string>
+    <string name="profile_status">Status</string>
+    <string name="status_memory">Memory</string>
+    <string name="status_goroutines">Goroutines</string>
+    <string name="profile">Profile</string>
+    <string name="core_version">Version</string>
+    <string name="core">Core</string>
+    <string name="core_data_size">Data Size</string>
 
 </resources>

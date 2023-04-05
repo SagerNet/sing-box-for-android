@@ -46,7 +46,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="none"
-                android:text="Local"
+                android:text="@string/profile_type_local"
                 app:simpleItems="@array/profile_type" />
 
         </com.google.android.material.textfield.TextInputLayout>

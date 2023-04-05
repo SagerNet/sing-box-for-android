@@ -145,38 +145,31 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
         builder.setPositiveButton(resources.getString(android.R.string.ok), null)
         when (type) {
             Alert.RequestVPNPermission -> {
-                builder.setMessage("Failed to request VPN permission")
+                builder.setMessage(getString(R.string.service_error_missing_permission))
             }
 
             Alert.RequestNotificationPermission -> {
-                builder.setMessage("Failed to request notification permission")
+                builder.setMessage(getString(R.string.service_error_missing_notification_permission))
             }
 
             Alert.EmptyConfiguration -> {
-                builder.setMessage("Empty configuration")
+                builder.setMessage(getString(R.string.service_error_empty_configuration))
             }
 
             Alert.StartCommandServer -> {
-                builder.setTitle("Start command server")
+                builder.setTitle(getString(R.string.service_error_title_start_command_server))
                 builder.setMessage(message)
             }
 
             Alert.CreateService -> {
-                if (message.isNullOrBlank()) {
-                    builder.setMessage("create service")
-                } else {
-                    builder.setTitle("Create service")
-                    builder.setMessage(message)
-                }
+                builder.setTitle(getString(R.string.service_error_title_create_service))
+                builder.setMessage(message)
             }
 
             Alert.StartService -> {
-                if (message.isNullOrBlank()) {
-                    builder.setMessage("start service")
-                } else {
-                    builder.setTitle("Start service")
-                    builder.setMessage(message)
-                }
+                builder.setTitle(getString(R.string.service_error_title_start_service))
+                builder.setMessage(message)
+
             }
         }
         builder.show()

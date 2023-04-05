@@ -37,7 +37,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Status"
+                    android:text="@string/profile_status"
                     android:textAppearance="?attr/textAppearanceTitleLarge">
 
                 </TextView>
@@ -49,17 +49,17 @@
 
                     <TextView
                         style="?attr/textAppearanceTitleSmall"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Memory" />
+                        android:text="@string/status_memory" />
 
                     <TextView
                         android:id="@+id/memoryText"
                         style="?attr/textAppearanceBodyMedium"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Loading..." />
+                        android:text="@string/loading" />
 
                 </LinearLayout>
 
@@ -69,17 +69,17 @@
 
                     <TextView
                         style="?attr/textAppearanceTitleSmall"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Goroutines" />
+                        android:text="@string/status_goroutines" />
 
                     <TextView
                         android:id="@+id/goroutinesText"
                         style="?attr/textAppearanceBodyMedium"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Loading..." />
+                        android:text="@string/loading" />
 
                 </LinearLayout>
 
@@ -105,7 +105,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Profile"
+                    android:text="@string/profile"
                     android:textAppearance="?attr/textAppearanceTitleLarge">
 
                 </TextView>

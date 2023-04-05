@@ -149,8 +149,8 @@ class DashboardFragment : Fragment(), CommandClientHandler {
         connected = true
         val binding = _binding ?: return
         lifecycleScope.launch(Dispatchers.Main) {
-            binding.memoryText.text = "Loading..."
-            binding.goroutinesText.text = "Loading..."
+            binding.memoryText.text = getString(R.string.loading)
+            binding.goroutinesText.text = getString(R.string.loading)
         }
     }
 
@@ -158,8 +158,8 @@ class DashboardFragment : Fragment(), CommandClientHandler {
         connected = false
         val binding = _binding ?: return
         lifecycleScope.launch(Dispatchers.Main) {
-            binding.memoryText.text = "Loading..."
-            binding.goroutinesText.text = "Loading..."
+            binding.memoryText.text = getString(R.string.loading)
+            binding.goroutinesText.text = getString(R.string.loading)
         }
     }
 
