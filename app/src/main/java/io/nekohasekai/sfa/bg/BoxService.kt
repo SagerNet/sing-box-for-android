@@ -149,6 +149,7 @@ class BoxService(
     }
 
     private suspend fun stopAndAlert(type: Alert, message: String? = null) {
+        Settings.startedByUser = false
         withContext(Dispatchers.Main) {
             if (receiverRegistered) {
                 service.unregisterReceiver(receiver)

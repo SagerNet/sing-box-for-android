@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.database.Profile
@@ -20,7 +21,6 @@ import io.nekohasekai.sfa.ktx.text
 import io.nekohasekai.sfa.ui.shared.AbstractActivity
 import io.nekohasekai.sfa.utils.HTTPClient
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -97,7 +97,7 @@ class NewProfileActivity : AbstractActivity() {
 
             }
         }
-        GlobalScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch(Dispatchers.IO) {
             runCatching {
                 createProfile0()
             }.onFailure { e ->

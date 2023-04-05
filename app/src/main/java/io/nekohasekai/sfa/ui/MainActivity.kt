@@ -8,7 +8,6 @@ import android.net.VpnService
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
@@ -16,9 +15,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.color.DynamicColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.elevation.SurfaceColors
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.bg.ServiceConnection
@@ -28,12 +25,13 @@ import io.nekohasekai.sfa.constant.ServiceMode
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.databinding.ActivityMainBinding
+import io.nekohasekai.sfa.ui.shared.AbstractActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.LinkedList
 
-class MainActivity : AppCompatActivity(), ServiceConnection.Callback {
+class MainActivity : AbstractActivity(), ServiceConnection.Callback {
 
     companion object {
         private const val TAG = "MyActivity"
@@ -49,18 +47,18 @@ class MainActivity : AppCompatActivity(), ServiceConnection.Callback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        DynamicColors.applyToActivityIfAvailable(this)
-
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val color = SurfaceColors.SURFACE_2.getColor(this)
-        window.statusBarColor = color
-        window.navigationBarColor = color
-
         val navController = findNavController(R.id.nav_host_fragment_activity_my)
         val appBarConfiguration =
-            AppBarConfiguration(setOf(R.id.navigation_dashboard, R.id.navigation_configuration/*,R.id.navigation_settings*/))
+            AppBarConfiguration(
+                setOf(
+                    R.id.navigation_dashboard,
+                    R.id.navigation_log,
+                    R.id.navigation_configuration
+                )
+            )
         setupActionBarWithNavController(navController, appBarConfiguration)
         binding.navView.setupWithNavController(navController)
 

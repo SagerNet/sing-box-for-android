@@ -9,6 +9,7 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,6 +21,7 @@ import io.nekohasekai.sfa.databinding.FragmentConfigurationBinding
 import io.nekohasekai.sfa.databinding.ViewConfigutationItemBinding
 import io.nekohasekai.sfa.ui.profile.EditProfileActivity
 import io.nekohasekai.sfa.ui.profile.NewProfileActivity
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -38,7 +40,7 @@ class ConfigurationFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         val binding = FragmentConfigurationBinding.inflate(inflater, container, false)
-        adapter = Adapter(binding)
+        adapter = Adapter(lifecycleScope, binding)
         binding.profileList.also {
             it.layoutManager = LinearLayoutManager(requireContext())
             it.adapter = adapter
@@ -74,7 +76,10 @@ class ConfigurationFragment : Fragment() {
         _adapter = null
     }
 
-    class Adapter(private val parent: FragmentConfigurationBinding) :
+    class Adapter(
+        internal val scope: CoroutineScope,
+        private val parent: FragmentConfigurationBinding
+    ) :
         RecyclerView.Adapter<Holder>() {
 
         internal var items: MutableList<Profile> = mutableListOf()
@@ -82,7 +87,7 @@ class ConfigurationFragment : Fragment() {
         internal var lastSelectedIndex: Int? = null
 
         internal fun reload() {
-            GlobalScope.launch(Dispatchers.IO) {
+            scope.launch(Dispatchers.IO) {
                 items = Profiles.list().toMutableList()
                 if (items.isNotEmpty()) {
                     selectedProfileID = Settings.selectedProfile
@@ -186,7 +191,7 @@ class ConfigurationFragment : Fragment() {
                         R.id.action_delete -> {
                             adapter.items.remove(profile)
                             adapter.notifyItemRemoved(adapterPosition)
-                            GlobalScope.launch(Dispatchers.IO) {
+                            adapter.scope.launch(Dispatchers.IO) {
                                 runCatching {
                                     Profiles.delete(profile)
                                 }

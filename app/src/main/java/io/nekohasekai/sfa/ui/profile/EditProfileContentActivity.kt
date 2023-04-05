@@ -16,7 +16,6 @@ import io.nekohasekai.sfa.databinding.ActivityEditProfileContentBinding
 import io.nekohasekai.sfa.ktx.errorDialogBuilder
 import io.nekohasekai.sfa.ui.shared.AbstractActivity
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -39,7 +38,7 @@ class EditProfileContentActivity : AbstractActivity() {
 
         binding.editor.language = JsonLanguage()
 
-        GlobalScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch(Dispatchers.IO) {
             runCatching {
                 loadConfiguration()
             }.onFailure {

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.database.Profile
@@ -15,7 +16,6 @@ import io.nekohasekai.sfa.ktx.errorDialogBuilder
 import io.nekohasekai.sfa.ktx.text
 import io.nekohasekai.sfa.ui.shared.AbstractActivity
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -35,7 +35,7 @@ class EditProfileActivity : AbstractActivity() {
         setContentView(binding.root)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        GlobalScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch(Dispatchers.IO) {
             runCatching {
                 loadProfile()
             }.onFailure {
@@ -55,7 +55,7 @@ class EditProfileActivity : AbstractActivity() {
         withContext(Dispatchers.Main) {
             binding.name.text = profile.name
             binding.name.addTextChangedListener {
-                GlobalScope.launch(Dispatchers.IO) {
+                lifecycleScope.launch(Dispatchers.IO) {
                     try {
                         profile.name = it
                         Profiles.update(profile)
@@ -89,7 +89,7 @@ class EditProfileActivity : AbstractActivity() {
 
     private fun checkProfile(button: View) {
         binding.progressView.isVisible = true
-        GlobalScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch(Dispatchers.IO) {
             delay(200)
             try {
                 Libbox.checkConfig(File(profile.typed.path).readText())
