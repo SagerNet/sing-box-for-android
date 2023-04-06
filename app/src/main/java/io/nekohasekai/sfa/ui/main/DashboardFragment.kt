@@ -139,6 +139,7 @@ class DashboardFragment : Fragment(), CommandClientHandler {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        _adapter = null
         _binding = null
         disconnect()
     }
