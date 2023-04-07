@@ -142,7 +142,11 @@ class BoxService(
                 fileDescriptor = null
             }
             boxService?.apply {
-                close()
+                runCatching {
+                    close()
+                }.onFailure {
+                    writeLog("service: error when closing: $it")
+                }
                 Seq.destroyRef(refnum)
             }
             boxService = null
@@ -169,7 +173,11 @@ class BoxService(
                 fileDescriptor = null
             }
             boxService?.apply {
-                close()
+                runCatching {
+                    close()
+                }.onFailure {
+                    writeLog("service: error when closing: $it")
+                }
                 Seq.destroyRef(refnum)
             }
             boxService = null
