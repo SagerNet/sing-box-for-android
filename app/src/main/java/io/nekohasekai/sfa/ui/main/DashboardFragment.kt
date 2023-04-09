@@ -282,7 +282,9 @@ class DashboardFragment : Fragment(), CommandClientHandler {
             runCatching {
                 Libbox.clientServiceReload(mainActivity.filesDir.absolutePath)
             }.onFailure {
-                mainActivity.errorDialogBuilder(it).show()
+                withContext(Dispatchers.Main) {
+                    mainActivity.errorDialogBuilder(it).show()
+                }
             }
         }
     }
