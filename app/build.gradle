@@ -20,7 +20,7 @@ android {
         applicationId "io.nekohasekai.sfa"
         minSdk 21
         targetSdk 33
-        versionCode 6
+        versionCode 9
         versionName "1.0"
     }
 
@@ -97,6 +97,7 @@ if (getProps("APPCENTER_TOKEN") != "") {
         apiToken = getProps("APPCENTER_TOKEN")
         ownerName = getProps("APPCENTER_OWNER")
         distributionGroups = [getProps("APPCENTER_GROUP")]
+        releaseNotes = getProps("RELEASE_NOTES")
         notifyTesters = true
         apps {
             release {

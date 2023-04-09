@@ -42,6 +42,9 @@ class BoxService(
             val baseDir = Application.application.getExternalFilesDir(null) ?: return
             baseDir.mkdirs()
             Libbox.setBasePath(baseDir.path)
+            val tempDir = Application.application.cacheDir
+            tempDir.mkdirs()
+            Libbox.setTempPath(tempDir.path)
             initializeOnce = true
             return
         }
