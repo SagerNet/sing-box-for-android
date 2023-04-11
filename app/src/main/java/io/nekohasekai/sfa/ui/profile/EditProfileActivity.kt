@@ -20,7 +20,6 @@ import io.nekohasekai.sfa.ui.shared.AbstractActivity
 import io.nekohasekai.sfa.ui.shared.EnabledType
 import io.nekohasekai.sfa.utils.HTTPClient
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -95,6 +94,7 @@ class EditProfileActivity : AbstractActivity() {
                         DateFormat.getDateTimeInstance().format(profile.typed.lastUpdated)
                     binding.autoUpdate.text = EnabledType.from(profile.typed.autoUpdate).name
                     binding.autoUpdate.setSimpleItems(R.array.enabled)
+                    binding.autoUpdateInterval.isVisible = profile.typed.autoUpdate
                     binding.autoUpdateInterval.text = profile.typed.autoUpdateInterval.toString()
                 }
             }

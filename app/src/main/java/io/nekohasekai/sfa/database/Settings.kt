@@ -15,7 +15,6 @@ import io.nekohasekai.sfa.ktx.long
 import io.nekohasekai.sfa.ktx.string
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.json.JSONException
 import org.json.JSONObject
 import java.io.File
 
@@ -57,7 +56,7 @@ object Settings {
             if (needVPNService()) {
                 newMode = ServiceMode.VPN
             }
-        } catch (_: JSONException) {
+        } catch (_: Exception) {
         }
         if (serviceMode == newMode) {
             return false

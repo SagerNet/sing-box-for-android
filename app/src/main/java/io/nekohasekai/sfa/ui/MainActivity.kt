@@ -39,6 +39,7 @@ import io.nekohasekai.sfa.databinding.ActivityMainBinding
 import io.nekohasekai.sfa.ktx.errorDialogBuilder
 import io.nekohasekai.sfa.ui.shared.AbstractActivity
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.LinkedList
@@ -141,6 +142,16 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback, DistributeL
     }
 
     override fun onReleaseAvailable(activity: Activity, releaseDetails: ReleaseDetails): Boolean {
+        lifecycleScope.launch(Dispatchers.Main) {
+            delay(2000L)
+            runCatching {
+                onReleaseAvailable0(releaseDetails)
+            }
+        }
+        return true
+    }
+
+    private fun onReleaseAvailable0(releaseDetails: ReleaseDetails) {
         val builder = MaterialAlertDialogBuilder(this)
             .setTitle(getString(com.microsoft.appcenter.distribute.R.string.appcenter_distribute_update_dialog_title))
         var message = if (releaseDetails.isMandatoryUpdate) {
@@ -171,7 +182,6 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback, DistributeL
             }
         }
         builder.show()
-        return true
     }
 
     override fun onNoReleaseAvailable(activity: Activity) {
