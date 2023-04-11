@@ -100,7 +100,7 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback, DistributeL
     }
 
     private fun showAnalysisDialog() {
-        MaterialAlertDialogBuilder(this)
+        val builder = MaterialAlertDialogBuilder(this)
             .setTitle(getString(R.string.analytics_title))
             .setMessage(getString(R.string.analytics_message))
             .setPositiveButton(getString(R.string.ok)) { _, _ ->
@@ -114,7 +114,7 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback, DistributeL
                     Settings.analyticsAllowed = Settings.ANALYSIS_DISALLOWED
                 }
             }
-            .show()
+        runCatching { builder.show() }
     }
 
     suspend fun startAnalysisInternal() {

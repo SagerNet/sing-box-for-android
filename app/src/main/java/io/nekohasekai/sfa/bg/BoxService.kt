@@ -45,6 +45,7 @@ class BoxService(
             val tempDir = Application.application.cacheDir
             tempDir.mkdirs()
             Libbox.setTempPath(tempDir.path)
+            Libbox.redirectStderr(File(baseDir, "stderr.log").path)
             initializeOnce = true
             return
         }

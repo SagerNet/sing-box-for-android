@@ -20,7 +20,7 @@ android {
         applicationId "io.nekohasekai.sfa"
         minSdk 21
         targetSdk 33
-        versionCode 9
+        versionCode 12
         versionName "1.0"
     }
 
