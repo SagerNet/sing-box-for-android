@@ -50,11 +50,6 @@ class DashboardFragment : Fragment(), CommandClientHandler {
         return binding.root
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        if (_binding != null) onCreate()
-    }
-
     private fun onCreate() {
         val activity = activity ?: return
 
@@ -144,10 +139,7 @@ class DashboardFragment : Fragment(), CommandClientHandler {
         disconnect()
     }
 
-    private var connected = false
-
     override fun connected() {
-        connected = true
         val binding = _binding ?: return
         lifecycleScope.launch(Dispatchers.Main) {
             binding.memoryText.text = getString(R.string.loading)
@@ -156,7 +148,6 @@ class DashboardFragment : Fragment(), CommandClientHandler {
     }
 
     override fun disconnected(message: String?) {
-        connected = false
         val binding = _binding ?: return
         lifecycleScope.launch(Dispatchers.Main) {
             binding.memoryText.text = getString(R.string.loading)
@@ -172,13 +163,6 @@ class DashboardFragment : Fragment(), CommandClientHandler {
         lifecycleScope.launch(Dispatchers.Main) {
             binding.memoryText.text = Libbox.formatBytes(message.memory)
             binding.goroutinesText.text = message.goroutines.toString()
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (!connected) {
-            reconnect()
         }
     }
 
