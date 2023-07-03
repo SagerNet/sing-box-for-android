@@ -15,6 +15,7 @@ import io.nekohasekai.libbox.CommandClient
 import io.nekohasekai.libbox.CommandClientHandler
 import io.nekohasekai.libbox.CommandClientOptions
 import io.nekohasekai.libbox.Libbox
+import io.nekohasekai.libbox.OutboundGroupIterator
 import io.nekohasekai.libbox.StatusMessage
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.bg.BoxService
@@ -166,6 +167,9 @@ class DashboardFragment : Fragment(), CommandClientHandler {
         }
     }
 
+    override fun writeGroups(message: OutboundGroupIterator?) {
+    }
+
     class Adapter(
         internal val scope: CoroutineScope,
         private val parent: FragmentDashboardBinding
@@ -264,7 +268,7 @@ class DashboardFragment : Fragment(), CommandClientHandler {
                 return
             }
             runCatching {
-                Libbox.clientServiceReload(mainActivity.filesDir.absolutePath)
+                Libbox.newStandaloneCommandClient(mainActivity.filesDir.absolutePath).serviceReload()
             }.onFailure {
                 withContext(Dispatchers.Main) {
                     mainActivity.errorDialogBuilder(it).show()

@@ -88,7 +88,7 @@ class BoxService(
 
     private fun startCommandServer() {
         val commandServer =
-            CommandServer(Application.application.filesDir.absolutePath, this)
+            CommandServer(Application.application.filesDir.absolutePath, this, 300)
         commandServer.start()
         this.commandServer = commandServer
     }
@@ -158,10 +158,6 @@ class BoxService(
             boxService = null
             startService()
         }
-    }
-
-    override fun serviceStop() {
-
     }
 
     private fun stopService() {
