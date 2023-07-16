@@ -1,229 +1,294 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:orientation="vertical">
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/appCenterCard"
-        style="?attr/materialCardViewElevatedStyle"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <LinearLayout
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/appCenterCard"
+            style="?attr/materialCardViewElevatedStyle"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:layout_height="wrap_content">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/title_app_center"
-                android:textAppearance="?attr/textAppearanceTitleLarge" />
-
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/appCenterEnabled"
-                style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:hint="@string/enabled">
+                android:orientation="vertical"
+                android:padding="16dp">
 
-                <AutoCompleteTextView
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/title_app_center"
+                    android:textAppearance="?attr/textAppearanceTitleLarge" />
+
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/appCenterEnabled"
+                    style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="none"
-                    android:text="@string/disabled"
-                    app:simpleItems="@array/enabled" />
+                    android:layout_marginTop="16dp"
+                    android:hint="@string/enabled">
 
-            </com.google.android.material.textfield.TextInputLayout>
+                    <AutoCompleteTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"
+                        android:text="@string/disabled"
+                        app:simpleItems="@array/enabled" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/checkUpdateEnabled"
-                style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:hint="@string/check_update">
+                </com.google.android.material.textfield.TextInputLayout>
 
-                <AutoCompleteTextView
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/checkUpdateEnabled"
+                    style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="none"
-                    android:text="@string/disabled"
-                    app:simpleItems="@array/enabled" />
+                    android:layout_marginTop="8dp"
+                    android:hint="@string/check_update">
 
-            </com.google.android.material.textfield.TextInputLayout>
+                    <AutoCompleteTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"
+                        android:text="@string/disabled"
+                        app:simpleItems="@array/enabled" />
 
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
+                </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/statusCard"
-        style="?attr/materialCardViewElevatedStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp">
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-        <LinearLayout
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/statusCard"
+            style="?attr/materialCardViewElevatedStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingStart="16dp"
-            android:paddingTop="16dp"
-            android:paddingEnd="16dp"
-            android:paddingBottom="8dp">
+            android:layout_marginTop="16dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/core"
-                android:textAppearance="?attr/textAppearanceTitleLarge">
-
-            </TextView>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/disableMemoryLimit"
-                style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:hint="@string/memory_limit">
+                android:orientation="vertical"
+                android:paddingStart="16dp"
+                android:paddingTop="16dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="8dp">
 
-                <AutoCompleteTextView
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/core"
+                    android:textAppearance="?attr/textAppearanceTitleLarge">
+
+                </TextView>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/disableMemoryLimit"
+                    style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="none"
-                    android:text="@string/enabled"
-                    app:simpleItems="@array/enabled" />
+                    android:layout_marginTop="8dp"
+                    android:hint="@string/memory_limit">
 
-            </com.google.android.material.textfield.TextInputLayout>
+                    <AutoCompleteTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"
+                        android:text="@string/enabled"
+                        app:simpleItems="@array/enabled" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp">
+                </com.google.android.material.textfield.TextInputLayout>
 
-                <TextView
-                    style="?attr/textAppearanceTitleSmall"
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/core_version" />
+                    android:layout_marginTop="16dp">
 
-                <TextView
-                    android:id="@+id/versionText"
-                    style="?attr/textAppearanceBodyMedium"
-                    android:layout_width="wrap_content"
+                    <TextView
+                        style="?attr/textAppearanceTitleSmall"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/core_version" />
+
+                    <TextView
+                        android:id="@+id/versionText"
+                        style="?attr/textAppearanceBodyMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        tools:text="@string/loading" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="?attr/textAppearanceTitleSmall"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/core_data_size" />
+
+                    <TextView
+                        android:id="@+id/dataSizeText"
+                        style="?attr/textAppearanceBodyMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="@string/loading" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    tools:text="@string/loading" />
+                    android:layout_marginTop="8dp"
+                    android:gravity="center_vertical|end"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/clearButton"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/settings_clear_working_directory"
+                        android:textColor="#E91E63" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
 
-                <TextView
-                    style="?attr/textAppearanceTitleSmall"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/core_data_size" />
+        </com.google.android.material.card.MaterialCardView>
 
-                <TextView
-                    android:id="@+id/dataSizeText"
-                    style="?attr/textAppearanceBodyMedium"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    tools:text="@string/loading" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:gravity="center_vertical|end"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/clearButton"
-                    style="@style/Widget.Material3.Button.TextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/settings_clear_working_directory"
-                    android:textColor="#E91E63" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-
-    </com.google.android.material.card.MaterialCardView>
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/aboutCard"
-        style="?attr/materialCardViewElevatedStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp">
-
-        <LinearLayout
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/backgroundPermissionCard"
+            style="?attr/materialCardViewElevatedStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingStart="16dp"
-            android:paddingTop="16dp"
-            android:paddingEnd="16dp"
-            android:paddingBottom="8dp">
+            android:layout_marginTop="16dp"
+            android:visibility="gone"
+            tools:visibility="visible">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/about_title"
-                android:textAppearance="?attr/textAppearanceTitleLarge">
-
-            </TextView>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/app_description" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical|end"
-                android:orientation="horizontal">
+                android:orientation="vertical"
+                android:paddingStart="16dp"
+                android:paddingTop="16dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="8dp">
 
-                <Button
-                    android:id="@+id/documentationButton"
-                    style="@style/Widget.Material3.Button.TextButton"
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/documentation_button" />
+                    android:text="@string/background_permission"
+                    android:textAppearance="?attr/textAppearanceTitleLarge">
 
-                <Button
-                    android:id="@+id/communityButton"
-                    style="@style/Widget.Material3.Button.TextButton"
+                </TextView>
+
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/community_button" />
+                    android:layout_marginTop="8dp"
+                    android:text="@string/background_permission_description" />
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical|end"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/dontKillMyAppButton"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/read_more" />
+
+                    <Button
+                        android:id="@+id/requestIgnoreBatteryOptimizationsButton"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/request_background_permission" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/aboutCard"
+            style="?attr/materialCardViewElevatedStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="16dp"
+                android:paddingTop="16dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/about_title"
+                    android:textAppearance="?attr/textAppearanceTitleLarge">
+
+                </TextView>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/app_description" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical|end"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/documentationButton"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/documentation_button" />
+
+                    <Button
+                        android:id="@+id/communityButton"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/community_button" />
+                </LinearLayout>
+
+
             </LinearLayout>
 
 
-        </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
+    </LinearLayout>
 
-    </com.google.android.material.card.MaterialCardView>
-
-
-</LinearLayout>
+</ScrollView>

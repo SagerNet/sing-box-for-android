@@ -4,6 +4,7 @@ import android.app.Application
 import android.app.NotificationManager
 import android.content.Context
 import android.net.ConnectivityManager
+import android.os.PowerManager
 import androidx.core.content.getSystemService
 import go.Seq
 import io.nekohasekai.sfa.bg.UpdateProfileWork
@@ -35,6 +36,7 @@ class Application : Application() {
         val notification by lazy { application.getSystemService<NotificationManager>()!! }
         val connectivity by lazy { application.getSystemService<ConnectivityManager>()!! }
         val packageManager by lazy { application.packageManager }
+        val powerManager by lazy { application.getSystemService<PowerManager>()!! }
     }
 
 }
