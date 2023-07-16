@@ -79,5 +79,6 @@
     <string name="app_description">Android client for sing-box, the universal proxy platform.</string>
     <string name="documentation_button">Documentation</string>
     <string name="community_button">Community</string>
+    <string name="memory_limit">Memory Limit</string>
 
 </resources>

@@ -74,6 +74,12 @@ class SettingsFragment : Fragment() {
                 }
             }
         }
+        binding.disableMemoryLimit.addTextChangedListener {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val newValue = EnabledType.valueOf(it).boolValue
+                Settings.disableMemoryLimit = !newValue
+            }
+        }
         binding.communityButton.setOnClickListener {
             it.context.launchCustomTab("https://community.sagernet.org/")
         }
@@ -97,6 +103,8 @@ class SettingsFragment : Fragment() {
             binding.checkUpdateEnabled.isEnabled = appCenterEnabled
             binding.checkUpdateEnabled.text = EnabledType.from(checkUpdateEnabled).name
             binding.checkUpdateEnabled.setSimpleItems(R.array.enabled)
+            binding.disableMemoryLimit.text = EnabledType.from(!Settings.disableMemoryLimit).name
+            binding.disableMemoryLimit.setSimpleItems(R.array.enabled)
         }
     }
 

@@ -122,6 +122,7 @@ class BoxService(
 
             DefaultNetworkMonitor.start()
             Libbox.registerLocalDNSTransport(LocalResolver)
+            Libbox.setMemoryLimit(!Settings.disableMemoryLimit)
 
             val newService = try {
                 Libbox.newService(content, platformInterface)

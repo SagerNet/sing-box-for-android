@@ -42,6 +42,7 @@ object Settings {
 
     var analyticsAllowed by dataStore.int(SettingsKey.ANALYTICS_ALLOWED) { ANALYSIS_UNKNOWN }
     var checkUpdateEnabled by dataStore.boolean(SettingsKey.CHECK_UPDATE_ENABLED) { true }
+    var disableMemoryLimit by dataStore.boolean(SettingsKey.DISABLE_MEMORY_LIMIT)
 
     fun serviceClass(): Class<*> {
         return when (serviceMode) {
