@@ -58,9 +58,16 @@
     <string name="service_error_title_start_command_server">Start command server</string>
     <string name="service_error_title_create_service">Create service</string>
     <string name="service_error_title_start_service">Start service</string>
-    <string name="profile_status">Status</string>
+
     <string name="status_memory">Memory</string>
     <string name="status_goroutines">Goroutines</string>
+    <string name="status_inbound_connections">Inbound Connections</string>
+    <string name="status_outbound_connections">Outbound Connections</string>
+    <string name="status_uplink">Uplink</string>
+    <string name="status_downlink">Downlink</string>
+    <string name="status_uplink_total">Uplink Total</string>
+    <string name="status_downlink_total">Downlink Total</string>
+
     <string name="profile">Profile</string>
     <string name="core_version">Version</string>
     <string name="core">Core</string>

@@ -1,6 +1,7 @@
 package io.nekohasekai.sfa.ui.main
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -64,7 +65,7 @@ class DashboardFragment : Fragment(), CommandClientHandler {
         binding.profileList.addItemDecoration(divider)
 
         activity.serviceStatus.observe(viewLifecycleOwner) {
-            binding.statusCard.isVisible = it == Status.Starting || it == Status.Started
+            binding.statusContainer.isVisible = it == Status.Starting || it == Status.Started
             when (it) {
                 Status.Stopped -> {
                     binding.fab.setImageResource(R.drawable.ic_play_arrow_24)
@@ -164,6 +165,16 @@ class DashboardFragment : Fragment(), CommandClientHandler {
         lifecycleScope.launch(Dispatchers.Main) {
             binding.memoryText.text = Libbox.formatBytes(message.memory)
             binding.goroutinesText.text = message.goroutines.toString()
+            val trafficAvailable = message.trafficAvailable
+            binding.trafficContainer.isVisible = trafficAvailable
+            if (trafficAvailable) {
+                binding.inboundConnectionsText.text = message.connectionsIn.toString()
+                binding.outboundConnectionsText.text = message.connectionsOut.toString()
+                binding.uplinkText.text = Libbox.formatBytes(message.uplink) + "/s"
+                binding.downlinkText.text = Libbox.formatBytes(message.downlink) + "/s"
+                binding.uplinkTotalText.text = Libbox.formatBytes(message.uplinkTotal)
+                binding.downlinkTotalText.text = Libbox.formatBytes(message.downlinkTotal)
+            }
         }
     }
 
