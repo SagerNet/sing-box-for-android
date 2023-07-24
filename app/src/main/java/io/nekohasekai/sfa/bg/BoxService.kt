@@ -43,7 +43,7 @@ class BoxService(
             baseDir.mkdirs()
             val tempDir = Application.application.cacheDir
             tempDir.mkdirs()
-            Libbox.setup(baseDir.path, tempDir.path, -1, -1)
+            Libbox.setup(baseDir.path, tempDir.path)
             Libbox.redirectStderr(File(baseDir, "stderr.log").path)
             initializeOnce = true
             return
