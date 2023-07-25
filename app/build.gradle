@@ -22,6 +22,7 @@ android {
         targetSdk 33
         versionCode getProps("VERSION_CODE").toInteger()
         versionName getProps("VERSION_NAME")
+        setProperty("archivesBaseName", "SFA-" + versionName)
     }
 
     signingConfigs {
@@ -62,6 +63,12 @@ android {
     buildFeatures {
         viewBinding true
         aidl true
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = (outputFileName as String).replace("-release", "")
+        }
     }
 }
 
