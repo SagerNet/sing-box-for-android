@@ -37,6 +37,7 @@
     <string name="menu_redo">Redo</string>
     <string name="menu_format">Format</string>
     <string name="menu_delete">Delete</string>
+    <string name="menu_share">Share</string>
 
     <string name="status_default">Service not started</string>
     <string name="status_starting">Service starting…</string>
@@ -75,7 +76,6 @@
     <string name="analytics_title">Analytics</string>
     <string name="analytics_message">Would you like to give SFA permission to collect analytics, send crash reports, and check update through AppCenter?</string>
     <string name="no_thanks">No, thanks</string>
-    <string name="ok">Ok</string>
     <string name="check_update">Check Update</string>
     <string name="title_app_center">App Center</string>
     <string name="title_feedback">Feedback</string>
@@ -91,5 +91,7 @@
     <string name="background_permission_description">Apply for the necessary permissions in order for the VPN to function properly.\n\nIf you are using a device made by a Chinese company, the card may not disappear after the permission is granted.</string>
     <string name="read_more">Read More</string>
     <string name="request_background_permission">Ignore battery optimizations</string>
+    <string name="import_remote_profile">Import remote profile</string>
+    <string name="import_remote_profile_message">Are you sure to import remote configuration %s? You will connect to %s to download the configuration.</string>
 
 </resources>

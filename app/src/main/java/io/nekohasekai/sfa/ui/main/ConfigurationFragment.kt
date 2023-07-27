@@ -12,11 +12,15 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.database.Profile
 import io.nekohasekai.sfa.database.Profiles
+import io.nekohasekai.sfa.database.TypedProfile
 import io.nekohasekai.sfa.databinding.FragmentConfigurationBinding
 import io.nekohasekai.sfa.databinding.ViewConfigutationItemBinding
+import io.nekohasekai.sfa.ktx.errorDialogBuilder
+import io.nekohasekai.sfa.ui.MainActivity
 import io.nekohasekai.sfa.ui.profile.EditProfileActivity
 import io.nekohasekai.sfa.ui.profile.NewProfileActivity
 import kotlinx.coroutines.CoroutineScope
@@ -152,12 +156,32 @@ class ConfigurationFragment : Fragment() {
                 intent.putExtra("profile_id", profile.id)
                 it.context.startActivity(intent)
             }
-            binding.moreButton.setOnClickListener { it ->
-                val popup = PopupMenu(it.context, it)
+            binding.moreButton.setOnClickListener { button ->
+                val popup = PopupMenu(button.context, button)
                 popup.setForceShowIcon(true)
                 popup.menuInflater.inflate(R.menu.profile_menu, popup.menu)
+                if (profile.typed.type != TypedProfile.Type.Remote) {
+                    popup.menu.removeItem(R.id.action_share)
+                }
                 popup.setOnMenuItemClickListener {
                     when (it.itemId) {
+                        R.id.action_share -> {
+                            try {
+                                val link = Libbox.generateRemoteProfileImportLink(
+                                    profile.name,
+                                    profile.typed.remoteURL
+                                )
+                                button.context.startActivity(Intent.createChooser(Intent(android.content.Intent.ACTION_SEND).apply {
+                                    type = "text/plain"
+                                    putExtra(Intent.EXTRA_SUBJECT, "Share profile ${profile.name}")
+                                    putExtra(Intent.EXTRA_TEXT, link)
+                                }, "Share"))
+                            } catch (e: Exception) {
+                                button.context.errorDialogBuilder(e).show()
+                            }
+                            true
+                        }
+
                         R.id.action_delete -> {
                             adapter.items.remove(profile)
                             adapter.notifyItemRemoved(adapterPosition)

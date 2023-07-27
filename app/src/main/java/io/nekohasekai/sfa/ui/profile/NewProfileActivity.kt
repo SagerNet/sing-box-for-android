@@ -82,6 +82,13 @@ class NewProfileActivity : AbstractActivity() {
             startFilesForResult(importFile, "application/json")
         }
         binding.createProfile.setOnClickListener(this::createProfile)
+        intent.getStringExtra("importName")?.also { importName ->
+            intent.getStringExtra("importURL") ?.also {  importURL ->
+                binding.name.editText?.setText(importName)
+                binding.type.text = TypedProfile.Type.Remote.name
+                binding.remoteURL.editText?.setText(importURL)
+            }
+        }
     }
 
     private fun createProfile(view: View) {

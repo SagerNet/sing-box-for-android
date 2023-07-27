@@ -3,6 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/action_share"
+        android:title="@string/menu_share"
+        android:icon="@drawable/ic_ios_share_24"
+        app:iconTintMode="src_in"
+        app:iconTint="?colorPrimary" />
+
+    <item
         android:id="@+id/action_delete"
         android:title="@string/menu_delete"
         android:icon="@drawable/ic_delete_24"

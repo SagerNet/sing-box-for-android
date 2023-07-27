@@ -9,14 +9,14 @@ fun Context.errorDialogBuilder(@StringRes messageId: Int): MaterialAlertDialogBu
     return MaterialAlertDialogBuilder(this)
         .setTitle(R.string.error_title)
         .setMessage(messageId)
-        .setPositiveButton(resources.getString(android.R.string.ok), null)
+        .setPositiveButton(android.R.string.ok, null)
 }
 
 fun Context.errorDialogBuilder(message: String): MaterialAlertDialogBuilder {
     return MaterialAlertDialogBuilder(this)
         .setTitle(R.string.error_title)
         .setMessage(message)
-        .setPositiveButton(resources.getString(android.R.string.ok), null)
+        .setPositiveButton(android.R.string.ok, null)
 }
 
 fun Context.errorDialogBuilder(exception: Throwable): MaterialAlertDialogBuilder {
