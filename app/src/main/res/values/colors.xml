@@ -12,4 +12,5 @@
     <color name="log_blue_light">#00a6b2</color>
     <color name="log_white">#ececec</color>
 
+    <color name="divider">#cfcfcf</color>
 </resources>

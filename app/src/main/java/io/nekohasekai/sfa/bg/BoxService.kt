@@ -39,12 +39,14 @@ class BoxService(
         private var initializeOnce = false
         private fun initialize() {
             if (initializeOnce) return
-            val baseDir = Application.application.getExternalFilesDir(null) ?: return
+            val baseDir = Application.application.filesDir
             baseDir.mkdirs()
+            val workingDir = Application.application.getExternalFilesDir(null) ?: return
+            workingDir.mkdirs()
             val tempDir = Application.application.cacheDir
             tempDir.mkdirs()
-            Libbox.setup(baseDir.path, baseDir.path, tempDir.path, false)
-            Libbox.redirectStderr(File(baseDir, "stderr.log").path)
+            Libbox.setup(baseDir.path, workingDir.path, tempDir.path, false)
+            Libbox.redirectStderr(File(workingDir, "stderr.log").path)
             initializeOnce = true
             return
         }
@@ -61,6 +63,14 @@ class BoxService(
         fun stop() {
             Application.application.sendBroadcast(
                 Intent(Action.SERVICE_CLOSE).setPackage(
+                    Application.application.packageName
+                )
+            )
+        }
+
+        fun reload() {
+            Application.application.sendBroadcast(
+                Intent(Action.SERVICE_RELOAD).setPackage(
                     Application.application.packageName
                 )
             )
@@ -82,6 +92,9 @@ class BoxService(
                 Action.SERVICE_CLOSE -> {
                     stopService()
                 }
+                Action.SERVICE_RELOAD -> {
+                    serviceReload()
+                }
             }
         }
     }
@@ -94,7 +107,6 @@ class BoxService(
     }
 
     private suspend fun startService() {
-        initialize()
         try {
             val selectedProfileId = Settings.selectedProfile
             if (selectedProfileId == -1L) {
@@ -224,6 +236,7 @@ class BoxService(
         if (!receiverRegistered) {
             service.registerReceiver(receiver, IntentFilter().apply {
                 addAction(Action.SERVICE_CLOSE)
+                addAction(Action.SERVICE_RELOAD)
             })
             receiverRegistered = true
         }
@@ -231,6 +244,7 @@ class BoxService(
         notification.show()
         GlobalScope.launch(Dispatchers.IO) {
             Settings.startedByUser = true
+            initialize()
             try {
                 startCommandServer()
             } catch (e: Exception) {

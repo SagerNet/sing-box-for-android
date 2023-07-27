@@ -78,6 +78,12 @@
         <activity
             android:name="io.nekohasekai.sfa.ui.profile.EditProfileContentActivity"
             android:exported="false" />
+        <activity
+            android:name="io.nekohasekai.sfa.ui.configoverride.ConfigOverrideActivity"
+            android:exported="false" />
+        <activity
+            android:name="io.nekohasekai.sfa.ui.configoverride.PerAppProxyActivity"
+            android:exported="false" />
 
         <service
             android:name=".bg.TileService"
@@ -114,6 +120,10 @@
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
+
+        <receiver
+            android:name="io.nekohasekai.sfa.bg.AppChangeReceiver"
+            android:exported="true" />
 
     </application>
 

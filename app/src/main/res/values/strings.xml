@@ -94,4 +94,30 @@
     <string name="import_remote_profile">Import remote profile</string>
     <string name="import_remote_profile_message">Are you sure to import remote configuration %s? You will connect to %s to download the configuration.</string>
 
+    <string name="title_config_override">Config Override</string>
+    <string name="config_override_description">Override configuration contents.</string>
+    <string name="config_override_configure">Configure</string>
+    <string name="title_per_app_proxy">Per-app Proxy</string>
+    <string name="per_app_proxy_description">Override include_package and exclude_package in the configuration.</string>
+    <string name="per_app_proxy_mode_exclude">Do not proxy selected apps</string>
+    <string name="per_app_proxy_mode_include">Proxy only selected apps</string>
+    <string name="content_description_app_icon">App icon</string>
+    <string name="menu_hide_system">Hide system apps</string>
+    <string name="menu_show_system">Show system apps</string>
+    <string name="menu_scan_china_apps">Scan China apps</string>
+    <string name="menu_import_from_clipboard">Import from clipboard</string>
+    <string name="menu_export_to_clipboard">Export to clipboard</string>
+    <string name="toast_clipboard_empty">Clipboard is empty</string>
+    <string name="toast_app_list_empty">App list is empty</string>
+    <string name="toast_copied_to_clipboard">Copied to clipboard</string>
+    <string name="toast_imported_from_clipboard">Imported from clipboard</string>
+    <string name="message_import_from_clipboard">Importing app list from clipboard will overwrite your current list. Are you sure to continue?</string>
+    <string name="message_scanning">Scanning… Please wait</string>
+    <string name="message_scan_app_error">Error scanning apps</string>
+    <string name="message_scan_app_no_apps_found">No matching apps found</string>
+    <string name="message_scan_app_found">Found the following apps, please choose the action you want.</string>
+    <string name="title_scan_result">Scan Result</string>
+    <string name="action_select">Select</string>
+    <string name="action_deselect">Deselect</string>
+    <string name="per_app_proxy_update_on_change">Update on App Installed/Updated</string>
 </resources>

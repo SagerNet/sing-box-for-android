@@ -24,6 +24,7 @@ import io.nekohasekai.sfa.ktx.launchCustomTab
 import io.nekohasekai.sfa.ktx.setSimpleItems
 import io.nekohasekai.sfa.ktx.text
 import io.nekohasekai.sfa.ui.MainActivity
+import io.nekohasekai.sfa.ui.configoverride.ConfigOverrideActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -57,9 +58,6 @@ class SettingsFragment : Fragment() {
                 activity.getExternalFilesDir(null)?.deleteRecursively()
                 reloadSettings()
             }
-        }
-        lifecycleScope.launch(Dispatchers.IO) {
-            reloadSettings()
         }
         binding.appCenterEnabled.addTextChangedListener {
             lifecycleScope.launch(Dispatchers.IO) {
@@ -105,11 +103,17 @@ class SettingsFragment : Fragment() {
                 )
             )
         }
+        binding.configureOverridesButton.setOnClickListener {
+            startActivity(Intent(requireContext(), ConfigOverrideActivity::class.java))
+        }
         binding.communityButton.setOnClickListener {
             it.context.launchCustomTab("https://community.sagernet.org/")
         }
         binding.documentationButton.setOnClickListener {
             it.context.launchCustomTab("http://sing-box.sagernet.org/installation/clients/sfa/")
+        }
+        lifecycleScope.launch(Dispatchers.IO) {
+            reloadSettings()
         }
     }
 

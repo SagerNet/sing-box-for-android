@@ -98,6 +98,17 @@ dependencies {
     implementation 'com.microsoft.appcenter:appcenter-analytics:5.0.2'
     implementation 'com.microsoft.appcenter:appcenter-crashes:5.0.2'
     implementation 'com.microsoft.appcenter:appcenter-distribute:5.0.2'
+
+    implementation('org.smali:dexlib2:2.5.2') {
+        exclude group: 'com.google.guava', module: 'guava'
+    }
+    implementation('com.google.guava:guava:32.1.1-android')
+    // ref: https://github.com/google/guava/releases/tag/v32.1.0#user-content-duplicate-ListenableFuture
+    modules {
+        module("com.google.guava:listenablefuture") {
+            replacedBy("com.google.guava:guava", "listenablefuture is part of guava")
+        }
+    }
 }
 
 if (getProps("APPCENTER_TOKEN") != "") {

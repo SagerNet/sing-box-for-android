@@ -53,6 +53,11 @@ fun PreferenceDataStore.stringToLong(
     getString(key, "$default")?.toLongOrNull() ?: default
 }, { key, value -> putString(key, "$value") })
 
+fun PreferenceDataStore.stringSet(
+    name: String,
+    defaultValue: () -> Set<String> = { emptySet() }
+) = PreferenceProxy(name, defaultValue, ::getStringSet, ::putStringSet)
+
 class PreferenceProxy<T>(
     val name: String,
     val defaultValue: () -> T,

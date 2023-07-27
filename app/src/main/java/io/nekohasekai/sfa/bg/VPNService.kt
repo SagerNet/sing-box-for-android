@@ -1,10 +1,12 @@
 package io.nekohasekai.sfa.bg
 
 import android.content.Intent
+import android.content.pm.PackageManager.NameNotFoundException
 import android.net.ProxyInfo
 import android.net.VpnService
 import android.os.Build
 import io.nekohasekai.libbox.TunOptions
+import io.nekohasekai.sfa.database.Settings
 
 class VPNService : VpnService(), PlatformInterfaceWrapper {
 
@@ -80,17 +82,43 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
                 builder.addRoute("::", 0)
             }
 
-            val includePackage = options.includePackage
-            if (includePackage.hasNext()) {
-                while (includePackage.hasNext()) {
-                    builder.addAllowedApplication(includePackage.next())
+            if (Settings.perAppProxyEnabled) {
+                val appList = Settings.perAppProxyList
+                if (Settings.perAppProxyMode == Settings.PER_APP_PROXY_INCLUDE) {
+                    appList.forEach {
+                        try {
+                            builder.addAllowedApplication(it)
+                        } catch (_: NameNotFoundException) {
+                        }
+                    }
+                    builder.addAllowedApplication(packageName)
+                } else {
+                    appList.forEach {
+                        try {
+                            builder.addDisallowedApplication(it)
+                        } catch (_: NameNotFoundException) {
+                        }
+                    }
                 }
-            }
+            } else {
+                val includePackage = options.includePackage
+                if (includePackage.hasNext()) {
+                    while (includePackage.hasNext()) {
+                        try {
+                            builder.addAllowedApplication(includePackage.next())
+                        } catch (_: NameNotFoundException) {
+                        }
+                    }
+                }
 
-            val excludePackage = options.excludePackage
-            if (excludePackage.hasNext()) {
-                while (excludePackage.hasNext()) {
-                    builder.addDisallowedApplication(excludePackage.next())
+                val excludePackage = options.excludePackage
+                if (excludePackage.hasNext()) {
+                    while (excludePackage.hasNext()) {
+                        try {
+                            builder.addDisallowedApplication(excludePackage.next())
+                        } catch (_: NameNotFoundException) {
+                        }
+                    }
                 }
             }
         }

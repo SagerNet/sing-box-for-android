@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/action_hide_system"
+        android:title="@string/menu_hide_system" />
+
+    <item
+        android:id="@+id/action_scan_china_apps"
+        android:title="@string/menu_scan_china_apps" />
+
+    <item
+        android:id="@+id/action_import"
+        android:title="@string/menu_import_from_clipboard" />
+
+    <item
+        android:id="@+id/action_export"
+        android:title="@string/menu_export_to_clipboard" />
+
+</menu>

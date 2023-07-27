@@ -3,10 +3,13 @@ package io.nekohasekai.sfa
 import android.app.Application
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.os.PowerManager
 import androidx.core.content.getSystemService
 import go.Seq
+import io.nekohasekai.sfa.bg.AppChangeReceiver
 import io.nekohasekai.sfa.bg.UpdateProfileWork
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -29,6 +32,11 @@ class Application : Application() {
         GlobalScope.launch(Dispatchers.IO) {
             UpdateProfileWork.reconfigureUpdater()
         }
+
+        registerReceiver(AppChangeReceiver(), IntentFilter().apply {
+            addAction(Intent.ACTION_PACKAGE_ADDED)
+            addDataScheme("package")
+        })
     }
 
     companion object {
