@@ -65,6 +65,10 @@
             android:id="@+id/nav_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="2.0dip"
+            app:itemTextAppearanceActive="@style/BottomNavigation.ActiveText"
+            app:itemTextAppearanceInactive="@style/BottomNavigation.InactiveText"
+            app:labelVisibilityMode="labeled"
             app:menu="@menu/bottom_nav_menu" />
 
     </LinearLayout>
