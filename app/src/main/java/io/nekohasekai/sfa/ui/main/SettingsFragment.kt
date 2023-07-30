@@ -2,6 +2,7 @@ package io.nekohasekai.sfa.ui.main
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -120,8 +121,11 @@ class SettingsFragment : Fragment() {
         )
         val appCenterEnabled = Settings.analyticsAllowed == Settings.ANALYSIS_ALLOWED
         val checkUpdateEnabled = Settings.checkUpdateEnabled
-        val removeBackgroudPermissionPage =
+        val removeBackgroudPermissionPage = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             Application.powerManager.isIgnoringBatteryOptimizations(Application.application.packageName)
+        } else {
+            true
+        }
         withContext(Dispatchers.Main) {
             binding.dataSizeText.text = dataSize
             binding.appCenterEnabled.text = EnabledType.from(appCenterEnabled).name
