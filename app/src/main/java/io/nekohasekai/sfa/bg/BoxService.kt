@@ -43,7 +43,7 @@ class BoxService(
             baseDir.mkdirs()
             val tempDir = Application.application.cacheDir
             tempDir.mkdirs()
-            Libbox.setup(baseDir.path, tempDir.path)
+            Libbox.setup(baseDir.path, baseDir.path, tempDir.path, false)
             Libbox.redirectStderr(File(baseDir, "stderr.log").path)
             initializeOnce = true
             return
@@ -88,7 +88,7 @@ class BoxService(
 
     private fun startCommandServer() {
         val commandServer =
-            CommandServer(Application.application.filesDir.absolutePath, this, 300)
+            CommandServer(this, 300)
         commandServer.start()
         this.commandServer = commandServer
     }

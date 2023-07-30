@@ -19,7 +19,7 @@ android {
     defaultConfig {
         applicationId "io.nekohasekai.sfa"
         minSdk 21
-        targetSdk 33
+        targetSdk 34
         versionCode getProps("VERSION_CODE").toInteger()
         versionName getProps("VERSION_NAME")
         setProperty("archivesBaseName", "SFA-" + versionName)
@@ -89,15 +89,15 @@ dependencies {
     ksp 'androidx.room:room-compiler:2.5.2'
     implementation 'androidx.work:work-runtime-ktx:2.8.1'
     implementation 'androidx.browser:browser:1.5.0'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
 
     // DO NOT UPDATE (minSdkVersion updated)
     implementation 'com.blacksquircle.ui:editorkit:2.2.0'
     implementation 'com.blacksquircle.ui:language-json:2.2.0'
 
-    implementation 'com.microsoft.appcenter:appcenter-analytics:5.0.1'
-    implementation 'com.microsoft.appcenter:appcenter-crashes:5.0.1'
-    implementation 'com.microsoft.appcenter:appcenter-distribute:5.0.1'
+    implementation 'com.microsoft.appcenter:appcenter-analytics:5.0.2'
+    implementation 'com.microsoft.appcenter:appcenter-crashes:5.0.2'
+    implementation 'com.microsoft.appcenter:appcenter-distribute:5.0.2'
 }
 
 if (getProps("APPCENTER_TOKEN") != "") {
