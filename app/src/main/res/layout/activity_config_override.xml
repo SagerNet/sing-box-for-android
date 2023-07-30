@@ -78,7 +78,7 @@
                         style="@style/Widget.Material3.Button.TextButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/config_override_configure" />
+                        android:text="@string/profile_override_configure" />
                 </LinearLayout>
 
             </LinearLayout>

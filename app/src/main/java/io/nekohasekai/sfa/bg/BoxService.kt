@@ -20,7 +20,7 @@ import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.constant.Action
 import io.nekohasekai.sfa.constant.Alert
 import io.nekohasekai.sfa.constant.Status
-import io.nekohasekai.sfa.database.Profiles
+import io.nekohasekai.sfa.database.ProfileManager
 import io.nekohasekai.sfa.database.Settings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -92,6 +92,7 @@ class BoxService(
                 Action.SERVICE_CLOSE -> {
                     stopService()
                 }
+
                 Action.SERVICE_RELOAD -> {
                     serviceReload()
                 }
@@ -114,7 +115,7 @@ class BoxService(
                 return
             }
 
-            val profile = Profiles.get(selectedProfileId)
+            val profile = ProfileManager.get(selectedProfileId)
             if (profile == null) {
                 stopAndAlert(Alert.EmptyConfiguration)
                 return

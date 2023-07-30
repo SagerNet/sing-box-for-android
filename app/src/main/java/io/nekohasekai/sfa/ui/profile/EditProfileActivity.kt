@@ -10,12 +10,13 @@ import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.bg.UpdateProfileWork
 import io.nekohasekai.sfa.constant.EnabledType
 import io.nekohasekai.sfa.database.Profile
-import io.nekohasekai.sfa.database.Profiles
+import io.nekohasekai.sfa.database.ProfileManager
 import io.nekohasekai.sfa.database.TypedProfile
 import io.nekohasekai.sfa.databinding.ActivityEditProfileBinding
 import io.nekohasekai.sfa.ktx.addTextChangedListener
 import io.nekohasekai.sfa.ktx.errorDialogBuilder
 import io.nekohasekai.sfa.ktx.setSimpleItems
+import io.nekohasekai.sfa.ktx.shareProfile
 import io.nekohasekai.sfa.ktx.text
 import io.nekohasekai.sfa.ui.shared.AbstractActivity
 import io.nekohasekai.sfa.utils.HTTPClient
@@ -57,14 +58,14 @@ class EditProfileActivity : AbstractActivity() {
 
         val profileId = intent.getLongExtra("profile_id", -1L)
         if (profileId == -1L) error("invalid arguments")
-        _profile = Profiles.get(profileId) ?: error("invalid arguments")
+        _profile = ProfileManager.get(profileId) ?: error("invalid arguments")
         withContext(Dispatchers.Main) {
             binding.name.text = profile.name
             binding.name.addTextChangedListener {
                 lifecycleScope.launch(Dispatchers.IO) {
                     try {
                         profile.name = it
-                        Profiles.update(profile)
+                        ProfileManager.update(profile)
                     } catch (e: Exception) {
                         errorDialogBuilder(e).show()
                     }
@@ -103,6 +104,7 @@ class EditProfileActivity : AbstractActivity() {
             binding.autoUpdateInterval.addTextChangedListener(this@EditProfileActivity::updateAutoUpdateInterval)
             binding.updateButton.setOnClickListener(this@EditProfileActivity::updateProfile)
             binding.checkButton.setOnClickListener(this@EditProfileActivity::checkProfile)
+            binding.shareButton.setOnClickListener(this@EditProfileActivity::shareProfile)
             binding.profileLayout.isVisible = true
             binding.progressView.isVisible = false
         }
@@ -155,7 +157,7 @@ class EditProfileActivity : AbstractActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             delay(200)
             try {
-                Profiles.update(profile)
+                ProfileManager.update(profile)
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     errorDialogBuilder(e).show()
@@ -175,7 +177,7 @@ class EditProfileActivity : AbstractActivity() {
                 Libbox.checkConfig(content)
                 File(profile.typed.path).writeText(content)
                 profile.typed.lastUpdated = Date()
-                Profiles.update(profile)
+                ProfileManager.update(profile)
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     errorDialogBuilder(e).show()
@@ -202,6 +204,18 @@ class EditProfileActivity : AbstractActivity() {
             }
             withContext(Dispatchers.Main) {
                 binding.progressView.isVisible = false
+            }
+        }
+    }
+
+    private fun shareProfile(button: View) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                shareProfile(profile)
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    errorDialogBuilder(e).show()
+                }
             }
         }
     }

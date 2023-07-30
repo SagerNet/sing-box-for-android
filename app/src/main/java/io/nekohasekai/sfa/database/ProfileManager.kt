@@ -7,7 +7,17 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 @Suppress("RedundantSuspendModifier")
-object Profiles {
+object ProfileManager {
+
+    private val callbacks = mutableListOf<() -> Unit>()
+
+    fun registerCallback(callback: () -> Unit) {
+        callbacks.add(callback)
+    }
+
+    fun unregisterCallback(callback: () -> Unit) {
+        callbacks.remove(callback)
+    }
 
     private val instance by lazy {
         Application.application.getDatabasePath(Path.PROFILES_DATABASE_PATH).parentFile?.mkdirs()
@@ -27,23 +37,50 @@ object Profiles {
 
     suspend fun create(profile: Profile): Profile {
         profile.id = instance.profileDao().insert(profile)
+        for (callback in callbacks.toList()) {
+            callback()
+        }
         return profile
     }
 
     suspend fun update(profile: Profile): Int {
-        return instance.profileDao().update(profile)
+        try {
+            return instance.profileDao().update(profile)
+        } finally {
+            for (callback in callbacks.toList()) {
+                callback()
+            }
+        }
     }
 
     suspend fun update(profiles: List<Profile>): Int {
-        return instance.profileDao().update(profiles)
+        try {
+            return instance.profileDao().update(profiles)
+        } finally {
+            for (callback in callbacks.toList()) {
+                callback()
+            }
+        }
     }
 
     suspend fun delete(profile: Profile): Int {
-        return instance.profileDao().delete(profile)
+        try {
+            return instance.profileDao().delete(profile)
+        } finally {
+            for (callback in callbacks.toList()) {
+                callback()
+            }
+        }
     }
 
     suspend fun delete(profiles: List<Profile>): Int {
-        return instance.profileDao().delete(profiles)
+        try {
+            return instance.profileDao().delete(profiles)
+        } finally {
+            for (callback in callbacks.toList()) {
+                callback()
+            }
+        }
     }
 
     suspend fun list(): List<Profile> {

@@ -20,6 +20,7 @@
     <string name="profile_create">Create</string>
     <string name="profile_edit_content">Edit Content</string>
     <string name="profile_check">Check</string>
+    <string name="profile_share">Share</string>
     <string name="profile_input_required">Required</string>
     <string name="profile_empty">Empty profiles</string>
     <string name="profile_last_updated">Last Updated</string>
@@ -92,11 +93,11 @@
     <string name="read_more">Read More</string>
     <string name="request_background_permission">Ignore battery optimizations</string>
     <string name="import_remote_profile">Import remote profile</string>
-    <string name="import_remote_profile_message">Are you sure to import remote configuration %s? You will connect to %s to download the configuration.</string>
+    <string name="import_remote_profile_message">Are you sure to import remote profile %s? You will connect to %s to download the configuration.</string>
 
-    <string name="title_config_override">Config Override</string>
-    <string name="config_override_description">Override configuration contents.</string>
-    <string name="config_override_configure">Configure</string>
+    <string name="title_profile_override">Profile Override</string>
+    <string name="profile_override_description">Overrides profile configuration items with platform-specific values.</string>
+    <string name="profile_override_configure">Configure</string>
     <string name="title_per_app_proxy">Per-app Proxy</string>
     <string name="per_app_proxy_description">Override include_package and exclude_package in the configuration.</string>
     <string name="per_app_proxy_mode_exclude">Do not proxy selected apps</string>
@@ -120,4 +121,7 @@
     <string name="action_select">Select</string>
     <string name="action_deselect">Deselect</string>
     <string name="per_app_proxy_update_on_change">Update on App Installed/Updated</string>
+    <string name="import_profile">Import profile</string>
+    <string name="import_profile_message">Are you sure to import profile %s?</string>
+    <string name="icloud_profile_unsupported">iCloud profile is not support on current platform</string>
 </resources>

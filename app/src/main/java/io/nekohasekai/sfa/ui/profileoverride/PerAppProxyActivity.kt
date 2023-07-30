@@ -1,4 +1,4 @@
-package io.nekohasekai.sfa.ui.configoverride
+package io.nekohasekai.sfa.ui.profileoverride
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -28,7 +28,6 @@ import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.databinding.ActivityPerAppProxyBinding
 import io.nekohasekai.sfa.databinding.ViewAppListItemBinding
-import io.nekohasekai.sfa.ktx.errorDialogBuilder
 import io.nekohasekai.sfa.ui.shared.AbstractActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -242,7 +241,7 @@ class PerAppProxyActivity : AbstractActivity() {
                     appNameMap[it.packageName] = it.name
                 }
                 val foundChinaApps = mutableMapOf<String, String>()
-                scanChinaApps(appList.map { it.packageName }).forEach {packageName ->
+                scanChinaApps(appList.map { it.packageName }).forEach { packageName ->
                     foundChinaApps[packageName] = appNameMap[packageName] ?: "Unknown"
                 }
                 foundChinaApps

@@ -10,7 +10,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.Application
-import io.nekohasekai.sfa.database.Profiles
+import io.nekohasekai.sfa.database.ProfileManager
 import io.nekohasekai.sfa.database.TypedProfile
 import io.nekohasekai.sfa.utils.HTTPClient
 import java.io.File
@@ -33,7 +33,7 @@ class UpdateProfileWork {
         private suspend fun reconfigureUpdater0() {
             WorkManager.getInstance(Application.application).cancelUniqueWork(WORK_NAME)
 
-            val remoteProfiles = Profiles.list()
+            val remoteProfiles = ProfileManager.list()
                 .filter { it.typed.type == TypedProfile.Type.Remote && it.typed.autoUpdate }
             if (remoteProfiles.isEmpty()) return
 
@@ -62,7 +62,7 @@ class UpdateProfileWork {
         appContext: Context, params: WorkerParameters
     ) : CoroutineWorker(appContext, params) {
         override suspend fun doWork(): Result {
-            val remoteProfiles = Profiles.list()
+            val remoteProfiles = ProfileManager.list()
                 .filter { it.typed.type == TypedProfile.Type.Remote && it.typed.autoUpdate }
             if (remoteProfiles.isEmpty()) return Result.success()
             val httpClient = HTTPClient()
@@ -73,7 +73,7 @@ class UpdateProfileWork {
                     Libbox.checkConfig(content)
                     File(profile.typed.path).writeText(content)
                     profile.typed.lastUpdated = Date()
-                    Profiles.update(profile)
+                    ProfileManager.update(profile)
                 } catch (e: Exception) {
                     Log.e("UpdateProfileWork", "error when updating profile ${profile.name}", e)
                     success = false

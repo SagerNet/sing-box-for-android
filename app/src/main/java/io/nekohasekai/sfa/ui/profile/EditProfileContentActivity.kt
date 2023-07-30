@@ -11,7 +11,7 @@ import com.blacksquircle.ui.language.json.JsonLanguage
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.database.Profile
-import io.nekohasekai.sfa.database.Profiles
+import io.nekohasekai.sfa.database.ProfileManager
 import io.nekohasekai.sfa.databinding.ActivityEditProfileContentBinding
 import io.nekohasekai.sfa.ktx.errorDialogBuilder
 import io.nekohasekai.sfa.ui.shared.AbstractActivity
@@ -114,7 +114,7 @@ class EditProfileContentActivity : AbstractActivity() {
 
         val profileId = intent.getLongExtra("profile_id", -1L)
         if (profileId == -1L) error("invalid arguments")
-        _profile = Profiles.get(profileId) ?: error("invalid arguments")
+        _profile = ProfileManager.get(profileId) ?: error("invalid arguments")
         val content = File(profile.typed.path).readText()
         withContext(Dispatchers.Main) {
             binding.editor.setTextContent(content)

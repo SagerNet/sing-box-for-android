@@ -12,15 +12,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.database.Profile
-import io.nekohasekai.sfa.database.Profiles
+import io.nekohasekai.sfa.database.ProfileManager
 import io.nekohasekai.sfa.database.TypedProfile
 import io.nekohasekai.sfa.databinding.FragmentConfigurationBinding
 import io.nekohasekai.sfa.databinding.ViewConfigutationItemBinding
 import io.nekohasekai.sfa.ktx.errorDialogBuilder
-import io.nekohasekai.sfa.ui.MainActivity
+import io.nekohasekai.sfa.ktx.shareProfile
 import io.nekohasekai.sfa.ui.profile.EditProfileActivity
 import io.nekohasekai.sfa.ui.profile.NewProfileActivity
 import kotlinx.coroutines.CoroutineScope
@@ -65,6 +64,7 @@ class ConfigurationFragment : Fragment() {
         binding.fab.setOnClickListener {
             startActivity(Intent(requireContext(), NewProfileActivity::class.java))
         }
+        ProfileManager.registerCallback(this::updateProfiles)
         return binding.root
     }
 
@@ -75,12 +75,17 @@ class ConfigurationFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        ProfileManager.unregisterCallback(this::updateProfiles)
         _adapter = null
+    }
+
+    private fun updateProfiles() {
+        _adapter?.reload()
     }
 
     class Adapter(
         internal val scope: CoroutineScope,
-        private val parent: FragmentConfigurationBinding
+        internal val parent: FragmentConfigurationBinding
     ) :
         RecyclerView.Adapter<Holder>() {
 
@@ -88,7 +93,7 @@ class ConfigurationFragment : Fragment() {
 
         internal fun reload() {
             scope.launch(Dispatchers.IO) {
-                items = Profiles.list().toMutableList()
+                items = ProfileManager.list().toMutableList()
                 withContext(Dispatchers.Main) {
                     if (items.isEmpty()) {
                         parent.statusText.isVisible = true
@@ -120,7 +125,7 @@ class ConfigurationFragment : Fragment() {
             updated.add(first)
             notifyItemMoved(from, to)
             GlobalScope.launch(Dispatchers.IO) {
-                Profiles.update(updated)
+                ProfileManager.update(updated)
             }
             return true
         }
@@ -166,18 +171,14 @@ class ConfigurationFragment : Fragment() {
                 popup.setOnMenuItemClickListener {
                     when (it.itemId) {
                         R.id.action_share -> {
-                            try {
-                                val link = Libbox.generateRemoteProfileImportLink(
-                                    profile.name,
-                                    profile.typed.remoteURL
-                                )
-                                button.context.startActivity(Intent.createChooser(Intent(android.content.Intent.ACTION_SEND).apply {
-                                    type = "text/plain"
-                                    putExtra(Intent.EXTRA_SUBJECT, "Share profile ${profile.name}")
-                                    putExtra(Intent.EXTRA_TEXT, link)
-                                }, "Share"))
-                            } catch (e: Exception) {
-                                button.context.errorDialogBuilder(e).show()
+                            adapter.scope.launch(Dispatchers.IO) {
+                                try {
+                                    button.context.shareProfile(profile)
+                                } catch (e: Exception) {
+                                    withContext(Dispatchers.Main) {
+                                        button.context.errorDialogBuilder(e).show()
+                                    }
+                                }
                             }
                             true
                         }
@@ -187,7 +188,7 @@ class ConfigurationFragment : Fragment() {
                             adapter.notifyItemRemoved(adapterPosition)
                             adapter.scope.launch(Dispatchers.IO) {
                                 runCatching {
-                                    Profiles.delete(profile)
+                                    ProfileManager.delete(profile)
                                 }
                             }
                             true

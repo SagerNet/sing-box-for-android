@@ -1,7 +1,6 @@
 package io.nekohasekai.sfa.ui.main
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,7 +21,7 @@ import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.bg.BoxService
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.database.Profile
-import io.nekohasekai.sfa.database.Profiles
+import io.nekohasekai.sfa.database.ProfileManager
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.databinding.FragmentDashboardBinding
 import io.nekohasekai.sfa.databinding.ViewProfileItemBinding
@@ -102,6 +101,8 @@ class DashboardFragment : Fragment(), CommandClientHandler {
                 else -> {}
             }
         }
+
+        ProfileManager.registerCallback(this::updateProfiles)
     }
 
     private fun reconnect() {
@@ -139,6 +140,11 @@ class DashboardFragment : Fragment(), CommandClientHandler {
         _adapter = null
         _binding = null
         disconnect()
+        ProfileManager.unregisterCallback(this::updateProfiles)
+    }
+
+    private fun updateProfiles() {
+        _adapter?.reload()
     }
 
     override fun connected() {
@@ -192,7 +198,7 @@ class DashboardFragment : Fragment(), CommandClientHandler {
         internal var lastSelectedIndex: Int? = null
         internal fun reload() {
             scope.launch(Dispatchers.IO) {
-                items = Profiles.list().toMutableList()
+                items = ProfileManager.list().toMutableList()
                 if (items.isNotEmpty()) {
                     selectedProfileID = Settings.selectedProfile
                     for ((index, profile) in items.withIndex()) {

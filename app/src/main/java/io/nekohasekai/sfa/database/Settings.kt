@@ -80,7 +80,7 @@ object Settings {
     private suspend fun needVPNService(): Boolean {
         val selectedProfileId = selectedProfile
         if (selectedProfileId == -1L) return false
-        val profile = Profiles.get(selectedProfile) ?: return false
+        val profile = ProfileManager.get(selectedProfile) ?: return false
         val content = JSONObject(File(profile.typed.path).readText())
         val inbounds = content.getJSONArray("inbounds")
         for (index in 0 until inbounds.length()) {

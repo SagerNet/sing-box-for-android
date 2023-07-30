@@ -40,7 +40,7 @@
             </intent-filter>
 
 
-            <intent-filter android:label="@string/import_remote_profile">
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -50,6 +50,23 @@
                     android:host="import-remote-profile"
                     android:scheme="sing-box" />
 
+            </intent-filter>
+
+            <intent-filter android:priority="999">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.OPENABLE" />
+
+                <data android:host="*" />
+                <data android:mimeType="application/octet-stream" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.bpf" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.bpf" />
+                <data android:pathPattern=".*\\..*\\..*\\.bpf" />
+                <data android:pathPattern=".*\\..*\\.bpf" />
+                <data android:pathPattern=".*\\.bpf" />
+                <data android:scheme="content" />
             </intent-filter>
 
             <meta-data
@@ -79,10 +96,10 @@
             android:name="io.nekohasekai.sfa.ui.profile.EditProfileContentActivity"
             android:exported="false" />
         <activity
-            android:name="io.nekohasekai.sfa.ui.configoverride.ConfigOverrideActivity"
+            android:name="io.nekohasekai.sfa.ui.profileoverride.ProfileOverrideActivity"
             android:exported="false" />
         <activity
-            android:name="io.nekohasekai.sfa.ui.configoverride.PerAppProxyActivity"
+            android:name="io.nekohasekai.sfa.ui.profileoverride.PerAppProxyActivity"
             android:exported="false" />
 
         <service
@@ -124,6 +141,16 @@
         <receiver
             android:name="io.nekohasekai.sfa.bg.AppChangeReceiver"
             android:exported="true" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.cache"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/cache_paths" />
+        </provider>
 
     </application>
 

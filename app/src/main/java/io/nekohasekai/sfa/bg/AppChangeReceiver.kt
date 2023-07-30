@@ -5,9 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import io.nekohasekai.sfa.database.Settings
-import io.nekohasekai.sfa.ui.configoverride.PerAppProxyActivity
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import io.nekohasekai.sfa.ui.profileoverride.PerAppProxyActivity
 
 class AppChangeReceiver : BroadcastReceiver() {
 

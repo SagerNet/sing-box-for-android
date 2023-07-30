@@ -1,4 +1,4 @@
-package io.nekohasekai.sfa.ui.configoverride
+package io.nekohasekai.sfa.ui.profileoverride
 
 import android.content.Intent
 import android.os.Bundle
@@ -15,13 +15,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ConfigOverrideActivity : AbstractActivity() {
+class ProfileOverrideActivity : AbstractActivity() {
 
     private lateinit var binding: ActivityConfigOverrideBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTitle(R.string.title_config_override)
+        setTitle(R.string.title_profile_override)
         binding = ActivityConfigOverrideBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -52,7 +52,8 @@ class ConfigOverrideActivity : AbstractActivity() {
     private suspend fun reloadSettings() {
         val perAppUpdateOnChange = Settings.perAppProxyUpdateOnChange
         withContext(Dispatchers.Main) {
-            binding.perAppProxyUpdateOnChange.text = PerAppProxyUpdateType.valueOf(perAppUpdateOnChange).name
+            binding.perAppProxyUpdateOnChange.text =
+                PerAppProxyUpdateType.valueOf(perAppUpdateOnChange).name
             binding.perAppProxyUpdateOnChange.setSimpleItems(R.array.per_app_proxy_update_on_change_value)
         }
     }

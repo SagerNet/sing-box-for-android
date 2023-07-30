@@ -10,6 +10,7 @@ enum class PerAppProxyUpdateType {
         Select -> Settings.PER_APP_PROXY_INCLUDE
         Deselect -> Settings.PER_APP_PROXY_EXCLUDE
     }
+
     companion object {
         fun valueOf(value: Int): PerAppProxyUpdateType = when (value) {
             Settings.PER_APP_PROXY_DISABLED -> Disabled

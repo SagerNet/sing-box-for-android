@@ -9,7 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.database.Profile
-import io.nekohasekai.sfa.database.Profiles
+import io.nekohasekai.sfa.database.ProfileManager
 import io.nekohasekai.sfa.database.TypedProfile
 import io.nekohasekai.sfa.databinding.ActivityAddProfileBinding
 import io.nekohasekai.sfa.ktx.addTextChangedListener
@@ -83,7 +83,7 @@ class NewProfileActivity : AbstractActivity() {
         }
         binding.createProfile.setOnClickListener(this::createProfile)
         intent.getStringExtra("importName")?.also { importName ->
-            intent.getStringExtra("importURL") ?.also {  importURL ->
+            intent.getStringExtra("importURL")?.also { importURL ->
                 binding.name.editText?.setText(importName)
                 binding.type.text = TypedProfile.Type.Remote.name
                 binding.remoteURL.editText?.setText(importURL)
@@ -128,7 +128,7 @@ class NewProfileActivity : AbstractActivity() {
     private suspend fun createProfile0() {
         val typedProfile = TypedProfile()
         val profile = Profile(name = binding.name.text, typed = typedProfile)
-        profile.userOrder = Profiles.nextOrder()
+        profile.userOrder = ProfileManager.nextOrder()
 
         when (binding.type.text) {
             TypedProfile.Type.Local.name -> {
@@ -174,7 +174,7 @@ class NewProfileActivity : AbstractActivity() {
                 typedProfile.lastUpdated = Date()
             }
         }
-        Profiles.create(profile)
+        ProfileManager.create(profile)
         withContext(Dispatchers.Main) {
             binding.progressView.isVisible = false
             finish()
