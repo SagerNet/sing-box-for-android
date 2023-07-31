@@ -24,7 +24,7 @@ class AppChangeReceiver : BroadcastReceiver() {
             return
         }
         val perAppProxyUpdateOnChange = Settings.perAppProxyUpdateOnChange
-        if (perAppProxyUpdateOnChange != Settings.PER_APP_PROXY_DISABLED) {
+        if (perAppProxyUpdateOnChange == Settings.PER_APP_PROXY_DISABLED) {
             Log.d(TAG, "update on change disabled")
             return
         }
