@@ -138,10 +138,6 @@
             </intent-filter>
         </receiver>
 
-        <receiver
-            android:name="io.nekohasekai.sfa.bg.AppChangeReceiver"
-            android:exported="true" />
-
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.cache"
