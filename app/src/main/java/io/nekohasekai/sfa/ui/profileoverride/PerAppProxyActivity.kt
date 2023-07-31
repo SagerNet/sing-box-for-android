@@ -18,6 +18,7 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.SearchView
 import androidx.core.content.getSystemService
 import androidx.core.view.isGone
 import androidx.lifecycle.lifecycleScope
@@ -46,6 +47,7 @@ class PerAppProxyActivity : AbstractActivity() {
     private val appList = mutableListOf<AppItem>()
 
     private var hideSystem = false
+    private var searchKeyword = ""
     private val filteredAppList = mutableListOf<AppItem>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -147,23 +149,35 @@ class PerAppProxyActivity : AbstractActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.per_app_menu, menu)
+
+        if (menu != null) {
+            val searchView = menu.findItem(R.id.action_search).actionView as SearchView
+            searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String): Boolean {
+                    return true
+                }
+
+                override fun onQueryTextChange(newText: String): Boolean {
+                    searchKeyword = newText
+                    filterApps()
+                    return true
+                }
+            })
+        }
+
         return super.onCreateOptionsMenu(menu)
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_hide_system -> {
                 hideSystem = !hideSystem
-                filteredAppList.clear()
                 if (hideSystem) {
-                    filteredAppList.addAll(appList.filter { !it.isSystemApp })
                     item.setTitle(R.string.menu_show_system)
                 } else {
-                    filteredAppList.addAll(appList)
                     item.setTitle(R.string.menu_hide_system)
                 }
-                adapter.notifyDataSetChanged()
+                filterApps()
                 return true
             }
 
@@ -190,6 +204,24 @@ class PerAppProxyActivity : AbstractActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun filterApps() {
+        filteredAppList.clear()
+        if (searchKeyword.isNotEmpty()) {
+            filteredAppList.addAll(appList.filter {
+                (!hideSystem || !it.isSystemApp) &&
+                        (it.name.contains(searchKeyword, true)
+                                || it.packageName.contains(searchKeyword, true))
+            })
+            adapter.notifyDataSetChanged()
+        } else if (hideSystem) {
+            filteredAppList.addAll(appList.filter { !it.isSystemApp })
+        } else {
+            filteredAppList.addAll(appList)
+        }
+        adapter.notifyDataSetChanged()
     }
 
     private fun importFromClipboard() {
