@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:clipChildren="false"
-    android:clipToPadding="false"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:orientation="vertical"
+        android:padding="16dp">
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/perAppProxyCard"
@@ -57,11 +56,11 @@
                     android:hint="@string/per_app_proxy_update_on_change">
 
                     <AutoCompleteTextView
-                        app:simpleItems="@array/per_app_proxy_update_on_change_value"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="none"
-                        android:text="@string/disabled" />
+                        android:text="@string/disabled"
+                        app:simpleItems="@array/per_app_proxy_update_on_change_value" />
 
 
                 </com.google.android.material.textfield.TextInputLayout>
