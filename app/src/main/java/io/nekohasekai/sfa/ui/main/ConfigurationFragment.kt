@@ -90,8 +90,10 @@ class ConfigurationFragment : Fragment() {
         RecyclerView.Adapter<Holder>() {
 
         internal var items: MutableList<Profile> = mutableListOf()
+        private var isMoving = false
 
         internal fun reload() {
+            if (isMoving) return
             scope.launch(Dispatchers.IO) {
                 items = ProfileManager.list().toMutableList()
                 withContext(Dispatchers.Main) {
@@ -124,8 +126,10 @@ class ConfigurationFragment : Fragment() {
             first.userOrder = previousOrder
             updated.add(first)
             notifyItemMoved(from, to)
+            isMoving = true
             GlobalScope.launch(Dispatchers.IO) {
                 ProfileManager.update(updated)
+                isMoving = false
             }
             return true
         }
