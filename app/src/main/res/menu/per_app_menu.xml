@@ -7,6 +7,7 @@
         android:icon="@drawable/ic_find_in_page_24"
         android:title="@string/search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:iconTint="?colorControlNormal"
         app:showAsAction="collapseActionView|always" />
 
     <item
