@@ -353,7 +353,7 @@ class PerAppProxyActivity : AbstractActivity() {
                         ) {
                             continue
                         }
-                        if (packageEntry.size > 10000000) {
+                        if (packageEntry.size > 15000000) {
                             foundChinaApps.add(packageName)
                             break
                         }
