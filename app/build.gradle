@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace 'io.nekohasekai.sfa'
-    compileSdk 33
+    compileSdk 34
 
     ksp {
         arg("room.incremental", "true")
@@ -60,13 +60,14 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
     buildFeatures {
         viewBinding true
         aidl true
     }
 
-    applicationVariants.all { variant ->
-        variant.outputs.all {
+    applicationVariants.configureEach { variant ->
+        variant.outputs.configureEach {
             outputFileName = (outputFileName as String).replace("-release", "")
         }
     }
@@ -102,13 +103,7 @@ dependencies {
     implementation('org.smali:dexlib2:2.5.2') {
         exclude group: 'com.google.guava', module: 'guava'
     }
-    implementation('com.google.guava:guava:32.1.1-android')
-    // ref: https://github.com/google/guava/releases/tag/v32.1.0#user-content-duplicate-ListenableFuture
-    modules {
-        module("com.google.guava:listenablefuture") {
-            replacedBy("com.google.guava:guava", "listenablefuture is part of guava")
-        }
-    }
+    implementation('com.google.guava:guava:32.1.2-android')
 }
 
 if (getProps("APPCENTER_TOKEN") != "") {
@@ -140,10 +135,10 @@ def getProps(String propName) {
         props.load(new FileInputStream(propsFile))
         String value = props[propName]
         if (value == null) {
-            return "";
+            return ""
         }
         return value
     } else {
-        return "";
+        return ""
     }
 }
