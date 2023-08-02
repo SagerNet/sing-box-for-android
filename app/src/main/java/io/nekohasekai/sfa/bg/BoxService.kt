@@ -235,10 +235,10 @@ class BoxService(
         status.value = Status.Starting
 
         if (!receiverRegistered) {
-            service.registerReceiver(receiver, IntentFilter().apply {
+            ContextCompat.registerReceiver(service, receiver, IntentFilter().apply {
                 addAction(Action.SERVICE_CLOSE)
                 addAction(Action.SERVICE_RELOAD)
-            })
+            }, ContextCompat.RECEIVER_NOT_EXPORTED)
             receiverRegistered = true
         }
 
