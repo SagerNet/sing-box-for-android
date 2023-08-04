@@ -10,6 +10,8 @@
     <string name="title_new_profile">New Profile</string>
     <string name="title_edit_profile">Edit Profile</string>
     <string name="title_edit_configuration">Edit Configuration</string>
+    <string name="title_overview">Overview</string>
+    <string name="title_groups">Groups</string>
 
     <string name="quick_toggle">Toggle</string>
     <string name="profile_name">Name</string>
@@ -61,14 +63,16 @@
     <string name="service_error_title_create_service">Create service</string>
     <string name="service_error_title_start_service">Start service</string>
 
+    <string name="status_status">Status</string>
     <string name="status_memory">Memory</string>
     <string name="status_goroutines">Goroutines</string>
-    <string name="status_inbound_connections">Inbound Connections</string>
-    <string name="status_outbound_connections">Outbound Connections</string>
+    <string name="status_connections">Connections</string>
+    <string name="status_connections_inbound">Inbound</string>
+    <string name="status_connections_outbound">Outbound</string>
     <string name="status_uplink">Uplink</string>
     <string name="status_downlink">Downlink</string>
-    <string name="status_uplink_total">Uplink Total</string>
-    <string name="status_downlink_total">Downlink Total</string>
+    <string name="status_traffic">Traffic</string>
+    <string name="status_traffic_total">Traffic Total</string>
 
     <string name="profile">Profile</string>
     <string name="core_version">Version</string>
@@ -125,4 +129,6 @@
     <string name="import_profile_message">Are you sure to import profile %s?</string>
     <string name="icloud_profile_unsupported">iCloud profile is not support on current platform</string>
     <string name="search">Search</string>
+    <string name="urltest">URLTest</string>
+    <string name="expand">Expand</string>
 </resources>
