@@ -212,7 +212,12 @@ class GroupsFragment : Fragment(), CommandClientHandler {
                 items.forEach {
                     builder.append("■")
                     builder.setSpan(
-                        ForegroundColorSpan(colorForURLTestDelay(it.urlTestDelay)),
+                        ForegroundColorSpan(
+                            colorForURLTestDelay(
+                                binding.root.context,
+                                it.urlTestDelay
+                            )
+                        ),
                         builder.length - 1,
                         builder.length,
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -288,7 +293,12 @@ class GroupsFragment : Fragment(), CommandClientHandler {
             binding.itemStatus.isVisible = item.urlTestTime > 0
             if (item.urlTestTime > 0) {
                 binding.itemStatus.text = "${item.urlTestDelay}ms"
-                binding.itemStatus.setTextColor(colorForURLTestDelay(item.urlTestDelay))
+                binding.itemStatus.setTextColor(
+                    colorForURLTestDelay(
+                        binding.root.context,
+                        item.urlTestDelay
+                    )
+                )
             }
         }
     }
