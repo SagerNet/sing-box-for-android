@@ -169,9 +169,6 @@ class ConfigurationFragment : Fragment() {
                 val popup = PopupMenu(button.context, button)
                 popup.setForceShowIcon(true)
                 popup.menuInflater.inflate(R.menu.profile_menu, popup.menu)
-                if (profile.typed.type != TypedProfile.Type.Remote) {
-                    popup.menu.removeItem(R.id.action_share)
-                }
                 popup.setOnMenuItemClickListener {
                     when (it.itemId) {
                         R.id.action_share -> {

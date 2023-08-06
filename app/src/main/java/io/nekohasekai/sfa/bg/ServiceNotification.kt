@@ -24,10 +24,7 @@ class ServiceNotification(private val service: Service) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
                 return true
             }
-            if (Application.notification.areNotificationsEnabled()) {
-                return true
-            }
-            return false
+            return Application.notification.areNotificationsEnabled()
         }
     }
 
@@ -36,7 +33,7 @@ class ServiceNotification(private val service: Service) {
         NotificationCompat.Builder(service, notificationChannel).setWhen(0)
             .setContentTitle("sing-box")
             .setContentText("service started").setOnlyAlertOnce(true)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.ic_menu)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setContentIntent(
                 PendingIntent.getActivity(

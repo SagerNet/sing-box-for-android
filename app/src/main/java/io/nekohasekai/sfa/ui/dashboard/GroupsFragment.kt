@@ -274,15 +274,17 @@ class GroupsFragment : Fragment(), CommandClientHandler {
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(groupView: GroupView, group: OutboundGroup, item: OutboundGroupItem) {
-            binding.itemCard.setOnClickListener {
-                binding.selectedView.isVisible = true
-                groupView.updateSelected(group, item)
-                GlobalScope.launch {
-                    runCatching {
-                        Libbox.newStandaloneCommandClient().selectOutbound(group.tag, item.tag)
-                    }.onFailure {
-                        withContext(Dispatchers.Main) {
-                            binding.root.context.errorDialogBuilder(it).show()
+            if (group.selectable) {
+                binding.itemCard.setOnClickListener {
+                    binding.selectedView.isVisible = true
+                    groupView.updateSelected(group, item)
+                    GlobalScope.launch {
+                        runCatching {
+                            Libbox.newStandaloneCommandClient().selectOutbound(group.tag, item.tag)
+                        }.onFailure {
+                            withContext(Dispatchers.Main) {
+                                binding.root.context.errorDialogBuilder(it).show()
+                            }
                         }
                     }
                 }
