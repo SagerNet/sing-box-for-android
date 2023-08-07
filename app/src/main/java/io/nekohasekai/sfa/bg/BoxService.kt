@@ -5,8 +5,11 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
+import android.os.PowerManager
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import go.Seq
@@ -96,6 +99,12 @@ class BoxService(
                 Action.SERVICE_RELOAD -> {
                     serviceReload()
                 }
+
+                PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        serviceUpdateIdleMode()
+                    }
+                }
             }
         }
     }
@@ -175,6 +184,15 @@ class BoxService(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun serviceUpdateIdleMode() {
+        if (Application.powerManager.isDeviceIdleMode) {
+            boxService?.sleep()
+        } else {
+            boxService?.wake()
+        }
+    }
+
     private fun stopService() {
         if (status.value != Status.Started) return
         status.value = Status.Stopping
@@ -238,6 +256,9 @@ class BoxService(
             ContextCompat.registerReceiver(service, receiver, IntentFilter().apply {
                 addAction(Action.SERVICE_CLOSE)
                 addAction(Action.SERVICE_RELOAD)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    addAction(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED)
+                }
             }, ContextCompat.RECEIVER_NOT_EXPORTED)
             receiverRegistered = true
         }
