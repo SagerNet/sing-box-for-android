@@ -100,19 +100,24 @@ class GroupsFragment : Fragment(), CommandClientHandler {
         commandClient = null
     }
 
+    private var displayed = false
+    private fun updateDisplayed(newValue: Boolean) {
+        if (displayed != newValue) {
+            displayed = newValue
+            binding.statusText.isVisible = !displayed
+            binding.container.isVisible = displayed
+        }
+    }
+
     override fun connected() {
-        val binding = _binding ?: return
         lifecycleScope.launch(Dispatchers.Main) {
-            binding.statusText.isVisible = false
-            binding.container.isVisible = true
+            updateDisplayed(true)
         }
     }
 
     override fun disconnected(message: String?) {
-        val binding = _binding ?: return
         lifecycleScope.launch(Dispatchers.Main) {
-            binding.statusText.isVisible = true
-            binding.container.isVisible = false
+            updateDisplayed(false)
         }
     }
 
@@ -123,6 +128,7 @@ class GroupsFragment : Fragment(), CommandClientHandler {
             groups.add(message.next())
         }
         activity?.runOnUiThread {
+            updateDisplayed(groups.isNotEmpty())
             adapter.groups = groups
             adapter.notifyDataSetChanged()
         }

@@ -34,6 +34,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
     private fun onCreate() {
         val activity = activity ?: return
         binding.dashboardPager.adapter = Adapter(this)
+        binding.dashboardPager.offscreenPageLimit = Page.values().size
         TabLayoutMediator(binding.dashboardTabLayout, binding.dashboardPager) { tab, position ->
             tab.setText(Page.values()[position].titleRes)
         }.attach()
@@ -42,8 +43,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
                 Status.Stopped -> {
                     binding.fab.setImageResource(R.drawable.ic_play_arrow_24)
                     binding.fab.show()
-                    binding.dashboardTabLayout.isVisible = false
-                    binding.dashboardPager.isUserInputEnabled = false
+                    disablePager()
                 }
 
                 Status.Starting -> {
@@ -53,12 +53,12 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
                 Status.Started -> {
                     binding.fab.setImageResource(R.drawable.ic_stop_24)
                     binding.fab.show()
-                    binding.dashboardTabLayout.isVisible = true
-                    binding.dashboardPager.isUserInputEnabled = true
+                    enablePager()
                 }
 
                 Status.Stopping -> {
                     binding.fab.hide()
+                    disablePager()
                 }
 
                 else -> {}
@@ -77,6 +77,17 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
                 else -> {}
             }
         }
+    }
+
+    private fun enablePager() {
+        binding.dashboardTabLayout.isVisible = true
+        binding.dashboardPager.isUserInputEnabled = true
+    }
+
+    private fun disablePager() {
+        binding.dashboardTabLayout.isVisible = false
+        binding.dashboardPager.isUserInputEnabled = false
+        binding.dashboardPager.setCurrentItem(0, false)
     }
 
     enum class Page(@StringRes val titleRes: Int, val fragmentClass: Class<out Fragment>) {
