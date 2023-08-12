@@ -45,5 +45,4 @@ class TileService : TileService(), ServiceConnection.Callback {
         }
     }
 
-
 }
