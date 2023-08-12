@@ -164,6 +164,11 @@
                 android:resource="@xml/cache_paths" />
         </provider>
 
+
+        <receiver
+            android:name="com.microsoft.appcenter.distribute.UpdateReceiver"
+            tools:node="remove" />
+
     </application>
 
 </manifest>
