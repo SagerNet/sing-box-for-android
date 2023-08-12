@@ -143,7 +143,6 @@ class GroupsFragment : Fragment(), CommandClientHandler {
     private class Adapter : RecyclerView.Adapter<GroupView>() {
 
         lateinit var groups: List<OutboundGroup>
-        private val expandStatus: MutableMap<String, Boolean> = mutableMapOf()
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GroupView {
             return GroupView(
                 ViewDashboardGroupBinding.inflate(
@@ -151,7 +150,6 @@ class GroupsFragment : Fragment(), CommandClientHandler {
                     parent,
                     false
                 ),
-                expandStatus
             )
         }
 
@@ -167,10 +165,7 @@ class GroupsFragment : Fragment(), CommandClientHandler {
         }
     }
 
-    private class GroupView(
-        val binding: ViewDashboardGroupBinding,
-        val expandStatus: MutableMap<String, Boolean>
-    ) :
+    private class GroupView(val binding: ViewDashboardGroupBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         lateinit var group: OutboundGroup
@@ -204,12 +199,17 @@ class GroupsFragment : Fragment(), CommandClientHandler {
         }
 
         private fun updateExpand(isExpand: Boolean? = null) {
-            val newExpandStatus: Boolean
-            if (isExpand == null) {
-                newExpandStatus = expandStatus[group.tag] ?: group.selectable
-            } else {
-                expandStatus[group.tag] = isExpand
-                newExpandStatus = isExpand
+            val newExpandStatus = isExpand ?: group.isExpand
+            if (isExpand != null) {
+                GlobalScope.launch {
+                    runCatching {
+                        Libbox.newStandaloneCommandClient().setGroupExpand(group.tag, isExpand)
+                    }.onFailure {
+                        withContext(Dispatchers.Main) {
+                            binding.root.context.errorDialogBuilder(it).show()
+                        }
+                    }
+                }
             }
             binding.itemList.isVisible = newExpandStatus
             binding.itemText.isVisible = !newExpandStatus
