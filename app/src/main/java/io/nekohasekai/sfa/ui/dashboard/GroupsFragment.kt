@@ -16,15 +16,9 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
-import go.Seq
-import io.nekohasekai.libbox.CommandClient
-import io.nekohasekai.libbox.CommandClientHandler
-import io.nekohasekai.libbox.CommandClientOptions
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.OutboundGroup
 import io.nekohasekai.libbox.OutboundGroupItem
-import io.nekohasekai.libbox.OutboundGroupIterator
-import io.nekohasekai.libbox.StatusMessage
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.databinding.FragmentDashboardGroupsBinding
@@ -33,22 +27,25 @@ import io.nekohasekai.sfa.databinding.ViewDashboardGroupItemBinding
 import io.nekohasekai.sfa.ktx.colorForURLTestDelay
 import io.nekohasekai.sfa.ktx.errorDialogBuilder
 import io.nekohasekai.sfa.ui.MainActivity
+import io.nekohasekai.sfa.utils.CommandClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-class GroupsFragment : Fragment(), CommandClientHandler {
+class GroupsFragment : Fragment(), CommandClient.Handler {
 
     private val activity: MainActivity? get() = super.getActivity() as MainActivity?
     private var _binding: FragmentDashboardGroupsBinding? = null
     private val binding get() = _binding!!
-    private var commandClient: CommandClient? = null
 
     private var _adapter: Adapter? = null
     private val adapter get() = _adapter!!
+
+    private val commandClient =
+        CommandClient(lifecycleScope, CommandClient.ConnectionType.Groups, this)
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -65,39 +62,9 @@ class GroupsFragment : Fragment(), CommandClientHandler {
         binding.container.layoutManager = LinearLayoutManager(requireContext())
         activity.serviceStatus.observe(viewLifecycleOwner) {
             if (it == Status.Started) {
-                reconnect()
+                commandClient.connect()
             }
         }
-    }
-
-    private fun reconnect() {
-        disconnect()
-        val options = CommandClientOptions()
-        options.command = Libbox.CommandGroup
-        options.statusInterval = 2 * 1000 * 1000 * 1000
-        val commandClient = CommandClient(requireContext().filesDir.absolutePath, this, options)
-        this.commandClient = commandClient
-        lifecycleScope.launch(Dispatchers.IO) {
-            for (i in 1..3) {
-                delay(100)
-                try {
-                    commandClient.connect()
-                    break
-                } catch (e: Exception) {
-                    break
-                }
-            }
-        }
-    }
-
-    private fun disconnect() {
-        commandClient?.apply {
-            runCatching {
-                disconnect()
-            }
-            Seq.destroyRef(refnum)
-        }
-        commandClient = null
     }
 
     private var displayed = false
@@ -109,35 +76,25 @@ class GroupsFragment : Fragment(), CommandClientHandler {
         }
     }
 
-    override fun connected() {
+    override fun onConnected() {
         lifecycleScope.launch(Dispatchers.Main) {
             updateDisplayed(true)
         }
     }
 
-    override fun disconnected(message: String?) {
+    override fun onDisconnected() {
         lifecycleScope.launch(Dispatchers.Main) {
             updateDisplayed(false)
         }
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    override fun writeGroups(message: OutboundGroupIterator) {
-        val groups = mutableListOf<OutboundGroup>()
-        while (message.hasNext()) {
-            groups.add(message.next())
-        }
+    override fun updateGroups(groups: List<OutboundGroup>) {
         activity?.runOnUiThread {
             updateDisplayed(groups.isNotEmpty())
             adapter.groups = groups
             adapter.notifyDataSetChanged()
         }
-    }
-
-    override fun writeLog(message: String?) {
-    }
-
-    override fun writeStatus(message: StatusMessage?) {
     }
 
     private class Adapter : RecyclerView.Adapter<GroupView>() {

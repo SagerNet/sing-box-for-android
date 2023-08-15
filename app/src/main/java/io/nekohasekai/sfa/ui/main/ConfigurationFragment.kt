@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.database.Profile
 import io.nekohasekai.sfa.database.ProfileManager
-import io.nekohasekai.sfa.database.TypedProfile
 import io.nekohasekai.sfa.databinding.FragmentConfigurationBinding
 import io.nekohasekai.sfa.databinding.ViewConfigutationItemBinding
 import io.nekohasekai.sfa.ktx.errorDialogBuilder
