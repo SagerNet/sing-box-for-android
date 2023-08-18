@@ -77,7 +77,7 @@ class CommandClient(
             }
             Seq.destroyRef(refnum)
         }
-
+        commandClient = null
     }
 
     private inner class ClientHandler : CommandClientHandler {
