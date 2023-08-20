@@ -173,7 +173,11 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
             if (!newExpandStatus) {
                 val builder = SpannableStringBuilder()
                 items.forEach {
-                    builder.append("■")
+                    if (it.tag == group.selected) {
+                        builder.append("▣")
+                    } else {
+                        builder.append("■")
+                    }
                     builder.setSpan(
                         ForegroundColorSpan(
                             colorForURLTestDelay(
