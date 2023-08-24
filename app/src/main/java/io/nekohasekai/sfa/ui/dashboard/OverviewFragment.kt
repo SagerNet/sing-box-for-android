@@ -29,13 +29,15 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class OverviewFragment : Fragment(), CommandClient.Handler {
+class OverviewFragment : Fragment() {
 
     private val activity: MainActivity? get() = super.getActivity() as MainActivity?
     private var _binding: FragmentDashboardOverviewBinding? = null
     private val binding get() = _binding!!
-    private val commandClient =
-        CommandClient(lifecycleScope, CommandClient.ConnectionType.Status, this)
+    private val statusClient =
+        CommandClient(lifecycleScope, CommandClient.ConnectionType.Status, StatusClient())
+    private val clashModeClient =
+        CommandClient(lifecycleScope, CommandClient.ConnectionType.ClashMode, ClashModeClient())
 
     private var _adapter: Adapter? = null
     private val adapter get() = _adapter!!
@@ -61,7 +63,8 @@ class OverviewFragment : Fragment(), CommandClient.Handler {
         activity.serviceStatus.observe(viewLifecycleOwner) {
             binding.statusContainer.isVisible = it == Status.Starting || it == Status.Started
             if (it == Status.Started) {
-                commandClient.connect()
+                statusClient.connect()
+//                clashModeClient.connect()
             }
         }
         ProfileManager.registerCallback(this::updateProfiles)
@@ -71,46 +74,76 @@ class OverviewFragment : Fragment(), CommandClient.Handler {
         super.onDestroyView()
         _adapter = null
         _binding = null
-        commandClient.disconnect()
+        statusClient.disconnect()
+//        clashModeClient.disconnect()
         ProfileManager.unregisterCallback(this::updateProfiles)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        statusClient.disconnect()
+//        clashModeClient.disconnect()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        statusClient.connect()
+//        clashModeClient.connect()
     }
 
     private fun updateProfiles() {
         _adapter?.reload()
     }
 
-    override fun onConnected() {
-        val binding = _binding ?: return
-        lifecycleScope.launch(Dispatchers.Main) {
-            binding.memoryText.text = getString(R.string.loading)
-            binding.goroutinesText.text = getString(R.string.loading)
-        }
-    }
 
-    override fun onDisconnected() {
-        val binding = _binding ?: return
-        lifecycleScope.launch(Dispatchers.Main) {
-            binding.memoryText.text = getString(R.string.loading)
-            binding.goroutinesText.text = getString(R.string.loading)
-        }
-    }
+    inner class StatusClient : CommandClient.Handler {
 
-    override fun updateStatus(status: StatusMessage) {
-        val binding = _binding ?: return
-        lifecycleScope.launch(Dispatchers.Main) {
-            binding.memoryText.text = Libbox.formatBytes(status.memory)
-            binding.goroutinesText.text = status.goroutines.toString()
-            val trafficAvailable = status.trafficAvailable
-            binding.trafficContainer.isVisible = trafficAvailable
-            if (trafficAvailable) {
-                binding.inboundConnectionsText.text = status.connectionsIn.toString()
-                binding.outboundConnectionsText.text = status.connectionsOut.toString()
-                binding.uplinkText.text = Libbox.formatBytes(status.uplink) + "/s"
-                binding.downlinkText.text = Libbox.formatBytes(status.downlink) + "/s"
-                binding.uplinkTotalText.text = Libbox.formatBytes(status.uplinkTotal)
-                binding.downlinkTotalText.text = Libbox.formatBytes(status.downlinkTotal)
+        override fun onConnected() {
+            val binding = _binding ?: return
+            lifecycleScope.launch(Dispatchers.Main) {
+                binding.memoryText.text = getString(R.string.loading)
+                binding.goroutinesText.text = getString(R.string.loading)
             }
         }
+
+        override fun onDisconnected() {
+            val binding = _binding ?: return
+            lifecycleScope.launch(Dispatchers.Main) {
+                binding.memoryText.text = getString(R.string.loading)
+                binding.goroutinesText.text = getString(R.string.loading)
+            }
+        }
+
+        override fun updateStatus(status: StatusMessage) {
+            val binding = _binding ?: return
+            lifecycleScope.launch(Dispatchers.Main) {
+                binding.memoryText.text = Libbox.formatBytes(status.memory)
+                binding.goroutinesText.text = status.goroutines.toString()
+                val trafficAvailable = status.trafficAvailable
+                binding.trafficContainer.isVisible = trafficAvailable
+                if (trafficAvailable) {
+                    binding.inboundConnectionsText.text = status.connectionsIn.toString()
+                    binding.outboundConnectionsText.text = status.connectionsOut.toString()
+                    binding.uplinkText.text = Libbox.formatBytes(status.uplink) + "/s"
+                    binding.downlinkText.text = Libbox.formatBytes(status.downlink) + "/s"
+                    binding.uplinkTotalText.text = Libbox.formatBytes(status.uplinkTotal)
+                    binding.downlinkTotalText.text = Libbox.formatBytes(status.downlinkTotal)
+                }
+            }
+        }
+
+    }
+
+    inner class ClashModeClient : CommandClient.Handler {
+
+        override fun initializeClashMode(modeList: List<String>, currentMode: String) {
+            // TODO: initialize mode selector here
+        }
+
+        override fun updateClashMode(newMode: String) {
+            // TODO: update mode here
+        }
+
     }
 
     class Adapter(
