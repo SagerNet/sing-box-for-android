@@ -124,7 +124,7 @@
     <string name="title_scan_result">Scan Result</string>
     <string name="action_select">Select</string>
     <string name="action_deselect">Deselect</string>
-    <string name="per_app_proxy_update_on_change">Update on App Installed/Updated</string>
+    <string name="per_app_proxy_update_on_change">Update on China App Installed/Updated</string>
     <string name="import_profile">Import profile</string>
     <string name="import_profile_message">Are you sure to import profile %s?</string>
     <string name="icloud_profile_unsupported">iCloud profile is not support on current platform</string>
