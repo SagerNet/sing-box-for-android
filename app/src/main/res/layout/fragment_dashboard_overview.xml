@@ -424,13 +424,14 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Mode"
+                        android:paddingTop="16dp"
+                        android:paddingHorizontal="16dp"
                         android:textAppearance="?attr/textAppearanceTitleSmall">
 
                     </TextView>
@@ -440,7 +441,7 @@
                         android:id="@+id/clashModeList"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginTop="16dp"
+                        android:padding="8dp"
                         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                         app:spanCount="3"
 

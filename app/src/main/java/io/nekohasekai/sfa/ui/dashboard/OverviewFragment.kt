@@ -164,13 +164,15 @@ class OverviewFragment : Fragment() {
     ) :
         RecyclerView.Adapter<ClashModeItemView>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ClashModeItemView {
-            return ClashModeItemView(
+            val view = ClashModeItemView(
                 ViewClashModeButtonBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false
                 )
             )
+            view.binding.clashModeButton.clipToOutline = true
+            return view
         }
 
         override fun getItemCount(): Int {
@@ -186,11 +188,12 @@ class OverviewFragment : Fragment() {
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: String, selected: String) {
-            binding.clashModeButton.text = item
+            binding.clashModeButtonText.text = item
             if (item != selected) {
-                binding.clashModeButton.setBackgroundColor(
-                    binding.root.context.getAttrColor(com.google.android.material.R.attr.colorButtonNormal)
+                binding.clashModeButtonText.setTextColor(
+                    binding.root.context.getAttrColor(com.google.android.material.R.attr.colorOnPrimaryContainer)
                 )
+                binding.clashModeButton.setBackgroundResource(R.drawable.bg_rounded_rectangle)
                 binding.clashModeButton.setOnClickListener {
                     runCatching {
                         Libbox.newStandaloneCommandClient().setClashMode(item)
@@ -202,9 +205,10 @@ class OverviewFragment : Fragment() {
                     }
                 }
             } else {
-                binding.clashModeButton.setBackgroundColor(
-                    binding.root.context.getAttrColor(com.google.android.material.R.attr.colorAccent)
+                binding.clashModeButtonText.setTextColor(
+                    binding.root.context.getAttrColor(com.google.android.material.R.attr.colorOnPrimary)
                 )
+                binding.clashModeButton.setBackgroundResource(R.drawable.bg_rounded_rectangle_active)
                 binding.clashModeButton.isClickable = false
             }
 
