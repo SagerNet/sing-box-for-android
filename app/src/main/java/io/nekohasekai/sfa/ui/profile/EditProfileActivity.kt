@@ -85,11 +85,13 @@ class EditProfileActivity : AbstractActivity() {
                 TypedProfile.Type.Local -> {
                     binding.editButton.isVisible = true
                     binding.remoteFields.isVisible = false
+                    binding.shareURLButton.isVisible = false
                 }
 
                 TypedProfile.Type.Remote -> {
                     binding.editButton.isVisible = false
                     binding.remoteFields.isVisible = true
+                    binding.shareURLButton.isVisible = true
                     binding.remoteURL.text = profile.typed.remoteURL
                     binding.lastUpdated.text =
                         DateFormat.getDateTimeInstance().format(profile.typed.lastUpdated)
@@ -105,6 +107,7 @@ class EditProfileActivity : AbstractActivity() {
             binding.updateButton.setOnClickListener(this@EditProfileActivity::updateProfile)
             binding.checkButton.setOnClickListener(this@EditProfileActivity::checkProfile)
             binding.shareButton.setOnClickListener(this@EditProfileActivity::shareProfile)
+            binding.shareURLButton.setOnClickListener(this@EditProfileActivity::shareProfileURL)
             binding.profileLayout.isVisible = true
             binding.progressView.isVisible = false
         }
@@ -217,6 +220,27 @@ class EditProfileActivity : AbstractActivity() {
                     errorDialogBuilder(e).show()
                 }
             }
+        }
+    }
+
+    private fun shareProfileURL(button: View) {
+        try {
+            startActivity(
+                Intent.createChooser(
+                    Intent(Intent.ACTION_SEND).setType("application/octet-stream")
+                        .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        .putExtra(
+                            Intent.EXTRA_STREAM,
+                            Libbox.generateRemoteProfileImportLink(
+                                profile.name,
+                                profile.typed.remoteURL
+                            )
+                        ),
+                    getString(com.google.android.material.R.string.abc_shareactionprovider_share_with)
+                )
+            )
+        } catch (e: Exception) {
+            errorDialogBuilder(e).show()
         }
     }
 

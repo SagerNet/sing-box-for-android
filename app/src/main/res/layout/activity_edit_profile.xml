@@ -149,6 +149,14 @@
                 android:text="@string/profile_share" />
 
             <Button
+                android:id="@+id/shareURLButton"
+                style="@style/Widget.Material3.Button.ElevatedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/profile_share_url" />
+
+            <Button
                 android:id="@+id/checkButton"
                 style="@style/Widget.Material3.Button.ElevatedButton"
                 android:layout_width="match_parent"
