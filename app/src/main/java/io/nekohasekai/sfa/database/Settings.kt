@@ -29,6 +29,7 @@ object Settings {
             Path.SETTINGS_DATABASE_PATH
         ).allowMainThreadQueries()
             .fallbackToDestructiveMigration()
+            .enableMultiInstanceInvalidation()
             .setQueryExecutor { GlobalScope.launch { it.run() } }
             .build()
     }
@@ -54,6 +55,8 @@ object Settings {
     var perAppProxyMode by dataStore.int(SettingsKey.PER_APP_PROXY_MODE) { PER_APP_PROXY_EXCLUDE }
     var perAppProxyList by dataStore.stringSet(SettingsKey.PER_APP_PROXY_LIST) { emptySet() }
     var perAppProxyUpdateOnChange by dataStore.int(SettingsKey.PER_APP_PROXY_UPDATE_ON_CHANGE) { PER_APP_PROXY_DISABLED }
+
+    var systemProxyEnabled by dataStore.boolean(SettingsKey.SYSTEM_PROXY_ENABLED) { true }
 
     fun serviceClass(): Class<*> {
         return when (serviceMode) {

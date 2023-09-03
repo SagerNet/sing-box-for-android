@@ -19,6 +19,7 @@ import io.nekohasekai.libbox.CommandServerHandler
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.PProfServer
 import io.nekohasekai.libbox.PlatformInterface
+import io.nekohasekai.libbox.SystemProxyStatus
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.constant.Action
 import io.nekohasekai.sfa.constant.Alert
@@ -164,6 +165,7 @@ class BoxService(
     }
 
     override fun serviceReload() {
+        status.postValue(Status.Starting)
         GlobalScope.launch(Dispatchers.IO) {
             val pfd = fileDescriptor
             if (pfd != null) {
@@ -182,6 +184,19 @@ class BoxService(
             boxService = null
             startService()
         }
+    }
+
+    override fun getSystemProxyStatus(): SystemProxyStatus {
+        val status = SystemProxyStatus()
+        if (service is VPNService) {
+            status.available = service.systemProxyAvailable
+            status.enabled = service.systemProxyEnabled
+        }
+        return status
+    }
+
+    override fun setSystemProxyEnabled(isEnabled: Boolean) {
+        serviceReload()
     }
 
     @RequiresApi(Build.VERSION_CODES.M)

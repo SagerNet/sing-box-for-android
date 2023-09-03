@@ -21,9 +21,15 @@ object ProfileManager {
 
     private val instance by lazy {
         Application.application.getDatabasePath(Path.PROFILES_DATABASE_PATH).parentFile?.mkdirs()
-        Room.databaseBuilder(
-            Application.application, ProfileDatabase::class.java, Path.PROFILES_DATABASE_PATH
-        ).fallbackToDestructiveMigration().setQueryExecutor { GlobalScope.launch { it.run() } }
+        Room
+            .databaseBuilder(
+                Application.application,
+                ProfileDatabase::class.java,
+                Path.PROFILES_DATABASE_PATH
+            )
+            .fallbackToDestructiveMigration()
+            .enableMultiInstanceInvalidation()
+            .setQueryExecutor { GlobalScope.launch { it.run() } }
             .build()
     }
 

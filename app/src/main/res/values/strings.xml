@@ -132,4 +132,5 @@
     <string name="search">Search</string>
     <string name="urltest">URLTest</string>
     <string name="expand">Expand</string>
+    <string name="http_proxy">HTTP Proxy</string>
 </resources>

@@ -65,12 +65,14 @@ class OverviewFragment : Fragment() {
         binding.profileList.addItemDecoration(divider)
         activity.serviceStatus.observe(viewLifecycleOwner) {
             binding.statusContainer.isVisible = it == Status.Starting || it == Status.Started
-            if (it != Status.Started) {
+            if (it == Status.Stopped) {
                 binding.clashModeCard.isVisible = false
+                binding.systemProxyCard.isVisible = false
             }
             if (it == Status.Started) {
                 statusClient.connect()
                 clashModeClient.connect()
+                reloadSystemProxyStatus()
             }
         }
         ProfileManager.registerCallback(this::updateProfiles)
@@ -87,6 +89,29 @@ class OverviewFragment : Fragment() {
 
     private fun updateProfiles() {
         adapter?.reload()
+    }
+
+    private fun reloadSystemProxyStatus() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val status = Libbox.newStandaloneCommandClient().systemProxyStatus
+            withContext(Dispatchers.Main) {
+                binding.systemProxyCard.isVisible = status.available
+                binding.systemProxyCard.isEnabled = true
+                binding.systemProxySwitch.setOnClickListener(null)
+                binding.systemProxySwitch.isChecked = status.enabled
+                binding.systemProxySwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+                    binding.systemProxyCard.isEnabled = false
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        Settings.systemProxyEnabled = isChecked
+                        runCatching {
+                            Libbox.newStandaloneCommandClient().setSystemProxyEnabled(isChecked)
+                        }.onFailure {
+                            buttonView.context.errorDialogBuilder(it).show()
+                        }
+                    }
+                }
+            }
+        }
     }
 
     inner class StatusClient : CommandClient.Handler {

@@ -429,18 +429,18 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Mode"
-                        android:paddingTop="16dp"
                         android:paddingHorizontal="16dp"
+                        android:paddingTop="16dp"
+                        android:text="Mode"
                         android:textAppearance="?attr/textAppearanceTitleSmall">
 
                     </TextView>
 
                     <androidx.recyclerview.widget.RecyclerView
-                        android:nestedScrollingEnabled="false"
                         android:id="@+id/clashModeList"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:nestedScrollingEnabled="false"
                         android:padding="8dp"
                         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                         app:spanCount="3"
@@ -452,12 +452,38 @@
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/profileCard"
+                android:id="@+id/systemProxyCard"
                 style="?attr/materialCardViewElevatedStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:visibility="gone"
                 tools:visibility="visible">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp">
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/systemProxySwitch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/http_proxy"
+                        android:textAppearance="?attr/textAppearanceTitleSmall" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/profileCard"
+                style="?attr/materialCardViewElevatedStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
