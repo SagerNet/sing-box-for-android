@@ -29,18 +29,14 @@ import kotlinx.coroutines.withContext
 
 class ConfigurationFragment : Fragment() {
 
-    private var _adapter: Adapter? = null
-    private var adapter: Adapter
-        get() = _adapter as Adapter
-        set(value) {
-            _adapter = value
-        }
+    private var adapter: Adapter? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         val binding = FragmentConfigurationBinding.inflate(inflater, container, false)
-        adapter = Adapter(lifecycleScope, binding)
+        val adapter = Adapter(lifecycleScope, binding)
+        this.adapter = adapter
         binding.profileList.also {
             it.layoutManager = LinearLayoutManager(requireContext())
             it.adapter = adapter
@@ -69,17 +65,17 @@ class ConfigurationFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        _adapter?.reload()
+        adapter?.reload()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         ProfileManager.unregisterCallback(this::updateProfiles)
-        _adapter = null
+        adapter = null
     }
 
     private fun updateProfiles() {
-        _adapter?.reload()
+        adapter?.reload()
     }
 
     class Adapter(
@@ -94,8 +90,10 @@ class ConfigurationFragment : Fragment() {
         internal fun reload() {
             if (isMoving) return
             scope.launch(Dispatchers.IO) {
-                items = ProfileManager.list().toMutableList()
+                val newItems = ProfileManager.list().toMutableList()
                 withContext(Dispatchers.Main) {
+                    items = newItems
+                    notifyDataSetChanged()
                     if (items.isEmpty()) {
                         parent.statusText.isVisible = true
                         parent.profileList.isVisible = false
@@ -103,7 +101,6 @@ class ConfigurationFragment : Fragment() {
                         parent.statusText.isVisible = false
                         parent.profileList.isVisible = true
                     }
-                    notifyDataSetChanged()
                 }
             }
         }

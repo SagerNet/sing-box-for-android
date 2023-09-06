@@ -192,5 +192,9 @@ object DefaultNetworkListener {
         }
     }
 
-    private fun unregister() = Application.connectivity.unregisterNetworkCallback(Callback)
+    private fun unregister() {
+        runCatching {
+            Application.connectivity.unregisterNetworkCallback(Callback)
+        }
+    }
 }

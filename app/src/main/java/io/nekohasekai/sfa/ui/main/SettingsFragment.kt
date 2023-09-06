@@ -31,13 +31,12 @@ import kotlinx.coroutines.withContext
 
 class SettingsFragment : Fragment() {
 
-    private var _binding: FragmentSettingsBinding? = null
-    private val binding get() = _binding!!
-
+    private var binding: FragmentSettingsBinding? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentSettingsBinding.inflate(inflater, container, false)
+        val binding = FragmentSettingsBinding.inflate(inflater, container, false)
+        this.binding = binding
         onCreate()
         return binding.root
     }
@@ -52,6 +51,7 @@ class SettingsFragment : Fragment() {
 
     private fun onCreate() {
         val activity = activity as MainActivity? ?: return
+        val binding = binding ?: return
         binding.versionText.text = Libbox.version()
         binding.clearButton.setOnClickListener {
             lifecycleScope.launch(Dispatchers.IO) {
@@ -119,6 +119,7 @@ class SettingsFragment : Fragment() {
 
     private suspend fun reloadSettings() {
         val activity = activity ?: return
+        val binding = binding ?: return
         val dataSize = Libbox.formatBytes(
             (activity.getExternalFilesDir(null) ?: activity.filesDir)
                 .walkTopDown().filter { it.isFile }.map { it.length() }.sum()
@@ -145,7 +146,7 @@ class SettingsFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+        binding = null
     }
 
 }
