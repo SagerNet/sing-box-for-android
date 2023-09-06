@@ -37,12 +37,8 @@ import kotlinx.coroutines.withContext
 class GroupsFragment : Fragment(), CommandClient.Handler {
 
     private val activity: MainActivity? get() = super.getActivity() as MainActivity?
-    private var _binding: FragmentDashboardGroupsBinding? = null
-    private val binding get() = _binding!!
-
-    private var _adapter: Adapter? = null
-    private val adapter get() = _adapter!!
-
+    private var binding: FragmentDashboardGroupsBinding? = null
+    private var adapter: Adapter? = null
     private val commandClient =
         CommandClient(lifecycleScope, CommandClient.ConnectionType.Groups, this)
 
@@ -50,14 +46,16 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentDashboardGroupsBinding.inflate(inflater, container, false)
+        val binding = FragmentDashboardGroupsBinding.inflate(inflater, container, false)
+        this.binding = binding
         onCreate()
         return binding.root
     }
 
     private fun onCreate() {
         val activity = activity ?: return
-        _adapter = Adapter()
+        val binding = binding ?: return
+        adapter = Adapter()
         binding.container.adapter = adapter
         binding.container.layoutManager = LinearLayoutManager(requireContext())
         activity.serviceStatus.observe(viewLifecycleOwner) {
@@ -67,8 +65,14 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding = null
+    }
+
     private var displayed = false
     private fun updateDisplayed(newValue: Boolean) {
+        val binding = binding ?: return
         if (displayed != newValue) {
             displayed = newValue
             binding.statusText.isVisible = !displayed
@@ -90,6 +94,7 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
 
     @SuppressLint("NotifyDataSetChanged")
     override fun updateGroups(groups: List<OutboundGroup>) {
+        val adapter = adapter ?: return
         activity?.runOnUiThread {
             updateDisplayed(groups.isNotEmpty())
             adapter.groups = groups

@@ -33,11 +33,10 @@ class NewProfileActivity : AbstractActivity() {
         Import("Import");
     }
 
-    private var _binding: ActivityAddProfileBinding? = null
-    private val binding get() = _binding!!
-
+    private var binding: ActivityAddProfileBinding? = null
     private val importFile =
         registerForActivityResult(ActivityResultContracts.GetContent()) { fileURI ->
+            val binding = binding ?: return@registerForActivityResult
             if (fileURI != null) {
                 binding.sourceURL.editText?.setText(fileURI.toString())
             }
@@ -47,7 +46,8 @@ class NewProfileActivity : AbstractActivity() {
         super.onCreate(savedInstanceState)
 
         setTitle(R.string.title_new_profile)
-        _binding = ActivityAddProfileBinding.inflate(layoutInflater)
+        val binding = ActivityAddProfileBinding.inflate(layoutInflater)
+        this.binding = binding
         setContentView(binding.root)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -91,7 +91,13 @@ class NewProfileActivity : AbstractActivity() {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        binding = null
+    }
+
     private fun createProfile(view: View) {
+        val binding = binding ?: return
         if (binding.name.showErrorIfEmpty()) {
             return
         }
@@ -126,6 +132,7 @@ class NewProfileActivity : AbstractActivity() {
     }
 
     private suspend fun createProfile0() {
+        val binding = binding ?: return
         val typedProfile = TypedProfile()
         val profile = Profile(name = binding.name.text, typed = typedProfile)
         profile.userOrder = ProfileManager.nextOrder()

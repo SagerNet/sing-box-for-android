@@ -23,20 +23,24 @@ import java.io.File
 
 class EditProfileContentActivity : AbstractActivity() {
 
-    private var _binding: ActivityEditProfileContentBinding? = null
-    private val binding get() = _binding!!
-
+    private var binding: ActivityEditProfileContentBinding? = null
     private var _profile: Profile? = null
     private val profile get() = _profile!!
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setTitle(R.string.title_edit_configuration)
-        _binding = ActivityEditProfileContentBinding.inflate(layoutInflater)
+        val binding = ActivityEditProfileContentBinding.inflate(layoutInflater)
+        this.binding = binding
         setContentView(binding.root)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.editor.language = JsonLanguage()
         loadConfiguration()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        binding = null
     }
 
     private fun loadConfiguration() {
@@ -59,6 +63,7 @@ class EditProfileContentActivity : AbstractActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val binding = binding ?: return false
         when (item.itemId) {
             R.id.action_undo -> {
                 if (binding.editor.canUndo()) binding.editor.undo()
@@ -110,6 +115,7 @@ class EditProfileContentActivity : AbstractActivity() {
     }
 
     private suspend fun loadConfiguration0() {
+        val binding = binding ?: return
         delay(200L)
 
         val profileId = intent.getLongExtra("profile_id", -1L)

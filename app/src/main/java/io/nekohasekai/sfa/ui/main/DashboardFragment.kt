@@ -20,19 +20,19 @@ import io.nekohasekai.sfa.ui.dashboard.OverviewFragment
 class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
 
     private val activity: MainActivity? get() = super.getActivity() as MainActivity?
-    private var _binding: FragmentDashboardBinding? = null
-    private val binding get() = _binding!!
-
+    private var binding: FragmentDashboardBinding? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentDashboardBinding.inflate(inflater, container, false)
+        val binding = FragmentDashboardBinding.inflate(inflater, container, false)
+        this.binding = binding
         onCreate()
         return binding.root
     }
 
     private fun onCreate() {
         val activity = activity ?: return
+        val binding = binding ?: return
         binding.dashboardPager.adapter = Adapter(this)
         binding.dashboardPager.offscreenPageLimit = Page.values().size
         TabLayoutMediator(binding.dashboardTabLayout, binding.dashboardPager) { tab, position ->
@@ -79,12 +79,19 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding = null
+    }
+
     private fun enablePager() {
+        val binding = binding ?: return
         binding.dashboardTabLayout.isVisible = true
         binding.dashboardPager.isUserInputEnabled = true
     }
 
     private fun disablePager() {
+        val binding = binding ?: return
         binding.dashboardTabLayout.isVisible = false
         binding.dashboardPager.isUserInputEnabled = false
         binding.dashboardPager.setCurrentItem(0, false)

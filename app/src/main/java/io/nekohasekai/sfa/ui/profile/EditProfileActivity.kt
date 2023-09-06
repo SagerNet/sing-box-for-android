@@ -30,15 +30,15 @@ import java.util.Date
 
 class EditProfileActivity : AbstractActivity() {
 
-    private var _binding: ActivityEditProfileBinding? = null
-    private val binding get() = _binding!!
+    private var binding: ActivityEditProfileBinding? = null
     private var _profile: Profile? = null
     private val profile get() = _profile!!
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setTitle(R.string.title_edit_profile)
-        _binding = ActivityEditProfileBinding.inflate(layoutInflater)
+        val binding = ActivityEditProfileBinding.inflate(layoutInflater)
+        this.binding = binding
         setContentView(binding.root)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -46,14 +46,22 @@ class EditProfileActivity : AbstractActivity() {
             runCatching {
                 loadProfile()
             }.onFailure {
-                errorDialogBuilder(it)
-                    .setPositiveButton(android.R.string.ok) { _, _ -> finish() }
-                    .show()
+                withContext(Dispatchers.Main) {
+                    errorDialogBuilder(it)
+                        .setPositiveButton(android.R.string.ok) { _, _ -> finish() }
+                        .show()
+                }
             }
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        binding = null
+    }
+
     private suspend fun loadProfile() {
+        val binding = binding ?: return
         delay(200L)
 
         val profileId = intent.getLongExtra("profile_id", -1L)
@@ -67,7 +75,9 @@ class EditProfileActivity : AbstractActivity() {
                         profile.name = it
                         ProfileManager.update(profile)
                     } catch (e: Exception) {
-                        errorDialogBuilder(e).show()
+                        withContext(Dispatchers.Main) {
+                            errorDialogBuilder(e).show()
+                        }
                     }
                 }
             }
@@ -120,6 +130,7 @@ class EditProfileActivity : AbstractActivity() {
     }
 
     private fun updateAutoUpdate(newValue: String) {
+        val binding = binding ?: return
         val boolValue = EnabledType.valueOf(newValue).boolValue
         if (profile.typed.autoUpdate == boolValue) {
             return
@@ -135,6 +146,7 @@ class EditProfileActivity : AbstractActivity() {
     }
 
     private fun updateAutoUpdateInterval(newValue: String) {
+        val binding = binding ?: return
         if (newValue.isBlank()) {
             binding.autoUpdateInterval.error = getString(R.string.profile_input_required)
             return
@@ -156,6 +168,7 @@ class EditProfileActivity : AbstractActivity() {
     }
 
     private fun updateProfile() {
+        val binding = binding ?: return
         binding.progressView.isVisible = true
         lifecycleScope.launch(Dispatchers.IO) {
             delay(200)
@@ -173,6 +186,7 @@ class EditProfileActivity : AbstractActivity() {
     }
 
     private fun updateProfile(view: View) {
+        val binding = binding ?: return
         binding.progressView.isVisible = true
         lifecycleScope.launch(Dispatchers.IO) {
             try {
@@ -195,6 +209,7 @@ class EditProfileActivity : AbstractActivity() {
     }
 
     private fun checkProfile(button: View) {
+        val binding = binding ?: return
         binding.progressView.isVisible = true
         lifecycleScope.launch(Dispatchers.IO) {
             delay(200)

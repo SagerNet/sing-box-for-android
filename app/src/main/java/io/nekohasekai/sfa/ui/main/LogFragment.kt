@@ -19,20 +19,21 @@ import java.util.LinkedList
 
 class LogFragment : Fragment() {
     private val activity: MainActivity? get() = super.getActivity() as MainActivity?
-    private var _binding: FragmentLogBinding? = null
-    private val binding get() = _binding!!
+    private var binding: FragmentLogBinding? = null
     private var logAdapter: LogAdapter? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentLogBinding.inflate(inflater, container, false)
+        val binding = FragmentLogBinding.inflate(inflater, container, false)
+        this.binding = binding
         onCreate()
         return binding.root
     }
 
     private fun onCreate() {
         val activity = activity ?: return
+        val binding = binding ?: return
         activity.logCallback = ::updateViews
         binding.logView.layoutManager = LinearLayoutManager(requireContext())
         binding.logView.adapter = LogAdapter(activity.logList).also { logAdapter = it }
@@ -82,6 +83,7 @@ class LogFragment : Fragment() {
     private fun updateViews(reset: Boolean) {
         val activity = activity ?: return
         val logAdapter = logAdapter ?: return
+        val binding = binding ?: return
         if (activity.logList.isEmpty()) {
             binding.logView.isVisible = false
             binding.statusText.isVisible = true
@@ -99,7 +101,7 @@ class LogFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+        binding = null
         activity?.logCallback = null
         logAdapter = null
     }
