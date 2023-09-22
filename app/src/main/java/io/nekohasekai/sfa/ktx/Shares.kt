@@ -26,6 +26,7 @@ suspend fun Context.shareProfile(profile: Profile) {
     content.config = File(profile.typed.path).readText()
     content.remotePath = profile.typed.remoteURL
     content.autoUpdate = profile.typed.autoUpdate
+    content.autoUpdateInterval = profile.typed.autoUpdateInterval
     content.lastUpdated = profile.typed.lastUpdated.time
 
     val configDirectory = File(cacheDir, "share").also { it.mkdirs() }

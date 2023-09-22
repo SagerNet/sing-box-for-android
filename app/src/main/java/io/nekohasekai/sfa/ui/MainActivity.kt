@@ -166,6 +166,8 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback, DistributeL
             Libbox.ProfileTypeRemote -> {
                 typedProfile.type = TypedProfile.Type.Remote
                 typedProfile.remoteURL = content.remotePath
+                typedProfile.autoUpdate = content.autoUpdate
+                typedProfile.autoUpdateInterval = content.autoUpdateInterval
                 typedProfile.lastUpdated = Date(content.lastUpdated)
             }
         }
