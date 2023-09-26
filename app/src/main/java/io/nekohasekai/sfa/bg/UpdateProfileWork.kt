@@ -65,11 +65,10 @@ class UpdateProfileWork {
             val remoteProfiles = ProfileManager.list()
                 .filter { it.typed.type == TypedProfile.Type.Remote && it.typed.autoUpdate }
             if (remoteProfiles.isEmpty()) return Result.success()
-            val httpClient = HTTPClient()
             var success = true
             for (profile in remoteProfiles) {
                 try {
-                    val content = httpClient.getString(profile.typed.remoteURL)
+                    val content = HTTPClient().use { it.getString(profile.typed.remoteURL) }
                     Libbox.checkConfig(content)
                     File(profile.typed.path).writeText(content)
                     profile.typed.lastUpdated = Date()
