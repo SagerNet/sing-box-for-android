@@ -26,6 +26,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Collections
 
 class ConfigurationFragment : Fragment() {
 
@@ -52,6 +53,16 @@ class ConfigurationFragment : Fragment() {
                 }
 
                 override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                }
+
+                override fun onSelectedChanged(
+                    viewHolder: RecyclerView.ViewHolder?,
+                    actionState: Int
+                ) {
+                    super.onSelectedChanged(viewHolder, actionState)
+                    if (actionState == ItemTouchHelper.ACTION_STATE_IDLE) {
+                        adapter.updateUserOrder()
+                    }
                 }
             }).attachToRecyclerView(it)
         }
@@ -85,10 +96,8 @@ class ConfigurationFragment : Fragment() {
         RecyclerView.Adapter<Holder>() {
 
         internal var items: MutableList<Profile> = mutableListOf()
-        private var isMoving = false
 
         internal fun reload() {
-            if (isMoving) return
             scope.launch(Dispatchers.IO) {
                 val newItems = ProfileManager.list().toMutableList()
                 withContext(Dispatchers.Main) {
@@ -106,28 +115,26 @@ class ConfigurationFragment : Fragment() {
         }
 
         internal fun move(from: Int, to: Int): Boolean {
-            val first = items.getOrNull(from) ?: return false
-            var previousOrder = first.userOrder
-            val (step, range) = if (from < to) Pair(1, from until to) else Pair(
-                -1, to + 1 downTo from
-            )
-            val updated = mutableListOf<Profile>()
-            for (i in range) {
-                val next = items.getOrNull(i + step) ?: return false
-                val order = next.userOrder
-                next.userOrder = previousOrder
-                previousOrder = order
-                updated.add(next)
+            if (from < to) {
+                for (i in from until to) {
+                    Collections.swap(items, i, i + 1)
+                }
+            } else {
+                for (i in from downTo to + 1) {
+                    Collections.swap(items, i, i - 1)
+                }
             }
-            first.userOrder = previousOrder
-            updated.add(first)
             notifyItemMoved(from, to)
-            isMoving = true
-            GlobalScope.launch(Dispatchers.IO) {
-                ProfileManager.update(updated)
-                isMoving = false
-            }
             return true
+        }
+
+        internal fun updateUserOrder() {
+            items.forEachIndexed { index, profile ->
+                profile.userOrder = index.toLong()
+            }
+            GlobalScope.launch(Dispatchers.IO) {
+                ProfileManager.update(items)
+            }
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
