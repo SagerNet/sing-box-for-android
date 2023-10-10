@@ -171,7 +171,7 @@ class EditProfileActivity : AbstractActivity() {
         val binding = binding ?: return
         binding.progressView.isVisible = true
         lifecycleScope.launch(Dispatchers.IO) {
-            delay(200)
+            delay(200L)
             try {
                 ProfileManager.update(profile)
             } catch (e: Exception) {
@@ -212,7 +212,7 @@ class EditProfileActivity : AbstractActivity() {
         val binding = binding ?: return
         binding.progressView.isVisible = true
         lifecycleScope.launch(Dispatchers.IO) {
-            delay(200)
+            delay(200L)
             try {
                 Libbox.checkConfig(File(profile.typed.path).readText())
             } catch (e: Exception) {

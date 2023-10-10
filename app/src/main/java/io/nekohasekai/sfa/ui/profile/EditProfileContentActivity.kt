@@ -138,7 +138,7 @@ class EditProfileContentActivity : AbstractActivity() {
                         }
                     }
                     withContext(Dispatchers.Main) {
-                        delay(200)
+                        delay(200L)
                         binding.progressView.isInvisible = true
                     }
                 }

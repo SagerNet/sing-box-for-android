@@ -338,7 +338,7 @@ class OverviewFragment : Fragment() {
             if (restart) {
                 mainActivity.reconnect()
                 BoxService.stop()
-                delay(200)
+                delay(200L)
                 mainActivity.startService()
                 return
             }
