@@ -65,14 +65,17 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.OPENABLE" />
 
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+
                 <data android:host="*" />
                 <data android:mimeType="application/octet-stream" />
+                <data android:mimeType="text/*" />
                 <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.bpf" />
                 <data android:pathPattern=".*\\..*\\..*\\..*\\.bpf" />
                 <data android:pathPattern=".*\\..*\\..*\\.bpf" />
                 <data android:pathPattern=".*\\..*\\.bpf" />
                 <data android:pathPattern=".*\\.bpf" />
-                <data android:scheme="content" />
             </intent-filter>
 
             <intent-filter>
