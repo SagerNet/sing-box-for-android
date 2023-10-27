@@ -111,6 +111,12 @@
         <activity
             android:name="io.nekohasekai.sfa.ui.profileoverride.PerAppProxyActivity"
             android:exported="false" />
+        <activity
+            android:name="io.nekohasekai.sfa.ui.debug.DebugActivity"
+            android:exported="false" />
+        <activity
+            android:name="io.nekohasekai.sfa.ui.debug.VPNScanActivity"
+            android:exported="false" />
 
         <service
             android:name=".bg.TileService"

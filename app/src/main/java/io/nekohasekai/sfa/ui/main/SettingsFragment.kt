@@ -24,6 +24,7 @@ import io.nekohasekai.sfa.ktx.launchCustomTab
 import io.nekohasekai.sfa.ktx.setSimpleItems
 import io.nekohasekai.sfa.ktx.text
 import io.nekohasekai.sfa.ui.MainActivity
+import io.nekohasekai.sfa.ui.debug.DebugActivity
 import io.nekohasekai.sfa.ui.profileoverride.ProfileOverrideActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -111,6 +112,9 @@ class SettingsFragment : Fragment() {
         }
         binding.documentationButton.setOnClickListener {
             it.context.launchCustomTab("http://sing-box.sagernet.org/installation/clients/sfa/")
+        }
+        binding.openDebugButton.setOnClickListener {
+            startActivity(Intent(requireContext(), DebugActivity::class.java))
         }
         lifecycleScope.launch(Dispatchers.IO) {
             reloadSettings()

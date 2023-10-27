@@ -12,6 +12,7 @@
     <string name="title_edit_configuration">Edit Configuration</string>
     <string name="title_overview">Overview</string>
     <string name="title_groups">Groups</string>
+    <string name="title_debug">Debug</string>
 
     <string name="quick_toggle">Toggle</string>
     <string name="profile_name">Name</string>
@@ -125,7 +126,7 @@
     <string name="title_scan_result">Scan Result</string>
     <string name="action_select">Select</string>
     <string name="action_deselect">Deselect</string>
-    <string name="per_app_proxy_update_on_change">Update on China App Installed/Updated</string>
+    <string name="per_app_proxy_update_on_change">Update on new China App Installed</string>
     <string name="import_profile">Import profile</string>
     <string name="import_profile_message">Are you sure to import profile %s?</string>
     <string name="icloud_profile_unsupported">iCloud profile is not support on current platform</string>
@@ -133,4 +134,16 @@
     <string name="urltest">URLTest</string>
     <string name="expand">Expand</string>
     <string name="http_proxy">HTTP Proxy</string>
+    <string name="title_scan_vpn">Scan VPN apps</string>
+    <string name="message_scan_vpn">Check the VPN installed on the device and its contents</string>
+    <string name="action_scan_vpn">Scan</string>
+    <string name="message_debug_tools">Some debug utilities</string>
+    <string name="action_open">Open</string>
+    <string name="vpn_app_type">App Type</string>
+    <string name="vpn_core_type">Core Type</string>
+    <string name="vpn_core_path">Detected Path</string>
+    <string name="vpn_golang_version">Go Version</string>
+    <string name="vpn_app_type_other">Other</string>
+    <string name="vpn_core_type_unknown">Unknown</string>
+
 </resources>
