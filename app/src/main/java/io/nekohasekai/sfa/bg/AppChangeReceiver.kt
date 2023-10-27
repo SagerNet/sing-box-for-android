@@ -23,6 +23,10 @@ class AppChangeReceiver : BroadcastReceiver() {
             Log.d(TAG, "per app proxy disabled")
             return
         }
+        if (intent.getBooleanExtra(Intent.EXTRA_REPLACING, false)) {
+            Log.d(TAG, "skip app update")
+            return
+        }
         val perAppProxyUpdateOnChange = Settings.perAppProxyUpdateOnChange
         if (perAppProxyUpdateOnChange == Settings.PER_APP_PROXY_DISABLED) {
             Log.d(TAG, "update on change disabled")
@@ -36,10 +40,10 @@ class AppChangeReceiver : BroadcastReceiver() {
         val isChinaApp = PerAppProxyActivity.scanChinaApps(listOf(packageName)).isNotEmpty()
         Log.d(TAG, "scan china app result for $packageName: $isChinaApp")
         if ((perAppProxyUpdateOnChange == Settings.PER_APP_PROXY_INCLUDE) xor !isChinaApp) {
-            Settings.perAppProxyList = Settings.perAppProxyList + packageName
+            Settings.perAppProxyList += packageName
             Log.d(TAG, "added to list")
         } else {
-            Settings.perAppProxyList = Settings.perAppProxyList - packageName
+            Settings.perAppProxyList -= packageName
             Log.d(TAG, "removed from list")
         }
     }
