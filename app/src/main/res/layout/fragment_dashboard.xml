@@ -14,10 +14,11 @@
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/dashboardTabLayout"
+            style="@style/Widget.Material3.TabLayout.Secondary"
+            android:background="?android:attr/windowBackground"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
+            app:tabUnboundedRipple="true"
             app:tabIndicatorFullWidth="true">
 
             <com.google.android.material.tabs.TabItem
