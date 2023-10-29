@@ -8,6 +8,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.constant.EnabledType
 import io.nekohasekai.sfa.database.Profile
 import io.nekohasekai.sfa.database.ProfileManager
 import io.nekohasekai.sfa.database.TypedProfile
@@ -51,6 +52,14 @@ class NewProfileActivity : AbstractActivity() {
         setContentView(binding.root)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        intent.getStringExtra("importName")?.also { importName ->
+            intent.getStringExtra("importURL")?.also { importURL ->
+                binding.name.editText?.setText(importName)
+                binding.type.text = TypedProfile.Type.Remote.name
+                binding.remoteURL.editText?.setText(importURL)
+            }
+        }
+
         binding.name.removeErrorIfNotEmpty()
         binding.type.addTextChangedListener {
             when (it) {
@@ -62,6 +71,9 @@ class NewProfileActivity : AbstractActivity() {
                 TypedProfile.Type.Remote.name -> {
                     binding.localFields.isVisible = false
                     binding.remoteFields.isVisible = true
+                    if (binding.autoUpdateInterval.text.toIntOrNull() == null) {
+                        binding.autoUpdateInterval.text = "60"
+                    }
                 }
             }
         }
@@ -82,13 +94,7 @@ class NewProfileActivity : AbstractActivity() {
             startFilesForResult(importFile, "application/json")
         }
         binding.createProfile.setOnClickListener(this::createProfile)
-        intent.getStringExtra("importName")?.also { importName ->
-            intent.getStringExtra("importURL")?.also { importURL ->
-                binding.name.editText?.setText(importName)
-                binding.type.text = TypedProfile.Type.Remote.name
-                binding.remoteURL.editText?.setText(importURL)
-            }
-        }
+        binding.autoUpdateInterval.addTextChangedListener(this::updateAutoUpdateInterval)
     }
 
     override fun onDestroy() {
@@ -179,6 +185,10 @@ class NewProfileActivity : AbstractActivity() {
                 typedProfile.path = configFile.path
                 typedProfile.remoteURL = remoteURL
                 typedProfile.lastUpdated = Date()
+                typedProfile.autoUpdate = EnabledType.valueOf(binding.autoUpdate.text).boolValue
+                binding.autoUpdateInterval.text.toIntOrNull()?.also {
+                    typedProfile.autoUpdateInterval = it
+                }
             }
         }
         ProfileManager.create(profile)
@@ -187,5 +197,26 @@ class NewProfileActivity : AbstractActivity() {
             finish()
         }
     }
+
+    private fun updateAutoUpdateInterval(newValue: String) {
+        val binding = binding ?: return
+        if (newValue.isBlank()) {
+            binding.autoUpdateInterval.error = getString(R.string.profile_input_required)
+            return
+        }
+        val intValue = try {
+            newValue.toInt()
+        } catch (e: Exception) {
+            binding.autoUpdateInterval.error = e.localizedMessage
+            return
+        }
+        if (intValue < 15) {
+            binding.autoUpdateInterval.error =
+                getString(R.string.profile_auto_update_interval_minimum_hint)
+            return
+        }
+        binding.autoUpdateInterval.error = null
+    }
+
 
 }
