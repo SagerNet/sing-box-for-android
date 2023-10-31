@@ -39,6 +39,10 @@
                 android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
 
+            <meta-data
+                android:name="firebase_crashlytics_collection_enabled"
+                android:value="false" />
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -172,11 +176,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/cache_paths" />
         </provider>
-
-
-        <receiver
-            android:name="com.microsoft.appcenter.distribute.UpdateReceiver"
-            tools:node="remove" />
 
     </application>
 

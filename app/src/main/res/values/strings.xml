@@ -2,6 +2,8 @@
     <string name="app_name">sing-box</string>
 
     <string name="stop">Stop</string>
+    <string name="ok">Ok</string>
+    <string name="no_thanks">No, thanks</string>
 
     <string name="title_dashboard">Dashboard</string>
     <string name="title_configuration">Profiles</string>
@@ -80,15 +82,10 @@
     <string name="core_version">Version</string>
     <string name="core">Core</string>
     <string name="core_data_size">Data Size</string>
-    <string name="analytics_title">Analytics</string>
-    <string name="analytics_message">Would you like to give SFA permission to collect analytics, send crash reports, and check update through AppCenter?</string>
-    <string name="no_thanks">No, thanks</string>
     <string name="check_update">Check Update</string>
-    <string name="title_app_center">App Center</string>
-    <string name="title_feedback">Feedback</string>
-    <string name="message">Message</string>
-    <string name="send">Send</string>
-    <string name="send_feedback">Send Feedback</string>
+    <string name="error_reporting">Error Reporting</string>
+    <string name="error_reporting_message">Would you like to allow sing to send error reports to developers via Firebase Crashlytics?</string>
+    <string name="title_app_settings">App Settings</string>
     <string name="about_title">About</string>
     <string name="app_description">Android client for sing-box, the universal proxy platform.</string>
     <string name="documentation_button">Documentation</string>

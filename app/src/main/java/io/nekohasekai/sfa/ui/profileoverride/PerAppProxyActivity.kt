@@ -282,7 +282,7 @@ class PerAppProxyActivity : AbstractActivity() {
 
             if (scanResult.isEmpty()) {
                 MaterialAlertDialogBuilder(this@PerAppProxyActivity)
-                    .setTitle(R.string.message)
+                    .setTitle(R.string.title_scan_result)
                     .setMessage(R.string.message_scan_app_no_apps_found)
                     .setPositiveButton(android.R.string.ok, null)
                     .show()

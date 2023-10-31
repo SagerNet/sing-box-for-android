@@ -2,12 +2,11 @@ package io.nekohasekai.sfa.ui
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.VpnService
 import android.os.Bundle
-import android.text.TextUtils
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -18,18 +17,16 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.microsoft.appcenter.AppCenter
-import com.microsoft.appcenter.analytics.Analytics
-import com.microsoft.appcenter.crashes.Crashes
-import com.microsoft.appcenter.distribute.Distribute
-import com.microsoft.appcenter.distribute.DistributeListener
-import com.microsoft.appcenter.distribute.ReleaseDetails
-import com.microsoft.appcenter.distribute.UpdateAction
-import com.microsoft.appcenter.utils.AppNameHelper
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.appupdate.AppUpdateOptions
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.InstallStatus
+import com.google.android.play.core.install.model.UpdateAvailability
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.ProfileContent
 import io.nekohasekai.sfa.Application
-import io.nekohasekai.sfa.BuildConfig
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.bg.ServiceConnection
 import io.nekohasekai.sfa.bg.ServiceNotification
@@ -45,17 +42,16 @@ import io.nekohasekai.sfa.ktx.errorDialogBuilder
 import io.nekohasekai.sfa.ui.profile.NewProfileActivity
 import io.nekohasekai.sfa.ui.shared.AbstractActivity
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.Date
 import java.util.LinkedList
 
-class MainActivity : AbstractActivity(), ServiceConnection.Callback, DistributeListener {
+class MainActivity : AbstractActivity(), ServiceConnection.Callback {
 
     companion object {
-        private const val TAG = "MyActivity"
+        private const val TAG = "MainActivity"
     }
 
     private lateinit var binding: ActivityMainBinding
@@ -86,7 +82,7 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback, DistributeL
         binding.navView.setupWithNavController(navController)
 
         reconnect()
-        startAnalysis()
+        startIntegration()
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -182,108 +178,75 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback, DistributeL
         connection.reconnect()
     }
 
-    private fun startAnalysis() {
+    private fun startIntegration() {
         lifecycleScope.launch(Dispatchers.IO) {
-            when (Settings.analyticsAllowed) {
-                Settings.ANALYSIS_UNKNOWN -> {
-                    withContext(Dispatchers.Main) {
-                        showAnalysisDialog()
-                    }
+            if (Settings.errorReportingEnabled == Settings.ERROR_REPORTING_UNKNOWN) {
+                withContext(Dispatchers.Main) {
+                    confirmErrorReportingIntegration()
                 }
-
-                Settings.ANALYSIS_ALLOWED -> {
-                    startAnalysisInternal()
-                }
+            } else if (Settings.checkUpdateEnabled) {
+                checkUpdate()
             }
         }
     }
 
-    private fun showAnalysisDialog() {
-        val builder = MaterialAlertDialogBuilder(this)
-            .setTitle(getString(R.string.analytics_title))
-            .setMessage(getString(R.string.analytics_message))
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-                lifecycleScope.launch(Dispatchers.IO) {
-                    Settings.analyticsAllowed = Settings.ANALYSIS_ALLOWED
-                    startAnalysisInternal()
+    private fun checkUpdate() {
+        val appUpdateManager = AppUpdateManagerFactory.create(this)
+        val appUpdateInfoTask = appUpdateManager.appUpdateInfo
+        appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
+            when (appUpdateInfo.updateAvailability()) {
+                UpdateAvailability.UPDATE_NOT_AVAILABLE -> {
+                    Log.d(TAG, "checkUpdate: not available")
+                }
+
+                UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS -> {
+                    when (appUpdateInfo.installStatus()) {
+                        InstallStatus.DOWNLOADED -> {
+                            appUpdateManager.completeUpdate()
+                        }
+                    }
+                }
+
+                UpdateAvailability.UPDATE_AVAILABLE -> {
+                    if (appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
+                        appUpdateManager.startUpdateFlow(
+                            appUpdateInfo,
+                            this,
+                            AppUpdateOptions.newBuilder(AppUpdateType.FLEXIBLE).build()
+                        )
+                    } else if (appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+                        appUpdateManager.startUpdateFlow(
+                            appUpdateInfo,
+                            this,
+                            AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build()
+                        )
+                    }
+                }
+
+                UpdateAvailability.UNKNOWN -> {
                 }
             }
-            .setNegativeButton(getString(R.string.no_thanks)) { _, _ ->
+        }
+        appUpdateInfoTask.addOnFailureListener {
+            Log.e(TAG, "checkUpdate: ", it)
+        }
+    }
+
+    private fun confirmErrorReportingIntegration() {
+        val builder = MaterialAlertDialogBuilder(this).setTitle(getString(R.string.error_reporting))
+            .setMessage(R.string.error_reporting_message)
+            .setPositiveButton(getString(R.string.ok)) { _, _ ->
                 lifecycleScope.launch(Dispatchers.IO) {
-                    Settings.analyticsAllowed = Settings.ANALYSIS_DISALLOWED
+                    Settings.errorReportingEnabled = Settings.ERROR_REPORTING_ALLOWED
+                    Firebase.crashlytics.setCrashlyticsCollectionEnabled(true)
+                }
+            }.setNegativeButton(getString(R.string.no_thanks)) { _, _ ->
+                lifecycleScope.launch(Dispatchers.IO) {
+                    Settings.errorReportingEnabled = Settings.ERROR_REPORTING_DISALLOWED
                 }
             }
         runCatching { builder.show() }
     }
-
-    suspend fun startAnalysisInternal() {
-        if (BuildConfig.APPCENTER_SECRET.isBlank()) {
-            return
-        }
-        Distribute.setListener(this)
-        runCatching {
-            AppCenter.start(
-                application,
-                BuildConfig.APPCENTER_SECRET,
-                Analytics::class.java,
-                Crashes::class.java,
-                Distribute::class.java,
-            )
-            if (!Settings.checkUpdateEnabled) {
-                Distribute.disableAutomaticCheckForUpdate()
-            }
-        }.onFailure {
-            withContext(Dispatchers.Main) {
-                errorDialogBuilder(it).show()
-            }
-        }
-    }
-
-    override fun onReleaseAvailable(activity: Activity, releaseDetails: ReleaseDetails): Boolean {
-        lifecycleScope.launch(Dispatchers.Main) {
-            delay(2000L)
-            runCatching {
-                onReleaseAvailable0(releaseDetails)
-            }
-        }
-        return true
-    }
-
-    private fun onReleaseAvailable0(releaseDetails: ReleaseDetails) {
-        val builder = MaterialAlertDialogBuilder(this)
-            .setTitle(getString(com.microsoft.appcenter.distribute.R.string.appcenter_distribute_update_dialog_title))
-        var message = if (releaseDetails.isMandatoryUpdate) {
-            getString(com.microsoft.appcenter.distribute.R.string.appcenter_distribute_update_dialog_message_mandatory)
-        } else {
-            getString(com.microsoft.appcenter.distribute.R.string.appcenter_distribute_update_dialog_message_optional)
-        }
-        message = String.format(
-            message,
-            AppNameHelper.getAppName(this),
-            releaseDetails.shortVersion,
-            releaseDetails.version
-        )
-        builder.setMessage(message)
-        builder.setPositiveButton(com.microsoft.appcenter.distribute.R.string.appcenter_distribute_update_dialog_download) { _, _ ->
-            startActivity(Intent(Intent.ACTION_VIEW, releaseDetails.downloadUrl))
-        }
-        builder.setCancelable(false)
-        if (!releaseDetails.isMandatoryUpdate) {
-            builder.setNegativeButton(com.microsoft.appcenter.distribute.R.string.appcenter_distribute_update_dialog_postpone) { _, _ ->
-                Distribute.notifyUpdateAction(UpdateAction.POSTPONE)
-            }
-        }
-        if (!TextUtils.isEmpty(releaseDetails.releaseNotes) && releaseDetails.releaseNotesUrl != null) {
-            builder.setNeutralButton(com.microsoft.appcenter.distribute.R.string.appcenter_distribute_update_dialog_view_release_notes) { _, _ ->
-                startActivity(Intent(Intent.ACTION_VIEW, releaseDetails.releaseNotesUrl))
-            }
-        }
-        builder.show()
-    }
-
-    override fun onNoReleaseAvailable(activity: Activity) {
-    }
-
 
     @SuppressLint("NewApi")
     fun startService() {

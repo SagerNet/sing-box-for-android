@@ -30,17 +30,17 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/title_app_center"
+                    android:text="@string/title_app_settings"
+                    android:layout_marginBottom="8dp"
                     android:textAppearance="?attr/textAppearanceTitleLarge" />
 
-
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/appCenterEnabled"
+                    android:id="@+id/checkUpdateEnabled"
                     style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:hint="@string/enabled">
+                    android:layout_marginTop="8dp"
+                    android:hint="@string/check_update">
 
                     <AutoCompleteTextView
                         android:layout_width="match_parent"
@@ -52,12 +52,12 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/checkUpdateEnabled"
+                    android:id="@+id/errorReportingEnabled"
                     style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_marginTop="8dp"
-                    android:hint="@string/check_update">
+                    android:hint="@string/error_reporting">
 
                     <AutoCompleteTextView
                         android:layout_width="match_parent"
@@ -95,27 +95,11 @@
 
                 </TextView>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/disableMemoryLimit"
-                    style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:hint="@string/memory_limit">
-
-                    <AutoCompleteTextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="none"
-                        android:text="@string/enabled"
-                        app:simpleItems="@array/enabled" />
-
-                </com.google.android.material.textfield.TextInputLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp">
+                    android:layout_marginTop="8dp">
 
                     <TextView
                         style="?attr/textAppearanceTitleSmall"
@@ -154,10 +138,27 @@
 
                 </LinearLayout>
 
-                <LinearLayout
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/disableMemoryLimit"
+                    style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
+                    android:hint="@string/memory_limit">
+
+                    <AutoCompleteTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"
+                        android:text="@string/enabled"
+                        app:simpleItems="@array/enabled" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:gravity="center_vertical|end"
                     android:orientation="horizontal">
 

@@ -11,8 +11,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.microsoft.appcenter.AppCenter
-import com.microsoft.appcenter.distribute.Distribute
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.R
@@ -60,31 +60,18 @@ class SettingsFragment : Fragment() {
                 reloadSettings()
             }
         }
-        binding.appCenterEnabled.addTextChangedListener {
-            lifecycleScope.launch(Dispatchers.IO) {
-                val allowed = EnabledType.valueOf(it).boolValue
-                Settings.analyticsAllowed =
-                    if (allowed) Settings.ANALYSIS_ALLOWED else Settings.ANALYSIS_DISALLOWED
-                withContext(Dispatchers.Main) {
-                    binding.checkUpdateEnabled.isEnabled = allowed
-                }
-                if (!allowed) {
-                    AppCenter.setEnabled(false)
-                } else {
-                    if (!AppCenter.isConfigured()) {
-                        activity.startAnalysisInternal()
-                    }
-                    AppCenter.setEnabled(true)
-                }
-            }
-        }
         binding.checkUpdateEnabled.addTextChangedListener {
             lifecycleScope.launch(Dispatchers.IO) {
                 val newValue = EnabledType.valueOf(it).boolValue
                 Settings.checkUpdateEnabled = newValue
-                if (!newValue) {
-                    Distribute.disableAutomaticCheckForUpdate()
-                }
+            }
+        }
+        binding.errorReportingEnabled.addTextChangedListener {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val newValue = EnabledType.valueOf(it).boolValue
+                Settings.errorReportingEnabled =
+                    if (newValue) Settings.ERROR_REPORTING_ALLOWED else Settings.ERROR_REPORTING_DISALLOWED
+                Firebase.crashlytics.setCrashlyticsCollectionEnabled(newValue)
             }
         }
         binding.disableMemoryLimit.addTextChangedListener {
@@ -128,23 +115,22 @@ class SettingsFragment : Fragment() {
             (activity.getExternalFilesDir(null) ?: activity.filesDir)
                 .walkTopDown().filter { it.isFile }.map { it.length() }.sum()
         )
-        val appCenterEnabled = Settings.analyticsAllowed == Settings.ANALYSIS_ALLOWED
+        val errorReportingEnabled = Settings.errorReportingEnabled == Settings.ERROR_REPORTING_ALLOWED
         val checkUpdateEnabled = Settings.checkUpdateEnabled
-        val removeBackgroudPermissionPage = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        val removeBackgroundPermissionPage = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             Application.powerManager.isIgnoringBatteryOptimizations(Application.application.packageName)
         } else {
             true
         }
         withContext(Dispatchers.Main) {
             binding.dataSizeText.text = dataSize
-            binding.appCenterEnabled.text = EnabledType.from(appCenterEnabled).name
-            binding.appCenterEnabled.setSimpleItems(R.array.enabled)
-            binding.checkUpdateEnabled.isEnabled = appCenterEnabled
+            binding.errorReportingEnabled.text = EnabledType.from(errorReportingEnabled).name
+            binding.errorReportingEnabled.setSimpleItems(R.array.enabled)
             binding.checkUpdateEnabled.text = EnabledType.from(checkUpdateEnabled).name
             binding.checkUpdateEnabled.setSimpleItems(R.array.enabled)
             binding.disableMemoryLimit.text = EnabledType.from(!Settings.disableMemoryLimit).name
             binding.disableMemoryLimit.setSimpleItems(R.array.enabled)
-            binding.backgroundPermissionCard.isGone = removeBackgroudPermissionPage
+            binding.backgroundPermissionCard.isGone = removeBackgroundPermissionPage
         }
     }
 

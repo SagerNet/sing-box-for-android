@@ -38,11 +38,11 @@ object Settings {
     var serviceMode by dataStore.string(SettingsKey.SERVICE_MODE) { ServiceMode.NORMAL }
     var startedByUser by dataStore.boolean(SettingsKey.STARTED_BY_USER)
 
-    const val ANALYSIS_UNKNOWN = -1
-    const val ANALYSIS_ALLOWED = 0
-    const val ANALYSIS_DISALLOWED = 1
+    const val ERROR_REPORTING_UNKNOWN = -1
+    const val ERROR_REPORTING_ALLOWED = 0
+    const val ERROR_REPORTING_DISALLOWED = 1
 
-    var analyticsAllowed by dataStore.int(SettingsKey.ANALYTICS_ALLOWED) { ANALYSIS_UNKNOWN }
+    var errorReportingEnabled by dataStore.int(SettingsKey.ERROR_REPORTING_ENABLED) { ERROR_REPORTING_UNKNOWN }
     var checkUpdateEnabled by dataStore.boolean(SettingsKey.CHECK_UPDATE_ENABLED) { true }
     var disableMemoryLimit by dataStore.boolean(SettingsKey.DISABLE_MEMORY_LIMIT)
 

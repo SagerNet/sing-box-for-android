@@ -5,6 +5,9 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-parcelize'
     id 'com.google.devtools.ksp'
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
+    id 'com.github.triplet.play'
 }
 
 android {
@@ -39,13 +42,15 @@ android {
             if (getProps("KEYSTORE_PASS") != "") {
                 signingConfig signingConfigs.release
             }
-            buildConfigField("String", "APPCENTER_SECRET", "\"" + getProps("APPCENTER_SECRET") + "\"")
         }
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
-            buildConfigField("String", "APPCENTER_SECRET", "\"" + getProps("APPCENTER_SECRET") + "\"")
+            firebaseCrashlytics {
+                nativeSymbolUploadEnabled true
+                unstrippedNativeLibsDir true
+            }
         }
     }
 
@@ -96,14 +101,14 @@ dependencies {
     implementation 'com.blacksquircle.ui:editorkit:2.2.0'
     implementation 'com.blacksquircle.ui:language-json:2.2.0'
 
-    implementation 'com.microsoft.appcenter:appcenter-analytics:5.0.2'
-    implementation 'com.microsoft.appcenter:appcenter-crashes:5.0.2'
-    implementation 'com.microsoft.appcenter:appcenter-distribute:5.0.2'
-
     implementation('org.smali:dexlib2:2.5.2') {
         exclude group: 'com.google.guava', module: 'guava'
     }
     implementation('com.google.guava:guava:32.1.2-android')
+
+    implementation platform('com.google.firebase:firebase-bom:32.4.0')
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
+    implementation 'com.google.android.play:app-update-ktx:2.1.0'
 }
 
 if (getProps("APPCENTER_TOKEN") != "") {
@@ -119,6 +124,15 @@ if (getProps("APPCENTER_TOKEN") != "") {
                 appName = getProps("APPCENTER_APP_NAME")
             }
         }
+    }
+}
+
+def playCredentialsJSON = rootProject.file("service-account-credentials.json")
+if (playCredentialsJSON.exists()) {
+    play {
+        serviceAccountCredentials = playCredentialsJSON
+        defaultToAppBundles = true
+        track = 'beta'
     }
 }
 
