@@ -8,6 +8,7 @@ import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
+import androidx.core.content.ContextCompat
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.constant.Action
@@ -28,8 +29,17 @@ class ServiceNotification(private val service: Service) {
         }
     }
 
+    private val notificationManager by lazy {
+        ContextCompat.getSystemService(
+            service,
+            NotificationManager::class.java
+        )!!
+    }
 
-    private val notification by lazy {
+    private var displayed = false
+
+
+    private val notificationBuilder by lazy {
         NotificationCompat.Builder(service, notificationChannel).setWhen(0)
             .setContentTitle("sing-box")
             .setContentText("service started").setOnlyAlertOnce(true)
@@ -68,10 +78,23 @@ class ServiceNotification(private val service: Service) {
                 )
             )
         }
-        service.startForeground(notificationId, notification.build())
+        service.startForeground(notificationId, notificationBuilder
+            .setContentText("service started")
+            .build())
+        displayed = true
+    }
+
+    fun updateContent(content: String) {
+        if (displayed) {
+            notificationManager.notify(
+                notificationId,
+                notificationBuilder.setContentText(content).build()
+            )
+        }
     }
 
     fun close() {
         ServiceCompat.stopForeground(service, ServiceCompat.STOP_FOREGROUND_REMOVE)
+        displayed = false
     }
 }
