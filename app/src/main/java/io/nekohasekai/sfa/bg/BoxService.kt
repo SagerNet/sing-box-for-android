@@ -19,6 +19,7 @@ import io.nekohasekai.libbox.CommandServerHandler
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.PProfServer
 import io.nekohasekai.libbox.PlatformInterface
+import io.nekohasekai.libbox.StatusMessage
 import io.nekohasekai.libbox.SystemProxyStatus
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.constant.Action
@@ -26,6 +27,7 @@ import io.nekohasekai.sfa.constant.Alert
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.database.ProfileManager
 import io.nekohasekai.sfa.database.Settings
+import io.nekohasekai.sfa.utils.CommandClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -89,6 +91,23 @@ class BoxService(
     private val notification = ServiceNotification(service)
     private var boxService: BoxService? = null
     private var commandServer: CommandServer? = null
+    private val statusClient = CommandClient(GlobalScope, CommandClient.ConnectionType.Status,
+        object : CommandClient.Handler {
+            override fun updateStatus(status: StatusMessage) {
+                val content = "Up: ${Libbox.formatBytes(status.uplink) + "/s"}\n" +
+                        "Down: ${Libbox.formatBytes(status.downlink) + "/s"}"
+                notification.updateContent(content)
+            }
+        }).also {
+        status.observeForever { status ->
+            if (status == Status.Started) {
+                it.connect()
+            } else if (status == Status.Stopped) {
+                it.disconnect()
+            }
+        }
+    }
+
     private var pprofServer: PProfServer? = null
     private var receiverRegistered = false
     private val receiver = object : BroadcastReceiver() {
@@ -110,6 +129,7 @@ class BoxService(
             }
         }
     }
+
 
     private fun startCommandServer() {
         val commandServer =
