@@ -40,9 +40,11 @@ class ServiceNotification(private val service: Service) {
 
 
     private val notificationBuilder by lazy {
-        NotificationCompat.Builder(service, notificationChannel).setWhen(0)
+        NotificationCompat.Builder(service, notificationChannel)
+            .setShowWhen(false)
+            .setOngoing(true)
             .setContentTitle("sing-box")
-            .setContentText("service started").setOnlyAlertOnce(true)
+            .setOnlyAlertOnce(true)
             .setSmallIcon(R.drawable.ic_menu)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setContentIntent(
@@ -84,11 +86,16 @@ class ServiceNotification(private val service: Service) {
         displayed = true
     }
 
-    fun updateContent(content: String) {
+    fun updateContent(content: String, subContent: String? = null) {
         if (displayed) {
             notificationManager.notify(
                 notificationId,
-                notificationBuilder.setContentText(content).build()
+                notificationBuilder.setContentText(content)
+                    .apply {
+                        if (!subContent.isNullOrBlank()){
+                            setSubText(subContent)
+                        }
+                    }.build()
             )
         }
     }

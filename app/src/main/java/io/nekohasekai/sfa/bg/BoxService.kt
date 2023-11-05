@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
 import android.os.PowerManager
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
@@ -94,17 +95,29 @@ class BoxService(
     private val statusClient = CommandClient(GlobalScope, CommandClient.ConnectionType.Status,
         object : CommandClient.Handler {
             override fun updateStatus(status: StatusMessage) {
-                val content = "Up: ${Libbox.formatBytes(status.uplink) + "/s"}\n" +
-                        "Down: ${Libbox.formatBytes(status.downlink) + "/s"}"
+                val content = Libbox.formatBytes(status.uplink) + "/s ↑\t" +
+                        Libbox.formatBytes(status.downlink) + "/s ↓"
                 notification.updateContent(content)
             }
         }).also {
-        status.observeForever { status ->
-            if (status == Status.Started) {
-                it.connect()
-            } else if (status == Status.Stopped) {
-                it.disconnect()
+        if (Settings.dynamicNotification) {
+            Log.d("dynamicNotification", "enabled")
+
+            status.observeForever { s ->
+                if (!Settings.dynamicNotification) {
+                    Log.d("dynamicNotification", "disabled")
+                    return@observeForever
+                }
+                if (s == Status.Started) {
+                    Log.d("dynamicNotification", "starting")
+                    it.connect()
+                } else if (s == Status.Stopped) {
+                    Log.d("dynamicNotification", "stopping")
+                    it.disconnect()
+                }
             }
+        } else {
+            Log.d("dynamicNotification", "disabled")
         }
     }
 

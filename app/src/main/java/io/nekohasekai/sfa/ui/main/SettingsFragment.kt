@@ -16,6 +16,7 @@ import com.google.firebase.ktx.Firebase
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.bg.BoxService
 import io.nekohasekai.sfa.constant.EnabledType
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.databinding.FragmentSettingsBinding
@@ -80,6 +81,13 @@ class SettingsFragment : Fragment() {
                 Settings.disableMemoryLimit = !newValue
             }
         }
+        binding.dynamicNotificationEnabled.addTextChangedListener {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val newValue = EnabledType.valueOf(it).boolValue
+                Settings.dynamicNotification = newValue
+            }
+        }
+
         binding.dontKillMyAppButton.setOnClickListener {
             it.context.launchCustomTab("https://dontkillmyapp.com/")
         }
