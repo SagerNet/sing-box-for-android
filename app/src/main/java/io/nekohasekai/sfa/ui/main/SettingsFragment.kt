@@ -130,6 +130,7 @@ class SettingsFragment : Fragment() {
         } else {
             true
         }
+        val dynamicNotification = Settings.dynamicNotification
         withContext(Dispatchers.Main) {
             binding.dataSizeText.text = dataSize
             binding.errorReportingEnabled.text = EnabledType.from(errorReportingEnabled).name
@@ -139,6 +140,8 @@ class SettingsFragment : Fragment() {
             binding.disableMemoryLimit.text = EnabledType.from(!Settings.disableMemoryLimit).name
             binding.disableMemoryLimit.setSimpleItems(R.array.enabled)
             binding.backgroundPermissionCard.isGone = removeBackgroundPermissionPage
+            binding.dynamicNotificationEnabled.text = EnabledType.from(dynamicNotification).name
+            binding.dynamicNotificationEnabled.setSimpleItems(R.array.enabled)
         }
     }
 
