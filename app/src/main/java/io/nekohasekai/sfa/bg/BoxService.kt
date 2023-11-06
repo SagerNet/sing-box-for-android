@@ -320,6 +320,12 @@ class BoxService(
         GlobalScope.launch(Dispatchers.IO) {
             Settings.startedByUser = true
             initialize()
+
+            val profileName = ProfileManager.get(Settings.selectedProfile)?.name
+            if (!profileName.isNullOrBlank()) {
+                notification.updateTitle(profileName)
+            }
+
             try {
                 startCommandServer()
             } catch (e: Exception) {

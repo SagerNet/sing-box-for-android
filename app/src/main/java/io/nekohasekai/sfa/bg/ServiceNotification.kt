@@ -86,6 +86,8 @@ class ServiceNotification(private val service: Service) {
         displayed = true
     }
 
+    fun updateTitle(title: String) = notificationBuilder.setContentTitle(title)
+
     fun updateContent(content: String, subContent: String? = null) {
         if (displayed) {
             notificationManager.notify(
