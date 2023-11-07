@@ -194,6 +194,7 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
                 }
 
                 UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS -> {
+                    Log.d(TAG, "checkUpdate: in progress, status: ${appUpdateInfo.installStatus()}")
                     when (appUpdateInfo.installStatus()) {
                         InstallStatus.DOWNLOADED -> {
                             appUpdateManager.completeUpdate()
@@ -202,6 +203,7 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
                 }
 
                 UpdateAvailability.UPDATE_AVAILABLE -> {
+                    Log.d(TAG, "checkUpdate: available")
                     if (appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
                         appUpdateManager.startUpdateFlow(
                             appUpdateInfo,
@@ -218,11 +220,17 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
                 }
 
                 UpdateAvailability.UNKNOWN -> {
+                    Log.d(TAG, "checkUpdate: unknown")
                 }
             }
         }
         appUpdateInfoTask.addOnFailureListener {
             Log.e(TAG, "checkUpdate: ", it)
+        }
+        appUpdateManager.registerListener { state ->
+            if (state.installStatus() == InstallStatus.DOWNLOADED) {
+                appUpdateManager.completeUpdate()
+            }
         }
     }
 
