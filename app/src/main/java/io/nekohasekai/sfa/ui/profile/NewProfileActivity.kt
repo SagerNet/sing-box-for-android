@@ -142,12 +142,15 @@ class NewProfileActivity : AbstractActivity() {
         val typedProfile = TypedProfile()
         val profile = Profile(name = binding.name.text, typed = typedProfile)
         profile.userOrder = ProfileManager.nextOrder()
+        val fileID = ProfileManager.nextFileID()
+        val configDirectory = File(filesDir, "configs").also { it.mkdirs() }
+        val configFile = File(configDirectory, "$fileID.json")
+        typedProfile.path = configFile.path
 
         when (binding.type.text) {
             TypedProfile.Type.Local.name -> {
                 typedProfile.type = TypedProfile.Type.Local
-                val configDirectory = File(filesDir, "configs").also { it.mkdirs() }
-                val configFile = File(configDirectory, "${profile.userOrder}.json")
+
                 when (binding.fileSourceMenu.text) {
                     FileSource.CreateNew.formatted -> {
                         configFile.writeText("{}")
@@ -166,23 +169,18 @@ class NewProfileActivity : AbstractActivity() {
                         } else {
                             error("unsupported source: $sourceURL")
                         }
-
                         Libbox.checkConfig(content)
                         configFile.writeText(content)
                     }
                 }
-                typedProfile.path = configFile.path
             }
 
             TypedProfile.Type.Remote.name -> {
                 typedProfile.type = TypedProfile.Type.Remote
-                val configDirectory = File(filesDir, "configs").also { it.mkdirs() }
-                val configFile = File(configDirectory, "${profile.userOrder}.json")
                 val remoteURL = binding.remoteURL.text
                 val content = HTTPClient().use { it.getString(remoteURL) }
                 Libbox.checkConfig(content)
                 configFile.writeText(content)
-                typedProfile.path = configFile.path
                 typedProfile.remoteURL = remoteURL
                 typedProfile.lastUpdated = Date()
                 typedProfile.autoUpdate = EnabledType.valueOf(binding.autoUpdate.text).boolValue

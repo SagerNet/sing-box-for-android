@@ -37,6 +37,11 @@ object ProfileManager {
         return instance.profileDao().nextOrder() ?: 0
     }
 
+    suspend fun nextFileID(): Long {
+        return instance.profileDao().nextFileID() ?: 1
+    }
+
+
     suspend fun get(id: Long): Profile? {
         return instance.profileDao().get(id)
     }
