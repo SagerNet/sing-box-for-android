@@ -2,8 +2,6 @@
 buildscript {
     dependencies {
         classpath "gradle.plugin.com.betomorrow.gradle:appcenter-plugin:2.0.4"
-        // https://github.com/invertase/react-native-firebase/issues/6983
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.2'
     }
 }
 
@@ -12,7 +10,6 @@ plugins {
     id 'com.android.library' version '8.1.2' apply false
     id 'org.jetbrains.kotlin.android' version '1.9.0' apply false
     id 'com.google.devtools.ksp' version '1.9.0-1.0.12' apply false
-    id 'com.google.gms.google-services' version '4.4.0' apply false
     id 'com.github.triplet.play' version '3.8.4' apply false
 }
 

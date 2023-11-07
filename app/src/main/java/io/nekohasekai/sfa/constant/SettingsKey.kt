@@ -4,7 +4,6 @@ object SettingsKey {
 
     const val SELECTED_PROFILE = "selected_profile"
     const val SERVICE_MODE = "service_mode"
-    const val ERROR_REPORTING_ENABLED = "error_reporting_enabled"
     const val CHECK_UPDATE_ENABLED = "check_update_enabled"
     const val DISABLE_MEMORY_LIMIT = "disable_memory_limit"
 

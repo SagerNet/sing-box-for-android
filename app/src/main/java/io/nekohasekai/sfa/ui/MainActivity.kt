@@ -22,8 +22,6 @@ import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
-import com.google.firebase.crashlytics.ktx.crashlytics
-import com.google.firebase.ktx.Firebase
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.ProfileContent
 import io.nekohasekai.sfa.Application
@@ -180,11 +178,7 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
 
     private fun startIntegration() {
         lifecycleScope.launch(Dispatchers.IO) {
-            if (Settings.errorReportingEnabled == Settings.ERROR_REPORTING_UNKNOWN) {
-                withContext(Dispatchers.Main) {
-                    confirmErrorReportingIntegration()
-                }
-            } else if (Settings.checkUpdateEnabled) {
+            if (Settings.checkUpdateEnabled) {
                 checkUpdate()
             }
         }
@@ -230,22 +224,6 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
         appUpdateInfoTask.addOnFailureListener {
             Log.e(TAG, "checkUpdate: ", it)
         }
-    }
-
-    private fun confirmErrorReportingIntegration() {
-        val builder = MaterialAlertDialogBuilder(this).setTitle(getString(R.string.error_reporting))
-            .setMessage(R.string.error_reporting_message)
-            .setPositiveButton(getString(R.string.ok)) { _, _ ->
-                lifecycleScope.launch(Dispatchers.IO) {
-                    Settings.errorReportingEnabled = Settings.ERROR_REPORTING_ALLOWED
-                    Firebase.crashlytics.setCrashlyticsCollectionEnabled(true)
-                }
-            }.setNegativeButton(getString(R.string.no_thanks)) { _, _ ->
-                lifecycleScope.launch(Dispatchers.IO) {
-                    Settings.errorReportingEnabled = Settings.ERROR_REPORTING_DISALLOWED
-                }
-            }
-        runCatching { builder.show() }
     }
 
     @SuppressLint("NewApi")
