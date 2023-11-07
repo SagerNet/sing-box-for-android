@@ -5,8 +5,12 @@ import android.content.pm.PackageManager.NameNotFoundException
 import android.net.ProxyInfo
 import android.net.VpnService
 import android.os.Build
+import android.os.IBinder
 import io.nekohasekai.libbox.TunOptions
 import io.nekohasekai.sfa.database.Settings
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 class VPNService : VpnService(), PlatformInterfaceWrapper {
 
@@ -19,13 +23,23 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int) =
         service.onStartCommand(intent, flags, startId)
 
-    override fun onBind(intent: Intent) = service.onBind(intent)
+    override fun onBind(intent: Intent): IBinder {
+        val binder = super.onBind(intent)
+        if (binder != null) {
+            return binder
+        }
+        return service.onBind(intent)
+    }
     override fun onDestroy() {
         service.onDestroy()
     }
 
     override fun onRevoke() {
-        service.onRevoke()
+        runBlocking {
+            withContext(Dispatchers.Main) {
+                service.onRevoke()
+            }
+        }
     }
 
     override fun autoDetectInterfaceControl(fd: Int) {

@@ -87,8 +87,8 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.2'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.4'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.7.4'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.5'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.7.5'
     implementation 'androidx.room:room-runtime:2.6.0'
     implementation 'androidx.coordinatorlayout:coordinatorlayout:1.2.0'
     implementation 'androidx.preference:preference-ktx:1.2.1'
@@ -132,7 +132,12 @@ if (playCredentialsJSON.exists()) {
     play {
         serviceAccountCredentials = playCredentialsJSON
         defaultToAppBundles = true
-        track = 'beta'
+        def version = getProps("VERSION_NAME")
+        if (version.contains("alpha") || version.contains("beta") || version.contains("rc")) {
+            track = 'beta'
+        } else {
+            track = 'production'
+        }
     }
 }
 
