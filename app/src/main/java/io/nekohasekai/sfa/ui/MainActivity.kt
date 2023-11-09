@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.VpnService
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -17,11 +16,6 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.play.core.appupdate.AppUpdateManagerFactory
-import com.google.android.play.core.appupdate.AppUpdateOptions
-import com.google.android.play.core.install.model.AppUpdateType
-import com.google.android.play.core.install.model.InstallStatus
-import com.google.android.play.core.install.model.UpdateAvailability
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.ProfileContent
 import io.nekohasekai.sfa.Application
@@ -39,6 +33,7 @@ import io.nekohasekai.sfa.databinding.ActivityMainBinding
 import io.nekohasekai.sfa.ktx.errorDialogBuilder
 import io.nekohasekai.sfa.ui.profile.NewProfileActivity
 import io.nekohasekai.sfa.ui.shared.AbstractActivity
+import io.nekohasekai.sfa.vendor.Vendor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -177,59 +172,11 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
     }
 
     private fun startIntegration() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            if (Settings.checkUpdateEnabled) {
-                checkUpdate()
-            }
-        }
-    }
-
-    private fun checkUpdate() {
-        val appUpdateManager = AppUpdateManagerFactory.create(this)
-        val appUpdateInfoTask = appUpdateManager.appUpdateInfo
-        appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
-            when (appUpdateInfo.updateAvailability()) {
-                UpdateAvailability.UPDATE_NOT_AVAILABLE -> {
-                    Log.d(TAG, "checkUpdate: not available")
+        if (Vendor.checkUpdateAvailable()) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                if (Settings.checkUpdateEnabled) {
+                    Vendor.checkUpdate(this@MainActivity, false)
                 }
-
-                UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS -> {
-                    Log.d(TAG, "checkUpdate: in progress, status: ${appUpdateInfo.installStatus()}")
-                    when (appUpdateInfo.installStatus()) {
-                        InstallStatus.DOWNLOADED -> {
-                            appUpdateManager.completeUpdate()
-                        }
-                    }
-                }
-
-                UpdateAvailability.UPDATE_AVAILABLE -> {
-                    Log.d(TAG, "checkUpdate: available")
-                    if (appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
-                        appUpdateManager.startUpdateFlow(
-                            appUpdateInfo,
-                            this,
-                            AppUpdateOptions.newBuilder(AppUpdateType.FLEXIBLE).build()
-                        )
-                    } else if (appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
-                        appUpdateManager.startUpdateFlow(
-                            appUpdateInfo,
-                            this,
-                            AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build()
-                        )
-                    }
-                }
-
-                UpdateAvailability.UNKNOWN -> {
-                    Log.d(TAG, "checkUpdate: unknown")
-                }
-            }
-        }
-        appUpdateInfoTask.addOnFailureListener {
-            Log.e(TAG, "checkUpdate: ", it)
-        }
-        appUpdateManager.registerListener { state ->
-            if (state.installStatus() == InstallStatus.DOWNLOADED) {
-                appUpdateManager.completeUpdate()
             }
         }
     }

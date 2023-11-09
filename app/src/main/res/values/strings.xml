@@ -82,6 +82,7 @@
     <string name="core_version">Version</string>
     <string name="core">Core</string>
     <string name="core_data_size">Data Size</string>
+    <string name="check_update_atomic">Atomic Check Update</string>
     <string name="check_update">Check Update</string>
     <string name="title_app_settings">App Settings</string>
     <string name="about_title">About</string>
@@ -92,7 +93,7 @@
     <string name="background_permission">Background permission</string>
     <string name="background_permission_description">Apply for the necessary permissions in order for the VPN to function properly.\n\nIf you are using a device made by a Chinese company, the card may not disappear after the permission is granted.</string>
     <string name="read_more">Read More</string>
-    <string name="request_background_permission">Ignore battery optimizations</string>
+    <string name="request_background_permission">Ignore Battery Optimizations</string>
     <string name="import_remote_profile">Import remote profile</string>
     <string name="import_remote_profile_message">Are you sure to import remote profile %s? You will connect to %s to download the configuration.</string>
 
@@ -140,5 +141,7 @@
     <string name="vpn_golang_version">Go Version</string>
     <string name="vpn_app_type_other">Other</string>
     <string name="vpn_core_type_unknown">Unknown</string>
+    <string name="no_updates_available">No updates available</string>
+
 
 </resources>

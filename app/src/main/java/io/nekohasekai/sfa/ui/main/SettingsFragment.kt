@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import io.nekohasekai.libbox.Libbox
@@ -24,6 +25,7 @@ import io.nekohasekai.sfa.ktx.text
 import io.nekohasekai.sfa.ui.MainActivity
 import io.nekohasekai.sfa.ui.debug.DebugActivity
 import io.nekohasekai.sfa.ui.profileoverride.ProfileOverrideActivity
+import io.nekohasekai.sfa.vendor.Vendor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -58,11 +60,17 @@ class SettingsFragment : Fragment() {
                 reloadSettings()
             }
         }
+        if (!Vendor.checkUpdateAvailable()) {
+            binding.appSettingsCard.isVisible = false
+        }
         binding.checkUpdateEnabled.addTextChangedListener {
             lifecycleScope.launch(Dispatchers.IO) {
                 val newValue = EnabledType.valueOf(it).boolValue
                 Settings.checkUpdateEnabled = newValue
             }
+        }
+        binding.checkUpdateButton.setOnClickListener {
+            Vendor.checkUpdate(activity, true)
         }
         binding.disableMemoryLimit.addTextChangedListener {
             lifecycleScope.launch(Dispatchers.IO) {
