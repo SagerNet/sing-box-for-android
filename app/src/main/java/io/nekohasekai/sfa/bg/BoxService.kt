@@ -86,7 +86,7 @@ class BoxService(
 
     private val status = MutableLiveData(Status.Stopped)
     private val binder = ServiceBinder(status)
-    private val notification = ServiceNotification(service)
+    private val notification = ServiceNotification(status, service)
     private var boxService: BoxService? = null
     private var commandServer: CommandServer? = null
     private var pprofServer: PProfServer? = null
@@ -118,6 +118,7 @@ class BoxService(
         this.commandServer = commandServer
     }
 
+    private var lastProfileName = ""
     private suspend fun startService(delayStart: Boolean = false) {
         try {
             val selectedProfileId = Settings.selectedProfile
@@ -138,6 +139,7 @@ class BoxService(
                 return
             }
 
+            lastProfileName = profile.name
             withContext(Dispatchers.Main) {
                 binder.broadcast {
                     it.onServiceResetLogs(listOf())
@@ -163,6 +165,10 @@ class BoxService(
             boxService = newService
             commandServer?.setService(boxService)
             status.postValue(Status.Started)
+
+            withContext(Dispatchers.Main) {
+                notification.show(lastProfileName)
+            }
         } catch (e: Exception) {
             stopAndAlert(Alert.StartService, e.message)
             return
@@ -170,23 +176,24 @@ class BoxService(
     }
 
     override fun serviceReload() {
+        notification.close()
         status.postValue(Status.Starting)
+        val pfd = fileDescriptor
+        if (pfd != null) {
+            pfd.close()
+            fileDescriptor = null
+        }
+        commandServer?.setService(null)
+        boxService?.apply {
+            runCatching {
+                close()
+            }.onFailure {
+                writeLog("service: error when closing: $it")
+            }
+            Seq.destroyRef(refnum)
+        }
+        boxService = null
         runBlocking {
-            val pfd = fileDescriptor
-            if (pfd != null) {
-                pfd.close()
-                fileDescriptor = null
-            }
-            commandServer?.setService(null)
-            boxService?.apply {
-                runCatching {
-                    close()
-                }.onFailure {
-                    writeLog("service: error when closing: $it")
-                }
-                Seq.destroyRef(refnum)
-            }
-            boxService = null
             startService(true)
         }
     }
@@ -283,7 +290,6 @@ class BoxService(
             receiverRegistered = true
         }
 
-        notification.show()
         GlobalScope.launch(Dispatchers.IO) {
             Settings.startedByUser = true
             initialize()

@@ -16,7 +16,6 @@
 
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/appSettingsCard"
             style="?attr/materialCardViewElevatedStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -38,11 +37,28 @@
                     android:textAppearance="?attr/textAppearanceTitleLarge" />
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/checkUpdateEnabled"
+                    android:id="@+id/dynamicNotificationEnabled"
                     style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:hint="@string/dynamic_notification">
+
+                    <AutoCompleteTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"
+                        android:text="@string/disabled"
+                        app:simpleItems="@array/enabled" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/checkUpdateEnabled"
+                    style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:hint="@string/check_update_atomic">
 
                     <AutoCompleteTextView

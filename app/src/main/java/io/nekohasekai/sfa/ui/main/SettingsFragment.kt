@@ -61,7 +61,8 @@ class SettingsFragment : Fragment() {
             }
         }
         if (!Vendor.checkUpdateAvailable()) {
-            binding.appSettingsCard.isVisible = false
+            binding.checkUpdateEnabled.isVisible = false
+            binding.checkUpdateButton.isVisible = false
         }
         binding.checkUpdateEnabled.addTextChangedListener {
             lifecycleScope.launch(Dispatchers.IO) {
@@ -78,6 +79,13 @@ class SettingsFragment : Fragment() {
                 Settings.disableMemoryLimit = !newValue
             }
         }
+        binding.dynamicNotificationEnabled.addTextChangedListener {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val newValue = EnabledType.valueOf(it).boolValue
+                Settings.dynamicNotification = newValue
+            }
+        }
+
         binding.dontKillMyAppButton.setOnClickListener {
             it.context.launchCustomTab("https://dontkillmyapp.com/")
         }
@@ -119,6 +127,7 @@ class SettingsFragment : Fragment() {
         } else {
             true
         }
+        val dynamicNotification = Settings.dynamicNotification
         withContext(Dispatchers.Main) {
             binding.dataSizeText.text = dataSize
             binding.checkUpdateEnabled.text = EnabledType.from(checkUpdateEnabled).name
@@ -126,6 +135,8 @@ class SettingsFragment : Fragment() {
             binding.disableMemoryLimit.text = EnabledType.from(!Settings.disableMemoryLimit).name
             binding.disableMemoryLimit.setSimpleItems(R.array.enabled)
             binding.backgroundPermissionCard.isGone = removeBackgroundPermissionPage
+            binding.dynamicNotificationEnabled.text = EnabledType.from(dynamicNotification).name
+            binding.dynamicNotificationEnabled.setSimpleItems(R.array.enabled)
         }
     }
 
