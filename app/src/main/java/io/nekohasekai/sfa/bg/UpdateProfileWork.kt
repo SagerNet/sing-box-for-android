@@ -21,29 +21,30 @@ class UpdateProfileWork {
 
     companion object {
         private const val WORK_NAME = "UpdateProfile"
+        private const val TAG = "UpdateProfileWork"
 
         suspend fun reconfigureUpdater() {
             runCatching {
                 reconfigureUpdater0()
             }.onFailure {
-                Log.e("UpdateProfileWork", "reconfigureUpdater", it)
+                Log.e(TAG, "reconfigureUpdater", it)
             }
         }
 
         private suspend fun reconfigureUpdater0() {
-            WorkManager.getInstance(Application.application).cancelUniqueWork(WORK_NAME)
-
             val remoteProfiles = ProfileManager.list()
                 .filter { it.typed.type == TypedProfile.Type.Remote && it.typed.autoUpdate }
-            if (remoteProfiles.isEmpty()) return
+            if (remoteProfiles.isEmpty()) {
+                WorkManager.getInstance(Application.application).cancelUniqueWork(WORK_NAME)
+                return
+            }
 
             var minDelay =
                 remoteProfiles.minByOrNull { it.typed.autoUpdateInterval }!!.typed.autoUpdateInterval.toLong()
-            val now = System.currentTimeMillis() / 1000L
+            val nowSeconds = System.currentTimeMillis() / 1000L
             val minInitDelay =
-                remoteProfiles.minOf { now - (it.typed.lastUpdated.time / 1000L) - (minDelay * 60) }
+                remoteProfiles.minOf { (it.typed.autoUpdateInterval * 60) - (nowSeconds - (it.typed.lastUpdated.time / 1000L)) }
             if (minDelay < 15) minDelay = 15
-
             WorkManager.getInstance(Application.application).enqueueUniquePeriodicWork(
                 WORK_NAME,
                 ExistingPeriodicWorkPolicy.UPDATE,
@@ -67,6 +68,11 @@ class UpdateProfileWork {
             if (remoteProfiles.isEmpty()) return Result.success()
             var success = true
             for (profile in remoteProfiles) {
+                val lastSeconds =
+                    (System.currentTimeMillis() - profile.typed.lastUpdated.time) / 1000L
+                if (lastSeconds < profile.typed.autoUpdateInterval * 60) {
+                    continue
+                }
                 try {
                     val content = HTTPClient().use { it.getString(profile.typed.remoteURL) }
                     Libbox.checkConfig(content)
@@ -74,7 +80,7 @@ class UpdateProfileWork {
                     profile.typed.lastUpdated = Date()
                     ProfileManager.update(profile)
                 } catch (e: Exception) {
-                    Log.e("UpdateProfileWork", "error when updating profile ${profile.name}", e)
+                    Log.e(TAG, "update profile ${profile.name}", e)
                     success = false
                 }
             }
