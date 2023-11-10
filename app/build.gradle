@@ -121,7 +121,7 @@ if (getProps("APPCENTER_TOKEN") != "") {
         releaseNotes = getProps("RELEASE_NOTES")
         notifyTesters = true
         apps {
-            release {
+            playRelease {
                 appName = getProps("APPCENTER_APP_NAME")
             }
         }
