@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import io.nekohasekai.sfa.R
-import io.nekohasekai.sfa.bg.BoxService
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.databinding.FragmentDashboardBinding
 import io.nekohasekai.sfa.ui.MainActivity
@@ -41,39 +40,15 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
         activity.serviceStatus.observe(viewLifecycleOwner) {
             when (it) {
                 Status.Stopped -> {
-                    binding.fab.setImageResource(R.drawable.ic_play_arrow_24)
-                    binding.fab.show()
                     disablePager()
                 }
-
-                Status.Starting -> {
-                    binding.fab.hide()
-                }
-
                 Status.Started -> {
-                    binding.fab.setImageResource(R.drawable.ic_stop_24)
-                    binding.fab.show()
                     enablePager()
                 }
 
                 Status.Stopping -> {
-                    binding.fab.hide()
                     disablePager()
                 }
-
-                else -> {}
-            }
-        }
-        binding.fab.setOnClickListener {
-            when (activity.serviceStatus.value) {
-                Status.Stopped -> {
-                    activity.startService()
-                }
-
-                Status.Started -> {
-                    BoxService.stop()
-                }
-
                 else -> {}
             }
         }
