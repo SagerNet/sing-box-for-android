@@ -17,7 +17,6 @@ import io.nekohasekai.libbox.BoxService
 import io.nekohasekai.libbox.CommandServer
 import io.nekohasekai.libbox.CommandServerHandler
 import io.nekohasekai.libbox.Libbox
-import io.nekohasekai.libbox.PProfServer
 import io.nekohasekai.libbox.PlatformInterface
 import io.nekohasekai.libbox.SystemProxyStatus
 import io.nekohasekai.sfa.Application
@@ -89,7 +88,6 @@ class BoxService(
     private val notification = ServiceNotification(status, service)
     private var boxService: BoxService? = null
     private var commandServer: CommandServer? = null
-    private var pprofServer: PProfServer? = null
     private var receiverRegistered = false
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {

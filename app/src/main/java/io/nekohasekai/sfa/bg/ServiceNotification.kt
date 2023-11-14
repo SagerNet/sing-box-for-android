@@ -44,6 +44,7 @@ class ServiceNotification(
 
     private val commandClient =
         CommandClient(GlobalScope, CommandClient.ConnectionType.Status, this)
+    private var receiverRegistered = false
 
     private val notificationBuilder by lazy {
         NotificationCompat.Builder(service, notificationChannel).setShowWhen(false).setOngoing(true)
@@ -103,6 +104,7 @@ class ServiceNotification(
             addAction(Intent.ACTION_SCREEN_ON)
             addAction(Intent.ACTION_SCREEN_OFF)
         })
+        receiverRegistered = true
     }
 
     override fun updateStatus(status: StatusMessage) {
@@ -129,6 +131,9 @@ class ServiceNotification(
     fun close() {
         commandClient.disconnect()
         ServiceCompat.stopForeground(service, ServiceCompat.STOP_FOREGROUND_REMOVE)
-        service.unregisterReceiver(this)
+        if (receiverRegistered) {
+            service.unregisterReceiver(this)
+            receiverRegistered = false
+        }
     }
 }
