@@ -59,7 +59,7 @@
                     style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/check_update_atomic">
+                    android:hint="@string/check_update_automatic">
 
                     <AutoCompleteTextView
                         android:layout_width="match_parent"

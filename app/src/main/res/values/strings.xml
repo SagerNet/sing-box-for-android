@@ -83,7 +83,7 @@
     <string name="core">Core</string>
     <string name="dynamic_notification">Display realtime speed in notification</string>
     <string name="core_data_size">Data Size</string>
-    <string name="check_update_atomic">Atomic Check Update</string>
+    <string name="check_update_automatic">Automatic Update Check</string>
     <string name="check_update">Check Update</string>
     <string name="title_app_settings">App</string>
     <string name="about_title">About</string>
