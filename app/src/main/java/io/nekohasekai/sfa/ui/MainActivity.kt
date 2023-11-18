@@ -4,10 +4,12 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.VpnService
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
@@ -187,6 +189,22 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
             notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             return
         }
+
+        if (ContextCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            if (!ActivityCompat.shouldShowRequestPermissionRationale(
+                    this, Manifest.permission.ACCESS_FINE_LOCATION
+                )
+            ) {
+                fineLocationPermissionLauncher.launch(
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
+            }
+        }
+
+
         lifecycleScope.launch(Dispatchers.IO) {
             if (Settings.rebuildServiceMode()) {
                 reconnect()
@@ -211,6 +229,12 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
         } else {
             onServiceAlert(Alert.RequestNotificationPermission, null)
         }
+    }
+
+    private val fineLocationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) {
+        startService()
     }
 
     private val prepareLauncher = registerForActivityResult(PrepareService()) {

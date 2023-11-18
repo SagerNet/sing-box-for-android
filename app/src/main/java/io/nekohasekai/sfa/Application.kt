@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
+import android.net.wifi.WifiManager
 import android.os.PowerManager
 import androidx.core.content.getSystemService
 import go.Seq
@@ -46,6 +47,7 @@ class Application : Application() {
         val packageManager by lazy { application.packageManager }
         val powerManager by lazy { application.getSystemService<PowerManager>()!! }
         val notificationManager by lazy { application.getSystemService<NotificationManager>()!! }
+        val wifiManager by lazy { application.getSystemService<WifiManager>()!! }
     }
 
 }
