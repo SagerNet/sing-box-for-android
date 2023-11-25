@@ -4,7 +4,7 @@ Experimental Android client for sing-box, the universal proxy platform.
 
 ## Documentation
 
-https://sing-box.sagernet.org/installation/clients/sfa/
+https://sing-box.sagernet.org/clients/android/
 
 ## License
 

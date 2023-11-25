@@ -104,7 +104,7 @@ class SettingsFragment : Fragment() {
             it.context.launchCustomTab("https://community.sagernet.org/")
         }
         binding.documentationButton.setOnClickListener {
-            it.context.launchCustomTab("http://sing-box.sagernet.org/installation/clients/sfa/")
+            it.context.launchCustomTab("https://sing-box.sagernet.org/clients/android/")
         }
         binding.openDebugButton.setOnClickListener {
             startActivity(Intent(requireContext(), DebugActivity::class.java))
