@@ -60,6 +60,8 @@ android {
         abi {
             enable true
             universalApk true
+            reset()
+            include "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
         }
     }
 
@@ -93,12 +95,12 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.7.5'
     implementation 'androidx.navigation:navigation-ui-ktx:2.7.5'
-    implementation 'androidx.room:room-runtime:2.6.0'
+    implementation 'androidx.room:room-runtime:2.6.1'
     implementation 'androidx.coordinatorlayout:coordinatorlayout:1.2.0'
     implementation 'androidx.preference:preference-ktx:1.2.1'
-    ksp 'androidx.room:room-compiler:2.6.0'
-    implementation 'androidx.work:work-runtime-ktx:2.8.1'
-    implementation 'androidx.browser:browser:1.6.0'
+    ksp 'androidx.room:room-compiler:2.6.1'
+    implementation 'androidx.work:work-runtime-ktx:2.9.0'
+    implementation 'androidx.browser:browser:1.7.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
 
     // DO NOT UPDATE (minSdkVersion updated)
