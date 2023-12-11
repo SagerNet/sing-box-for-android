@@ -184,13 +184,14 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
     }
 
     @SuppressLint("NewApi")
-    fun startService() {
+    fun startService(skipRequestFineLocation: Boolean = false) {
         if (!ServiceNotification.checkPermission()) {
             notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             return
         }
 
-        if (ContextCompat.checkSelfPermission(
+        // MIUI always return false for shouldShowRequestPermissionRationale
+        if (!skipRequestFineLocation && ContextCompat.checkSelfPermission(
                 this, Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
@@ -203,7 +204,6 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
                 )
             }
         }
-
 
         lifecycleScope.launch(Dispatchers.IO) {
             if (Settings.rebuildServiceMode()) {
@@ -234,7 +234,7 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
     private val fineLocationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) {
-        startService()
+        startService(true)
     }
 
     private val prepareLauncher = registerForActivityResult(PrepareService()) {
