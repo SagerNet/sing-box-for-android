@@ -100,12 +100,6 @@ class SettingsFragment : Fragment() {
         binding.configureOverridesButton.setOnClickListener {
             startActivity(Intent(requireContext(), ProfileOverrideActivity::class.java))
         }
-        binding.communityButton.setOnClickListener {
-            it.context.launchCustomTab("https://community.sagernet.org/")
-        }
-        binding.documentationButton.setOnClickListener {
-            it.context.launchCustomTab("http://sing-box.sagernet.org/installation/clients/sfa/")
-        }
         binding.openDebugButton.setOnClickListener {
             startActivity(Intent(requireContext(), DebugActivity::class.java))
         }

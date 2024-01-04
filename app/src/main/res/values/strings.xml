@@ -86,10 +86,6 @@
     <string name="check_update_automatic">Automatic Update Check</string>
     <string name="check_update">Check Update</string>
     <string name="title_app_settings">App</string>
-    <string name="about_title">About</string>
-    <string name="app_description">Android client for sing-box, the universal proxy platform.</string>
-    <string name="documentation_button">Documentation</string>
-    <string name="community_button">Community</string>
     <string name="memory_limit">Memory Limit</string>
     <string name="background_permission">Background permission</string>
     <string name="background_permission_description">Apply for the necessary permissions in order for the VPN to function properly.\n\nIf you are using a device made by a Chinese company, the card may not disappear after the permission is granted.</string>
