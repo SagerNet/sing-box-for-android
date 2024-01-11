@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
+import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.lifecycle.MutableLiveData
@@ -76,7 +77,7 @@ class ServiceNotification(
             }
     }
 
-    suspend fun show(lastProfileName: String) {
+    fun show(lastProfileName: String, @StringRes contentTextId: Int) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Application.notification.createNotificationChannel(
                 NotificationChannel(
@@ -87,14 +88,15 @@ class ServiceNotification(
         service.startForeground(
             notificationId, notificationBuilder
                 .setContentTitle(lastProfileName.takeIf { it.isNotBlank() } ?: "sing-box")
-                .setContentText("service started").build()
+                .setContentText(service.getString(contentTextId)).build()
         )
-        withContext(Dispatchers.IO) {
-            if (Settings.dynamicNotification) {
-                commandClient.connect()
-                withContext(Dispatchers.Main) {
-                    registerReceiver()
-                }
+    }
+
+    suspend fun start() {
+        if (Settings.dynamicNotification) {
+            commandClient.connect()
+            withContext(Dispatchers.Main) {
+                registerReceiver()
             }
         }
     }

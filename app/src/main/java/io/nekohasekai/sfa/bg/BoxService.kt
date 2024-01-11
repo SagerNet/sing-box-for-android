@@ -21,6 +21,7 @@ import io.nekohasekai.libbox.PlatformInterface
 import io.nekohasekai.libbox.SystemProxyStatus
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.BuildConfig
+import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.constant.Action
 import io.nekohasekai.sfa.constant.Alert
 import io.nekohasekai.sfa.constant.Status
@@ -122,6 +123,10 @@ class BoxService(
     private var lastProfileName = ""
     private suspend fun startService(delayStart: Boolean = false) {
         try {
+            withContext(Dispatchers.Main) {
+                notification.show(lastProfileName, R.string.status_starting)
+            }
+
             val selectedProfileId = Settings.selectedProfile
             if (selectedProfileId == -1L) {
                 stopAndAlert(Alert.EmptyConfiguration)
@@ -142,6 +147,7 @@ class BoxService(
 
             lastProfileName = profile.name
             withContext(Dispatchers.Main) {
+                notification.show(lastProfileName, R.string.status_starting)
                 binder.broadcast {
                     it.onServiceResetLogs(listOf())
                 }
@@ -166,10 +172,10 @@ class BoxService(
             boxService = newService
             commandServer?.setService(boxService)
             status.postValue(Status.Started)
-
             withContext(Dispatchers.Main) {
-                notification.show(lastProfileName)
+                notification.show(lastProfileName, R.string.status_started)
             }
+            notification.start()
         } catch (e: Exception) {
             stopAndAlert(Alert.StartService, e.message)
             return
