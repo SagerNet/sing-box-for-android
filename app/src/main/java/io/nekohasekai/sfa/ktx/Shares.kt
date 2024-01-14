@@ -2,11 +2,18 @@ package io.nekohasekai.sfa.ktx
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Color
 import androidx.core.content.FileProvider
+import androidx.fragment.app.FragmentActivity
 import com.google.android.material.R
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.qrcode.QRCodeWriter
+import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.ProfileContent
 import io.nekohasekai.sfa.database.Profile
 import io.nekohasekai.sfa.database.TypedProfile
+import io.nekohasekai.sfa.ui.shared.QRCodeDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -43,4 +50,28 @@ suspend fun Context.shareProfile(profile: Profile) {
             )
         )
     }
+}
+
+suspend fun FragmentActivity.shareProfileURL(profile: Profile) {
+    val link = Libbox.generateRemoteProfileImportLink(
+        profile.name,
+        profile.typed.remoteURL
+    )
+    val imageSize = dp2px(256)
+    val color = getAttrColor(com.google.android.material.R.attr.colorPrimary)
+    val image = QRCodeWriter().encode(link, BarcodeFormat.QR_CODE, imageSize, imageSize, null)
+    val imageWidth = image.width
+    val imageHeight = image.height
+    val imageArray = IntArray(imageWidth * imageHeight)
+    for (y in 0 until imageHeight) {
+        val offset = y * imageWidth
+        for (x in 0 until imageWidth) {
+            imageArray[offset + x] = if (image.get(x, y)) color else Color.TRANSPARENT
+
+        }
+    }
+    val bitmap = Bitmap.createBitmap(imageWidth, imageHeight, Bitmap.Config.ARGB_8888)
+    bitmap.setPixels(imageArray, 0, imageSize, 0, 0, imageWidth, imageHeight)
+    val dialog = QRCodeDialog(bitmap)
+    dialog.show(supportFragmentManager, "share-profile-url")
 }

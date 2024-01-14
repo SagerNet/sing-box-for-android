@@ -14,21 +14,38 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingStart="16dp"
         android:paddingEnd="4dp">
 
-        <TextView
-            android:id="@+id/profile_name"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="?android:attr/textColorPrimary"
-            tools:text="Profile name" />
+            android:layout_width="0dp"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/profile_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?textAppearanceTitleMedium"
+                android:textColor="?android:attr/textColorPrimary"
+                tools:text="Profile name" />
+
+            <TextView
+                tools:visibility="gone"
+                android:id="@+id/profile_last_updated"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textAppearance="?textAppearanceBodySmall"
+                android:textColor="?android:attr/textColorPrimary"
+                tools:text="Last updated at now" />
+        </LinearLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical|end"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="top|end"
             android:orientation="horizontal">
 
             <Button

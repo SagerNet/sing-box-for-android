@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,13 +16,14 @@ import androidx.recyclerview.widget.RecyclerView
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.database.Profile
 import io.nekohasekai.sfa.database.ProfileManager
+import io.nekohasekai.sfa.database.TypedProfile
 import io.nekohasekai.sfa.databinding.FragmentConfigurationBinding
 import io.nekohasekai.sfa.databinding.ViewConfigutationItemBinding
 import io.nekohasekai.sfa.ktx.errorDialogBuilder
 import io.nekohasekai.sfa.ktx.shareProfile
+import io.nekohasekai.sfa.ktx.shareProfileURL
 import io.nekohasekai.sfa.ui.profile.EditProfileActivity
 import io.nekohasekai.sfa.ui.profile.NewProfileActivity
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -36,7 +38,7 @@ class ConfigurationFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         val binding = FragmentConfigurationBinding.inflate(inflater, container, false)
-        val adapter = Adapter(lifecycleScope, binding)
+        val adapter = Adapter(binding)
         this.adapter = adapter
         binding.profileList.also {
             it.layoutManager = LinearLayoutManager(requireContext())
@@ -89,16 +91,17 @@ class ConfigurationFragment : Fragment() {
         adapter?.reload()
     }
 
-    class Adapter(
-        internal val scope: CoroutineScope,
-        internal val parent: FragmentConfigurationBinding
+    inner class Adapter(
+        private val parent: FragmentConfigurationBinding
     ) :
         RecyclerView.Adapter<Holder>() {
 
         internal var items: MutableList<Profile> = mutableListOf()
+        internal val scope = lifecycleScope
+        internal val fragmentActivity = requireActivity() as FragmentActivity
 
         internal fun reload() {
-            scope.launch(Dispatchers.IO) {
+            lifecycleScope.launch(Dispatchers.IO) {
                 val newItems = ProfileManager.list().toMutableList()
                 withContext(Dispatchers.Main) {
                     items = newItems
@@ -163,6 +166,15 @@ class ConfigurationFragment : Fragment() {
 
         internal fun bind(profile: Profile) {
             binding.profileName.text = profile.name
+            if (profile.typed.type == TypedProfile.Type.Remote) {
+                binding.profileLastUpdated.isVisible = true
+                binding.profileLastUpdated.text = binding.root.context.getString(
+                    R.string.profile_item_last_updated,
+                    profile.typed.lastUpdated.toLocaleString()
+                )
+            } else {
+                binding.profileLastUpdated.isVisible = false
+            }
             binding.root.setOnClickListener {
                 val intent = Intent(binding.root.context, EditProfileActivity::class.java)
                 intent.putExtra("profile_id", profile.id)
@@ -172,12 +184,28 @@ class ConfigurationFragment : Fragment() {
                 val popup = PopupMenu(button.context, button)
                 popup.setForceShowIcon(true)
                 popup.menuInflater.inflate(R.menu.profile_menu, popup.menu)
+                if (profile.typed.type != TypedProfile.Type.Remote) {
+                    popup.menu.removeItem(R.id.action_share_url)
+                }
                 popup.setOnMenuItemClickListener {
                     when (it.itemId) {
                         R.id.action_share -> {
                             adapter.scope.launch(Dispatchers.IO) {
                                 try {
                                     button.context.shareProfile(profile)
+                                } catch (e: Exception) {
+                                    withContext(Dispatchers.Main) {
+                                        button.context.errorDialogBuilder(e).show()
+                                    }
+                                }
+                            }
+                            true
+                        }
+
+                        R.id.action_share_url -> {
+                            adapter.scope.launch(Dispatchers.IO) {
+                                try {
+                                    adapter.fragmentActivity.shareProfileURL(profile)
                                 } catch (e: Exception) {
                                     withContext(Dispatchers.Main) {
                                         button.context.errorDialogBuilder(e).show()

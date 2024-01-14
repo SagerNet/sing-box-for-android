@@ -26,9 +26,10 @@
     <string name="profile_edit_content">Edit Content</string>
     <string name="profile_check">Check</string>
     <string name="profile_share">Share</string>
-    <string name="profile_share_url">Share URL</string>
+    <string name="profile_share_url">Share URL as QR Code</string>
     <string name="profile_input_required">Required</string>
     <string name="profile_empty">Empty profiles</string>
+    <string name="profile_item_last_updated">Last Updated: %s</string>
     <string name="profile_last_updated">Last Updated</string>
     <string name="profile_update">Update</string>
     <string name="profile_auto_update">Auto Update</string>
