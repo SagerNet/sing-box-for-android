@@ -57,6 +57,9 @@ class NewProfileActivity : AbstractActivity() {
                 binding.name.editText?.setText(importName)
                 binding.type.text = TypedProfile.Type.Remote.name
                 binding.remoteURL.editText?.setText(importURL)
+                binding.localFields.isVisible = false
+                binding.remoteFields.isVisible = true
+                binding.autoUpdateInterval.text = "60"
             }
         }
 

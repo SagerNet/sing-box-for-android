@@ -78,6 +78,8 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
 
         reconnect()
         startIntegration()
+
+        onNewIntent(intent)
     }
 
     override fun onNewIntent(intent: Intent) {
