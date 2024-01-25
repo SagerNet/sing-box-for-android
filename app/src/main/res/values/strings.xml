@@ -140,6 +140,10 @@
     <string name="vpn_app_type_other">Other</string>
     <string name="vpn_core_type_unknown">Unknown</string>
     <string name="no_updates_available">No updates available</string>
-
+    <string name="sponsor">Sponsor</string>
+    <string name="sponsor_play">Sponsor via Play Store</string>
+    <string name="sponsor_message">If I\'ve defended your modern life, please consider sponsoring me.</string>
+    <string name="other_methods">Other methods</string>
+    <string name="action_start">Start</string>
 
 </resources>

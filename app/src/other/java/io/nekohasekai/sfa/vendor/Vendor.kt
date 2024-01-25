@@ -11,5 +11,8 @@ object Vendor : VendorInterface {
     override fun checkUpdate(activity: Activity, byUser: Boolean) {
     }
 
+    override fun startSponsor(activity: Activity, fallback: () -> Unit) {
+        fallback()
+    }
 
 }

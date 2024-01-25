@@ -103,6 +103,11 @@ class SettingsFragment : Fragment() {
         binding.openDebugButton.setOnClickListener {
             startActivity(Intent(requireContext(), DebugActivity::class.java))
         }
+        binding.startSponserButton.setOnClickListener {
+            Vendor.startSponsor(requireActivity()) {
+                activity.launchCustomTab("https://sekai.icu/sponsor/")
+            }
+        }
         lifecycleScope.launch(Dispatchers.IO) {
             reloadSettings()
         }
