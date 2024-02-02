@@ -108,7 +108,7 @@ open class CommandClient(
         }
 
         override fun clearLog() {
-           handler.clearLog()
+            handler.clearLog()
         }
 
         override fun writeLog(message: String?) {

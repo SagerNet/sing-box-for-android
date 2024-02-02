@@ -42,6 +42,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
                 Status.Stopped -> {
                     disablePager()
                 }
+
                 Status.Started -> {
                     enablePager()
                 }
@@ -49,6 +50,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
                 Status.Stopping -> {
                     disablePager()
                 }
+
                 else -> {}
             }
         }

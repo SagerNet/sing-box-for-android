@@ -31,6 +31,7 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
         }
         return service.onBind(intent)
     }
+
     override fun onDestroy() {
         service.onDestroy()
     }
@@ -96,14 +97,14 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
                 }
 
                 val inet4RouteExcludeAddress = options.inet4RouteExcludeAddress
-                    while (inet4RouteExcludeAddress.hasNext()) {
-                        builder.excludeRoute(inet4RouteExcludeAddress.next().toIpPrefix())
-                    }
+                while (inet4RouteExcludeAddress.hasNext()) {
+                    builder.excludeRoute(inet4RouteExcludeAddress.next().toIpPrefix())
+                }
 
                 val inet6RouteExcludeAddress = options.inet6RouteExcludeAddress
-                    while (inet6RouteExcludeAddress.hasNext()) {
-                        builder.excludeRoute(inet6RouteExcludeAddress.next().toIpPrefix())
-                    }
+                while (inet6RouteExcludeAddress.hasNext()) {
+                    builder.excludeRoute(inet6RouteExcludeAddress.next().toIpPrefix())
+                }
             } else {
                 val inet4RouteAddress = options.inet4RouteRange
                 if (inet4RouteAddress.hasNext()) {
