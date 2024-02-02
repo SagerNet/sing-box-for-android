@@ -185,7 +185,7 @@ class PerAppProxyActivity : AbstractActivity() {
                 MaterialAlertDialogBuilder(this)
                     .setTitle(R.string.menu_import_from_clipboard)
                     .setMessage(R.string.message_import_from_clipboard)
-                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                    .setPositiveButton(R.string.ok) { _, _ ->
                         importFromClipboard()
                     }
                     .setNegativeButton(android.R.string.cancel, null)
@@ -284,7 +284,7 @@ class PerAppProxyActivity : AbstractActivity() {
                 MaterialAlertDialogBuilder(this@PerAppProxyActivity)
                     .setTitle(R.string.title_scan_result)
                     .setMessage(R.string.message_scan_app_no_apps_found)
-                    .setPositiveButton(android.R.string.ok, null)
+                    .setPositiveButton(R.string.ok, null)
                     .show()
                 return@launch
             }

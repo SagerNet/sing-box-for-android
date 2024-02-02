@@ -101,7 +101,7 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
                         profile.host
                     )
                 )
-                .setPositiveButton(android.R.string.ok) { _, _ ->
+                .setPositiveButton(R.string.ok) { _, _ ->
                     startActivity(Intent(this, NewProfileActivity::class.java).apply {
                         putExtra("importName", profile.name)
                         putExtra("importURL", profile.url)
@@ -121,7 +121,7 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
                             content.name
                         )
                     )
-                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                    .setPositiveButton(R.string.ok) { _, _ ->
                         lifecycleScope.launch {
                             withContext(Dispatchers.IO) {
                                 runCatching {
@@ -186,14 +186,14 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
     }
 
     @SuppressLint("NewApi")
-    fun startService(skipRequestFineLocation: Boolean = false) {
+    fun startService(skipRequestLocation: Boolean = false) {
         if (!ServiceNotification.checkPermission()) {
             notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             return
         }
 
         // MIUI always return false for shouldShowRequestPermissionRationale
-        if (!skipRequestFineLocation && ContextCompat.checkSelfPermission(
+        if (!skipRequestLocation && ContextCompat.checkSelfPermission(
                 this, Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
@@ -201,9 +201,20 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
                     this, Manifest.permission.ACCESS_FINE_LOCATION
                 )
             ) {
-                fineLocationPermissionLauncher.launch(
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                )
+                MaterialAlertDialogBuilder(this)
+                    .setTitle(R.string.location_permission_title)
+                    .setMessage(R.string.location_permission_description)
+                    .setPositiveButton(R.string.ok) { _, _ ->
+                        locationPermissionLauncher.launch(
+                            arrayOf(
+                                Manifest.permission.ACCESS_COARSE_LOCATION,
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                            )
+                        )
+                    }
+                    .setCancelable(false)
+                    .show()
+                return
             }
         }
 
@@ -233,8 +244,8 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
         }
     }
 
-    private val fineLocationPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
+    private val locationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
     ) {
         startService(true)
     }
@@ -278,7 +289,7 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
 
     override fun onServiceAlert(type: Alert, message: String?) {
         val builder = MaterialAlertDialogBuilder(this)
-        builder.setPositiveButton(android.R.string.ok, null)
+        builder.setPositiveButton(R.string.ok, null)
         when (type) {
             Alert.RequestVPNPermission -> {
                 builder.setMessage(getString(R.string.service_error_missing_permission))

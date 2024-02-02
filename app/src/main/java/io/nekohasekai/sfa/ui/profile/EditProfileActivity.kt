@@ -48,7 +48,7 @@ class EditProfileActivity : AbstractActivity() {
             }.onFailure {
                 withContext(Dispatchers.Main) {
                     errorDialogBuilder(it)
-                        .setPositiveButton(android.R.string.ok) { _, _ -> finish() }
+                        .setPositiveButton(R.string.ok) { _, _ -> finish() }
                         .show()
                 }
             }
