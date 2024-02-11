@@ -221,7 +221,7 @@ class BoxService(
     @RequiresApi(Build.VERSION_CODES.M)
     private fun serviceUpdateIdleMode() {
         if (Application.powerManager.isDeviceIdleMode) {
-            boxService?.sleep()
+            boxService?.pause()
         } else {
             boxService?.wake()
         }
