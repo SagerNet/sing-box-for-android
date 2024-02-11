@@ -80,6 +80,8 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
         startIntegration()
 
         onNewIntent(intent)
+
+        Vendor.initializeBillingClient(this)
     }
 
     override fun onNewIntent(intent: Intent) {
