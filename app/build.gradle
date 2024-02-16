@@ -21,8 +21,8 @@ android {
         applicationId "io.nekohasekai.sfa"
         minSdk 21
         targetSdk 34
-        versionCode getProps("VERSION_CODE").toInteger()
-        versionName getProps("VERSION_NAME")
+        versionCode getVersionProps("VERSION_CODE").toInteger()
+        versionName getVersionProps("VERSION_NAME")
         setProperty("archivesBaseName", "SFA-" + versionName)
     }
 
@@ -79,7 +79,7 @@ android {
         variant.outputs.configureEach {
             outputFileName = (outputFileName as String).replace("-release", "")
             outputFileName = (outputFileName as String).replace("-play", "")
-            outputFileName = (outputFileName as String).replace("-other", "")
+            outputFileName = (outputFileName as String).replace("-other", "-foss")
         }
     }
 }
@@ -155,6 +155,21 @@ tasks.withType(KotlinCompile.class).configureEach {
 
 def getProps(String propName) {
     def propsFile = rootProject.file('local.properties')
+    if (propsFile.exists()) {
+        def props = new Properties()
+        props.load(new FileInputStream(propsFile))
+        String value = props[propName]
+        if (value == null) {
+            return ""
+        }
+        return value
+    } else {
+        return ""
+    }
+}
+
+def getVersionProps(String propName) {
+    def propsFile = rootProject.file('version.properties')
     if (propsFile.exists()) {
         def props = new Properties()
         props.load(new FileInputStream(propsFile))
