@@ -146,6 +146,6 @@
     <string name="other_methods">Other methods</string>
     <string name="action_start">Start</string>
     <string name="location_permission_title">Location permission</string>
-    <string name="location_permission_description">sing-box uses the location permission to provide `wifi_ssid` and `wifi_bssid` routing rule entries, deny it if you don\'t need this feature.</string>
+    <string name="location_permission_description">sing-box uses the **background location** permission to implement the `wifi_ssid` and `wifi_bssid` routing rule items that **you are using**.</string>
 
 </resources>

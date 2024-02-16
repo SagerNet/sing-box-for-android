@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
@@ -169,6 +170,23 @@ class BoxService(
             }
 
             newService.start()
+
+            if (newService.needWIFIState()) {
+                val wifiPermission = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                    android.Manifest.permission.ACCESS_FINE_LOCATION
+                } else {
+                    android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                }
+                if (ContextCompat.checkSelfPermission(
+                        service, wifiPermission
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    newService.close()
+                    stopAndAlert(Alert.RequestLocationPermission)
+                    return
+                }
+            }
+
             boxService = newService
             commandServer?.setService(boxService)
             status.postValue(Status.Started)

@@ -4,12 +4,13 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
+import android.net.Uri
 import android.net.VpnService
+import android.os.Build
 import android.os.Bundle
+import android.os.Process
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
@@ -188,36 +189,10 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
     }
 
     @SuppressLint("NewApi")
-    fun startService(skipRequestLocation: Boolean = false) {
+    fun startService() {
         if (!ServiceNotification.checkPermission()) {
             notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             return
-        }
-
-        // MIUI always return false for shouldShowRequestPermissionRationale
-        if (!skipRequestLocation && ContextCompat.checkSelfPermission(
-                this, Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            if (!ActivityCompat.shouldShowRequestPermissionRationale(
-                    this, Manifest.permission.ACCESS_FINE_LOCATION
-                )
-            ) {
-                MaterialAlertDialogBuilder(this)
-                    .setTitle(R.string.location_permission_title)
-                    .setMessage(R.string.location_permission_description)
-                    .setPositiveButton(R.string.ok) { _, _ ->
-                        locationPermissionLauncher.launch(
-                            arrayOf(
-                                Manifest.permission.ACCESS_COARSE_LOCATION,
-                                Manifest.permission.ACCESS_FINE_LOCATION,
-                            )
-                        )
-                    }
-                    .setCancelable(false)
-                    .show()
-                return
-            }
         }
 
         lifecycleScope.launch(Dispatchers.IO) {
@@ -246,11 +221,8 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
         }
     }
 
-    private val locationPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) {
-        startService(true)
-    }
+    private val locationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
 
     private val prepareLauncher = registerForActivityResult(PrepareService()) {
         if (it) {
@@ -290,6 +262,14 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
     }
 
     override fun onServiceAlert(type: Alert, message: String?) {
+        when (type) {
+            Alert.RequestLocationPermission -> {
+                return requestLocationPermission()
+            }
+
+            else -> {}
+        }
+
         val builder = MaterialAlertDialogBuilder(this)
         builder.setPositiveButton(R.string.ok, null)
         when (type) {
@@ -320,8 +300,60 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
                 builder.setMessage(message)
 
             }
+
+            else -> {}
         }
         builder.show()
+    }
+
+    private fun requestLocationPermission() {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.location_permission_title)
+            .setMessage(R.string.location_permission_description)
+            .setPositiveButton(R.string.ok) { _, _ ->
+                requestLocationPermission0()
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    private fun requestLocationPermission0() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        } else {
+            openPermissionSettings()
+        }
+    }
+
+    private fun openPermissionSettings() {
+        if (!getSystemProperty("ro.miui.ui.version.name").isNullOrBlank()) {
+            val intent = Intent("miui.intent.action.APP_PERM_EDITOR")
+            intent.putExtra("extra_package_uid", Process.myUid())
+            intent.putExtra("extra_pkgname", packageName)
+            try {
+                startActivity(intent)
+                return
+            } catch (ignored: Exception) {
+            }
+        }
+
+        try {
+            val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+            intent.data = Uri.parse("package:$packageName")
+            startActivity(intent)
+        } catch (e: Exception) {
+            errorDialogBuilder(e).show()
+        }
+    }
+
+    @SuppressLint("PrivateApi")
+    fun getSystemProperty(key: String?): String? {
+        try {
+            return Class.forName("android.os.SystemProperties").getMethod("get", String::class.java)
+                .invoke(null, key) as String
+        } catch (ignored: Exception) {
+        }
+        return null
     }
 
     private var paused = false
