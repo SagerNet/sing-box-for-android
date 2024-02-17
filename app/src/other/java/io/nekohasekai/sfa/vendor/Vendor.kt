@@ -11,11 +11,4 @@ object Vendor : VendorInterface {
     override fun checkUpdate(activity: Activity, byUser: Boolean) {
     }
 
-    override fun initializeBillingClient(activity: Activity) {
-    }
-
-    override fun startSponsor(activity: Activity, fallback: () -> Unit) {
-        fallback()
-    }
-
 }

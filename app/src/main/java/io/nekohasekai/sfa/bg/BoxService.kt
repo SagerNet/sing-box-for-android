@@ -21,7 +21,6 @@ import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.PlatformInterface
 import io.nekohasekai.libbox.SystemProxyStatus
 import io.nekohasekai.sfa.Application
-import io.nekohasekai.sfa.BuildConfig
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.constant.Action
 import io.nekohasekai.sfa.constant.Alert
@@ -53,9 +52,7 @@ class BoxService(
             val tempDir = Application.application.cacheDir
             tempDir.mkdirs()
             Libbox.setup(baseDir.path, workingDir.path, tempDir.path, false)
-            if (!BuildConfig.DEBUG) {
-                Libbox.redirectStderr(File(workingDir, "stderr.log").path)
-            }
+            Libbox.redirectStderr(File(workingDir, "stderr.log").path)
             initializeOnce = true
             return
         }
