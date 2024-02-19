@@ -9,8 +9,10 @@ import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
 import android.os.Process
+import android.text.Html
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
@@ -34,6 +36,7 @@ import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.database.TypedProfile
 import io.nekohasekai.sfa.databinding.ActivityMainBinding
 import io.nekohasekai.sfa.ktx.errorDialogBuilder
+import io.nekohasekai.sfa.ktx.hasPermission
 import io.nekohasekai.sfa.ui.profile.NewProfileActivity
 import io.nekohasekai.sfa.ui.shared.AbstractActivity
 import io.nekohasekai.sfa.vendor.Vendor
@@ -220,7 +223,26 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
     }
 
     private val locationPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+            if (it) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    requestBackgroundLocationPermission()
+                } else {
+                    startService()
+                }
+            } else {
+                showPermissionDeniedDescription()
+            }
+        }
+
+    private val backgroundLocationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+            if (it) {
+                startService()
+            } else {
+                showPermissionDeniedDescription()
+            }
+        }
 
     private val prepareLauncher = registerForActivityResult(PrepareService()) {
         if (it) {
@@ -305,22 +327,56 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
     }
 
     private fun requestLocationPermission() {
+        if (!hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
+            requestFineLocationPermission()
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            requestBackgroundLocationPermission()
+        }
+    }
+
+    private fun requestFineLocationPermission() {
+        val message = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Html.fromHtml(
+                getString(R.string.location_permission_description),
+                Html.FROM_HTML_MODE_LEGACY
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            Html.fromHtml(getString(R.string.location_permission_description))
+        }
         MaterialAlertDialogBuilder(this)
             .setTitle(R.string.location_permission_title)
-            .setMessage(R.string.location_permission_description)
+            .setMessage(message)
             .setPositiveButton(R.string.ok) { _, _ ->
-                requestLocationPermission0()
+                requestFineLocationPermission0()
             }
             .setCancelable(false)
             .show()
     }
 
-    private fun requestLocationPermission0() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+    private fun requestFineLocationPermission0() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         } else {
             openPermissionSettings()
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun requestBackgroundLocationPermission() {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.location_permission_title)
+            .setMessage(
+                Html.fromHtml(
+                    getString(R.string.location_permission_background_description),
+                    Html.FROM_HTML_MODE_LEGACY
+                )
+            )
+            .setPositiveButton(R.string.ok) { _, _ ->
+                backgroundLocationPermissionLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            }
+            .setCancelable(false)
+            .show()
     }
 
     private fun openPermissionSettings() {
@@ -342,6 +398,27 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
         } catch (e: Exception) {
             errorDialogBuilder(e).show()
         }
+    }
+
+    private fun showPermissionDeniedDescription() {
+        val message = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Html.fromHtml(
+                getString(R.string.location_permission_denied_description),
+                Html.FROM_HTML_MODE_LEGACY
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            Html.fromHtml(getString(R.string.location_permission_denied_description))
+        }
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.location_permission_title)
+            .setMessage(message)
+            .setPositiveButton(R.string.ok, null)
+            .setNeutralButton(R.string.open_settings) { _, _ ->
+                openPermissionSettings()
+            }
+            .setCancelable(false)
+            .show()
     }
 
     @SuppressLint("PrivateApi")
