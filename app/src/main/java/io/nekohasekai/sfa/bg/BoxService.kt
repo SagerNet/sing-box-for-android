@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
@@ -27,6 +26,7 @@ import io.nekohasekai.sfa.constant.Alert
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.database.ProfileManager
 import io.nekohasekai.sfa.database.Settings
+import io.nekohasekai.sfa.ktx.hasPermission
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -174,10 +174,7 @@ class BoxService(
                 } else {
                     android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
                 }
-                if (ContextCompat.checkSelfPermission(
-                        service, wifiPermission
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
+                if (!service.hasPermission(wifiPermission)) {
                     newService.close()
                     stopAndAlert(Alert.RequestLocationPermission)
                     return
