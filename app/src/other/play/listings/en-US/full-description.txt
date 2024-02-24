@@ -1,0 +1,1 @@
+sing-box is a fast, customizable and univsersal proxy platform that can be used to create network proxy servers, clients and transparent proxies. This app allows users to manage and use local and remote sing-box profiles and provides platform specific feature implementations such as the TUN transparent proxy implementation through the Android VpnService.
