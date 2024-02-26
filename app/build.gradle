@@ -1,16 +1,18 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id 'com.android.application'
-    id 'kotlin-android'
-    id 'kotlin-parcelize'
-    id 'com.google.devtools.ksp'
-    id 'com.github.triplet.play'
+    id "com.android.application"
+    id "kotlin-android"
+    id "kotlin-parcelize"
+    id "com.google.devtools.ksp"
+    id "com.github.triplet.play"
 }
 
 android {
-    namespace 'io.nekohasekai.sfa'
+    namespace "io.nekohasekai.sfa"
     compileSdk 34
+
+    ndkVersion "26.2.11394342"
 
     ksp {
         arg("room.incremental", "true")
@@ -43,7 +45,7 @@ android {
         }
         release {
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             signingConfig signingConfigs.release
         }
     }
@@ -85,34 +87,34 @@ android {
 }
 
 dependencies {
-    implementation(fileTree('libs'))
+    implementation(fileTree("libs"))
 
-    implementation 'androidx.core:core-ktx:1.12.0'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.11.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.7.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.7'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.7.7'
-    implementation 'com.google.zxing:core:3.4.1'
-    implementation 'androidx.room:room-runtime:2.6.1'
-    implementation 'androidx.coordinatorlayout:coordinatorlayout:1.2.0'
-    implementation 'androidx.preference:preference-ktx:1.2.1'
-    ksp 'androidx.room:room-compiler:2.6.1'
-    implementation 'androidx.work:work-runtime-ktx:2.9.0'
-    implementation 'androidx.browser:browser:1.7.0'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0'
+    implementation "androidx.core:core-ktx:1.12.0"
+    implementation "androidx.appcompat:appcompat:1.6.1"
+    implementation "com.google.android.material:material:1.11.0"
+    implementation "androidx.constraintlayout:constraintlayout:2.1.4"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.7.0"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0"
+    implementation "androidx.navigation:navigation-fragment-ktx:2.7.7"
+    implementation "androidx.navigation:navigation-ui-ktx:2.7.7"
+    implementation "com.google.zxing:core:3.4.1"
+    implementation "androidx.room:room-runtime:2.6.1"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:1.2.0"
+    implementation "androidx.preference:preference-ktx:1.2.1"
+    ksp "androidx.room:room-compiler:2.6.1"
+    implementation "androidx.work:work-runtime-ktx:2.9.0"
+    implementation "androidx.browser:browser:1.7.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0"
 
     // DO NOT UPDATE (minSdkVersion updated)
-    implementation 'com.blacksquircle.ui:editorkit:2.2.0'
-    implementation 'com.blacksquircle.ui:language-json:2.2.0'
+    implementation "com.blacksquircle.ui:editorkit:2.2.0"
+    implementation "com.blacksquircle.ui:language-json:2.2.0"
 
-    implementation('org.smali:dexlib2:2.5.2') {
-        exclude group: 'com.google.guava', module: 'guava'
+    implementation("org.smali:dexlib2:2.5.2") {
+        exclude group: "com.google.guava", module: "guava"
     }
-    implementation 'com.google.guava:guava:32.1.2-android'
-    playImplementation 'com.google.android.play:app-update-ktx:2.1.0'
+    implementation "com.google.guava:guava:32.1.2-android"
+    playImplementation "com.google.android.play:app-update-ktx:2.1.0"
 }
 
 if (getProps("APPCENTER_TOKEN") != "") {
@@ -138,9 +140,9 @@ if (playCredentialsJSON.exists()) {
         defaultToAppBundles = true
         def version = getProps("VERSION_NAME")
         if (version.contains("alpha") || version.contains("beta") || version.contains("rc")) {
-            track = 'beta'
+            track = "beta"
         } else {
-            track = 'production'
+            track = "production"
         }
     }
 }
@@ -152,7 +154,7 @@ tasks.withType(KotlinCompile.class).configureEach {
 }
 
 def getProps(String propName) {
-    def propsFile = rootProject.file('local.properties')
+    def propsFile = rootProject.file("local.properties")
     if (propsFile.exists()) {
         def props = new Properties()
         props.load(new FileInputStream(propsFile))
@@ -167,7 +169,7 @@ def getProps(String propName) {
 }
 
 def getVersionProps(String propName) {
-    def propsFile = rootProject.file('version.properties')
+    def propsFile = rootProject.file("version.properties")
     if (propsFile.exists()) {
         def props = new Properties()
         props.load(new FileInputStream(propsFile))
