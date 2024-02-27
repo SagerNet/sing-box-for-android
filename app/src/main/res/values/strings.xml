@@ -146,7 +146,7 @@
     <string name="other_methods">Other methods</string>
     <string name="action_start">Start</string>
     <string name="location_permission_title">Location permission</string>
-    <string name="location_permission_description"><![CDATA[sing-box uses the <strong>location</strong> permission to implement the <strong><tt>wifi_ssid</tt> and <tt>wifi_bssid</tt> routing rules</strong> that <strong>you are using</strong>. Please grant the permission.]]></string>
+    <string name="location_permission_description"><![CDATA[Your profile contains <strong><tt>wifi_ssid</tt> and <tt>wifi_bssid</tt> routing rules</strong>. To make them work, sing-box uses the <strong>location</strong> permission <strong>in the background</strong> to get information about the connected Wi-Fi network. The information will be used <strong>only for routing purposes</strong>. Please grant the permission to continue.]]></string>
     <string name="location_permission_background_description"><![CDATA[On Android 10 and up, <strong>background location</strong> permission is required. Please select <strong>Allow all the time</strong> to grant the permission.]]></string>
     <string name="location_permission_denied_description"><![CDATA[It looks like you have denied the required permission. To continue using the app, please <strong>grant the permission</strong> or <strong>remove <tt>wifi_ssid</tt> and <tt>wifi_bssid</tt> routing rules</strong> from your profile.]]></string>
     <string name="open_settings">Open Settings</string>
