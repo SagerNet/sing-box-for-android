@@ -350,6 +350,7 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
             .setPositiveButton(R.string.ok) { _, _ ->
                 requestFineLocationPermission0()
             }
+            .setNegativeButton(R.string.cancel, null)
             .setCancelable(false)
             .show()
     }
@@ -375,6 +376,7 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
             .setPositiveButton(R.string.ok) { _, _ ->
                 backgroundLocationPermissionLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
             }
+            .setNegativeButton(R.string.cancel, null)
             .setCancelable(false)
             .show()
     }
