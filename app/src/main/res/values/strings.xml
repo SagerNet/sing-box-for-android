@@ -3,6 +3,7 @@
 
     <string name="stop">Stop</string>
     <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
     <string name="no_thanks">No, thanks</string>
 
     <string name="title_dashboard">Dashboard</string>
