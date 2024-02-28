@@ -138,7 +138,7 @@ if (playCredentialsJSON.exists()) {
     play {
         serviceAccountCredentials = playCredentialsJSON
         defaultToAppBundles = true
-        def version = getProps("VERSION_NAME")
+        def version = getVersionProps("VERSION_NAME")
         if (version.contains("alpha") || version.contains("beta") || version.contains("rc")) {
             track = "beta"
         } else {
