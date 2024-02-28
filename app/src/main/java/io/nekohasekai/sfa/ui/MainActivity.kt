@@ -225,13 +225,11 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
     private val locationPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) {
             if (it) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                if (it && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     requestBackgroundLocationPermission()
                 } else {
                     startService()
                 }
-            } else {
-                showPermissionDeniedDescription()
             }
         }
 
@@ -239,8 +237,6 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
         registerForActivityResult(ActivityResultContracts.RequestPermission()) {
             if (it) {
                 startService()
-            } else {
-                showPermissionDeniedDescription()
             }
         }
 
@@ -350,7 +346,7 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
             .setPositiveButton(R.string.ok) { _, _ ->
                 requestFineLocationPermission0()
             }
-            .setNegativeButton(R.string.cancel, null)
+            .setNegativeButton(R.string.no_thanks, null)
             .setCancelable(false)
             .show()
     }
@@ -376,7 +372,7 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
             .setPositiveButton(R.string.ok) { _, _ ->
                 backgroundLocationPermissionLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
             }
-            .setNegativeButton(R.string.cancel, null)
+            .setNegativeButton(R.string.no_thanks, null)
             .setCancelable(false)
             .show()
     }
@@ -400,27 +396,6 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
         } catch (e: Exception) {
             errorDialogBuilder(e).show()
         }
-    }
-
-    private fun showPermissionDeniedDescription() {
-        val message = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            Html.fromHtml(
-                getString(R.string.location_permission_denied_description),
-                Html.FROM_HTML_MODE_LEGACY
-            )
-        } else {
-            @Suppress("DEPRECATION")
-            Html.fromHtml(getString(R.string.location_permission_denied_description))
-        }
-        MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.location_permission_title)
-            .setMessage(message)
-            .setPositiveButton(R.string.ok, null)
-            .setNeutralButton(R.string.open_settings) { _, _ ->
-                openPermissionSettings()
-            }
-            .setCancelable(false)
-            .show()
     }
 
     @SuppressLint("PrivateApi")

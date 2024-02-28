@@ -3,7 +3,6 @@
 
     <string name="stop">Stop</string>
     <string name="ok">OK</string>
-    <string name="cancel">Cancel</string>
     <string name="no_thanks">No, thanks</string>
 
     <string name="title_dashboard">Dashboard</string>
@@ -87,6 +86,7 @@
     <string name="core_data_size">Data Size</string>
     <string name="check_update_automatic">Automatic Update Check</string>
     <string name="check_update">Check Update</string>
+    <string name="privacy_policy">Privacy Policy</string>
     <string name="title_app_settings">App</string>
     <string name="memory_limit">Memory Limit</string>
     <string name="background_permission">Background permission</string>
@@ -147,8 +147,7 @@
     <string name="other_methods">Other methods</string>
     <string name="action_start">Start</string>
     <string name="location_permission_title">Location permission</string>
-    <string name="location_permission_description"><![CDATA[Your profile contains <strong><tt>wifi_ssid</tt> and <tt>wifi_bssid</tt> routing rules</strong>. To make them work, sing-box uses the <strong>location</strong> permission <strong>in the background</strong> to get information about the connected Wi-Fi network. The information will be used <strong>only for routing purposes</strong>. Please grant the permission to continue.]]></string>
-    <string name="location_permission_background_description"><![CDATA[On Android 10 and up, <strong>background location</strong> permission is required. Please select <strong>Allow all the time</strong> to grant the permission.]]></string>
-    <string name="location_permission_denied_description"><![CDATA[It looks like you have denied the required permission. To continue using the app, please <strong>grant the permission</strong> or <strong>remove <tt>wifi_ssid</tt> and <tt>wifi_bssid</tt> routing rules</strong> from your profile.]]></string>
+    <string name="location_permission_description"><![CDATA[Your profile contains <strong><tt>wifi_ssid</tt> or <tt>wifi_bssid</tt> routing rules</strong>. To make them work, sing-box uses the <strong>location</strong> permission <strong>in the background</strong> to get information about the connected Wi-Fi network. The information will be used <strong>for routing purposes only</strong>.]]></string>
+    <string name="location_permission_background_description"><![CDATA[On Android 10 and up, <strong>background location</strong> permission is required. Select <strong>Allow all the time</strong> to grant the permission.]]></string>
     <string name="open_settings">Open Settings</string>
 </resources>

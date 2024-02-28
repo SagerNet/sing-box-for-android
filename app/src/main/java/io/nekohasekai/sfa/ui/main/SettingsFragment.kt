@@ -73,6 +73,9 @@ class SettingsFragment : Fragment() {
         binding.checkUpdateButton.setOnClickListener {
             Vendor.checkUpdate(activity, true)
         }
+        binding.openPrivacyPolicyButton.setOnClickListener {
+            activity.launchCustomTab("https://sing-box.sagernet.org/clients/privacy/")
+        }
         binding.disableMemoryLimit.addTextChangedListener {
             lifecycleScope.launch(Dispatchers.IO) {
                 val newValue = EnabledType.valueOf(it).boolValue
