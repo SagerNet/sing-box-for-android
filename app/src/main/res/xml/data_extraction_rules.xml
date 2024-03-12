@@ -1,13 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <data-extraction-rules>
     <cloud-backup>
-        <include domain="database" path="profiles.db" />
-        <include domain="database" path="settings.db" />
-        <include domain="file" path="configs" />
+        <include
+            domain="database"
+            path="profiles.db" />
+        <include
+            domain="database"
+            path="settings.db" />
+        <include
+            domain="file"
+            path="configs" />
     </cloud-backup>
     <device-transfer>
-        <include domain="database" path="profiles.db" />
-        <include domain="database" path="settings.db" />
-        <include domain="file" path="configs" />
+        <include
+            domain="database"
+            path="profiles.db" />
+        <include
+            domain="database"
+            path="settings.db" />
+        <include
+            domain="file"
+            path="configs" />
     </device-transfer>
 </data-extraction-rules>

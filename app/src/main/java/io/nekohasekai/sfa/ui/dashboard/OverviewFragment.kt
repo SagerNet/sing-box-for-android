@@ -70,42 +70,20 @@ class OverviewFragment : Fragment() {
                 Status.Stopped -> {
                     binding.clashModeCard.isVisible = false
                     binding.systemProxyCard.isVisible = false
-                    binding.fab.setImageResource(R.drawable.ic_play_arrow_24)
-                    binding.fab.show()
-                }
 
-                Status.Starting -> {
-                    binding.fab.hide()
                 }
 
                 Status.Started -> {
                     statusClient.connect()
                     clashModeClient.connect()
                     reloadSystemProxyStatus()
-                    binding.fab.setImageResource(R.drawable.ic_stop_24)
-                    binding.fab.show()
-                }
 
-                Status.Stopping -> {
-                    binding.fab.hide()
                 }
 
                 else -> {}
             }
         }
-        binding.fab.setOnClickListener {
-            when (activity.serviceStatus.value) {
-                Status.Stopped -> {
-                    activity.startService()
-                }
 
-                Status.Started -> {
-                    BoxService.stop()
-                }
-
-                else -> {}
-            }
-        }
         ProfileManager.registerCallback(this::updateProfiles)
     }
 

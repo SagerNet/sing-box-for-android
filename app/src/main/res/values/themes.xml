@@ -1,8 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-
-    <style name="AppTheme" parent="Theme.Material3.DayNight">
-        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
-    </style>
+<resources>
 
     <style name="AppTheme.Translucent" parent="Theme.Material3.DayNight.Dialog.Alert">
         <item name="android:background">@android:color/transparent</item>

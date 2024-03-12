@@ -36,9 +36,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:backgroundTint="@color/blue_grey_600"
-        android:text="@string/title_new_profile"
-        android:textColor="@android:color/white"
         app:icon="@drawable/ic_note_add_24"
         app:iconTint="@android:color/white" />
 

@@ -4,70 +4,87 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="16dp">
 
-    <LinearLayout
+    <com.google.android.material.card.MaterialCardView
+        style="?attr/materialCardViewElevatedStyle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/groupName"
-            style="?attr/textAppearanceTitleLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="Group Name" />
-
-        <TextView
-            android:id="@+id/groupType"
-            style="?attr/textAppearanceBodyLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            tools:text="Group Name" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="end"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <ImageButton
-                android:id="@+id/expandButton"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:backgroundTint="?colorSurface"
-                android:contentDescription="@string/expand"
-                android:src="@drawable/ic_expand_less_24"
-                app:tint="?colorControlNormal" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-            <ImageButton
-                android:id="@+id/urlTestButton"
-                android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/groupName"
+                    style="?attr/textAppearanceTitleLarge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="Group Name" />
+
+                <TextView
+                    android:id="@+id/groupType"
+                    style="?attr/textAppearanceBodyLarge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    tools:text="Group Name" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:id="@+id/expandButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:backgroundTint="?colorSurfaceContainerLow"
+                        android:contentDescription="@string/expand"
+                        android:src="@drawable/ic_expand_less_24"
+                        app:tint="?colorControlNormal" />
+
+                    <ImageButton
+                        android:id="@+id/urlTestButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:backgroundTint="?colorSurfaceContainerLow"
+                        android:contentDescription="@string/urltest"
+                        android:src="@drawable/ic_electric_bolt_24"
+                        app:tint="?colorControlNormal" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/itemText"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:backgroundTint="?colorSurface"
-                android:contentDescription="@string/urltest"
-                android:src="@drawable/ic_electric_bolt_24"
-                app:tint="?colorControlNormal" />
+                android:paddingEnd="56dp" />
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/itemList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                tools:listitem="@layout/view_dashboard_group_item" />
         </LinearLayout>
 
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/itemText"
-        android:layout_width="match_parent"
-        android:paddingEnd="56dp"
-        android:layout_height="wrap_content" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/itemList"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp" />
+    </com.google.android.material.card.MaterialCardView>
 
 
 </LinearLayout>

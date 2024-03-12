@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <io.nekohasekai.sfa.ui.settings.Preference
+        app:fragment="io.nekohasekai.sfa.ui.settings.CoreFragment"
+        app:icon="@drawable/ic_qr_code_2_24"
+        app:title="@string/settings_title_core" />
+
+</androidx.preference.PreferenceScreen>

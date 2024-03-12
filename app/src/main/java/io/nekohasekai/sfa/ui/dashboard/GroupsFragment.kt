@@ -12,7 +12,6 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -133,6 +132,8 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
         lateinit var group: OutboundGroup
         lateinit var items: MutableList<OutboundGroupItem>
         lateinit var adapter: ItemAdapter
+
+        @SuppressLint("NotifyDataSetChanged")
         fun bind(group: OutboundGroup) {
             this.group = group
             binding.groupName.text = group.tag
@@ -153,10 +154,23 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
             while (itemIterator.hasNext()) {
                 items.add(itemIterator.next())
             }
-            adapter = ItemAdapter(this, group, items)
-            binding.itemList.adapter = adapter
-            (binding.itemList.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-            binding.itemList.layoutManager = GridLayoutManager(binding.root.context, 2)
+            if (!::adapter.isInitialized) {
+                adapter = ItemAdapter(this, group, items)
+                binding.itemList.adapter = adapter
+                /* val divider =
+                     MaterialDividerItemDecoration(
+                         binding.root.context,
+                         LinearLayoutManager.VERTICAL
+                     )
+                 divider.isLastItemDecorated = false
+                 binding.itemList.addItemDecoration(divider)*/
+                (binding.itemList.itemAnimator as SimpleItemAnimator).supportsChangeAnimations =
+                    false
+                binding.itemList.layoutManager = LinearLayoutManager(binding.root.context)
+            } else {
+                adapter.items = items
+                adapter.notifyDataSetChanged()
+            }
             updateExpand()
         }
 
@@ -220,7 +234,7 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
     private class ItemAdapter(
         val groupView: GroupView,
         val group: OutboundGroup,
-        val items: List<OutboundGroupItem>
+        var items: List<OutboundGroupItem> = emptyList()
     ) :
         RecyclerView.Adapter<ItemGroupView>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemGroupView {

@@ -5,7 +5,6 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import com.google.android.material.color.DynamicColors
-import com.google.android.material.elevation.SurfaceColors
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.ktx.getAttrColor
 
@@ -16,9 +15,10 @@ abstract class AbstractActivity : AppCompatActivity() {
 
         DynamicColors.applyToActivityIfAvailable(this)
 
-        val color = SurfaceColors.SURFACE_2.getColor(this)
-        window.statusBarColor = color
-        window.navigationBarColor = color
+        val colorSurfaceContainer =
+            getAttrColor(com.google.android.material.R.attr.colorSurfaceContainer)
+        window.statusBarColor = colorSurfaceContainer
+        window.navigationBarColor = colorSurfaceContainer
 
         supportActionBar?.setHomeAsUpIndicator(AppCompatResources.getDrawable(
             this@AbstractActivity,

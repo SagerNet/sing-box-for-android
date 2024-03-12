@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <full-backup-content>
 
-    <include domain="database" path="profiles.db" />
-    <include domain="database" path="settings.db" />
-    <include domain="file" path="configs" />
+    <include
+        domain="database"
+        path="profiles.db" />
+    <include
+        domain="database"
+        path="settings.db" />
+    <include
+        domain="file"
+        path="configs" />
 
 </full-backup-content>

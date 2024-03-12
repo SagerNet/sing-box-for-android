@@ -25,10 +25,9 @@
 
     </RadioGroup>
 
-    <View
+    <com.google.android.material.divider.MaterialDivider
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/divider" />
+        android:layout_height="1dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_app_list"

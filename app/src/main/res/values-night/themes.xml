@@ -1,7 +1,0 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-
-    <style name="AppTheme" parent="Theme.Material3.DayNight">
-        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
-        <item name="colorPrimaryContainer">@color/blue_grey_600</item>
-    </style>
-</resources>

@@ -14,12 +14,17 @@ import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.preference.Preference
+import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.ProfileContent
@@ -38,6 +43,7 @@ import io.nekohasekai.sfa.databinding.ActivityMainBinding
 import io.nekohasekai.sfa.ktx.errorDialogBuilder
 import io.nekohasekai.sfa.ktx.hasPermission
 import io.nekohasekai.sfa.ui.profile.NewProfileActivity
+import io.nekohasekai.sfa.ui.settings.CoreFragment
 import io.nekohasekai.sfa.ui.shared.AbstractActivity
 import io.nekohasekai.sfa.vendor.Vendor
 import kotlinx.coroutines.Dispatchers
@@ -47,13 +53,15 @@ import java.io.File
 import java.util.Date
 import java.util.LinkedList
 
-class MainActivity : AbstractActivity(), ServiceConnection.Callback {
+class MainActivity : AbstractActivity(),
+    PreferenceFragmentCompat.OnPreferenceStartFragmentCallback,
+    ServiceConnection.Callback {
 
     companion object {
         private const val TAG = "MainActivity"
     }
 
-    private lateinit var binding: ActivityMainBinding
+    internal lateinit var binding: ActivityMainBinding
     private val connection = ServiceConnection(this, this)
 
     val logList = LinkedList<String>()
@@ -65,9 +73,12 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
 
         val navController = findNavController(R.id.nav_host_fragment_activity_my)
+        navController.setGraph(R.navigation.mobile_navigation)
         navController.navigate(R.id.navigation_dashboard)
+        navController.addOnDestinationChangedListener(::onDestinationChanged)
         val appBarConfiguration =
             AppBarConfiguration(
                 setOf(
@@ -84,6 +95,31 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
         startIntegration()
 
         onNewIntent(intent)
+    }
+
+
+    private fun onDestinationChanged(
+        navController: NavController,
+        navDestination: NavDestination,
+        bundle: Bundle?
+    ) {
+        val destinationId = navDestination.id
+        binding.dashboardTabContainer.isVisible = destinationId == R.id.navigation_dashboard
+    }
+
+    override fun onPreferenceStartFragment(
+        caller: PreferenceFragmentCompat,
+        pref: Preference
+    ): Boolean {
+        val navController = findNavController(R.id.nav_host_fragment_activity_my)
+        when (pref.fragment) {
+            CoreFragment::class.java.name -> {
+                navController.navigate(R.id.navigation_settings_core)
+                return true
+            }
+
+            else -> return false
+        }
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -444,5 +480,6 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
         connection.disconnect()
         super.onDestroy()
     }
+
 
 }
