@@ -31,7 +31,7 @@ open class CommandClient(
         fun onConnected() {}
         fun onDisconnected() {}
         fun updateStatus(status: StatusMessage) {}
-        fun updateGroups(groups: List<OutboundGroup>) {}
+        fun updateGroups(newGroups: MutableList<OutboundGroup>) {}
         fun clearLog() {}
         fun appendLog(message: String) {}
         fun initializeClashMode(modeList: List<String>, currentMode: String) {}
