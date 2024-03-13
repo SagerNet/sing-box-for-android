@@ -36,12 +36,6 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
         val binding = binding ?: return
         binding.dashboardPager.adapter = Adapter(this)
         binding.dashboardPager.offscreenPageLimit = Page.values().size
-        mediator = TabLayoutMediator(
-            activity.binding.dashboardTabLayout,
-            binding.dashboardPager
-        ) { tab, position ->
-            tab.setText(Page.values()[position].titleRes)
-        }.apply { attach() }
         activity.serviceStatus.observe(viewLifecycleOwner) {
             when (it) {
                 Status.Stopped -> {
@@ -81,6 +75,19 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
                 else -> {}
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val activity = activity ?: return
+        val binding = binding ?: return
+        if (mediator != null) return
+        mediator = TabLayoutMediator(
+            activity.binding.dashboardTabLayout,
+            binding.dashboardPager
+        ) { tab, position ->
+            tab.setText(Page.values()[position].titleRes)
+        }.apply { attach() }
     }
 
     override fun onDestroyView() {

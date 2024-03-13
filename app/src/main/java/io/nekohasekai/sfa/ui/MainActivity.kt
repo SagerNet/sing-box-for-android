@@ -8,7 +8,6 @@ import android.net.Uri
 import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
-import android.os.Process
 import android.text.Html
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
@@ -45,6 +44,7 @@ import io.nekohasekai.sfa.ktx.hasPermission
 import io.nekohasekai.sfa.ui.profile.NewProfileActivity
 import io.nekohasekai.sfa.ui.settings.CoreFragment
 import io.nekohasekai.sfa.ui.shared.AbstractActivity
+import io.nekohasekai.sfa.utils.MIUIUtils
 import io.nekohasekai.sfa.vendor.Vendor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -414,12 +414,9 @@ class MainActivity : AbstractActivity(),
     }
 
     private fun openPermissionSettings() {
-        if (!getSystemProperty("ro.miui.ui.version.name").isNullOrBlank()) {
-            val intent = Intent("miui.intent.action.APP_PERM_EDITOR")
-            intent.putExtra("extra_package_uid", Process.myUid())
-            intent.putExtra("extra_pkgname", packageName)
+        if (MIUIUtils.isMIUI) {
             try {
-                startActivity(intent)
+                MIUIUtils.openPermissionSettings(this)
                 return
             } catch (ignored: Exception) {
             }
@@ -434,15 +431,6 @@ class MainActivity : AbstractActivity(),
         }
     }
 
-    @SuppressLint("PrivateApi")
-    fun getSystemProperty(key: String?): String? {
-        try {
-            return Class.forName("android.os.SystemProperties").getMethod("get", String::class.java)
-                .invoke(null, key) as String
-        } catch (ignored: Exception) {
-        }
-        return null
-    }
 
     private var paused = false
     override fun onPause() {
