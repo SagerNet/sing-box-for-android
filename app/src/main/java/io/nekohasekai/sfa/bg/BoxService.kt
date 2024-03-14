@@ -217,6 +217,10 @@ class BoxService(
         }
     }
 
+    override fun postServiceClose() {
+        // Not used on Android
+    }
+
     override fun getSystemProxyStatus(): SystemProxyStatus {
         val status = SystemProxyStatus()
         if (service is VPNService) {
