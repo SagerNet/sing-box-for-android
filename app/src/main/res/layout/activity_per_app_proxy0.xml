@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -17,24 +18,38 @@
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize" />
 
+
         <com.google.android.material.progressindicator.LinearProgressIndicator
-            android:id="@+id/progressView"
+            android:id="@+id/progress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:indeterminate="true" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="?colorSurfaceContainerLow"
+            android:gravity="center_vertical"
+            android:paddingLeft="16dp">
+
+            <TextView
+                android:id="@+id/per_app_proxy_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/per_app_proxy_mode_include" />
+
+        </LinearLayout>
+
     </com.google.android.material.appbar.AppBarLayout>
 
-    <com.blacksquircle.ui.editorkit.widget.TextProcessor
-        android:id="@+id/editor"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/app_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@null"
-        android:gravity="top|start"
-        android:padding="8dp"
-        android:textSize="14sp"
-        android:typeface="monospace"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        android:scrollbars="vertical"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:listitem="@layout/view_app_list_item" />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

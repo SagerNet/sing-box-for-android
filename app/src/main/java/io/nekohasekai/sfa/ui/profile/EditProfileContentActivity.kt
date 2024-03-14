@@ -21,26 +21,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-class EditProfileContentActivity : AbstractActivity() {
+class EditProfileContentActivity : AbstractActivity<ActivityEditProfileContentBinding>() {
 
-    private var binding: ActivityEditProfileContentBinding? = null
-    private var _profile: Profile? = null
-    private val profile get() = _profile!!
+    private var profile: Profile? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setTitle(R.string.title_edit_configuration)
-        val binding = ActivityEditProfileContentBinding.inflate(layoutInflater)
-        this.binding = binding
-        setContentView(binding.root)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.editor.language = JsonLanguage()
         loadConfiguration()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        binding = null
     }
 
     private fun loadConfiguration() {
@@ -120,7 +109,8 @@ class EditProfileContentActivity : AbstractActivity() {
 
         val profileId = intent.getLongExtra("profile_id", -1L)
         if (profileId == -1L) error("invalid arguments")
-        _profile = ProfileManager.get(profileId) ?: error("invalid arguments")
+        val profile = ProfileManager.get(profileId) ?: error("invalid arguments")
+        this.profile = profile
         val content = File(profile.typed.path).readText()
         withContext(Dispatchers.Main) {
             binding.editor.setTextContent(content)

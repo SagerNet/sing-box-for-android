@@ -99,22 +99,53 @@
     <string name="title_profile_override">Profile Override</string>
     <string name="profile_override_description">Overrides profile configuration items with platform-specific values.</string>
     <string name="profile_override_configure">Configure</string>
+
     <string name="title_per_app_proxy">Per-app Proxy</string>
     <string name="per_app_proxy_description">Override include_package and exclude_package in the configuration.</string>
-    <string name="per_app_proxy_mode_exclude">Do not proxy selected apps</string>
-    <string name="per_app_proxy_mode_include">Proxy only selected apps</string>
+    <string name="per_app_proxy_mode">Proxy Mode</string>
+    <string name="per_app_proxy_mode_include">Include</string>
+    <string name="per_app_proxy_mode_include_description">Only selected apps are allowed through the VPN</string>
+    <string name="per_app_proxy_mode_exclude">Exclude</string>
+    <string name="per_app_proxy_mode_exclude_description">Selected apps will be excluded from VPN</string>
+    <string name="per_app_proxy_action_copy">Copy</string>
+    <string name="per_app_proxy_action_copy_application_label">Name</string>
+    <string name="per_app_proxy_action_copy_package_name">Package Name</string>
+    <string name="per_app_proxy_action_copy_uid">UID</string>
+
+    <string name="per_app_proxy_sort_mode">Sort Mode</string>
+    <string name="per_app_proxy_sort_mode_name">By name</string>
+    <string name="per_app_proxy_sort_mode_package_name">By package name</string>
+    <string name="per_app_proxy_sort_mode_uid">By UID</string>
+    <string name="per_app_proxy_sort_mode_install_time">By install time</string>
+    <string name="per_app_proxy_sort_mode_update_time">By update time</string>
+    <string name="per_app_proxy_sort_mode_reverse">Reverse</string>
+
+    <string name="per_app_proxy_filter">Filter</string>
+    <string name="per_app_proxy_hide_system_apps">Hide system apps</string>
+    <string name="per_app_proxy_hide_offline_apps">Hide offline apps</string>
+    <string name="per_app_proxy_hide_disabled_apps">Hide disabled apps</string>
+
+    <string name="per_app_proxy_select">Select</string>
+    <string name="per_app_proxy_select_all">Select all</string>
+    <string name="per_app_proxy_select_none">Deselect all</string>
+
+    <string name="per_app_proxy_backup">Backup</string>
+    <string name="per_app_proxy_import">Import from clipboard</string>
+    <string name="per_app_proxy_export">Export to clipboard</string>
+
+    <string name="per_app_proxy_scan">Scan</string>
+    <string name="per_app_proxy_scan_china_apps">China apps</string>
+
     <string name="content_description_app_icon">App icon</string>
     <string name="menu_hide_system">Hide system apps</string>
     <string name="menu_show_system">Show system apps</string>
     <string name="menu_scan_china_apps">Scan China apps</string>
-    <string name="menu_import_from_clipboard">Import from clipboard</string>
-    <string name="menu_export_to_clipboard">Export to clipboard</string>
     <string name="toast_clipboard_empty">Clipboard is empty</string>
     <string name="toast_app_list_empty">App list is empty</string>
-    <string name="toast_copied_to_clipboard">Copied to clipboard</string>
+    <string name="toast_copied_to_clipboard">Exported to clipboard</string>
     <string name="toast_imported_from_clipboard">Imported from clipboard</string>
     <string name="message_import_from_clipboard">Importing app list from clipboard will overwrite your current list. Are you sure to continue?</string>
-    <string name="message_scanning">Scanning… Please wait</string>
+    <string name="message_scanning">Scanning…</string>
     <string name="message_scan_app_error">Error scanning apps</string>
     <string name="message_scan_app_no_apps_found">No matching apps found</string>
     <string name="message_scan_app_found">Found the following apps, please choose the action you want.</string>

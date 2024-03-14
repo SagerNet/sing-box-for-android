@@ -79,11 +79,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
 
     override fun onStart() {
         super.onStart()
-        val activity = activity ?: return
+        val activityBinding = activity?.binding ?: return
         val binding = binding ?: return
         if (mediator != null) return
         mediator = TabLayoutMediator(
-            activity.binding.dashboardTabLayout,
+            activityBinding.dashboardTabLayout,
             binding.dashboardPager
         ) { tab, position ->
             tab.setText(Page.values()[position].titleRes)
@@ -93,20 +93,21 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
     override fun onDestroyView() {
         super.onDestroyView()
         mediator?.detach()
+        mediator = null
         binding = null
     }
 
     private fun enablePager() {
         val activity = activity ?: return
         val binding = binding ?: return
-        activity.binding.dashboardTabLayout.isVisible = true
+        activity.binding?.dashboardTabLayout?.isVisible = true
         binding.dashboardPager.isUserInputEnabled = true
     }
 
     private fun disablePager() {
         val activity = activity ?: return
         val binding = binding ?: return
-        activity.binding.dashboardTabLayout.isVisible = false
+        activity.binding?.dashboardTabLayout?.isVisible = false
         binding.dashboardPager.isUserInputEnabled = false
         binding.dashboardPager.setCurrentItem(0, false)
     }

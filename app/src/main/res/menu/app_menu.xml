@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_copy"
+        android:icon="@drawable/ic_insert_drive_file_24"
+        android:title="@string/per_app_proxy_action_copy"
+        app:iconTint="?colorPrimary"
+        app:iconTintMode="src_in">
+        <menu>
+            <item
+                android:id="@+id/action_copy_application_label"
+                android:title="@string/per_app_proxy_action_copy_application_label" />
+            <item
+                android:id="@+id/action_copy_package_name"
+                android:title="@string/per_app_proxy_action_copy_package_name" />
+            <item
+                android:id="@+id/action_copy_uid"
+                android:title="@string/per_app_proxy_action_copy_uid" />
+
+        </menu>
+    </item>
+
+</menu>

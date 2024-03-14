@@ -3,7 +3,6 @@ package io.nekohasekai.sfa.ui.profileoverride
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Dialog
-import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
@@ -20,7 +19,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.getSystemService
-import androidx.core.view.isGone
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -29,6 +27,7 @@ import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.databinding.ActivityPerAppProxyBinding
 import io.nekohasekai.sfa.databinding.ViewAppListItemBinding
+import io.nekohasekai.sfa.ktx.clipboardText
 import io.nekohasekai.sfa.ui.shared.AbstractActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,10 +36,9 @@ import org.jf.dexlib2.dexbacked.DexBackedDexFile
 import java.io.File
 import java.util.zip.ZipFile
 
-class PerAppProxyActivity : AbstractActivity() {
+class PerAppProxyActivity : AbstractActivity<ActivityPerAppProxyBinding>() {
 
 
-    private lateinit var binding: ActivityPerAppProxyBinding
     private lateinit var adapter: AppListAdapter
 
     private val perAppProxyList = mutableSetOf<String>()
@@ -52,10 +50,8 @@ class PerAppProxyActivity : AbstractActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setTitle(R.string.title_per_app_proxy)
-        binding = ActivityPerAppProxyBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val proxyMode = Settings.perAppProxyMode
         if (proxyMode == Settings.PER_APP_PROXY_INCLUDE) {
@@ -87,8 +83,8 @@ class PerAppProxyActivity : AbstractActivity() {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun loadAppList() {
-        binding.recyclerViewAppList.isGone = true
-        binding.layoutProgress.isGone = false
+//        binding.recyclerViewAppList.isGone = true
+//        binding.layoutProgress.isGone = false
 
         lifecycleScope.launch {
             val list = withContext(Dispatchers.IO) {
@@ -142,8 +138,8 @@ class PerAppProxyActivity : AbstractActivity() {
             adapter.notifyDataSetChanged()
 
             binding.recyclerViewAppList.scrollToPosition(0)
-            binding.layoutProgress.isGone = true
-            binding.recyclerViewAppList.isGone = false
+//            binding.layoutProgress.isGone = true
+//            binding.recyclerViewAppList.isGone = false
         }
     }
 
@@ -183,7 +179,7 @@ class PerAppProxyActivity : AbstractActivity() {
 
             R.id.action_import -> {
                 MaterialAlertDialogBuilder(this)
-                    .setTitle(R.string.menu_import_from_clipboard)
+                    .setTitle(R.string.per_app_proxy_import)
                     .setMessage(R.string.message_import_from_clipboard)
                     .setPositiveButton(R.string.ok) { _, _ ->
                         importFromClipboard()
@@ -247,9 +243,7 @@ class PerAppProxyActivity : AbstractActivity() {
             return
         }
         val content = perAppProxyList.joinToString("\n")
-        val clipboardManager = getSystemService<ClipboardManager>()!!
-        val clip = ClipData.newPlainText(null, content)
-        clipboardManager.setPrimaryClip(clip)
+        clipboardText = content
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             Toast.makeText(this, R.string.toast_copied_to_clipboard, Toast.LENGTH_SHORT).show()
         }
@@ -477,14 +471,14 @@ class PerAppProxyActivity : AbstractActivity() {
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: AppItem) {
-            binding.imageAppIcon.setImageDrawable(item.icon)
-            binding.textAppName.text = item.name
-            binding.textAppPackageName.text = item.packageName
-            binding.checkboxAppSelected.isChecked = item.selected
+            binding.appIcon.setImageDrawable(item.icon)
+            binding.applicationLabel.text = item.name
+            binding.packageName.text = item.packageName
+            binding.selected.isChecked = item.selected
         }
 
         fun bindCheck(item: AppItem) {
-            binding.checkboxAppSelected.isChecked = item.selected
+            binding.selected.isChecked = item.selected
         }
     }
 }

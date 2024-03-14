@@ -28,13 +28,12 @@ import java.io.File
 import java.io.InputStream
 import java.util.Date
 
-class NewProfileActivity : AbstractActivity() {
+class NewProfileActivity : AbstractActivity<ActivityAddProfileBinding>() {
     enum class FileSource(val formatted: String) {
         CreateNew("Create New"),
         Import("Import");
     }
 
-    private var binding: ActivityAddProfileBinding? = null
     private val importFile =
         registerForActivityResult(ActivityResultContracts.GetContent()) { fileURI ->
             val binding = binding ?: return@registerForActivityResult
@@ -47,10 +46,6 @@ class NewProfileActivity : AbstractActivity() {
         super.onCreate(savedInstanceState)
 
         setTitle(R.string.title_new_profile)
-        val binding = ActivityAddProfileBinding.inflate(layoutInflater)
-        this.binding = binding
-        setContentView(binding.root)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         intent.getStringExtra("importName")?.also { importName ->
             intent.getStringExtra("importURL")?.also { importURL ->
@@ -98,11 +93,6 @@ class NewProfileActivity : AbstractActivity() {
         }
         binding.createProfile.setOnClickListener(this::createProfile)
         binding.autoUpdateInterval.addTextChangedListener(this::updateAutoUpdateInterval)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        binding = null
     }
 
     private fun createProfile(view: View) {

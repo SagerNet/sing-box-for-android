@@ -15,17 +15,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ProfileOverrideActivity : AbstractActivity() {
-
-    private lateinit var binding: ActivityConfigOverrideBinding
+class ProfileOverrideActivity :
+    AbstractActivity<ActivityConfigOverrideBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTitle(R.string.title_profile_override)
-        binding = ActivityConfigOverrideBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        setTitle(R.string.title_profile_override)
         binding.switchPerAppProxy.isChecked = Settings.perAppProxyEnabled
         binding.switchPerAppProxy.setOnCheckedChangeListener { _, isChecked ->
             Settings.perAppProxyEnabled = isChecked
@@ -42,7 +38,7 @@ class ProfileOverrideActivity : AbstractActivity() {
         }
 
         binding.configureAppListButton.setOnClickListener {
-            startActivity(Intent(this, PerAppProxyActivity::class.java))
+            startActivity(Intent(this, PerAppProxyActivity0::class.java))
         }
         lifecycleScope.launch(Dispatchers.IO) {
             reloadSettings()

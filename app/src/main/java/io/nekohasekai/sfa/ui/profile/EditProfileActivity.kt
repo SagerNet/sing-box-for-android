@@ -16,7 +16,6 @@ import io.nekohasekai.sfa.databinding.ActivityEditProfileBinding
 import io.nekohasekai.sfa.ktx.addTextChangedListener
 import io.nekohasekai.sfa.ktx.errorDialogBuilder
 import io.nekohasekai.sfa.ktx.setSimpleItems
-import io.nekohasekai.sfa.ktx.shareProfile
 import io.nekohasekai.sfa.ktx.text
 import io.nekohasekai.sfa.ui.shared.AbstractActivity
 import io.nekohasekai.sfa.utils.HTTPClient
@@ -28,20 +27,13 @@ import java.io.File
 import java.text.DateFormat
 import java.util.Date
 
-class EditProfileActivity : AbstractActivity() {
+class EditProfileActivity : AbstractActivity<ActivityEditProfileBinding>() {
 
-    private var binding: ActivityEditProfileBinding? = null
-    private var _profile: Profile? = null
-    private val profile get() = _profile!!
+    private lateinit var profile: Profile
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setTitle(R.string.title_edit_profile)
-        val binding = ActivityEditProfileBinding.inflate(layoutInflater)
-        this.binding = binding
-        setContentView(binding.root)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
         lifecycleScope.launch(Dispatchers.IO) {
             runCatching {
                 loadProfile()
@@ -55,18 +47,11 @@ class EditProfileActivity : AbstractActivity() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        binding = null
-    }
-
     private suspend fun loadProfile() {
-        val binding = binding ?: return
         delay(200L)
-
         val profileId = intent.getLongExtra("profile_id", -1L)
         if (profileId == -1L) error("invalid arguments")
-        _profile = ProfileManager.get(profileId) ?: error("invalid arguments")
+        profile = ProfileManager.get(profileId) ?: error("invalid arguments")
         withContext(Dispatchers.Main) {
             binding.name.text = profile.name
             binding.name.addTextChangedListener {
@@ -199,18 +184,6 @@ class EditProfileActivity : AbstractActivity() {
                 binding.lastUpdated.text =
                     DateFormat.getDateTimeInstance().format(profile.typed.lastUpdated)
                 binding.progressView.isVisible = false
-            }
-        }
-    }
-
-    private fun shareProfile(button: View) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                shareProfile(profile)
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    errorDialogBuilder(e).show()
-                }
             }
         }
     }

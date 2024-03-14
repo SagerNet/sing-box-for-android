@@ -37,7 +37,6 @@
             android:name=".ui.MainActivity"
             android:exported="true"
             android:icon="@mipmap/ic_launcher"
-            android:theme="@style/AppTheme.NoActionBar"
             android:launchMode="singleTask">
 
             <meta-data
@@ -119,6 +118,9 @@
             android:exported="false" />
         <activity
             android:name="io.nekohasekai.sfa.ui.profileoverride.PerAppProxyActivity"
+            android:exported="false" />
+        <activity
+            android:name="io.nekohasekai.sfa.ui.profileoverride.PerAppProxyActivity0"
             android:exported="false" />
         <activity
             android:name="io.nekohasekai.sfa.ui.debug.DebugActivity"

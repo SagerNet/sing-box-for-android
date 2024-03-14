@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_search"
+        android:icon="@drawable/ic_find_in_page_24"
+        android:title="@string/search"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:iconTint="?colorControlNormal"
+        app:showAsAction="collapseActionView|always" />
+
+    <item android:title="@string/per_app_proxy_mode">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/action_mode_include"
+                    android:title="@string/per_app_proxy_mode_include" />
+                <item
+                    android:id="@+id/action_mode_exclude"
+                    android:title="@string/per_app_proxy_mode_exclude" />
+            </group>
+        </menu>
+    </item>
+
+    <item android:title="@string/per_app_proxy_sort_mode">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/action_sort_by_name"
+                    android:title="@string/per_app_proxy_sort_mode_name" />
+                <item
+                    android:id="@+id/action_sort_by_package_name"
+                    android:title="@string/per_app_proxy_sort_mode_package_name" />
+                <item
+                    android:id="@+id/action_sort_by_uid"
+                    android:title="@string/per_app_proxy_sort_mode_uid" />
+                <item
+                    android:id="@+id/action_sort_by_install_time"
+                    android:title="@string/per_app_proxy_sort_mode_install_time" />
+                <item
+                    android:id="@+id/action_sort_by_update_time"
+                    android:title="@string/per_app_proxy_sort_mode_update_time" />
+            </group>
+            <item
+                android:id="@+id/action_sort_reverse"
+                android:checkable="true"
+                android:title="@string/per_app_proxy_sort_mode_reverse" />
+        </menu>
+    </item>
+
+    <item android:title="@string/per_app_proxy_filter">
+        <menu>
+            <item
+                android:id="@+id/action_hide_system_apps"
+                android:checkable="true"
+                android:title="@string/per_app_proxy_hide_system_apps" />
+            <item
+                android:id="@+id/action_hide_offline_apps"
+                android:checkable="true"
+                android:title="@string/per_app_proxy_hide_offline_apps" />
+            <item
+                android:id="@+id/action_hide_disabled_apps"
+                android:checkable="true"
+                android:title="@string/per_app_proxy_hide_disabled_apps" />
+        </menu>
+    </item>
+
+    <item android:title="@string/action_select">
+        <menu>
+            <item
+                android:id="@+id/action_select_all"
+                android:title="@string/per_app_proxy_select_all" />
+            <item
+                android:id="@+id/action_deselect_all"
+                android:title="@string/per_app_proxy_select_none" />
+        </menu>
+    </item>
+
+    <item android:title="@string/per_app_proxy_backup">
+        <menu>
+            <item
+                android:id="@+id/action_import"
+                android:title="@string/per_app_proxy_import" />
+            <item
+                android:id="@+id/action_export"
+                android:title="@string/per_app_proxy_export" />
+        </menu>
+    </item>
+
+    <item android:title="@string/per_app_proxy_scan">
+        <menu>
+            <item
+                android:id="@+id/action_scan_china_apps"
+                android:title="@string/per_app_proxy_scan_china_apps" />
+        </menu>
+    </item>
+
+</menu>

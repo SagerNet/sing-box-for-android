@@ -25,19 +25,14 @@ import java.io.File
 import java.util.zip.ZipFile
 import kotlin.math.roundToInt
 
-class VPNScanActivity : AbstractActivity() {
+class VPNScanActivity : AbstractActivity<ActivityVpnScanBinding>() {
 
-    private var binding: ActivityVpnScanBinding? = null
     private var adapter: Adapter? = null
     private val appInfoList = mutableListOf<AppInfo>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setTitle(R.string.title_scan_vpn)
-        val binding = ActivityVpnScanBinding.inflate(layoutInflater)
-        this.binding = binding
-        setContentView(binding.root)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.scanVPNResult.adapter = Adapter().also {
             adapter = it
         }

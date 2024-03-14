@@ -53,7 +53,7 @@ import java.io.File
 import java.util.Date
 import java.util.LinkedList
 
-class MainActivity : AbstractActivity(),
+class MainActivity : AbstractActivity<ActivityMainBinding>(),
     PreferenceFragmentCompat.OnPreferenceStartFragmentCallback,
     ServiceConnection.Callback {
 
@@ -61,7 +61,6 @@ class MainActivity : AbstractActivity(),
         private const val TAG = "MainActivity"
     }
 
-    internal lateinit var binding: ActivityMainBinding
     private val connection = ServiceConnection(this, this)
 
     val logList = LinkedList<String>()
@@ -70,10 +69,6 @@ class MainActivity : AbstractActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        setSupportActionBar(binding.toolbar)
 
         val navController = findNavController(R.id.nav_host_fragment_activity_my)
         navController.setGraph(R.navigation.mobile_navigation)
@@ -103,6 +98,7 @@ class MainActivity : AbstractActivity(),
         navDestination: NavDestination,
         bundle: Bundle?
     ) {
+        val binding = binding ?: return
         val destinationId = navDestination.id
         binding.dashboardTabContainer.isVisible = destinationId == R.id.navigation_dashboard
     }

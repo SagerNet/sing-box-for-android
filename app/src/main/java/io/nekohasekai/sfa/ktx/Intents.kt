@@ -1,12 +1,12 @@
 package io.nekohasekai.sfa.ktx
 
+import android.app.Activity
 import android.content.ActivityNotFoundException
 import androidx.activity.result.ActivityResultLauncher
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.nekohasekai.sfa.R
-import io.nekohasekai.sfa.ui.shared.AbstractActivity
 
-fun AbstractActivity.startFilesForResult(
+fun Activity.startFilesForResult(
     launcher: ActivityResultLauncher<String>, input: String
 ) {
     try {
