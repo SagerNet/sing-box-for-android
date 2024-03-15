@@ -82,13 +82,13 @@ class PerAppProxyActivity : AbstractActivity<ActivityPerAppProxyBinding>() {
         setTitle(R.string.title_per_app_proxy)
 
         lifecycleScope.launch {
-            proxyMode = if (Settings.perAppProxyMode == Settings.PER_APP_PROXY_EXCLUDE) {
-                Settings.PER_APP_PROXY_EXCLUDE
-            } else {
+            proxyMode = if (Settings.perAppProxyMode == Settings.PER_APP_PROXY_INCLUDE) {
                 Settings.PER_APP_PROXY_INCLUDE
+            } else {
+                Settings.PER_APP_PROXY_EXCLUDE
             }
             withContext(Dispatchers.Main) {
-                if (proxyMode != Settings.PER_APP_PROXY_EXCLUDE) {
+                if (proxyMode == Settings.PER_APP_PROXY_INCLUDE) {
                     binding.perAppProxyMode.setText(R.string.per_app_proxy_mode_include_description)
                 } else {
                     binding.perAppProxyMode.setText(R.string.per_app_proxy_mode_exclude_description)
@@ -438,16 +438,18 @@ class PerAppProxyActivity : AbstractActivity<ActivityPerAppProxyBinding>() {
 
             R.id.action_select_all -> {
                 val selectedUIDs = mutableSetOf<Int>()
-                for (packageCache in packages) {
-                    selectedUIDs.add(packageCache.uid)
+                currentPackages.forEach {
+                    selectedUIDs.add(it.uid)
                 }
-                this.selectedUIDs = selectedUIDs
-                saveSelectedApplications()
+                lifecycleScope.launch {
+                    postSaveSelectedApplications(selectedUIDs)
+                }
             }
 
             R.id.action_deselect_all -> {
-                selectedUIDs = mutableSetOf()
-                saveSelectedApplications()
+                lifecycleScope.launch {
+                    postSaveSelectedApplications(mutableSetOf())
+                }
             }
 
             R.id.action_export -> {
@@ -502,6 +504,8 @@ class PerAppProxyActivity : AbstractActivity<ActivityPerAppProxyBinding>() {
             R.id.action_scan_china_apps -> {
                 scanChinaApps()
             }
+
+            else -> return super.onOptionsItemSelected(item)
         }
         return true
     }
@@ -511,8 +515,14 @@ class PerAppProxyActivity : AbstractActivity<ActivityPerAppProxyBinding>() {
         val binding = DialogProgressbarBinding.inflate(layoutInflater)
         binding.progress.max = currentPackages.size
         binding.message.setText(R.string.message_scanning)
+        val dialogTheme =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && resources.configuration.isNightModeActive) {
+                com.google.android.material.R.style.Theme_MaterialComponents_Dialog
+            } else {
+                com.google.android.material.R.style.Theme_MaterialComponents_Light_Dialog
+            }
         val progress = MaterialAlertDialogBuilder(
-            this, com.google.android.material.R.style.Theme_MaterialComponents_Dialog
+            this, dialogTheme
         ).setView(binding.root).setCancelable(false).create()
         progress.show()
         lifecycleScope.launch {

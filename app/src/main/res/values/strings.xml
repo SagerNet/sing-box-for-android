@@ -79,6 +79,8 @@
     <string name="status_traffic">Traffic</string>
     <string name="status_traffic_total">Traffic Total</string>
 
+    <string name="group_selected_title">Selected</string>
+
     <string name="profile">Profile</string>
     <string name="core_version">Version</string>
     <string name="core">Core</string>
