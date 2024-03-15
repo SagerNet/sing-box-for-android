@@ -117,22 +117,6 @@ dependencies {
     playImplementation "com.google.android.play:app-update-ktx:2.1.0"
 }
 
-if (getProps("APPCENTER_TOKEN") != "") {
-    apply plugin: "com.betomorrow.appcenter"
-    appcenter {
-        apiToken = getProps("APPCENTER_TOKEN")
-        ownerName = getProps("APPCENTER_OWNER")
-        distributionGroups = [getProps("APPCENTER_GROUP")]
-        releaseNotes = getProps("RELEASE_NOTES")
-        notifyTesters = true
-        apps {
-            playRelease {
-                appName = getProps("APPCENTER_APP_NAME")
-            }
-        }
-    }
-}
-
 def playCredentialsJSON = rootProject.file("service-account-credentials.json")
 if (playCredentialsJSON.exists()) {
     play {
