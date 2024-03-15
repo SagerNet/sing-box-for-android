@@ -17,11 +17,15 @@
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         android:padding="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clipChildren="false"
+            android:clipToPadding="false"
             android:orientation="vertical">
 
             <LinearLayout
@@ -30,10 +34,14 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:visibility="gone"
+                android:clipChildren="false"
+                android:clipToPadding="false"
                 tools:visibility="visible">
 
                 <LinearLayout
                     android:layout_width="match_parent"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
                     android:orientation="horizontal">
@@ -222,6 +230,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
                     android:orientation="horizontal"
                     android:visibility="gone"
                     tools:visibility="visible">
