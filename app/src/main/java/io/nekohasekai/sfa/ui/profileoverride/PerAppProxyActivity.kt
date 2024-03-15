@@ -7,6 +7,7 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Menu
@@ -18,6 +19,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
+import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.R
@@ -31,7 +33,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jf.dexlib2.dexbacked.DexBackedDexFile
 import java.io.File
 import java.util.zip.ZipFile
 
@@ -602,23 +603,74 @@ class PerAppProxyActivity : AbstractActivity<ActivityPerAppProxyBinding>() {
 
     companion object {
 
-        private val chinaAppPrefixList by lazy {
-            runCatching {
-                Application.application.assets.open("prefix-china-apps.txt").reader().readLines()
-            }.getOrNull() ?: emptyList()
-        }
+        private val skipPrefixList = listOf(
+            "com.google",
+            "com.android.chrome",
+            "com.android.vending",
+            "com.microsoft",
+            "com.apple",
+            "com.zhiliaoapp.musically", // Banned by China
+        )
+
+        private val chinaAppPrefixList = listOf(
+            "com.tencent",
+            "com.alibaba",
+            "com.umeng",
+            "com.qihoo",
+            "com.ali",
+            "com.alipay",
+            "com.amap",
+            "com.sina",
+            "com.weibo",
+            "com.vivo",
+            "com.xiaomi",
+            "com.huawei",
+            "com.taobao",
+            "com.secneo",
+            "s.h.e.l.l",
+            "com.stub",
+            "com.kiwisec",
+            "com.secshell",
+            "com.wrapper",
+            "cn.securitystack",
+            "com.mogosec",
+            "com.secoen",
+            "com.netease",
+            "com.mx",
+            "com.qq.e",
+            "com.baidu",
+            "com.bytedance",
+            "com.bugly",
+            "com.miui",
+            "com.oppo",
+            "com.coloros",
+            "com.iqoo",
+            "com.meizu",
+            "com.gionee",
+            "cn.nubia",
+            "com.oplus",
+            "andes.oplus",
+            "com.unionpay",
+            "cn.wps"
+        )
+
 
         private val chinaAppRegex by lazy {
             ("(" + chinaAppPrefixList.joinToString("|").replace(".", "\\.") + ").*").toRegex()
         }
 
         fun scanChinaPackage(packageName: String): Boolean {
+            skipPrefixList.forEach {
+                if (packageName == it || packageName.startsWith("$it.")) return false
+            }
+
             val packageManagerFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 PackageManager.MATCH_UNINSTALLED_PACKAGES or PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES or PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS
             } else {
                 @Suppress("DEPRECATION") PackageManager.GET_UNINSTALLED_PACKAGES or PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES or PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS
             }
             if (packageName.matches(chinaAppRegex)) {
+                Log.d("PerAppProxyActivity", "Match package name: $packageName")
                 return true
             }
             try {
@@ -632,18 +684,34 @@ class PerAppProxyActivity : AbstractActivity<ActivityPerAppProxyBinding>() {
                         packageName, packageManagerFlags
                     )
                 }
-                if (packageInfo.services?.find { it.name.matches(chinaAppRegex) } != null || packageInfo.activities?.find {
-                        it.name.matches(
-                            chinaAppRegex
-                        )
-                    } != null || packageInfo.receivers?.find { it.name.matches(chinaAppRegex) } != null || packageInfo.providers?.find {
-                        it.name.matches(
-                            chinaAppRegex
-                        )
-                    } != null) {
-                    return true
+                packageInfo.services?.forEach {
+                    if (it.name.matches(chinaAppRegex)) {
+                        Log.d("PerAppProxyActivity", "Match service ${it.name} in $packageName")
+                        return true
+                    }
+                }
+                packageInfo.activities?.forEach {
+                    if (it.name.matches(chinaAppRegex)) {
+                        Log.d("PerAppProxyActivity", "Match activity ${it.name} in $packageName")
+                        return true
+                    }
+                }
+                packageInfo.receivers?.forEach {
+                    if (it.name.matches(chinaAppRegex)) {
+                        Log.d("PerAppProxyActivity", "Match receiver ${it.name} in $packageName")
+                        return true
+                    }
+                }
+                packageInfo.providers?.forEach {
+                    if (it.name.matches(chinaAppRegex)) {
+                        Log.d("PerAppProxyActivity", "Match provider ${it.name} in $packageName")
+                        return true
+                    }
                 }
                 ZipFile(File(packageInfo.applicationInfo.publicSourceDir)).use {
+                    for (packageEntry in it.entries()) {
+                        if (packageEntry.name.startsWith("firebase-")) return false
+                    }
                     for (packageEntry in it.entries()) {
                         if (!(packageEntry.name.startsWith("classes") && packageEntry.name.endsWith(
                                 ".dex"
@@ -652,12 +720,17 @@ class PerAppProxyActivity : AbstractActivity<ActivityPerAppProxyBinding>() {
                             continue
                         }
                         if (packageEntry.size > 15000000) {
+                            Log.d(
+                                "PerAppProxyActivity",
+                                "Confirm $packageName due to large dex file"
+                            )
                             return true
                         }
                         val input = it.getInputStream(packageEntry).buffered()
                         val dexFile = try {
                             DexBackedDexFile.fromInputStream(null, input)
                         } catch (e: Exception) {
+                            Log.e("PerAppProxyActivity", "Error reading dex file", e)
                             return false
                         }
                         for (clazz in dexFile.classes) {
@@ -665,12 +738,14 @@ class PerAppProxyActivity : AbstractActivity<ActivityPerAppProxyBinding>() {
                                 clazz.type.substring(1, clazz.type.length - 1).replace("/", ".")
                                     .replace("$", ".")
                             if (clazzName.matches(chinaAppRegex)) {
+                                Log.d("PerAppProxyActivity", "Match $clazzName in $packageName")
                                 return true
                             }
                         }
                     }
                 }
-            } catch (ignored: Exception) {
+            } catch (e: Exception) {
+                Log.e("PerAppProxyActivity", "Error scanning package $packageName", e)
             }
             return false
         }

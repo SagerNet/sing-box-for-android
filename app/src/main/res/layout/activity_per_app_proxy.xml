@@ -36,7 +36,7 @@
                 android:id="@+id/per_app_proxy_mode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/per_app_proxy_mode_include" />
+                android:text="@string/per_app_proxy_mode_exclude_description" />
 
         </LinearLayout>
 
