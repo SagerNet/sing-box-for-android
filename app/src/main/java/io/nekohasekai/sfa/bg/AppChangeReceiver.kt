@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import io.nekohasekai.sfa.database.Settings
-import io.nekohasekai.sfa.ui.profileoverride.PerAppProxyActivity0
+import io.nekohasekai.sfa.ui.profileoverride.PerAppProxyActivity
 
 class AppChangeReceiver : BroadcastReceiver() {
 
@@ -37,7 +37,7 @@ class AppChangeReceiver : BroadcastReceiver() {
             Log.d(TAG, "missing package name in intent")
             return
         }
-        val isChinaApp = PerAppProxyActivity0.scanChinaPackage(packageName)
+        val isChinaApp = PerAppProxyActivity.scanChinaPackage(packageName)
         Log.d(TAG, "scan china app result for $packageName: $isChinaApp")
         if ((perAppProxyUpdateOnChange == Settings.PER_APP_PROXY_INCLUDE) xor !isChinaApp) {
             Settings.perAppProxyList += packageName

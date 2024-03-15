@@ -19,7 +19,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.Preference
@@ -61,6 +63,10 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
         private const val TAG = "MainActivity"
     }
 
+    private lateinit var navHostFragment: NavHostFragment
+    private lateinit var navController: NavController
+    private lateinit var appBarConfiguration: AppBarConfiguration
+
     private val connection = ServiceConnection(this, this)
 
     val logList = LinkedList<String>()
@@ -70,11 +76,13 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val navController = findNavController(R.id.nav_host_fragment_activity_my)
+        navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_my) as NavHostFragment
+        navController = navHostFragment.navController
         navController.setGraph(R.navigation.mobile_navigation)
         navController.navigate(R.id.navigation_dashboard)
         navController.addOnDestinationChangedListener(::onDestinationChanged)
-        val appBarConfiguration =
+        appBarConfiguration =
             AppBarConfiguration(
                 setOf(
                     R.id.navigation_dashboard,
@@ -85,13 +93,15 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
             )
         setupActionBarWithNavController(navController, appBarConfiguration)
         binding.navView.setupWithNavController(navController)
-
         reconnect()
         startIntegration()
 
         onNewIntent(intent)
     }
 
+    override fun onSupportNavigateUp(): Boolean {
+        return navController.navigateUp(appBarConfiguration)
+    }
 
     private fun onDestinationChanged(
         navController: NavController,

@@ -38,7 +38,7 @@ class ProfileOverrideActivity :
         }
 
         binding.configureAppListButton.setOnClickListener {
-            startActivity(Intent(this, PerAppProxyActivity0::class.java))
+            startActivity(Intent(this, PerAppProxyActivity::class.java))
         }
         lifecycleScope.launch(Dispatchers.IO) {
             reloadSettings()

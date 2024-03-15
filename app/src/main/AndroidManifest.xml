@@ -120,9 +120,6 @@
             android:name="io.nekohasekai.sfa.ui.profileoverride.PerAppProxyActivity"
             android:exported="false" />
         <activity
-            android:name="io.nekohasekai.sfa.ui.profileoverride.PerAppProxyActivity0"
-            android:exported="false" />
-        <activity
             android:name="io.nekohasekai.sfa.ui.debug.DebugActivity"
             android:exported="false" />
         <activity

@@ -12,6 +12,7 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -175,7 +176,7 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
                 binding.itemList.adapter = adapter
                 (binding.itemList.itemAnimator as SimpleItemAnimator).supportsChangeAnimations =
                     false
-                binding.itemList.layoutManager = LinearLayoutManager(binding.root.context)
+                binding.itemList.layoutManager = GridLayoutManager(binding.root.context, 2)
             } else {
                 adapter.setItems(items)
             }
