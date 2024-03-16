@@ -30,10 +30,13 @@ import io.nekohasekai.sfa.databinding.ViewAppListItemBinding
 import io.nekohasekai.sfa.ktx.clipboardText
 import io.nekohasekai.sfa.ui.shared.AbstractActivity
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.zip.ZipFile
 
 class PerAppProxyActivity : AbstractActivity<ActivityPerAppProxyBinding>() {
@@ -530,18 +533,26 @@ class PerAppProxyActivity : AbstractActivity<ActivityPerAppProxyBinding>() {
         ).setView(binding.root).setCancelable(false).create()
         progress.show()
         lifecycleScope.launch {
-            val foundApps = withContext(Dispatchers.IO) {
+            val startTime = System.currentTimeMillis()
+            val foundApps = withContext(Dispatchers.Default) {
                 mutableMapOf<String, PackageCache>().also { foundApps ->
-                    currentPackages.forEachIndexed { index, it ->
-                        if (scanChinaPackage(it.packageName)) {
-                            foundApps[it.packageName] = it
+                    val progressInt = AtomicInteger()
+                    currentPackages.map { it ->
+                        async {
+                            if (scanChinaPackage(it.packageName)) {
+                                foundApps[it.packageName] = it
+                            }
+                            runOnUiThread {
+                                binding.progress.progress = progressInt.addAndGet(1)
+                            }
                         }
-                        withContext(Dispatchers.Main) {
-                            binding.progress.progress = index + 1
-                        }
-                    }
+                    }.awaitAll()
                 }
             }
+            Log.d(
+                "PerAppProxyActivity",
+                "Scan China apps took ${(System.currentTimeMillis() - startTime).toDouble() / 1000}s"
+            )
             withContext(Dispatchers.Main) {
                 progress.dismiss()
                 if (foundApps.isEmpty()) {

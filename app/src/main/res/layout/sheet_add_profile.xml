@@ -16,6 +16,31 @@
             android:layout_height="wrap_content" />
 
         <LinearLayout
+            android:id="@+id/import_from_file"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:background="?selectableItemBackground"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="64dp"
+                android:padding="18dp"
+                app:tint="?colorControlNormal"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_baseline_file_open_24" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:textAppearance="?android:attr/textAppearanceListItem"
+                android:text="@string/profile_add_import_file"
+                android:gravity="center_vertical"
+                android:layout_height="match_parent">
+
+            </TextView>
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/scan_qr_code"
             android:layout_width="match_parent"
             android:layout_height="64dp"
@@ -32,7 +57,7 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:textSize="16sp"
+                android:textAppearance="?android:attr/textAppearanceListItem"
                 android:text="@string/profile_add_scan_qr_code"
                 android:gravity="center_vertical"
                 android:layout_height="match_parent">
@@ -57,7 +82,7 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:textSize="16sp"
+                android:textAppearance="?android:attr/textAppearanceListItem"
                 android:text="@string/profile_add_create_manually"
                 android:gravity="center_vertical"
                 android:layout_height="match_parent">

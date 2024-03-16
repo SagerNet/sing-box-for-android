@@ -15,7 +15,9 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
@@ -36,6 +38,13 @@ class QRScanActivity : AbstractActivity<ActivityQrScanBinding>() {
         setTitle(R.string.profile_add_scan_qr_code)
 
         analysisExecutor = Executors.newSingleThreadExecutor()
+        binding.previewView.implementationMode = PreviewView.ImplementationMode.COMPATIBLE
+        binding.previewView.previewStreamState.observe(this) {
+            if (it === PreviewView.StreamState.STREAMING) {
+                binding.progress.isVisible = false
+                binding.previewView.implementationMode = PreviewView.ImplementationMode.PERFORMANCE
+            }
+        }
         if (ContextCompat.checkSelfPermission(
                 this, Manifest.permission.CAMERA
             ) == PackageManager.PERMISSION_GRANTED

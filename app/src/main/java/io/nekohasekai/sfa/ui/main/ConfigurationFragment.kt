@@ -2,10 +2,12 @@ package io.nekohasekai.sfa.ui.main
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -84,12 +86,18 @@ class ConfigurationFragment : Fragment() {
 
     class AddProfileDialog : BottomSheetDialogFragment(R.layout.sheet_add_profile) {
 
+        private val importFromFile =
+            registerForActivityResult(ActivityResultContracts.GetContent(), ::onImportResult)
+
         private val scanQrCode =
             registerForActivityResult(QRScanActivity.Contract(), ::onScanResult)
 
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
             val binding = SheetAddProfileBinding.bind(view)
+            binding.importFromFile.setOnClickListener {
+                importFromFile.launch("*/*")
+            }
             binding.scanQrCode.setOnClickListener {
                 scanQrCode.launch(null)
             }
@@ -97,6 +105,11 @@ class ConfigurationFragment : Fragment() {
                 dismiss()
                 startActivity(Intent(requireContext(), NewProfileActivity::class.java))
             }
+        }
+
+        private fun onImportResult(result: Uri?) {
+            dismiss()
+            (activity as? MainActivity ?: return).onNewIntent(Intent(Intent.ACTION_VIEW, result))
         }
 
         private fun onScanResult(result: Intent?) {
