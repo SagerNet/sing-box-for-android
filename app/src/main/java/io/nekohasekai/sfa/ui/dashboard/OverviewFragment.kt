@@ -28,6 +28,7 @@ import io.nekohasekai.sfa.ktx.getAttrColor
 import io.nekohasekai.sfa.ui.MainActivity
 import io.nekohasekai.sfa.utils.CommandClient
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -224,6 +225,7 @@ class OverviewFragment : Fragment() {
     private inner class ClashModeItemView(val binding: ViewClashModeButtonBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
+        @OptIn(DelicateCoroutinesApi::class)
         fun bind(item: String, selected: String) {
             binding.clashModeButtonText.text = item
             if (item != selected) {

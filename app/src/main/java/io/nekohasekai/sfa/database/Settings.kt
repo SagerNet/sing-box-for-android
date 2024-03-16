@@ -14,6 +14,7 @@ import io.nekohasekai.sfa.ktx.int
 import io.nekohasekai.sfa.ktx.long
 import io.nekohasekai.sfa.ktx.string
 import io.nekohasekai.sfa.ktx.stringSet
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -21,6 +22,7 @@ import java.io.File
 
 object Settings {
 
+    @OptIn(DelicateCoroutinesApi::class)
     private val instance by lazy {
         Application.application.getDatabasePath(Path.SETTINGS_DATABASE_PATH).parentFile?.mkdirs()
         Room.databaseBuilder(

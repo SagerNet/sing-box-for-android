@@ -29,6 +29,7 @@ import io.nekohasekai.sfa.ktx.errorDialogBuilder
 import io.nekohasekai.sfa.ktx.text
 import io.nekohasekai.sfa.ui.MainActivity
 import io.nekohasekai.sfa.utils.CommandClient
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -152,6 +153,7 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
         private lateinit var adapter: ItemAdapter
         private lateinit var textWatcher: TextWatcher
 
+        @OptIn(DelicateCoroutinesApi::class)
         @SuppressLint("NotifyDataSetChanged")
         fun bind(group: OutboundGroup) {
             this.group = group
@@ -185,6 +187,7 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
             updateExpand()
         }
 
+        @OptIn(DelicateCoroutinesApi::class)
         private fun updateExpand(isExpand: Boolean? = null) {
             val newExpandStatus = isExpand ?: group.isExpand
             if (isExpand != null) {
@@ -280,6 +283,7 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
     private class ItemGroupView(val binding: ViewDashboardGroupItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
+        @OptIn(DelicateCoroutinesApi::class)
         fun bind(groupView: GroupView, group: OutboundGroup, item: OutboundGroupItem) {
             if (group.selectable) {
                 binding.itemCard.setOnClickListener {

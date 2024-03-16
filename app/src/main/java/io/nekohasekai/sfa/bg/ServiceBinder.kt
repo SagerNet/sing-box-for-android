@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import io.nekohasekai.sfa.aidl.IService
 import io.nekohasekai.sfa.aidl.IServiceCallback
 import io.nekohasekai.sfa.constant.Status
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -23,6 +24,7 @@ class ServiceBinder(private val status: MutableLiveData<Status>) : IService.Stub
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     fun broadcast(work: (IServiceCallback) -> Unit) {
         GlobalScope.launch(Dispatchers.Main) {
             broadcastLock.withLock {

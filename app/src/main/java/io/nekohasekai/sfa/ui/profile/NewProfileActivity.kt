@@ -36,7 +36,6 @@ class NewProfileActivity : AbstractActivity<ActivityAddProfileBinding>() {
 
     private val importFile =
         registerForActivityResult(ActivityResultContracts.GetContent()) { fileURI ->
-            val binding = binding ?: return@registerForActivityResult
             if (fileURI != null) {
                 binding.sourceURL.editText?.setText(fileURI.toString())
             }
@@ -95,8 +94,7 @@ class NewProfileActivity : AbstractActivity<ActivityAddProfileBinding>() {
         binding.autoUpdateInterval.addTextChangedListener(this::updateAutoUpdateInterval)
     }
 
-    private fun createProfile(view: View) {
-        val binding = binding ?: return
+    private fun createProfile(@Suppress("UNUSED_PARAMETER") view: View) {
         if (binding.name.showErrorIfEmpty()) {
             return
         }
@@ -131,7 +129,6 @@ class NewProfileActivity : AbstractActivity<ActivityAddProfileBinding>() {
     }
 
     private suspend fun createProfile0() {
-        val binding = binding ?: return
         val typedProfile = TypedProfile()
         val profile = Profile(name = binding.name.text, typed = typedProfile)
         profile.userOrder = ProfileManager.nextOrder()
@@ -190,7 +187,6 @@ class NewProfileActivity : AbstractActivity<ActivityAddProfileBinding>() {
     }
 
     private fun updateAutoUpdateInterval(newValue: String) {
-        val binding = binding ?: return
         if (newValue.isBlank()) {
             binding.autoUpdateInterval.error = getString(R.string.profile_input_required)
             return

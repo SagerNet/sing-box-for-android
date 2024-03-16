@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -29,10 +28,12 @@ import io.nekohasekai.sfa.ui.MainActivity
 import io.nekohasekai.sfa.ui.profile.EditProfileActivity
 import io.nekohasekai.sfa.ui.profile.NewProfileActivity
 import io.nekohasekai.sfa.ui.profile.QRScanActivity
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.DateFormat
 import java.util.Collections
 
 class ConfigurationFragment : Fragment() {
@@ -126,7 +127,7 @@ class ConfigurationFragment : Fragment() {
 
         internal var items: MutableList<Profile> = mutableListOf()
         internal val scope = lifecycleScope
-        internal val fragmentActivity = requireActivity() as FragmentActivity
+        internal val fragmentActivity = requireActivity()
 
         @SuppressLint("NotifyDataSetChanged")
         internal fun reload() {
@@ -160,6 +161,7 @@ class ConfigurationFragment : Fragment() {
             return true
         }
 
+        @OptIn(DelicateCoroutinesApi::class)
         internal fun updateUserOrder() {
             items.forEachIndexed { index, profile ->
                 profile.userOrder = index.toLong()
@@ -199,7 +201,7 @@ class ConfigurationFragment : Fragment() {
                 binding.profileLastUpdated.isVisible = true
                 binding.profileLastUpdated.text = binding.root.context.getString(
                     R.string.profile_item_last_updated,
-                    profile.typed.lastUpdated.toLocaleString()
+                    DateFormat.getDateTimeInstance().format(profile.typed.lastUpdated)
                 )
             } else {
                 binding.profileLastUpdated.isVisible = false

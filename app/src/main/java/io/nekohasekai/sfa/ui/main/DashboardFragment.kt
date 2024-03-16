@@ -100,14 +100,14 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
     private fun enablePager() {
         val activity = activity ?: return
         val binding = binding ?: return
-        activity.binding?.dashboardTabLayout?.isVisible = true
+        activity.binding.dashboardTabLayout.isVisible = true
         binding.dashboardPager.isUserInputEnabled = true
     }
 
     private fun disablePager() {
         val activity = activity ?: return
         val binding = binding ?: return
-        activity.binding?.dashboardTabLayout?.isVisible = false
+        activity.binding.dashboardTabLayout.isVisible = false
         binding.dashboardPager.isUserInputEnabled = false
         binding.dashboardPager.setCurrentItem(0, false)
     }
@@ -119,11 +119,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
 
     class Adapter(parent: Fragment) : FragmentStateAdapter(parent) {
         override fun getItemCount(): Int {
-            return Page.values().size
+            return Page.entries.size
         }
 
         override fun createFragment(position: Int): Fragment {
-            return Page.values()[position].fragmentClass.newInstance()
+            return Page.entries[position].fragmentClass.getConstructor().newInstance()
         }
     }
 

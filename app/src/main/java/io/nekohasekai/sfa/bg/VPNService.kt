@@ -22,14 +22,14 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
     private val service = BoxService(this, this)
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int) =
-        service.onStartCommand(intent, flags, startId)
+        service.onStartCommand()
 
     override fun onBind(intent: Intent): IBinder {
         val binder = super.onBind(intent)
         if (binder != null) {
             return binder
         }
-        return service.onBind(intent)
+        return service.onBind()
     }
 
     override fun onDestroy() {

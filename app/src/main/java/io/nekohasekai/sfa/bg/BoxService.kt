@@ -27,6 +27,7 @@ import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.database.ProfileManager
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.ktx.hasPermission
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -243,6 +244,7 @@ class BoxService(
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     private fun stopService() {
         if (status.value != Status.Started) return
         status.value = Status.Stopping
@@ -298,7 +300,9 @@ class BoxService(
         }
     }
 
-    fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    @OptIn(DelicateCoroutinesApi::class)
+    @Suppress("SameReturnValue")
+    internal fun onStartCommand(): Int {
         if (status.value != Status.Stopped) return Service.START_NOT_STICKY
         status.value = Status.Starting
 
@@ -327,19 +331,19 @@ class BoxService(
         return Service.START_NOT_STICKY
     }
 
-    fun onBind(intent: Intent): IBinder {
+    internal fun onBind(): IBinder {
         return binder
     }
 
-    fun onDestroy() {
+    internal fun onDestroy() {
         binder.close()
     }
 
-    fun onRevoke() {
+    internal fun onRevoke() {
         stopService()
     }
 
-    fun writeLog(message: String) {
+    internal fun writeLog(message: String) {
         binder.broadcast {
             it.onServiceWriteLog(message)
         }

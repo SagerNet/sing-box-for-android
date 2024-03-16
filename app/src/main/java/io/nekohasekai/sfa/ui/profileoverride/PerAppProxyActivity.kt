@@ -112,7 +112,8 @@ class PerAppProxyActivity : AbstractActivity<ActivityPerAppProxyBinding>() {
         val packageManagerFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             PackageManager.GET_PERMISSIONS or PackageManager.MATCH_UNINSTALLED_PACKAGES
         } else {
-            @Suppress("DEPRECATION") PackageManager.GET_PERMISSIONS or PackageManager.GET_UNINSTALLED_PACKAGES
+            @Suppress("DEPRECATION")
+            PackageManager.GET_PERMISSIONS or PackageManager.GET_UNINSTALLED_PACKAGES
         }
         val installedPackages = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             packageManager.getInstalledPackages(
@@ -669,7 +670,8 @@ class PerAppProxyActivity : AbstractActivity<ActivityPerAppProxyBinding>() {
             val packageManagerFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 PackageManager.MATCH_UNINSTALLED_PACKAGES or PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES or PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS
             } else {
-                @Suppress("DEPRECATION") PackageManager.GET_UNINSTALLED_PACKAGES or PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES or PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS
+                @Suppress("DEPRECATION")
+                PackageManager.GET_UNINSTALLED_PACKAGES or PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES or PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS
             }
             if (packageName.matches(chinaAppRegex)) {
                 Log.d("PerAppProxyActivity", "Match package name: $packageName")

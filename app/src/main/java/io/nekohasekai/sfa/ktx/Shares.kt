@@ -52,7 +52,7 @@ suspend fun Context.shareProfile(profile: Profile) {
     }
 }
 
-suspend fun FragmentActivity.shareProfileURL(profile: Profile) {
+fun FragmentActivity.shareProfileURL(profile: Profile) {
     val link = Libbox.generateRemoteProfileImportLink(
         profile.name,
         profile.typed.remoteURL

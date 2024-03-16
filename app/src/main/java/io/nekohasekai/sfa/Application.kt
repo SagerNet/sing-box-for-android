@@ -31,6 +31,7 @@ class Application : Application() {
 
         Seq.setContext(this)
 
+        @Suppress("OPT_IN_USAGE")
         GlobalScope.launch(Dispatchers.IO) {
             UpdateProfileWork.reconfigureUpdater()
         }

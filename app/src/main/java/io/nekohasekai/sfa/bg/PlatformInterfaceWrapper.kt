@@ -103,6 +103,7 @@ interface PlatformInterfaceWrapper : PlatformInterface {
     }
 
     override fun readWIFIState(): WIFIState? {
+        @Suppress("DEPRECATION")
         val wifiInfo = Application.wifiManager.connectionInfo ?: return null
         var ssid = wifiInfo.ssid
         if (ssid.startsWith("\"") && ssid.endsWith("\"")) {

@@ -110,7 +110,6 @@ class EditProfileActivity : AbstractActivity<ActivityEditProfileBinding>() {
     }
 
     private fun updateAutoUpdate(newValue: String) {
-        val binding = binding ?: return
         val boolValue = EnabledType.valueOf(newValue).boolValue
         if (profile.typed.autoUpdate == boolValue) {
             return
@@ -126,7 +125,6 @@ class EditProfileActivity : AbstractActivity<ActivityEditProfileBinding>() {
     }
 
     private fun updateAutoUpdateInterval(newValue: String) {
-        val binding = binding ?: return
         if (newValue.isBlank()) {
             binding.autoUpdateInterval.error = getString(R.string.profile_input_required)
             return
@@ -148,7 +146,6 @@ class EditProfileActivity : AbstractActivity<ActivityEditProfileBinding>() {
     }
 
     private fun updateProfile() {
-        val binding = binding ?: return
         binding.progressView.isVisible = true
         lifecycleScope.launch(Dispatchers.IO) {
             delay(200L)
@@ -165,8 +162,8 @@ class EditProfileActivity : AbstractActivity<ActivityEditProfileBinding>() {
         }
     }
 
+    @Suppress("UNUSED_PARAMETER")
     private fun updateProfile(view: View) {
-        val binding = binding ?: return
         binding.progressView.isVisible = true
         lifecycleScope.launch(Dispatchers.IO) {
             try {

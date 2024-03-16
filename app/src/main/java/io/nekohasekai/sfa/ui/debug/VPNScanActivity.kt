@@ -114,7 +114,6 @@ class VPNScanActivity : AbstractActivity<ActivityVpnScanBinding>() {
 
     private suspend fun scanVPN() {
         val adapter = adapter ?: return
-        val binding = binding ?: return
         val flag =
             PackageManager.GET_SERVICES or if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 PackageManager.MATCH_UNINSTALLED_PACKAGES

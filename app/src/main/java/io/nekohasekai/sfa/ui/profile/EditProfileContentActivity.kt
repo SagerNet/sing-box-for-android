@@ -52,7 +52,6 @@ class EditProfileContentActivity : AbstractActivity<ActivityEditProfileContentBi
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val binding = binding ?: return false
         when (item.itemId) {
             R.id.action_undo -> {
                 if (binding.editor.canUndo()) binding.editor.undo()
@@ -104,7 +103,6 @@ class EditProfileContentActivity : AbstractActivity<ActivityEditProfileContentBi
     }
 
     private suspend fun loadConfiguration0() {
-        val binding = binding ?: return
         delay(200L)
 
         val profileId = intent.getLongExtra("profile_id", -1L)

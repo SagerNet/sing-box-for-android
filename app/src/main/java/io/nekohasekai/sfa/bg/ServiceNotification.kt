@@ -22,6 +22,7 @@ import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.ui.MainActivity
 import io.nekohasekai.sfa.utils.CommandClient
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.withContext
@@ -43,6 +44,7 @@ class ServiceNotification(
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     private val commandClient =
         CommandClient(GlobalScope, CommandClient.ConnectionType.Status, this)
     private var receiverRegistered = false

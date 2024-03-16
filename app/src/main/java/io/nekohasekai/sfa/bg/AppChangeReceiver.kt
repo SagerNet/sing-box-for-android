@@ -15,10 +15,10 @@ class AppChangeReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         Log.d(TAG, "onReceive: ${intent.action}")
-        checkUpdate(context, intent)
+        checkUpdate(intent)
     }
 
-    private fun checkUpdate(context: Context, intent: Intent) {
+    private fun checkUpdate(intent: Intent) {
         if (!Settings.perAppProxyEnabled) {
             Log.d(TAG, "per app proxy disabled")
             return
