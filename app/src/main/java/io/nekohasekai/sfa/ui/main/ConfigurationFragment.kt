@@ -1,5 +1,6 @@
 package io.nekohasekai.sfa.ui.main
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,17 +14,21 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.database.Profile
 import io.nekohasekai.sfa.database.ProfileManager
 import io.nekohasekai.sfa.database.TypedProfile
 import io.nekohasekai.sfa.databinding.FragmentConfigurationBinding
+import io.nekohasekai.sfa.databinding.SheetAddProfileBinding
 import io.nekohasekai.sfa.databinding.ViewConfigutationItemBinding
 import io.nekohasekai.sfa.ktx.errorDialogBuilder
 import io.nekohasekai.sfa.ktx.shareProfile
 import io.nekohasekai.sfa.ktx.shareProfileURL
+import io.nekohasekai.sfa.ui.MainActivity
 import io.nekohasekai.sfa.ui.profile.EditProfileActivity
 import io.nekohasekai.sfa.ui.profile.NewProfileActivity
+import io.nekohasekai.sfa.ui.profile.QRScanActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -70,10 +75,33 @@ class ConfigurationFragment : Fragment() {
         }
         adapter.reload()
         binding.fab.setOnClickListener {
-            startActivity(Intent(requireContext(), NewProfileActivity::class.java))
+            AddProfileDialog().show(childFragmentManager, "add_profile")
         }
         ProfileManager.registerCallback(this::updateProfiles)
         return binding.root
+    }
+
+    class AddProfileDialog : BottomSheetDialogFragment(R.layout.sheet_add_profile) {
+
+        private val scanQrCode =
+            registerForActivityResult(QRScanActivity.Contract(), ::onScanResult)
+
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+            super.onViewCreated(view, savedInstanceState)
+            val binding = SheetAddProfileBinding.bind(view)
+            binding.scanQrCode.setOnClickListener {
+                scanQrCode.launch(null)
+            }
+            binding.createManually.setOnClickListener {
+                dismiss()
+                startActivity(Intent(requireContext(), NewProfileActivity::class.java))
+            }
+        }
+
+        private fun onScanResult(result: Intent?) {
+            dismiss()
+            (activity as? MainActivity ?: return).onNewIntent(result ?: return)
+        }
     }
 
     override fun onResume() {
@@ -100,6 +128,7 @@ class ConfigurationFragment : Fragment() {
         internal val scope = lifecycleScope
         internal val fragmentActivity = requireActivity() as FragmentActivity
 
+        @SuppressLint("NotifyDataSetChanged")
         internal fun reload() {
             lifecycleScope.launch(Dispatchers.IO) {
                 val newItems = ProfileManager.list().toMutableList()

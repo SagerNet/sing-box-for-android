@@ -101,6 +101,9 @@ dependencies {
     implementation "androidx.room:room-runtime:2.6.1"
     implementation "androidx.coordinatorlayout:coordinatorlayout:1.2.0"
     implementation "androidx.preference:preference-ktx:1.2.1"
+    implementation "androidx.camera:camera-view:1.3.2"
+    implementation "androidx.camera:camera-lifecycle:1.3.2"
+    implementation "androidx.camera:camera-camera2:1.3.2"
     ksp "androidx.room:room-compiler:2.6.1"
     implementation "androidx.work:work-runtime-ktx:2.9.0"
     implementation "androidx.browser:browser:1.8.0"
@@ -115,6 +118,7 @@ dependencies {
     }
     implementation "com.google.guava:guava:33.0.0-android"
     playImplementation "com.google.android.play:app-update-ktx:2.1.0"
+    playImplementation "com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.0"
 }
 
 def playCredentialsJSON = rootProject.file("service-account-credentials.json")

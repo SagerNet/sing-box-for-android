@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
@@ -13,6 +18,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <uses-permission
         android:name="android.permission.QUERY_ALL_PACKAGES"
@@ -124,6 +130,10 @@
             android:exported="false" />
         <activity
             android:name="io.nekohasekai.sfa.ui.debug.VPNScanActivity"
+            android:exported="false" />
+
+        <activity
+            android:name="io.nekohasekai.sfa.ui.profile.QRScanActivity"
             android:exported="false" />
 
         <service

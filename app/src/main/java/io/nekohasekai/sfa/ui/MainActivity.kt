@@ -128,7 +128,7 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
         }
     }
 
-    override fun onNewIntent(intent: Intent) {
+    override public fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         val uri = intent.data ?: return
         if (uri.scheme == "sing-box" && uri.host == "import-remote-profile") {

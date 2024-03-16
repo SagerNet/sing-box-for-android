@@ -41,6 +41,10 @@
     <string name="profile_source_create_new">Create New</string>
     <string name="profile_source_import">Import</string>
 
+    <string name="profile_add_scan_qr_code">Scan QR code</string>
+    <string name="profile_add_import_from_clipboard">Import remote profile from clipboard</string>
+    <string name="profile_add_create_manually">Create Manually</string>
+
     <string name="menu_undo">Undo</string>
     <string name="menu_redo">Redo</string>
     <string name="menu_format">Format</string>
@@ -185,5 +189,6 @@
     <string name="open_settings">Open Settings</string>
 
     <string name="settings_title_core">Core</string>
+    <string name="disable_vendor_analyzer">Disable Google MLKit</string>
 
 </resources>
