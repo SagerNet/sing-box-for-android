@@ -42,7 +42,10 @@
     <string name="profile_source_import">Import</string>
 
     <string name="profile_add_scan_qr_code">Scan QR code</string>
-    <string name="profile_add_import_from_clipboard">Import remote profile from clipboard</string>
+    <string name="profile_add_scan_use_front_camera">Front camera</string>
+    <string name="profile_add_scan_use_vendor_analyzer">MLKit analyzer</string>
+    <string name="profile_add_scan_enable_torch">Torch</string>
+
     <string name="profile_add_create_manually">Create Manually</string>
 
     <string name="menu_undo">Undo</string>
@@ -189,6 +192,5 @@
     <string name="open_settings">Open Settings</string>
 
     <string name="settings_title_core">Core</string>
-    <string name="disable_vendor_analyzer">Disable Google MLKit</string>
 
 </resources>

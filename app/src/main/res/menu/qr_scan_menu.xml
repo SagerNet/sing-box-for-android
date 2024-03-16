@@ -2,7 +2,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/action_disable_vendor_analyzer"
-        android:title="@string/disable_vendor_analyzer" />
+        android:checkable="true"
+        android:id="@+id/action_use_front_camera"
+        android:title="@string/profile_add_scan_use_front_camera" />
+
+    <item
+        android:checkable="true"
+        android:id="@+id/action_enable_torch"
+        android:title="@string/profile_add_scan_enable_torch" />
+
+    <item
+        android:checkable="true"
+        android:id="@+id/action_use_vendor_analyzer"
+        android:title="@string/profile_add_scan_use_vendor_analyzer" />
+
 
 </menu>

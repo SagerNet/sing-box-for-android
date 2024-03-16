@@ -83,25 +83,27 @@ class PerAppProxyActivity : AbstractActivity<ActivityPerAppProxyBinding>() {
         setTitle(R.string.title_per_app_proxy)
 
         lifecycleScope.launch {
-            proxyMode = if (Settings.perAppProxyMode == Settings.PER_APP_PROXY_INCLUDE) {
-                Settings.PER_APP_PROXY_INCLUDE
-            } else {
-                Settings.PER_APP_PROXY_EXCLUDE
-            }
-            withContext(Dispatchers.Main) {
-                if (proxyMode == Settings.PER_APP_PROXY_INCLUDE) {
-                    binding.perAppProxyMode.setText(R.string.per_app_proxy_mode_include_description)
+            withContext(Dispatchers.IO) {
+                proxyMode = if (Settings.perAppProxyMode == Settings.PER_APP_PROXY_INCLUDE) {
+                    Settings.PER_APP_PROXY_INCLUDE
                 } else {
-                    binding.perAppProxyMode.setText(R.string.per_app_proxy_mode_exclude_description)
+                    Settings.PER_APP_PROXY_EXCLUDE
                 }
-            }
-            reloadApplicationList()
-            filterApplicationList()
-            withContext(Dispatchers.Main) {
-                adapter = ApplicationAdapter(displayPackages)
-                binding.appList.adapter = adapter
-                delay(500L)
-                binding.progress.isVisible = false
+                withContext(Dispatchers.Main) {
+                    if (proxyMode == Settings.PER_APP_PROXY_INCLUDE) {
+                        binding.perAppProxyMode.setText(R.string.per_app_proxy_mode_include_description)
+                    } else {
+                        binding.perAppProxyMode.setText(R.string.per_app_proxy_mode_exclude_description)
+                    }
+                }
+                reloadApplicationList()
+                filterApplicationList()
+                withContext(Dispatchers.Main) {
+                    adapter = ApplicationAdapter(displayPackages)
+                    binding.appList.adapter = adapter
+                    delay(500L)
+                    binding.progress.isVisible = false
+                }
             }
         }
     }

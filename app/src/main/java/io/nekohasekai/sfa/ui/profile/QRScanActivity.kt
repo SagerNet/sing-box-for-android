@@ -10,6 +10,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -69,6 +70,9 @@ class QRScanActivity : AbstractActivity<ActivityQrScanBinding>() {
         }
     }
     private val vendorAnalyzer = Vendor.createQRCodeAnalyzer(onSuccess, onFailure)
+    private lateinit var cameraProvider: ProcessCameraProvider
+    private lateinit var cameraPreview: Preview
+    private lateinit var camera: Camera
 
     private fun startCamera() {
         val cameraProviderFuture = try {
@@ -78,14 +82,14 @@ class QRScanActivity : AbstractActivity<ActivityQrScanBinding>() {
             return
         }
         cameraProviderFuture.addListener({
-            val cameraProvider = try {
+            cameraProvider = try {
                 cameraProviderFuture.get()
             } catch (e: Exception) {
                 fatalError(e)
                 return@addListener
             }
 
-            val preview = Preview.Builder().build()
+            cameraPreview = Preview.Builder().build()
                 .also { it.setSurfaceProvider(binding.previewView.surfaceProvider) }
             imageAnalysis = ImageAnalysis.Builder().build()
             imageAnalyzer = vendorAnalyzer ?: ZxingQRCodeAnalyzer(onSuccess, onFailure)
@@ -93,8 +97,8 @@ class QRScanActivity : AbstractActivity<ActivityQrScanBinding>() {
             cameraProvider.unbindAll()
 
             try {
-                cameraProvider.bindToLifecycle(
-                    this, CameraSelector.DEFAULT_BACK_CAMERA, preview, imageAnalysis
+                camera = cameraProvider.bindToLifecycle(
+                    this, CameraSelector.DEFAULT_BACK_CAMERA, cameraPreview, imageAnalysis
                 )
             } catch (e: Exception) {
                 fatalError(e)
@@ -134,20 +138,46 @@ class QRScanActivity : AbstractActivity<ActivityQrScanBinding>() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        if (vendorAnalyzer == null) {
-            return false
-        }
         menuInflater.inflate(R.menu.qr_scan_menu, menu)
+        if (vendorAnalyzer == null) {
+            menu.findItem(R.id.action_use_vendor_analyzer).isEnabled = false
+        } else {
+            menu.findItem(R.id.action_use_vendor_analyzer).isChecked = true
+        }
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.action_disable_vendor_analyzer -> {
+            R.id.action_use_front_camera -> {
+                item.isChecked = !item.isChecked
+                cameraProvider.unbindAll()
+                try {
+                    camera = cameraProvider.bindToLifecycle(
+                        this,
+                        if (!item.isChecked) CameraSelector.DEFAULT_BACK_CAMERA else CameraSelector.DEFAULT_FRONT_CAMERA,
+                        cameraPreview,
+                        imageAnalysis
+                    )
+                } catch (e: Exception) {
+                    fatalError(e)
+                }
+            }
+
+            R.id.action_enable_torch -> {
+                item.isChecked = !item.isChecked
+                camera.cameraControl.enableTorch(item.isChecked)
+            }
+
+            R.id.action_use_vendor_analyzer -> {
+                item.isChecked = !item.isChecked
                 imageAnalysis.clearAnalyzer()
-                imageAnalyzer = ZxingQRCodeAnalyzer(onSuccess, onFailure)
+                imageAnalyzer = if (item.isChecked) {
+                    vendorAnalyzer!!
+                } else {
+                    ZxingQRCodeAnalyzer(onSuccess, onFailure)
+                }
                 imageAnalysis.setAnalyzer(analysisExecutor, imageAnalyzer)
-                item.isVisible = false
             }
 
             else -> return super.onOptionsItemSelected(item)

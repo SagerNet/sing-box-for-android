@@ -2,7 +2,6 @@ package io.nekohasekai.sfa.vendor
 
 import android.app.Activity
 import androidx.camera.core.ImageAnalysis
-import java.lang.Exception
 
 object Vendor : VendorInterface {
 
