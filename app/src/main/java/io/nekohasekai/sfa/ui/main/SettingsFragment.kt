@@ -1,5 +1,7 @@
 package io.nekohasekai.sfa.ui.main
 
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -8,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -32,24 +35,25 @@ import kotlinx.coroutines.withContext
 
 class SettingsFragment : Fragment() {
 
-    private var binding: FragmentSettingsBinding? = null
+    private lateinit var binding: FragmentSettingsBinding
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        val binding = FragmentSettingsBinding.inflate(inflater, container, false)
-        this.binding = binding
+        binding = FragmentSettingsBinding.inflate(inflater, container, false)
         onCreate()
         return binding.root
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private val requestIgnoreBatteryOptimizations = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
-    ) { _ ->
-        lifecycleScope.launch(Dispatchers.IO) {
-            reloadSettings()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            binding.backgroundPermissionCard.isVisible = false
         }
     }
 
+    @SuppressLint("BatteryLife")
     private fun onCreate() {
         val activity = activity as MainActivity? ?: return
         val binding = binding ?: return
@@ -92,13 +96,16 @@ class SettingsFragment : Fragment() {
         binding.dontKillMyAppButton.setOnClickListener {
             it.context.launchCustomTab("https://dontkillmyapp.com/")
         }
-        binding.requestIgnoreBatteryOptimizationsButton.setOnClickListener {
-            requestIgnoreBatteryOptimizations.launch(
-                Intent(
-                    android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
-                    Uri.parse("package:${Application.application.packageName}")
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            binding.requestIgnoreBatteryOptimizationsButton.setOnClickListener {
+                requestIgnoreBatteryOptimizations.launch(
+                    Intent(
+                        android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+                        Uri.parse("package:${Application.application.packageName}")
+                    )
                 )
-            )
+            }
         }
         binding.configureOverridesButton.setOnClickListener {
             startActivity(Intent(requireContext(), ProfileOverrideActivity::class.java))
@@ -138,11 +145,6 @@ class SettingsFragment : Fragment() {
             binding.dynamicNotificationEnabled.text = EnabledType.from(dynamicNotification).name
             binding.dynamicNotificationEnabled.setSimpleItems(R.array.enabled)
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        binding = null
     }
 
 }
