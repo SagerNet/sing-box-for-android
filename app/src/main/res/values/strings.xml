@@ -104,7 +104,7 @@
     <string name="read_more">Read More</string>
     <string name="request_background_permission">Ignore Battery Optimizations</string>
     <string name="import_remote_profile">Import remote profile</string>
-    <string name="import_remote_profile_message">Are you sure to import remote profile %s? You will connect to %s to download the configuration.</string>
+    <string name="import_remote_profile_message">Are you sure to import remote profile %1$s? You will connect to %2$s to download the configuration.</string>
 
     <string name="title_profile_override">Profile Override</string>
     <string name="profile_override_description">Overrides profile configuration items with platform-specific values.</string>
