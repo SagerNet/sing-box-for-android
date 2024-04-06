@@ -182,6 +182,7 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
                     false
                 binding.itemList.layoutManager = GridLayoutManager(binding.root.context, 2)
             } else {
+                adapter.group = group
                 adapter.setItems(items)
             }
             updateExpand()
@@ -241,7 +242,7 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
 
     private class ItemAdapter(
         val groupView: GroupView,
-        val group: OutboundGroup,
+        var group: OutboundGroup,
         private var items: MutableList<OutboundGroupItem> = mutableListOf()
     ) :
         RecyclerView.Adapter<ItemGroupView>() {
