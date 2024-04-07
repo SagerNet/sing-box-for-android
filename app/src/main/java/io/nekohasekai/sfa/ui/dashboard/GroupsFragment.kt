@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.OutboundGroup
-import io.nekohasekai.libbox.OutboundGroupItem
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.databinding.FragmentDashboardGroupsBinding
@@ -99,18 +98,18 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
         val adapter = adapter ?: return
         activity?.runOnUiThread {
             updateDisplayed(newGroups.isNotEmpty())
-            adapter.setGroups(newGroups)
+            adapter.setGroups(newGroups.map(::Group))
         }
     }
 
     private class Adapter : RecyclerView.Adapter<GroupView>() {
 
-        private lateinit var groups: MutableList<OutboundGroup>
+        private lateinit var groups: MutableList<Group>
 
         @SuppressLint("NotifyDataSetChanged")
-        fun setGroups(newGroups: MutableList<OutboundGroup>) {
+        fun setGroups(newGroups: List<Group>) {
             if (!::groups.isInitialized || groups.size != newGroups.size) {
-                groups = newGroups
+                groups = newGroups.toMutableList()
                 notifyDataSetChanged()
             } else {
                 newGroups.forEachIndexed { index, group ->
@@ -119,7 +118,6 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
                         notifyItemChanged(index)
                     }
                 }
-
             }
         }
 
@@ -148,14 +146,14 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
     private class GroupView(val binding: ViewDashboardGroupBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        private lateinit var group: OutboundGroup
-        private lateinit var items: MutableList<OutboundGroupItem>
+        private lateinit var group: Group
+        private lateinit var items: List<GroupItem>
         private lateinit var adapter: ItemAdapter
         private lateinit var textWatcher: TextWatcher
 
         @OptIn(DelicateCoroutinesApi::class)
         @SuppressLint("NotifyDataSetChanged")
-        fun bind(group: OutboundGroup) {
+        fun bind(group: Group) {
             this.group = group
             binding.groupName.text = group.tag
             binding.groupType.text = Libbox.proxyDisplayType(group.type)
@@ -170,13 +168,9 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
                     }
                 }
             }
-            items = mutableListOf()
-            val itemIterator = group.items
-            while (itemIterator.hasNext()) {
-                items.add(itemIterator.next())
-            }
+            items = group.items
             if (!::adapter.isInitialized) {
-                adapter = ItemAdapter(this, group, items)
+                adapter = ItemAdapter(this, group, items.toMutableList())
                 binding.itemList.adapter = adapter
                 (binding.itemList.itemAnimator as SimpleItemAnimator).supportsChangeAnimations =
                     false
@@ -231,7 +225,7 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
             }
         }
 
-        fun updateSelected(group: OutboundGroup, itemTag: String) {
+        fun updateSelected(group: Group, itemTag: String) {
             val oldSelected = items.indexOfFirst { it.tag == group.selected }
             group.selected = itemTag
             if (oldSelected != -1) {
@@ -242,15 +236,15 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
 
     private class ItemAdapter(
         val groupView: GroupView,
-        var group: OutboundGroup,
-        private var items: MutableList<OutboundGroupItem> = mutableListOf()
+        var group: Group,
+        private var items: MutableList<GroupItem> = mutableListOf()
     ) :
         RecyclerView.Adapter<ItemGroupView>() {
 
         @SuppressLint("NotifyDataSetChanged")
-        fun setItems(newItems: MutableList<OutboundGroupItem>) {
+        fun setItems(newItems: List<GroupItem>) {
             if (items.size != newItems.size) {
-                items = newItems
+                items = newItems.toMutableList()
                 notifyDataSetChanged()
             } else {
                 newItems.forEachIndexed { index, item ->
@@ -285,7 +279,7 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
         RecyclerView.ViewHolder(binding.root) {
 
         @OptIn(DelicateCoroutinesApi::class)
-        fun bind(groupView: GroupView, group: OutboundGroup, item: OutboundGroupItem) {
+        fun bind(groupView: GroupView, group: Group, item: GroupItem) {
             if (group.selectable) {
                 binding.itemCard.setOnClickListener {
                     binding.selectedView.isVisible = true
