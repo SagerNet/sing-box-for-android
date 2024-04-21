@@ -10,7 +10,7 @@ class HTTPClient : Closeable {
         val userAgent by lazy {
             var userAgent = "SFA/"
             userAgent += BuildConfig.VERSION_NAME
-            userAgent += " ("
+            userAgent += " (Build "
             userAgent += BuildConfig.VERSION_CODE
             userAgent += "; sing-box "
             userAgent += Libbox.version()
