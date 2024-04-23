@@ -49,16 +49,6 @@
                     android:orientation="horizontal">
 
                     <ImageButton
-                        android:id="@+id/expandButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
-                        android:backgroundTint="?colorSurfaceContainerLow"
-                        android:contentDescription="@string/expand"
-                        android:src="@drawable/ic_expand_less_24"
-                        app:tint="?colorControlNormal" />
-
-                    <ImageButton
                         android:id="@+id/urlTestButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -66,6 +56,16 @@
                         android:backgroundTint="?colorSurfaceContainerLow"
                         android:contentDescription="@string/urltest"
                         android:src="@drawable/ic_electric_bolt_24"
+                        app:tint="?colorControlNormal" />
+
+                    <ImageButton
+                        android:id="@+id/expandButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:backgroundTint="?colorSurfaceContainerLow"
+                        android:contentDescription="@string/expand"
+                        android:src="@drawable/ic_expand_less_24"
                         app:tint="?colorControlNormal" />
 
                 </LinearLayout>

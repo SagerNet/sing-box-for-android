@@ -212,12 +212,24 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
                         if (selected != group.selected) {
                             updateSelected(group, selected)
                         }
+                        GlobalScope.launch {
+                            runCatching {
+                                Libbox.newStandaloneCommandClient()
+                                    .selectOutbound(group.tag, selected)
+                            }.onFailure {
+                                withContext(Dispatchers.Main) {
+                                    binding.root.context.errorDialogBuilder(it).show()
+                                }
+                            }
+                        }
                     }
                 }
             }
             if (newExpandStatus) {
+                binding.urlTestButton.isVisible = true
                 binding.expandButton.setImageResource(R.drawable.ic_expand_less_24)
             } else {
+                binding.urlTestButton.isVisible = false
                 binding.expandButton.setImageResource(R.drawable.ic_expand_more_24)
             }
             binding.expandButton.setOnClickListener {
