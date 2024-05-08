@@ -83,6 +83,8 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
                     while (inet4RouteAddress.hasNext()) {
                         builder.addRoute(inet4RouteAddress.next().toIpPrefix())
                     }
+                } else if (options.inet4Address.hasNext()) {
+                    builder.addRoute("0.0.0.0", 0)
                 }
 
                 val inet6RouteAddress = options.inet6RouteAddress
@@ -90,6 +92,8 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
                     while (inet6RouteAddress.hasNext()) {
                         builder.addRoute(inet6RouteAddress.next().toIpPrefix())
                     }
+                } else if (options.inet6Address.hasNext()) {
+                    builder.addRoute("::", 0)
                 }
 
                 val inet4RouteExcludeAddress = options.inet4RouteExcludeAddress
