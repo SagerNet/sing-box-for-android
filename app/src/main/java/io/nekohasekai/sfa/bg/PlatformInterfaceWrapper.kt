@@ -99,6 +99,10 @@ interface PlatformInterfaceWrapper : PlatformInterface {
         return false
     }
 
+    override fun includeAllNetworks(): Boolean {
+        return false
+    }
+
     override fun clearDNSCache() {
     }
 
