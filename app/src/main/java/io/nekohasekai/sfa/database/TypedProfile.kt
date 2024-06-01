@@ -2,15 +2,18 @@ package io.nekohasekai.sfa.database
 
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.annotation.StringRes
 import androidx.room.TypeConverter
+import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.ktx.marshall
 import io.nekohasekai.sfa.ktx.unmarshall
 import java.util.Date
 
 class TypedProfile() : Parcelable {
 
-    enum class Type {
-        Local, Remote;
+    enum class Type(@StringRes var stringId: Int) {
+        Local(R.string.profile_type_local),
+        Remote(R.string.profile_type_remote);
 
         companion object {
             fun valueOf(value: Int): Type {

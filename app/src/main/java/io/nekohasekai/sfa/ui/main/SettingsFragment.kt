@@ -70,7 +70,7 @@ class SettingsFragment : Fragment() {
         }
         binding.checkUpdateEnabled.addTextChangedListener {
             lifecycleScope.launch(Dispatchers.IO) {
-                val newValue = EnabledType.valueOf(it).boolValue
+                val newValue = EnabledType.valueOf(it, requireContext()).boolValue
                 Settings.checkUpdateEnabled = newValue
             }
         }
@@ -82,13 +82,13 @@ class SettingsFragment : Fragment() {
         }
         binding.disableMemoryLimit.addTextChangedListener {
             lifecycleScope.launch(Dispatchers.IO) {
-                val newValue = EnabledType.valueOf(it).boolValue
+                val newValue = EnabledType.valueOf(it, requireContext()).boolValue
                 Settings.disableMemoryLimit = !newValue
             }
         }
         binding.dynamicNotificationEnabled.addTextChangedListener {
             lifecycleScope.launch(Dispatchers.IO) {
-                val newValue = EnabledType.valueOf(it).boolValue
+                val newValue = EnabledType.valueOf(it, requireContext()).boolValue
                 Settings.dynamicNotification = newValue
             }
         }
@@ -137,12 +137,15 @@ class SettingsFragment : Fragment() {
         val dynamicNotification = Settings.dynamicNotification
         withContext(Dispatchers.Main) {
             binding.dataSizeText.text = dataSize
-            binding.checkUpdateEnabled.text = EnabledType.from(checkUpdateEnabled).name
+            binding.checkUpdateEnabled.text =
+                getString(EnabledType.from(checkUpdateEnabled).stringId)
             binding.checkUpdateEnabled.setSimpleItems(R.array.enabled)
-            binding.disableMemoryLimit.text = EnabledType.from(!Settings.disableMemoryLimit).name
+            binding.disableMemoryLimit.text =
+                getString(EnabledType.from(!Settings.disableMemoryLimit).stringId)
             binding.disableMemoryLimit.setSimpleItems(R.array.enabled)
             binding.backgroundPermissionCard.isGone = removeBackgroundPermissionPage
-            binding.dynamicNotificationEnabled.text = EnabledType.from(dynamicNotification).name
+            binding.dynamicNotificationEnabled.text =
+                getString(EnabledType.from(dynamicNotification).stringId)
             binding.dynamicNotificationEnabled.setSimpleItems(R.array.enabled)
         }
     }
