@@ -4,6 +4,7 @@ import androidx.room.Room
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.bg.ProxyService
 import io.nekohasekai.sfa.bg.VPNService
+import io.nekohasekai.sfa.constant.GroupItemSortMode
 import io.nekohasekai.sfa.constant.Path
 import io.nekohasekai.sfa.constant.ServiceMode
 import io.nekohasekai.sfa.constant.SettingsKey
@@ -44,6 +45,7 @@ object Settings {
     var disableMemoryLimit by dataStore.boolean(SettingsKey.DISABLE_MEMORY_LIMIT)
     var dynamicNotification by dataStore.boolean(SettingsKey.DYNAMIC_NOTIFICATION) { true }
 
+    var groupItemSortMode by dataStore.int(SettingsKey.GROUP_ITEM_SORT_MODE) { GroupItemSortMode.DEFAULT.ordinal }
 
     const val PER_APP_PROXY_DISABLED = 0
     const val PER_APP_PROXY_EXCLUDE = 1

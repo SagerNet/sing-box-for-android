@@ -8,6 +8,8 @@ object SettingsKey {
     const val DISABLE_MEMORY_LIMIT = "disable_memory_limit"
     const val DYNAMIC_NOTIFICATION = "dynamic_notification"
 
+    const val GROUP_ITEM_SORT_MODE = "group_item_sort_mode"
+
     const val PER_APP_PROXY_ENABLED = "per_app_proxy_enabled"
     const val PER_APP_PROXY_MODE = "per_app_proxy_mode"
     const val PER_APP_PROXY_LIST = "per_app_proxy_list"
