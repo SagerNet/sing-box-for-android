@@ -19,7 +19,9 @@ import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.OutboundGroup
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.constant.GroupItemSortMode
 import io.nekohasekai.sfa.constant.Status
+import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.databinding.FragmentDashboardGroupsBinding
 import io.nekohasekai.sfa.databinding.ViewDashboardGroupBinding
 import io.nekohasekai.sfa.databinding.ViewDashboardGroupItemBinding
@@ -63,6 +65,13 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
             if (it == Status.Started) {
                 commandClient.connect()
             }
+        }
+        binding.fab.setImageResource(GroupItemSortMode.from(Settings.groupItemSortMode).drawableId)
+        binding.fab.setOnClickListener {
+            Settings.groupItemSortMode =
+                GroupItemSortMode.from(Settings.groupItemSortMode).next().ordinal
+            binding.fab.setImageResource(GroupItemSortMode.from(Settings.groupItemSortMode).drawableId)
+            adapter?.notifyDataSetChanged()
         }
     }
 
@@ -189,6 +198,7 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
                 GlobalScope.launch {
                     runCatching {
                         Libbox.newStandaloneCommandClient().setGroupExpand(group.tag, isExpand)
+                        group.isExpand = isExpand
                     }.onFailure {
                         withContext(Dispatchers.Main) {
                             binding.root.context.errorDialogBuilder(it).show()
@@ -203,7 +213,7 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
                 binding.groupSelected.isEnabled = group.selectable
                 if (group.selectable) {
                     val textView = (binding.groupSelected.editText as MaterialAutoCompleteTextView)
-                    textView.setSimpleItems(group.items.toList().map { it.tag }.toTypedArray())
+                    textView.setSimpleItems(adapter.getItems().map { it.tag }.toTypedArray())
                     if (::textWatcher.isInitialized) {
                         textView.removeTextChangedListener(textWatcher)
                     }
@@ -238,10 +248,14 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
         }
 
         fun updateSelected(group: Group, itemTag: String) {
-            val oldSelected = items.indexOfFirst { it.tag == group.selected }
+            val oldSelected = adapter.getIndexOfFirstItem(group.selected)
+            val newSelected = adapter.getIndexOfFirstItem(itemTag)
             group.selected = itemTag
             if (oldSelected != -1) {
                 adapter.notifyItemChanged(oldSelected)
+            }
+            if (newSelected != -1) {
+                adapter.notifyItemChanged(newSelected)
             }
         }
     }
@@ -253,18 +267,53 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
     ) :
         RecyclerView.Adapter<ItemGroupView>() {
 
+        init {
+            sortItemsByMode()
+        }
+
+        fun getIndexOfFirstItem(tag: String): Int {
+            return items.indexOfFirst { it.tag == tag }
+        }
+
+        fun getItems(): MutableList<GroupItem> {
+            return items
+        }
+
         @SuppressLint("NotifyDataSetChanged")
         fun setItems(newItems: List<GroupItem>) {
+            val sortedItems = sortItemsByMode(newItems)
             if (items.size != newItems.size) {
-                items = newItems.toMutableList()
+                items = sortedItems.toMutableList()
                 notifyDataSetChanged()
             } else {
-                newItems.forEachIndexed { index, item ->
+                sortedItems.forEachIndexed { index, item ->
                     if (items[index] != item) {
                         items[index] = item
                         notifyItemChanged(index)
                     }
                 }
+            }
+        }
+
+        private fun sortItemsByMode() {
+            when (Settings.groupItemSortMode) {
+                GroupItemSortMode.DEFAULT.ordinal -> items
+                GroupItemSortMode.DELAY_ASC.ordinal -> items.sortWith(compareBy { if (it.urlTestDelay == 0) Int.MAX_VALUE else it.urlTestDelay })
+                GroupItemSortMode.DELAY_DESC.ordinal -> items.sortByDescending { it.urlTestDelay }
+                GroupItemSortMode.TAG_ASC.ordinal -> items.sortBy { it.tag }
+                GroupItemSortMode.TAG_DESC.ordinal -> items.sortByDescending { it.tag }
+                else -> throw IllegalArgumentException()
+            }
+        }
+
+        private fun sortItemsByMode(newItems: List<GroupItem>): List<GroupItem> {
+            return when (Settings.groupItemSortMode) {
+                GroupItemSortMode.DEFAULT.ordinal -> newItems
+                GroupItemSortMode.DELAY_ASC.ordinal -> newItems.sortedWith(compareBy { if (it.urlTestDelay == 0) Int.MAX_VALUE else it.urlTestDelay })
+                GroupItemSortMode.DELAY_DESC.ordinal -> newItems.sortedByDescending { it.urlTestDelay }
+                GroupItemSortMode.TAG_ASC.ordinal -> newItems.sortedBy { it.tag }
+                GroupItemSortMode.TAG_DESC.ordinal -> newItems.sortedByDescending { it.tag }
+                else -> throw IllegalArgumentException()
             }
         }
 
