@@ -149,7 +149,7 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
         private lateinit var group: Group
         private lateinit var items: List<GroupItem>
         private lateinit var adapter: ItemAdapter
-        private lateinit var textWatcher: TextWatcher
+        private var textWatcher: TextWatcher? = null
 
         @OptIn(DelicateCoroutinesApi::class)
         @SuppressLint("NotifyDataSetChanged")
@@ -198,15 +198,15 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
             }
             binding.itemList.isVisible = newExpandStatus
             binding.groupSelected.isVisible = !newExpandStatus
+            val textView = (binding.groupSelected.editText as MaterialAutoCompleteTextView)
+            if (textWatcher != null) {
+                textView.removeTextChangedListener(textWatcher)
+            }
             if (!newExpandStatus) {
                 binding.groupSelected.text = group.selected
                 binding.groupSelected.isEnabled = group.selectable
                 if (group.selectable) {
-                    val textView = (binding.groupSelected.editText as MaterialAutoCompleteTextView)
                     textView.setSimpleItems(group.items.toList().map { it.tag }.toTypedArray())
-                    if (::textWatcher.isInitialized) {
-                        textView.removeTextChangedListener(textWatcher)
-                    }
                     textWatcher = textView.addTextChangedListener {
                         val selected = textView.text.toString()
                         if (selected != group.selected) {
@@ -301,7 +301,8 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
                             Libbox.newStandaloneCommandClient().selectOutbound(group.tag, item.tag)
                         }.onFailure {
                             withContext(Dispatchers.Main) {
-                                binding.root.context.errorDialogBuilder(it).show()
+                                binding.root.context.errorDialogBuilder("select outbound: ${it.localizedMessage}")
+                                    .show()
                             }
                         }
                     }
