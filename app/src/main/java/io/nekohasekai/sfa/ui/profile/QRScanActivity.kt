@@ -62,8 +62,8 @@ class QRScanActivity : AbstractActivity<ActivityQrScanBinding>() {
             } else {
                 setResult(RESULT_CANCELED)
                 finish()
+            }
         }
-    }
 
     private lateinit var imageAnalysis: ImageAnalysis
     private lateinit var imageAnalyzer: ImageAnalysis.Analyzer
