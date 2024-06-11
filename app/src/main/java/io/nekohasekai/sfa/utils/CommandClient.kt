@@ -4,6 +4,7 @@ import go.Seq
 import io.nekohasekai.libbox.CommandClient
 import io.nekohasekai.libbox.CommandClientHandler
 import io.nekohasekai.libbox.CommandClientOptions
+import io.nekohasekai.libbox.Connections
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.OutboundGroup
 import io.nekohasekai.libbox.OutboundGroupIterator
@@ -133,6 +134,8 @@ open class CommandClient(
             handler.updateClashMode(newMode)
         }
 
+        override fun writeConnections(message: Connections?) {
+        }
     }
 
 }
