@@ -94,8 +94,6 @@ class ServiceConnection(
     interface Callback {
         fun onServiceStatusChanged(status: Status)
         fun onServiceAlert(type: Alert, message: String?) {}
-        fun onServiceWriteLog(message: String?) {}
-        fun onServiceResetLogs(messages: MutableList<String>) {}
     }
 
     class ServiceCallback(private val callback: Callback) : IServiceCallback.Stub() {
@@ -106,10 +104,5 @@ class ServiceConnection(
         override fun onServiceAlert(type: Int, message: String?) {
             callback.onServiceAlert(Alert.values()[type], message)
         }
-
-        override fun onServiceWriteLog(message: String?) = callback.onServiceWriteLog(message)
-
-        override fun onServiceResetLogs(messages: MutableList<String>) =
-            callback.onServiceResetLogs(messages)
     }
 }

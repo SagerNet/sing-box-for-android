@@ -11,6 +11,11 @@ fun Iterable<String>.toStringIterator(): StringIterator {
     return object : StringIterator {
         val iterator = iterator()
 
+        override fun len(): Int {
+            // not used by core
+            return 0
+        }
+
         override fun hasNext(): Boolean {
             return iterator.hasNext()
         }

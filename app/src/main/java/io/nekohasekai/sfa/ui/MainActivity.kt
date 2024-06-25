@@ -53,7 +53,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.Date
-import java.util.LinkedList
 
 class MainActivity : AbstractActivity<ActivityMainBinding>(),
     PreferenceFragmentCompat.OnPreferenceStartFragmentCallback,
@@ -69,8 +68,6 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
 
     private val connection = ServiceConnection(this, this)
 
-    val logList = LinkedList<String>()
-    var logCallback: ((Boolean) -> Unit)? = null
     val serviceStatus = MutableLiveData(Status.Stopped)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -436,43 +433,9 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
         }
     }
 
-
-    private var paused = false
-    override fun onPause() {
-        super.onPause()
-
-        paused = true
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        paused = false
-        logCallback?.invoke(true)
-    }
-
-    override fun onServiceWriteLog(message: String?) {
-        if (paused) {
-            if (logList.size > 300) {
-                logList.removeFirst()
-            }
-        }
-        logList.addLast(message)
-        if (!paused) {
-            logCallback?.invoke(false)
-        }
-    }
-
-    override fun onServiceResetLogs(messages: MutableList<String>) {
-        logList.clear()
-        logList.addAll(messages)
-        if (!paused) logCallback?.invoke(true)
-    }
-
     override fun onDestroy() {
         connection.disconnect()
         super.onDestroy()
     }
-
 
 }

@@ -150,6 +150,11 @@ interface PlatformInterfaceWrapper : PlatformInterface {
 
     private class StringArray(private val iterator: Iterator<String>) : StringIterator {
 
+        override fun len(): Int {
+            // not used by core
+            return 0
+        }
+
         override fun hasNext(): Boolean {
             return iterator.hasNext()
         }

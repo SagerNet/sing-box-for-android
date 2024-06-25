@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.nekohasekai.sfa.R
@@ -15,12 +16,18 @@ import io.nekohasekai.sfa.databinding.FragmentLogBinding
 import io.nekohasekai.sfa.databinding.ViewLogTextItemBinding
 import io.nekohasekai.sfa.ui.MainActivity
 import io.nekohasekai.sfa.utils.ColorUtils
+import io.nekohasekai.sfa.utils.CommandClient
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.LinkedList
 
-class LogFragment : Fragment() {
+class LogFragment : Fragment(), CommandClient.Handler {
     private val activity: MainActivity? get() = super.getActivity() as MainActivity?
     private var binding: FragmentLogBinding? = null
-    private var logAdapter: LogAdapter? = null
+    private var adapter: Adapter? = null
+    private val commandClient =
+        CommandClient(lifecycleScope, CommandClient.ConnectionType.Log, this)
+    private val logList = LinkedList<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -34,10 +41,9 @@ class LogFragment : Fragment() {
     private fun onCreate() {
         val activity = activity ?: return
         val binding = binding ?: return
-        activity.logCallback = ::updateViews
         binding.logView.layoutManager = LinearLayoutManager(requireContext())
-        binding.logView.adapter = LogAdapter(activity.logList).also { logAdapter = it }
-        updateViews(true)
+        binding.logView.adapter = Adapter(logList).also { adapter = it }
+        updateViews()
         activity.serviceStatus.observe(viewLifecycleOwner) {
             when (it) {
                 Status.Stopped -> {
@@ -52,8 +58,10 @@ class LogFragment : Fragment() {
                 }
 
                 Status.Started -> {
+                    commandClient.connect()
                     binding.fab.setImageResource(R.drawable.ic_stop_24)
                     binding.fab.show()
+                    binding.fab.isEnabled = true
                     binding.statusText.setText(R.string.status_started)
                 }
 
@@ -68,6 +76,7 @@ class LogFragment : Fragment() {
         binding.fab.setOnClickListener {
             when (activity.serviceStatus.value) {
                 Status.Stopped -> {
+                    it.isEnabled = false
                     activity.startService()
                 }
 
@@ -80,34 +89,68 @@ class LogFragment : Fragment() {
         }
     }
 
-    private fun updateViews(reset: Boolean) {
+    private fun updateViews(removeLen: Int = 0, insertLen: Int = 0) {
         val activity = activity ?: return
-        val logAdapter = logAdapter ?: return
+        val logAdapter = adapter ?: return
         val binding = binding ?: return
-        if (activity.logList.isEmpty()) {
+        if (logList.isEmpty()) {
             binding.logView.isVisible = false
             binding.statusText.isVisible = true
         } else if (!binding.logView.isVisible) {
             binding.logView.isVisible = true
             binding.statusText.isVisible = false
         }
-        if (reset) {
+        if (insertLen == 0) {
             logAdapter.notifyDataSetChanged()
-            binding.logView.scrollToPosition(activity.logList.size - 1)
+            if (logList.size > 0) {
+                binding.logView.scrollToPosition(logList.size - 1)
+            }
         } else {
-            binding.logView.scrollToPosition(logAdapter.notifyItemInserted())
+            if (logList.size == 300) {
+                logAdapter.notifyItemRangeRemoved(0, removeLen)
+            }
+            logAdapter.notifyItemRangeInserted(logList.size - insertLen, insertLen)
+            binding.logView.scrollToPosition(logList.size - 1)
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        commandClient.disconnect()
         binding = null
-        activity?.logCallback = null
-        logAdapter = null
+        adapter = null
+    }
+
+    override fun onConnected() {
+        lifecycleScope.launch(Dispatchers.Main) {
+            logList.clear()
+            updateViews()
+        }
+    }
+
+    override fun clearLogs() {
+        lifecycleScope.launch(Dispatchers.Main) {
+            logList.clear()
+            updateViews()
+        }
+    }
+
+    override fun appendLogs(messageList: List<String>) {
+        lifecycleScope.launch(Dispatchers.Main) {
+            val messageLen = messageList.size
+            val removeLen = logList.size + messageLen - 300
+            if (removeLen > 0) {
+                repeat(removeLen) {
+                    logList.removeFirst()
+                }
+            }
+            logList.addAll(messageList)
+            updateViews(removeLen, messageLen)
+        }
     }
 
 
-    class LogAdapter(private val logList: LinkedList<String>) :
+    class Adapter(private val logList: LinkedList<String>) :
         RecyclerView.Adapter<LogViewHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LogViewHolder {
             return LogViewHolder(
@@ -123,17 +166,6 @@ class LogFragment : Fragment() {
 
         override fun getItemCount(): Int {
             return logList.size
-        }
-
-        fun notifyItemInserted(): Int {
-            if (logList.size > 300) {
-                logList.removeFirst()
-                notifyItemRemoved(0)
-            }
-
-            val position = logList.size - 1
-            notifyItemInserted(position)
-            return position
         }
 
     }

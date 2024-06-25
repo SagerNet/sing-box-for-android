@@ -107,17 +107,27 @@ class OverviewFragment : Fragment() {
             val status = Libbox.newStandaloneCommandClient().systemProxyStatus
             withContext(Dispatchers.Main) {
                 binding.systemProxyCard.isVisible = status.available
-                binding.systemProxySwitch.setOnClickListener(null)
+                binding.systemProxySwitch.setOnCheckedChangeListener(null)
                 binding.systemProxySwitch.isChecked = status.enabled
-                binding.systemProxySwitch.isEnabled = true
+                var reloading = false
                 binding.systemProxySwitch.setOnCheckedChangeListener { buttonView, isChecked ->
-                    binding.systemProxySwitch.isEnabled = false
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        Settings.systemProxyEnabled = isChecked
-                        runCatching {
-                            Libbox.newStandaloneCommandClient().setSystemProxyEnabled(isChecked)
-                        }.onFailure {
-                            buttonView.context.errorDialogBuilder(it).show()
+                    synchronized(this@OverviewFragment) {
+                        if (reloading) return@setOnCheckedChangeListener
+                        reloading = true
+                        binding.systemProxySwitch.isEnabled = false
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            Settings.systemProxyEnabled = isChecked
+                            runCatching {
+                                Libbox.newStandaloneCommandClient().setSystemProxyEnabled(isChecked)
+                            }.onFailure {
+                                withContext(Dispatchers.Main) {
+                                    buttonView.context.errorDialogBuilder(it).show()
+                                }
+                            }
+                            withContext(Dispatchers.Main) {
+                                delay(1000L)
+                                binding.systemProxySwitch.isEnabled = true
+                            }
                         }
                     }
                 }

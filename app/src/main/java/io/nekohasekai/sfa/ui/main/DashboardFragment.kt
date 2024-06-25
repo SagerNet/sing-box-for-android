@@ -52,6 +52,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
                     enablePager()
                     binding.fab.setImageResource(R.drawable.ic_stop_24)
                     binding.fab.show()
+                    binding.fab.isEnabled = true
                 }
 
                 Status.Stopping -> {
@@ -65,6 +66,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
         binding.fab.setOnClickListener {
             when (activity.serviceStatus.value) {
                 Status.Stopped -> {
+                    it.isEnabled = false
                     activity.startService()
                 }
 

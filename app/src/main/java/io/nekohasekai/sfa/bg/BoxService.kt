@@ -30,7 +30,6 @@ import io.nekohasekai.sfa.ktx.hasPermission
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -74,14 +73,6 @@ class BoxService(
                 )
             )
         }
-
-        fun reload() {
-            Application.application.sendBroadcast(
-                Intent(Action.SERVICE_RELOAD).setPackage(
-                    Application.application.packageName
-                )
-            )
-        }
     }
 
     var fileDescriptor: ParcelFileDescriptor? = null
@@ -99,9 +90,6 @@ class BoxService(
                     stopService()
                 }
 
-                Action.SERVICE_RELOAD -> {
-                    serviceReload()
-                }
 
                 PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -120,7 +108,7 @@ class BoxService(
     }
 
     private var lastProfileName = ""
-    private suspend fun startService(delayStart: Boolean = false) {
+    private suspend fun startService() {
         try {
             withContext(Dispatchers.Main) {
                 notification.show(lastProfileName, R.string.status_starting)
@@ -147,9 +135,6 @@ class BoxService(
             lastProfileName = profile.name
             withContext(Dispatchers.Main) {
                 notification.show(lastProfileName, R.string.status_starting)
-                binder.broadcast {
-                    it.onServiceResetLogs(listOf())
-                }
             }
 
             DefaultNetworkMonitor.start()
@@ -161,10 +146,6 @@ class BoxService(
             } catch (e: Exception) {
                 stopAndAlert(Alert.CreateService, e.message)
                 return
-            }
-
-            if (delayStart) {
-                delay(1000L)
             }
 
             newService.start()
@@ -203,7 +184,6 @@ class BoxService(
             pfd.close()
             fileDescriptor = null
         }
-        commandServer?.setService(null)
         boxService?.apply {
             runCatching {
                 close()
@@ -212,9 +192,11 @@ class BoxService(
             }
             Seq.destroyRef(refnum)
         }
+        commandServer?.setService(null)
+        commandServer?.resetLog()
         boxService = null
         runBlocking {
-            startService(true)
+            startService()
         }
     }
 
@@ -259,7 +241,6 @@ class BoxService(
                 pfd.close()
                 fileDescriptor = null
             }
-            commandServer?.setService(null)
             boxService?.apply {
                 runCatching {
                     close()
@@ -268,6 +249,7 @@ class BoxService(
                 }
                 Seq.destroyRef(refnum)
             }
+            commandServer?.setService(null)
             boxService = null
             Libbox.registerLocalDNSTransport(null)
             DefaultNetworkMonitor.stop()
@@ -309,7 +291,6 @@ class BoxService(
         if (!receiverRegistered) {
             ContextCompat.registerReceiver(service, receiver, IntentFilter().apply {
                 addAction(Action.SERVICE_CLOSE)
-                addAction(Action.SERVICE_RELOAD)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     addAction(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED)
                 }
@@ -344,9 +325,7 @@ class BoxService(
     }
 
     internal fun writeLog(message: String) {
-        binder.broadcast {
-            it.onServiceWriteLog(message)
-        }
+        commandServer?.writeMessage(message)
     }
 
 }
