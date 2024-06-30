@@ -168,10 +168,10 @@ class NewProfileActivity : AbstractActivity<ActivityAddProfileBinding>() {
             TypedProfile.Type.Remote.name -> {
                 typedProfile.type = TypedProfile.Type.Remote
                 val remoteURL = binding.remoteURL.text
-                val content = HTTPClient().use { it.getString(remoteURL) }
+                val (content, newURL) = HTTPClient().use { it.getConfigWithUpdatedURL(remoteURL) }
                 Libbox.checkConfig(content)
                 configFile.writeText(content)
-                typedProfile.remoteURL = remoteURL
+                typedProfile.remoteURL = newURL
                 typedProfile.lastUpdated = Date()
                 typedProfile.autoUpdate = EnabledType.valueOf(binding.autoUpdate.text).boolValue
                 binding.autoUpdateInterval.text.toIntOrNull()?.also {
