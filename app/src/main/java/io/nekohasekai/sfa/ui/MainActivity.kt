@@ -43,6 +43,8 @@ import io.nekohasekai.sfa.database.TypedProfile
 import io.nekohasekai.sfa.databinding.ActivityMainBinding
 import io.nekohasekai.sfa.ktx.errorDialogBuilder
 import io.nekohasekai.sfa.ktx.hasPermission
+import io.nekohasekai.sfa.ui.main.DashboardFragment
+import io.nekohasekai.sfa.ui.main.LogFragment
 import io.nekohasekai.sfa.ui.profile.NewProfileActivity
 import io.nekohasekai.sfa.ui.settings.CoreFragment
 import io.nekohasekai.sfa.ui.shared.AbstractActivity
@@ -362,6 +364,14 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
             else -> {}
         }
         builder.show()
+        for (fragment in navHostFragment.childFragmentManager.fragments) {
+            when (fragment) {
+                is DashboardFragment -> fragment.getFab()
+                is LogFragment -> fragment.getFab()
+                else -> continue
+            }?.setImageResource(R.drawable.ic_play_arrow_24) ?: continue
+            break
+        }
     }
 
     private fun requestLocationPermission() {

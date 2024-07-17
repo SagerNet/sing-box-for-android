@@ -8,6 +8,7 @@ import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayoutMediator
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.bg.BoxService
@@ -125,6 +126,10 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
         override fun createFragment(position: Int): Fragment {
             return Page.entries[position].fragmentClass.getConstructor().newInstance()
         }
+    }
+
+    public fun getFab(): FloatingActionButton? {
+        return binding?.fab
     }
 
 }

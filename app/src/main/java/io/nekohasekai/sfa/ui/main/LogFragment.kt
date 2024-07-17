@@ -8,6 +8,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.bg.BoxService
 import io.nekohasekai.sfa.constant.Status
@@ -144,6 +145,10 @@ class LogFragment : Fragment() {
         fun bind(message: String) {
             binding.text.text = ColorUtils.ansiEscapeToSpannable(binding.root.context, message)
         }
+    }
+
+    public fun getFab(): FloatingActionButton? {
+        return binding?.fab
     }
 
 }
