@@ -80,7 +80,6 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_my) as NavHostFragment
         navController = navHostFragment.navController
         navController.setGraph(R.navigation.mobile_navigation)
-        navController.navigate(R.id.navigation_dashboard)
         navController.addOnDestinationChangedListener(::onDestinationChanged)
         appBarConfiguration =
             AppBarConfiguration(
