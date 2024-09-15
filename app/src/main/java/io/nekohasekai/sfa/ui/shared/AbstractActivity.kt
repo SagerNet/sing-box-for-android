@@ -1,11 +1,14 @@
 package io.nekohasekai.sfa.ui.shared
 
+import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.view.WindowCompat
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.color.DynamicColors
@@ -15,8 +18,7 @@ import io.nekohasekai.sfa.ui.MainActivity
 import io.nekohasekai.sfa.utils.MIUIUtils
 import java.lang.reflect.ParameterizedType
 
-abstract class AbstractActivity<Binding : ViewBinding>() :
-    AppCompatActivity() {
+abstract class AbstractActivity<Binding : ViewBinding> : AppCompatActivity() {
 
     private var _binding: Binding? = null
     internal val binding get() = _binding!!
@@ -26,10 +28,17 @@ abstract class AbstractActivity<Binding : ViewBinding>() :
 
         DynamicColors.applyToActivityIfAvailable(this)
 
-        val colorSurfaceContainer =
-            getAttrColor(com.google.android.material.R.attr.colorSurfaceContainer)
-        window.statusBarColor = colorSurfaceContainer
-        window.navigationBarColor = colorSurfaceContainer
+        // Set light navigation bar for Android 8.0
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.O) {
+            val nightFlag = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+            if (nightFlag != Configuration.UI_MODE_NIGHT_YES) {
+                val insetsController = WindowCompat.getInsetsController(
+                    window,
+                    window.decorView
+                )
+                insetsController.isAppearanceLightNavigationBars = true
+            }
+        }
 
         _binding = createBindingInstance(layoutInflater).also {
             setContentView(it.root)

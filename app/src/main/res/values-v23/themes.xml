@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="AppTheme" parent="AppTheme.Base.V23" />
+
+    <style name="AppTheme.Base.V23" parent="AppTheme.Base">
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:statusBarColor">?attr/colorSurfaceContainer</item>
+    </style>
+
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="AppTheme" parent="AppTheme.Base.V26" />
+
+    <style name="AppTheme.Base.V26" parent="AppTheme.Base.V23">
+        <item name="android:navigationBarColor">?attr/colorSurfaceContainer</item>
+    </style>
+
+</resources>
