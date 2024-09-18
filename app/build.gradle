@@ -114,7 +114,7 @@ dependencies {
     implementation "com.blacksquircle.ui:editorkit:2.2.0"
     implementation "com.blacksquircle.ui:language-json:2.2.0"
 
-    implementation("com.android.tools.smali:smali-dexlib2:3.0.7") {
+    implementation("com.android.tools.smali:smali-dexlib2:3.0.8") {
         exclude group: "com.google.guava", module: "guava"
     }
     implementation "com.google.guava:guava:33.0.0-android"
