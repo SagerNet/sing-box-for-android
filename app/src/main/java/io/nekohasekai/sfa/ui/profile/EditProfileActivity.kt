@@ -167,9 +167,10 @@ class EditProfileActivity : AbstractActivity<ActivityEditProfileBinding>() {
         binding.progressView.isVisible = true
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val content = HTTPClient().use { it.getString(profile.typed.remoteURL) }
+                val (content, newURL) = HTTPClient().use { it.getConfigWithUpdatedURL(profile.typed.remoteURL) }
                 Libbox.checkConfig(content)
                 File(profile.typed.path).writeText(content)
+                profile.typed.remoteURL = newURL
                 profile.typed.lastUpdated = Date()
                 ProfileManager.update(profile)
             } catch (e: Exception) {

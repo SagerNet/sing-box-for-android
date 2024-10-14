@@ -10,7 +10,7 @@ class HTTPClient : Closeable {
         val userAgent by lazy {
             var userAgent = "SFA/"
             userAgent += BuildConfig.VERSION_NAME
-            userAgent += " ("
+            userAgent += " (Build "
             userAgent += BuildConfig.VERSION_CODE
             userAgent += "; sing-box "
             userAgent += Libbox.version()
@@ -25,12 +25,20 @@ class HTTPClient : Closeable {
         client.modernTLS()
     }
 
-    fun getString(url: String): String {
+    private fun _getResponse(url: String): HTTPResponse {
         val request = client.newRequest()
         request.setUserAgent(userAgent)
         request.setURL(url)
-        val response = request.execute()
-        return response.contentString
+        return request.execute()
+    }
+
+    fun getString(url: String): String {
+        return _getResponse(url).contentString
+    }
+
+    fun getConfigWithUpdatedURL(url: String): Pair<String, String> {
+        val response = _getResponse(url);
+        return Pair(response.contentString, response.finalURL)
     }
 
     override fun close() {
