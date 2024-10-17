@@ -66,7 +66,7 @@ class EditProfileActivity : AbstractActivity<ActivityEditProfileBinding>() {
                     }
                 }
             }
-            binding.type.text = profile.typed.type.name
+            binding.type.text = getString(profile.typed.type.stringId)
             binding.editButton.setOnClickListener {
                 startActivity(
                     Intent(
@@ -88,7 +88,8 @@ class EditProfileActivity : AbstractActivity<ActivityEditProfileBinding>() {
                     binding.remoteURL.text = profile.typed.remoteURL
                     binding.lastUpdated.text =
                         DateFormat.getDateTimeInstance().format(profile.typed.lastUpdated)
-                    binding.autoUpdate.text = EnabledType.from(profile.typed.autoUpdate).name
+                    binding.autoUpdate.text =
+                        getString(EnabledType.from(profile.typed.autoUpdate).stringId)
                     binding.autoUpdate.setSimpleItems(R.array.enabled)
                     binding.autoUpdateInterval.isVisible = profile.typed.autoUpdate
                     binding.autoUpdateInterval.text = profile.typed.autoUpdateInterval.toString()
@@ -110,7 +111,7 @@ class EditProfileActivity : AbstractActivity<ActivityEditProfileBinding>() {
     }
 
     private fun updateAutoUpdate(newValue: String) {
-        val boolValue = EnabledType.valueOf(newValue).boolValue
+        val boolValue = EnabledType.valueOf(newValue, this).boolValue
         if (profile.typed.autoUpdate == boolValue) {
             return
         }

@@ -4,6 +4,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import io.nekohasekai.libbox.Libbox
@@ -29,9 +30,9 @@ import java.io.InputStream
 import java.util.Date
 
 class NewProfileActivity : AbstractActivity<ActivityAddProfileBinding>() {
-    enum class FileSource(val formatted: String) {
-        CreateNew("Create New"),
-        Import("Import");
+    enum class FileSource(@StringRes var stringId: Int) {
+        CreateNew(R.string.profile_source_create_new),
+        Import(R.string.profile_source_import);
     }
 
     private val importFile =
@@ -49,7 +50,7 @@ class NewProfileActivity : AbstractActivity<ActivityAddProfileBinding>() {
         intent.getStringExtra("importName")?.also { importName ->
             intent.getStringExtra("importURL")?.also { importURL ->
                 binding.name.editText?.setText(importName)
-                binding.type.text = TypedProfile.Type.Remote.name
+                binding.type.text = getString(TypedProfile.Type.Remote.stringId)
                 binding.remoteURL.editText?.setText(importURL)
                 binding.localFields.isVisible = false
                 binding.remoteFields.isVisible = true
@@ -60,12 +61,12 @@ class NewProfileActivity : AbstractActivity<ActivityAddProfileBinding>() {
         binding.name.removeErrorIfNotEmpty()
         binding.type.addTextChangedListener {
             when (it) {
-                TypedProfile.Type.Local.name -> {
+                getString(TypedProfile.Type.Local.stringId) -> {
                     binding.localFields.isVisible = true
                     binding.remoteFields.isVisible = false
                 }
 
-                TypedProfile.Type.Remote.name -> {
+                getString(TypedProfile.Type.Remote.stringId) -> {
                     binding.localFields.isVisible = false
                     binding.remoteFields.isVisible = true
                     if (binding.autoUpdateInterval.text.toIntOrNull() == null) {
@@ -76,12 +77,12 @@ class NewProfileActivity : AbstractActivity<ActivityAddProfileBinding>() {
         }
         binding.fileSourceMenu.addTextChangedListener {
             when (it) {
-                FileSource.CreateNew.formatted -> {
+                getString(FileSource.CreateNew.stringId) -> {
                     binding.importFileButton.isVisible = false
                     binding.sourceURL.isVisible = false
                 }
 
-                FileSource.Import.formatted -> {
+                getString(FileSource.Import.stringId) -> {
                     binding.importFileButton.isVisible = true
                     binding.sourceURL.isVisible = true
                 }
@@ -99,9 +100,9 @@ class NewProfileActivity : AbstractActivity<ActivityAddProfileBinding>() {
             return
         }
         when (binding.type.text) {
-            TypedProfile.Type.Local.name -> {
+            getString(TypedProfile.Type.Local.stringId) -> {
                 when (binding.fileSourceMenu.text) {
-                    FileSource.Import.formatted -> {
+                    getString(FileSource.Import.stringId) -> {
                         if (binding.sourceURL.showErrorIfEmpty()) {
                             return
                         }
@@ -109,7 +110,7 @@ class NewProfileActivity : AbstractActivity<ActivityAddProfileBinding>() {
                 }
             }
 
-            TypedProfile.Type.Remote.name -> {
+            getString(TypedProfile.Type.Remote.stringId) -> {
                 if (binding.remoteURL.showErrorIfEmpty()) {
                     return
                 }
@@ -138,15 +139,15 @@ class NewProfileActivity : AbstractActivity<ActivityAddProfileBinding>() {
         typedProfile.path = configFile.path
 
         when (binding.type.text) {
-            TypedProfile.Type.Local.name -> {
+            getString(TypedProfile.Type.Local.stringId) -> {
                 typedProfile.type = TypedProfile.Type.Local
 
                 when (binding.fileSourceMenu.text) {
-                    FileSource.CreateNew.formatted -> {
+                    getString(FileSource.CreateNew.stringId) -> {
                         configFile.writeText("{}")
                     }
 
-                    FileSource.Import.formatted -> {
+                    getString(FileSource.Import.stringId) -> {
                         val sourceURL = binding.sourceURL.text
                         val content = if (sourceURL.startsWith("content://")) {
                             val inputStream =
@@ -165,7 +166,7 @@ class NewProfileActivity : AbstractActivity<ActivityAddProfileBinding>() {
                 }
             }
 
-            TypedProfile.Type.Remote.name -> {
+            getString(TypedProfile.Type.Remote.stringId) -> {
                 typedProfile.type = TypedProfile.Type.Remote
                 val remoteURL = binding.remoteURL.text
                 val content = HTTPClient().use { it.getString(remoteURL) }
@@ -173,7 +174,8 @@ class NewProfileActivity : AbstractActivity<ActivityAddProfileBinding>() {
                 configFile.writeText(content)
                 typedProfile.remoteURL = remoteURL
                 typedProfile.lastUpdated = Date()
-                typedProfile.autoUpdate = EnabledType.valueOf(binding.autoUpdate.text).boolValue
+                typedProfile.autoUpdate =
+                    EnabledType.valueOf(binding.autoUpdate.text, this).boolValue
                 binding.autoUpdateInterval.text.toIntOrNull()?.also {
                     typedProfile.autoUpdateInterval = it
                 }
