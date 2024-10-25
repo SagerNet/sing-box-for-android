@@ -29,7 +29,9 @@ class MLKitQRCodeAnalyzer(
     override fun analyze(image: ImageProxy) {
         if (image.image == null) return
 
-        if (failureOccurred && System.currentTimeMillis() - failureTimestamp < 1000L) {
+        val nowMills = System.currentTimeMillis()
+        if (failureOccurred && nowMills - failureTimestamp < 5000L) {
+            failureTimestamp = nowMills
             Log.d("MLKitQRCodeAnalyzer", "throttled analysis since error occurred in previous pass")
             image.close()
             return
