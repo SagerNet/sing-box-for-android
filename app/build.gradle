@@ -12,7 +12,7 @@ android {
     namespace "io.nekohasekai.sfa"
     compileSdk 34
 
-    ndkVersion "26.2.11394342"
+    ndkVersion "27.2.12479018"
 
     ksp {
         arg("room.incremental", "true")
@@ -96,8 +96,8 @@ dependencies {
     implementation "androidx.constraintlayout:constraintlayout:2.1.4"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.8.6"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6"
-    implementation "androidx.navigation:navigation-fragment-ktx:2.8.2"
-    implementation "androidx.navigation:navigation-ui-ktx:2.8.2"
+    implementation "androidx.navigation:navigation-fragment-ktx:2.8.3"
+    implementation "androidx.navigation:navigation-ui-ktx:2.8.3"
     implementation "com.google.zxing:core:3.5.3"
     implementation "androidx.room:room-runtime:2.6.1"
     implementation "androidx.coordinatorlayout:coordinatorlayout:1.2.0"
