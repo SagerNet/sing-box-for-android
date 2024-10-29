@@ -8,14 +8,23 @@ import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayoutMediator
+import io.nekohasekai.libbox.DeprecatedNoteIterator
+import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.bg.BoxService
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.databinding.FragmentDashboardBinding
+import io.nekohasekai.sfa.ktx.errorDialogBuilder
+import io.nekohasekai.sfa.ktx.launchCustomTab
 import io.nekohasekai.sfa.ui.MainActivity
 import io.nekohasekai.sfa.ui.dashboard.GroupsFragment
 import io.nekohasekai.sfa.ui.dashboard.OverviewFragment
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
 
@@ -49,6 +58,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
                 }
 
                 Status.Started -> {
+                    checkDeprecatedNotes()
                     enablePager()
                     binding.fab.setImageResource(R.drawable.ic_stop_24)
                     binding.fab.show()
@@ -97,6 +107,38 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
         mediator?.detach()
         mediator = null
         binding = null
+    }
+
+    private fun checkDeprecatedNotes() {
+        GlobalScope.launch(Dispatchers.IO) {
+            runCatching {
+                val notes = Libbox.newStandaloneCommandClient().deprecatedNotes
+                if (notes.hasNext()) {
+                    withContext(Dispatchers.Main) {
+                        loopShowDeprecatedNotes(notes)
+                    }
+                }
+            }.onFailure {
+                activity?.errorDialogBuilder(it)?.show()
+            }
+        }
+    }
+
+    private fun loopShowDeprecatedNotes(notes: DeprecatedNoteIterator) {
+        if (notes.hasNext()) {
+            val note = notes.next()
+            val builder = MaterialAlertDialogBuilder(requireContext())
+            builder.setTitle(getString(R.string.service_error_title_deprecated_warning))
+            builder.setMessage(note.message())
+            builder.setPositiveButton(R.string.ok) { _, _ ->
+                loopShowDeprecatedNotes(notes)
+            }
+            builder.setNeutralButton(R.string.service_error_deprecated_warning_documentation) { _, _ ->
+                requireContext().launchCustomTab(note.migrationLink)
+                loopShowDeprecatedNotes(notes)
+            }
+            builder.show()
+        }
     }
 
     private fun enablePager() {

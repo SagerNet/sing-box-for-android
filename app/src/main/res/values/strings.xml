@@ -75,6 +75,8 @@
     <string name="service_error_title_start_command_server">Start command server</string>
     <string name="service_error_title_create_service">Create service</string>
     <string name="service_error_title_start_service">Start service</string>
+    <string name="service_error_title_deprecated_warning">Deprecated Warning</string>
+    <string name="service_error_deprecated_warning_documentation">Documentation</string>
 
     <string name="status_status">Status</string>
     <string name="status_memory">Memory</string>
