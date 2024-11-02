@@ -20,7 +20,8 @@ import kotlinx.coroutines.launch
 open class CommandClient(
     private val scope: CoroutineScope,
     private val connectionType: ConnectionType,
-    private val handler: Handler
+    private val handler: Handler,
+    private val isMainClient: Boolean = false
 ) {
 
     enum class ConnectionType {
@@ -31,15 +32,19 @@ open class CommandClient(
 
         fun onConnected() {}
         fun onDisconnected() {}
+
         fun updateStatus(status: StatusMessage) {}
-        fun updateGroups(newGroups: MutableList<OutboundGroup>) {}
+        fun openURL(url: String) {}
+
         fun clearLogs() {}
         fun appendLogs(message: List<String>) {}
+
+        fun updateGroups(newGroups: MutableList<OutboundGroup>) {}
+
         fun initializeClashMode(modeList: List<String>, currentMode: String) {}
         fun updateClashMode(newMode: String) {}
 
     }
-
 
     private var commandClient: CommandClient? = null
     private val clientHandler = ClientHandler()
@@ -52,7 +57,8 @@ open class CommandClient(
             ConnectionType.Log -> Libbox.CommandLog
             ConnectionType.ClashMode -> Libbox.CommandClashMode
         }
-        options.statusInterval = 2 * 1000 * 1000 * 1000
+        options.isMainClient = isMainClient
+        options.statusInterval = 1 * 1000 * 1000 * 1000
         val commandClient = CommandClient(clientHandler, options)
         scope.launch(Dispatchers.IO) {
             for (i in 1..10) {
@@ -119,11 +125,12 @@ open class CommandClient(
             handler.appendLogs(messageList.toList())
         }
 
-        override fun writeStatus(message: StatusMessage?) {
-            if (message == null) {
-                return
-            }
+        override fun writeStatus(message: StatusMessage) {
             handler.updateStatus(message)
+        }
+
+        override fun openURL(url: String) {
+            handler.openURL(url)
         }
 
         override fun initializeClashMode(modeList: StringIterator, currentMode: String) {
