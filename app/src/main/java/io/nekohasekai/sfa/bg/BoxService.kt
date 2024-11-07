@@ -1,15 +1,20 @@
 package io.nekohasekai.sfa.bg
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.net.Uri
 import android.os.Build
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
 import android.os.PowerManager
 import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import go.Seq
@@ -17,6 +22,7 @@ import io.nekohasekai.libbox.BoxService
 import io.nekohasekai.libbox.CommandServer
 import io.nekohasekai.libbox.CommandServerHandler
 import io.nekohasekai.libbox.Libbox
+import io.nekohasekai.libbox.Notification
 import io.nekohasekai.libbox.PlatformInterface
 import io.nekohasekai.libbox.SystemProxyStatus
 import io.nekohasekai.sfa.Application
@@ -27,6 +33,7 @@ import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.database.ProfileManager
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.ktx.hasPermission
+import io.nekohasekai.sfa.ui.MainActivity
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -36,8 +43,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 class BoxService(
-    private val service: Service,
-    private val platformInterface: PlatformInterface
+    private val service: Service, private val platformInterface: PlatformInterface
 ) : CommandServerHandler {
 
     companion object {
@@ -101,8 +107,7 @@ class BoxService(
     }
 
     private fun startCommandServer() {
-        val commandServer =
-            CommandServer(this, 300)
+        val commandServer = CommandServer(this, 300)
         commandServer.start()
         this.commandServer = commandServer
     }
@@ -328,4 +333,45 @@ class BoxService(
         commandServer?.writeMessage(message)
     }
 
+    internal fun sendNotification(notification: Notification) {
+        val builder =
+            NotificationCompat.Builder(service, notification.identifier).setShowWhen(false)
+                .setContentTitle(notification.title)
+                .setContentText(notification.body)
+                .setOnlyAlertOnce(true)
+                .setSmallIcon(R.drawable.ic_menu)
+                .setCategory(NotificationCompat.CATEGORY_EVENT)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true)
+        if (!notification.subtitle.isNullOrBlank()) {
+            builder.setContentInfo(notification.subtitle)
+        }
+        if (!notification.openURL.isNullOrBlank()) {
+            builder.setContentIntent(
+                PendingIntent.getActivity(
+                    service,
+                    0,
+                    Intent(
+                        service, MainActivity::class.java
+                    ).apply {
+                        setAction(Action.OPEN_URL).setData(Uri.parse(notification.openURL))
+                        setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                    },
+                    ServiceNotification.flags,
+                )
+            )
+        }
+        GlobalScope.launch(Dispatchers.Main) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                Application.notification.createNotificationChannel(
+                    NotificationChannel(
+                        notification.identifier,
+                        notification.typeName,
+                        NotificationManager.IMPORTANCE_HIGH
+                    )
+                )
+            }
+            Application.notification.notify(notification.typeID, builder.build())
+        }
+    }
 }

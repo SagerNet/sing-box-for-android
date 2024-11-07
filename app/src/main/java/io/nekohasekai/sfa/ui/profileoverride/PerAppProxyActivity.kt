@@ -53,24 +53,25 @@ class PerAppProxyActivity : AbstractActivity<ActivityPerAppProxyBinding>() {
 
     inner class PackageCache(
         private val packageInfo: PackageInfo,
+        private val appInfo: ApplicationInfo,
     ) {
 
         val packageName: String get() = packageInfo.packageName
 
-        val uid get() = packageInfo.applicationInfo.uid
+        val uid get() = packageInfo.applicationInfo!!.uid
 
         val installTime get() = packageInfo.firstInstallTime
         val updateTime get() = packageInfo.lastUpdateTime
-        val isSystem get() = packageInfo.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM == 1
+        val isSystem get() = appInfo.flags and ApplicationInfo.FLAG_SYSTEM == 1
         val isOffline get() = packageInfo.requestedPermissions?.contains(Manifest.permission.INTERNET) != true
-        val isDisabled get() = packageInfo.applicationInfo.flags and ApplicationInfo.FLAG_INSTALLED == 0
+        val isDisabled get() = appInfo.flags and ApplicationInfo.FLAG_INSTALLED == 0
 
         val applicationIcon by lazy {
-            packageInfo.applicationInfo.loadIcon(packageManager)
+            appInfo.loadIcon(packageManager)
         }
 
         val applicationLabel by lazy {
-            packageInfo.applicationInfo.loadLabel(packageManager).toString()
+            appInfo.loadLabel(packageManager).toString()
         }
     }
 
@@ -130,7 +131,8 @@ class PerAppProxyActivity : AbstractActivity<ActivityPerAppProxyBinding>() {
         val packages = mutableListOf<PackageCache>()
         for (packageInfo in installedPackages) {
             if (packageInfo.packageName == packageName) continue
-            packages.add(PackageCache(packageInfo))
+            val appInfo = packageInfo.applicationInfo ?: continue
+            packages.add(PackageCache(packageInfo, appInfo))
         }
         val selectedPackageNames = Settings.perAppProxyList.toMutableSet()
         val selectedUIDs = mutableSetOf<Int>()
@@ -699,6 +701,7 @@ class PerAppProxyActivity : AbstractActivity<ActivityPerAppProxyBinding>() {
                         packageName, packageManagerFlags
                     )
                 }
+                val appInfo = packageInfo.applicationInfo ?: return false
                 packageInfo.services?.forEach {
                     if (it.name.matches(chinaAppRegex)) {
                         Log.d("PerAppProxyActivity", "Match service ${it.name} in $packageName")
@@ -723,7 +726,7 @@ class PerAppProxyActivity : AbstractActivity<ActivityPerAppProxyBinding>() {
                         return true
                     }
                 }
-                ZipFile(File(packageInfo.applicationInfo.publicSourceDir)).use {
+                ZipFile(File(appInfo.publicSourceDir)).use {
                     for (packageEntry in it.entries()) {
                         if (packageEntry.name.startsWith("firebase-")) return false
                     }

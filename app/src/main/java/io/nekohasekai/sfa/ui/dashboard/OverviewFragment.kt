@@ -25,7 +25,6 @@ import io.nekohasekai.sfa.databinding.ViewClashModeButtonBinding
 import io.nekohasekai.sfa.databinding.ViewProfileItemBinding
 import io.nekohasekai.sfa.ktx.errorDialogBuilder
 import io.nekohasekai.sfa.ktx.getAttrColor
-import io.nekohasekai.sfa.ktx.launchCustomTab
 import io.nekohasekai.sfa.ui.MainActivity
 import io.nekohasekai.sfa.utils.CommandClient
 import kotlinx.coroutines.CoroutineScope
@@ -41,7 +40,7 @@ class OverviewFragment : Fragment() {
     private val activity: MainActivity? get() = super.getActivity() as MainActivity?
     private var binding: FragmentDashboardOverviewBinding? = null
     private val statusClient =
-        CommandClient(lifecycleScope, CommandClient.ConnectionType.Status, StatusClient(), true)
+        CommandClient(lifecycleScope, CommandClient.ConnectionType.Status, StatusClient())
     private val clashModeClient =
         CommandClient(lifecycleScope, CommandClient.ConnectionType.ClashMode, ClashModeClient())
 
@@ -170,10 +169,6 @@ class OverviewFragment : Fragment() {
                     binding.downlinkTotalText.text = Libbox.formatBytes(status.downlinkTotal)
                 }
             }
-        }
-
-        override fun openURL(url: String) {
-            requireContext().launchCustomTab(url)
         }
 
     }

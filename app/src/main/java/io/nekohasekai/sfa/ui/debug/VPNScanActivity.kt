@@ -78,9 +78,9 @@ class VPNScanActivity : AbstractActivity<ActivityVpnScanBinding>() {
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(element: AppInfo) {
-            binding.appIcon.setImageDrawable(element.packageInfo.applicationInfo.loadIcon(binding.root.context.packageManager))
+            binding.appIcon.setImageDrawable(element.packageInfo.applicationInfo!!.loadIcon(binding.root.context.packageManager))
             binding.appName.text =
-                element.packageInfo.applicationInfo.loadLabel(binding.root.context.packageManager)
+                element.packageInfo.applicationInfo!!.loadLabel(binding.root.context.packageManager)
             binding.packageName.text = element.packageInfo.packageName
             val appType = element.vpnType.appType
             if (appType != null) {
@@ -129,7 +129,8 @@ class VPNScanActivity : AbstractActivity<ActivityVpnScanBinding>() {
         }
         val vpnAppList =
             installedPackages.filter {
-                it.services?.any { it.permission == Manifest.permission.BIND_VPN_SERVICE } ?: false
+                it.services?.any { it.permission == Manifest.permission.BIND_VPN_SERVICE && it.applicationInfo != null }
+                    ?: false
             }
         for ((index, packageInfo) in vpnAppList.withIndex()) {
             val appType = runCatching { getVPNAppType(packageInfo) }.getOrNull()
@@ -181,7 +182,7 @@ class VPNScanActivity : AbstractActivity<ActivityVpnScanBinding>() {
     }
 
     private fun getVPNAppType(packageInfo: PackageInfo): String? {
-        ZipFile(File(packageInfo.applicationInfo.publicSourceDir)).use { packageFile ->
+        ZipFile(File(packageInfo.applicationInfo!!.publicSourceDir)).use { packageFile ->
             for (packageEntry in packageFile.entries()) {
                 if (!(packageEntry.name.startsWith("classes") && packageEntry.name.endsWith(
                         ".dex"
@@ -235,8 +236,8 @@ class VPNScanActivity : AbstractActivity<ActivityVpnScanBinding>() {
     }
 
     private fun getVPNCoreType(packageInfo: PackageInfo): VPNCoreType? {
-        val packageFiles = mutableListOf(packageInfo.applicationInfo.publicSourceDir)
-        packageInfo.applicationInfo.splitPublicSourceDirs?.also {
+        val packageFiles = mutableListOf(packageInfo.applicationInfo!!.publicSourceDir)
+        packageInfo.applicationInfo!!.splitPublicSourceDirs?.also {
             packageFiles.addAll(it)
         }
         val vpnType = try {

@@ -21,7 +21,6 @@ open class CommandClient(
     private val scope: CoroutineScope,
     private val connectionType: ConnectionType,
     private val handler: Handler,
-    private val isMainClient: Boolean = false
 ) {
 
     enum class ConnectionType {
@@ -34,7 +33,6 @@ open class CommandClient(
         fun onDisconnected() {}
 
         fun updateStatus(status: StatusMessage) {}
-        fun openURL(url: String) {}
 
         fun clearLogs() {}
         fun appendLogs(message: List<String>) {}
@@ -57,7 +55,6 @@ open class CommandClient(
             ConnectionType.Log -> Libbox.CommandLog
             ConnectionType.ClashMode -> Libbox.CommandClashMode
         }
-        options.isMainClient = isMainClient
         options.statusInterval = 1 * 1000 * 1000 * 1000
         val commandClient = CommandClient(clientHandler, options)
         scope.launch(Dispatchers.IO) {
@@ -127,10 +124,6 @@ open class CommandClient(
 
         override fun writeStatus(message: StatusMessage) {
             handler.updateStatus(message)
-        }
-
-        override fun openURL(url: String) {
-            handler.openURL(url)
         }
 
         override fun initializeClashMode(modeList: StringIterator, currentMode: String) {

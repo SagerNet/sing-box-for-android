@@ -33,6 +33,7 @@ import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.bg.ServiceConnection
 import io.nekohasekai.sfa.bg.ServiceNotification
+import io.nekohasekai.sfa.constant.Action
 import io.nekohasekai.sfa.constant.Alert
 import io.nekohasekai.sfa.constant.ServiceMode
 import io.nekohasekai.sfa.constant.Status
@@ -43,6 +44,7 @@ import io.nekohasekai.sfa.database.TypedProfile
 import io.nekohasekai.sfa.databinding.ActivityMainBinding
 import io.nekohasekai.sfa.ktx.errorDialogBuilder
 import io.nekohasekai.sfa.ktx.hasPermission
+import io.nekohasekai.sfa.ktx.launchCustomTab
 import io.nekohasekai.sfa.ui.profile.NewProfileActivity
 import io.nekohasekai.sfa.ui.settings.CoreFragment
 import io.nekohasekai.sfa.ui.shared.AbstractActivity
@@ -127,6 +129,12 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
     override public fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         val uri = intent.data ?: return
+        when (intent.action) {
+            Action.OPEN_URL -> {
+                launchCustomTab(uri.toString())
+                return
+            }
+        }
         if (uri.scheme == "sing-box" && uri.host == "import-remote-profile") {
             val profile = try {
                 Libbox.parseRemoteProfileImportLink(uri.toString())

@@ -16,13 +16,14 @@ import io.nekohasekai.sfa.bg.UpdateProfileWork
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import me.weishu.reflection.Reflection
 import io.nekohasekai.sfa.Application as BoxApplication
 
 class Application : Application() {
 
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
-
+        Reflection.unseal(base)
         application = this
     }
 

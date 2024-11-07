@@ -33,7 +33,7 @@ class ServiceNotification(
     companion object {
         private const val notificationId = 1
         private const val notificationChannel = "service"
-        private val flags =
+        val flags =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
 
         fun checkPermission(): Boolean {
@@ -83,7 +83,7 @@ class ServiceNotification(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Application.notification.createNotificationChannel(
                 NotificationChannel(
-                    notificationChannel, "sing-box service", NotificationManager.IMPORTANCE_LOW
+                    notificationChannel, "Service Notifications", NotificationManager.IMPORTANCE_LOW
                 )
             )
         }

@@ -6,6 +6,7 @@ import android.net.ProxyInfo
 import android.net.VpnService
 import android.os.Build
 import android.os.IBinder
+import io.nekohasekai.libbox.Notification
 import io.nekohasekai.libbox.TunOptions
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.ktx.toIpPrefix
@@ -187,5 +188,8 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
     }
 
     override fun writeLog(message: String) = service.writeLog(message)
+
+    override fun sendNotification(notification: Notification) =
+        service.sendNotification(notification)
 
 }
