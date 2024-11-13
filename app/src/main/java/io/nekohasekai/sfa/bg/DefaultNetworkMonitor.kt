@@ -63,19 +63,19 @@ object DefaultNetworkMonitor {
                 // https://github.com/golang/go/issues/68760
                 if (BuildConfig.DEBUG) {
                     GlobalScope.launch(Dispatchers.IO) {
-                        listener.updateDefaultInterface(interfaceName, interfaceIndex)
+                        listener.updateDefaultInterface(interfaceName, interfaceIndex, false, false)
                     }
                 } else {
-                    listener.updateDefaultInterface(interfaceName, interfaceIndex)
+                    listener.updateDefaultInterface(interfaceName, interfaceIndex, false, false)
                 }
             }
         } else {
             if (BuildConfig.DEBUG) {
                 GlobalScope.launch(Dispatchers.IO) {
-                    listener.updateDefaultInterface("", -1)
+                    listener.updateDefaultInterface("", -1, false, false)
                 }
             } else {
-                listener.updateDefaultInterface("", -1)
+                listener.updateDefaultInterface("", -1, false, false)
             }
         }
     }
