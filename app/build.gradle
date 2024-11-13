@@ -12,7 +12,7 @@ android {
     namespace "io.nekohasekai.sfa"
     compileSdk 35
 
-    ndkVersion "27.2.12479018"
+    ndkVersion "26.2.11394342"
 
     ksp {
         arg("room.incremental", "true")
