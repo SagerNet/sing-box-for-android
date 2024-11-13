@@ -139,12 +139,12 @@ class LogFragment : Fragment(), CommandClient.Handler {
         lifecycleScope.launch(Dispatchers.Main) {
             val messageLen = messageList.size
             val removeLen = logList.size + messageLen - 300
+            logList.addAll(messageList)
             if (removeLen > 0) {
                 repeat(removeLen) {
                     logList.removeFirst()
                 }
             }
-            logList.addAll(messageList)
             updateViews(removeLen, messageLen)
         }
     }
