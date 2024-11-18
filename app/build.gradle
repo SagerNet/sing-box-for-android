@@ -120,8 +120,6 @@ dependencies {
     implementation "com.google.guava:guava:33.0.0-android"
     playImplementation "com.google.android.play:app-update-ktx:2.1.0"
     playImplementation "com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.1"
-
-    implementation "com.github.tiann:FreeReflection:3.1.0"
 }
 
 def playCredentialsJSON = rootProject.file("service-account-credentials.json")
