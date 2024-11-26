@@ -51,6 +51,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
                     disablePager()
                     binding.fab.setImageResource(R.drawable.ic_play_arrow_24)
                     binding.fab.show()
+                    binding.fab.isEnabled = true
                 }
 
                 Status.Starting -> {
