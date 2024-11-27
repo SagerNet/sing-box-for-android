@@ -120,7 +120,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
                     }
                 }
             }.onFailure {
-                activity?.errorDialogBuilder(it)?.show()
+                withContext(Dispatchers.Main) {
+                    activity?.errorDialogBuilder(it)?.show()
+                }
             }
         }
     }
