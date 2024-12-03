@@ -18,14 +18,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.preference.Preference
-import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.ProfileContent
@@ -46,7 +43,6 @@ import io.nekohasekai.sfa.ktx.errorDialogBuilder
 import io.nekohasekai.sfa.ktx.hasPermission
 import io.nekohasekai.sfa.ktx.launchCustomTab
 import io.nekohasekai.sfa.ui.profile.NewProfileActivity
-import io.nekohasekai.sfa.ui.settings.CoreFragment
 import io.nekohasekai.sfa.ui.shared.AbstractActivity
 import io.nekohasekai.sfa.utils.MIUIUtils
 import io.nekohasekai.sfa.vendor.Vendor
@@ -57,7 +53,6 @@ import java.io.File
 import java.util.Date
 
 class MainActivity : AbstractActivity<ActivityMainBinding>(),
-    PreferenceFragmentCompat.OnPreferenceStartFragmentCallback,
     ServiceConnection.Callback {
 
     companion object {
@@ -109,21 +104,6 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
     ) {
         val destinationId = navDestination.id
         binding.dashboardTabContainer.isVisible = destinationId == R.id.navigation_dashboard
-    }
-
-    override fun onPreferenceStartFragment(
-        caller: PreferenceFragmentCompat,
-        pref: Preference
-    ): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment_activity_my)
-        when (pref.fragment) {
-            CoreFragment::class.java.name -> {
-                navController.navigate(R.id.navigation_settings_core)
-                return true
-            }
-
-            else -> return false
-        }
     }
 
     override public fun onNewIntent(intent: Intent) {
