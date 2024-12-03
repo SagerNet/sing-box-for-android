@@ -11,6 +11,7 @@ import io.nekohasekai.sfa.bg.UpdateProfileWork
 import io.nekohasekai.sfa.constant.EnabledType
 import io.nekohasekai.sfa.database.Profile
 import io.nekohasekai.sfa.database.ProfileManager
+import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.database.TypedProfile
 import io.nekohasekai.sfa.databinding.ActivityEditProfileBinding
 import io.nekohasekai.sfa.ktx.addTextChangedListener
@@ -166,10 +167,17 @@ class EditProfileActivity : AbstractActivity<ActivityEditProfileBinding>() {
     private fun updateProfile(view: View) {
         binding.progressView.isVisible = true
         lifecycleScope.launch(Dispatchers.IO) {
+            var selectedProfileUpdated = false
             try {
                 val content = HTTPClient().use { it.getString(profile.typed.remoteURL) }
                 Libbox.checkConfig(content)
-                File(profile.typed.path).writeText(content)
+                val file = File(profile.typed.path)
+                if (file.readText() != content) {
+                    File(profile.typed.path).writeText(content)
+                    if (profile.id == Settings.selectedProfile) {
+                        selectedProfileUpdated = true
+                    }
+                }
                 profile.typed.lastUpdated = Date()
                 ProfileManager.update(profile)
             } catch (e: Exception) {
@@ -181,6 +189,11 @@ class EditProfileActivity : AbstractActivity<ActivityEditProfileBinding>() {
                 binding.lastUpdated.text =
                     DateFormat.getDateTimeInstance().format(profile.typed.lastUpdated)
                 binding.progressView.isVisible = false
+            }
+            if (selectedProfileUpdated) {
+                runCatching {
+                    Libbox.newStandaloneCommandClient().serviceReload()
+                }
             }
         }
     }

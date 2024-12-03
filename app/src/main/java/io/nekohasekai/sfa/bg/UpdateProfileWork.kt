@@ -11,6 +11,7 @@ import androidx.work.WorkerParameters
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.database.ProfileManager
+import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.database.TypedProfile
 import io.nekohasekai.sfa.utils.HTTPClient
 import java.io.File
@@ -63,10 +64,12 @@ class UpdateProfileWork {
         appContext: Context, params: WorkerParameters
     ) : CoroutineWorker(appContext, params) {
         override suspend fun doWork(): Result {
+            var selectedProfileUpdated = false
             val remoteProfiles = ProfileManager.list()
                 .filter { it.typed.type == TypedProfile.Type.Remote && it.typed.autoUpdate }
             if (remoteProfiles.isEmpty()) return Result.success()
             var success = true
+            val selectedProfile = Settings.selectedProfile
             for (profile in remoteProfiles) {
                 val lastSeconds =
                     (System.currentTimeMillis() - profile.typed.lastUpdated.time) / 1000L
@@ -76,12 +79,23 @@ class UpdateProfileWork {
                 try {
                     val content = HTTPClient().use { it.getString(profile.typed.remoteURL) }
                     Libbox.checkConfig(content)
-                    File(profile.typed.path).writeText(content)
+                    val file = File(profile.typed.path)
+                    if (file.readText() != content) {
+                        File(profile.typed.path).writeText(content)
+                        if (profile.id == selectedProfile) {
+                            selectedProfileUpdated = true
+                        }
+                    }
                     profile.typed.lastUpdated = Date()
                     ProfileManager.update(profile)
                 } catch (e: Exception) {
                     Log.e(TAG, "update profile ${profile.name}", e)
                     success = false
+                }
+            }
+            if (selectedProfileUpdated) {
+                runCatching {
+                    Libbox.newStandaloneCommandClient().serviceReload()
                 }
             }
             return if (success) {
