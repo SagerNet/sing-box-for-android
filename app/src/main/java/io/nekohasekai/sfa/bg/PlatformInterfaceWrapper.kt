@@ -10,6 +10,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import io.nekohasekai.libbox.InterfaceUpdateListener
 import io.nekohasekai.libbox.Libbox
+import io.nekohasekai.libbox.LocalDNSTransport
 import io.nekohasekai.libbox.NetworkInterfaceIterator
 import io.nekohasekai.libbox.PlatformInterface
 import io.nekohasekai.libbox.StringIterator
@@ -23,6 +24,10 @@ import java.net.NetworkInterface
 import io.nekohasekai.libbox.NetworkInterface as LibboxNetworkInterface
 
 interface PlatformInterfaceWrapper : PlatformInterface {
+
+    override fun localDNSTransport(): LocalDNSTransport? {
+        return LocalResolver
+    }
 
     override fun usePlatformAutoDetectInterfaceControl(): Boolean {
         return true
