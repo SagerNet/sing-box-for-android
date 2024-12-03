@@ -1,7 +1,6 @@
 package io.nekohasekai.sfa.ui.main
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -48,8 +47,8 @@ class SettingsFragment : Fragment() {
     private val requestIgnoreBatteryOptimizations = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            binding.backgroundPermissionCard.isVisible = false
+        if (Application.powerManager.isIgnoringBatteryOptimizations(Application.application.packageName)) {
+            binding.backgroundPermissionCard.isGone = true
         }
     }
 
