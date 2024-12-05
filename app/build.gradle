@@ -147,18 +147,25 @@ tasks.withType(KotlinCompile.class).configureEach {
 }
 
 def getProps(String propName) {
+    def propsInEnv = System.getenv("LOCAL_PROPERTIES")
+    if (propsInEnv != null) {
+        def props = new Properties()
+        props.load(new ByteArrayInputStream(Base64.decoder.decode(propsInEnv)))
+        String value = props[propName]
+        if (value != null) {
+            return value
+        }
+    }
     def propsFile = rootProject.file("local.properties")
     if (propsFile.exists()) {
         def props = new Properties()
         props.load(new FileInputStream(propsFile))
         String value = props[propName]
-        if (value == null) {
-            return ""
+        if (value != null) {
+            return value
         }
-        return value
-    } else {
-        return ""
     }
+    return ""
 }
 
 def getVersionProps(String propName) {
@@ -167,11 +174,9 @@ def getVersionProps(String propName) {
         def props = new Properties()
         props.load(new FileInputStream(propsFile))
         String value = props[propName]
-        if (value == null) {
-            return ""
+        if (value != null) {
+            return value
         }
-        return value
-    } else {
-        return ""
     }
+    return ""
 }
