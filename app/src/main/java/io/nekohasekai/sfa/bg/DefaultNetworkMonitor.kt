@@ -4,6 +4,10 @@ import android.net.Network
 import android.os.Build
 import io.nekohasekai.libbox.InterfaceUpdateListener
 import io.nekohasekai.sfa.Application
+import io.nekohasekai.sfa.BuildConfig
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.net.NetworkInterface
 
 object DefaultNetworkMonitor {
@@ -55,12 +59,25 @@ object DefaultNetworkMonitor {
                     Thread.sleep(100)
                     continue
                 }
-                listener.updateDefaultInterface(interfaceName, interfaceIndex)
+                // TODO: remove launch after fixed
+                // https://github.com/golang/go/issues/68760
+                if (BuildConfig.DEBUG) {
+                    GlobalScope.launch(Dispatchers.IO) {
+                        listener.updateDefaultInterface(interfaceName, interfaceIndex)
+                    }
+                } else {
+                    listener.updateDefaultInterface(interfaceName, interfaceIndex)
+                }
             }
         } else {
-            listener.updateDefaultInterface("", -1)
+            if (BuildConfig.DEBUG) {
+                GlobalScope.launch(Dispatchers.IO) {
+                    listener.updateDefaultInterface("", -1)
+                }
+            } else {
+                listener.updateDefaultInterface("", -1)
+            }
         }
     }
-
 
 }
