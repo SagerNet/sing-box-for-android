@@ -4,8 +4,15 @@ import android.net.IpPrefix
 import android.os.Build
 import androidx.annotation.RequiresApi
 import io.nekohasekai.libbox.RoutePrefix
+import io.nekohasekai.libbox.StringBox
 import io.nekohasekai.libbox.StringIterator
 import java.net.InetAddress
+
+val StringBox?.unwrap: String
+    get() {
+        if (this == null) return ""
+        return value
+    }
 
 fun Iterable<String>.toStringIterator(): StringIterator {
     return object : StringIterator {

@@ -14,6 +14,7 @@ import io.nekohasekai.sfa.database.Profile
 import io.nekohasekai.sfa.database.ProfileManager
 import io.nekohasekai.sfa.databinding.ActivityEditProfileContentBinding
 import io.nekohasekai.sfa.ktx.errorDialogBuilder
+import io.nekohasekai.sfa.ktx.unwrap
 import io.nekohasekai.sfa.ui.shared.AbstractActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -84,7 +85,7 @@ class EditProfileContentActivity : AbstractActivity<ActivityEditProfileContentBi
             R.id.action_format -> {
                 lifecycleScope.launch(Dispatchers.IO) {
                     runCatching {
-                        val content = Libbox.formatConfig(binding.editor.text.toString())
+                        val content = Libbox.formatConfig(binding.editor.text.toString()).unwrap
                         if (binding.editor.text.toString() != content) {
                             withContext(Dispatchers.Main) {
                                 binding.editor.setTextContent(content)
