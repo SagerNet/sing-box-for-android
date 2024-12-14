@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">sing-box</string>
+    <string name="app_name" translatable="false">sing-box</string>
 
     <string name="stop">Stop</string>
     <string name="ok">OK</string>
@@ -20,7 +20,7 @@
     <string name="profile_name">Name</string>
     <string name="profile_type">Type</string>
     <string name="profile_source">Source</string>
-    <string name="profile_url">URL</string>
+    <string name="profile_url" translatable="false">URL</string>
     <string name="profile_import_file">Import File</string>
     <string name="profile_create">Create</string>
     <string name="profile_edit_content">Edit Content</string>
@@ -69,8 +69,8 @@
     <string name="file_manager_missing">Your device lacks an Android standard file selector, please install one, such as Material Files.</string>
     <string name="loading">Loading…</string>
 
-    <string name="service_error_missing_permission">Failed to request VPN permission</string>
-    <string name="service_error_missing_notification_permission">Failed to request notification permission</string>
+    <string name="service_error_missing_permission">Missiong VPN permission</string>
+    <string name="service_error_missing_notification_permission">Missing notification permission</string>
     <string name="service_error_empty_configuration">Empty configuration</string>
     <string name="service_error_title_start_command_server">Start command server</string>
     <string name="service_error_title_create_service">Create service</string>
@@ -80,7 +80,7 @@
 
     <string name="status_status">Status</string>
     <string name="status_memory">Memory</string>
-    <string name="status_goroutines">Goroutines</string>
+    <string name="status_goroutines" translatable="false">Goroutines</string>
     <string name="status_connections">Connections</string>
     <string name="status_connections_inbound">Inbound</string>
     <string name="status_connections_outbound">Outbound</string>
@@ -124,7 +124,7 @@
     <string name="per_app_proxy_action_copy_package_name">Package Name</string>
     <string name="per_app_proxy_action_copy_uid">UID</string>
 
-    <string name="per_app_proxy_sort_mode">Sort Mode</string>
+    <string name="per_app_proxy_sort_mode">Sort By</string>
     <string name="per_app_proxy_sort_mode_name">By name</string>
     <string name="per_app_proxy_sort_mode_package_name">By package name</string>
     <string name="per_app_proxy_sort_mode_uid">By UID</string>
@@ -149,9 +149,6 @@
     <string name="per_app_proxy_scan_china_apps">China apps</string>
 
     <string name="content_description_app_icon">App icon</string>
-    <string name="menu_hide_system">Hide system apps</string>
-    <string name="menu_show_system">Show system apps</string>
-    <string name="menu_scan_china_apps">Scan China apps</string>
     <string name="toast_clipboard_empty">Clipboard is empty</string>
     <string name="toast_app_list_empty">App list is empty</string>
     <string name="toast_copied_to_clipboard">Exported to clipboard</string>
@@ -169,7 +166,7 @@
     <string name="import_profile_message">Are you sure to import profile %s?</string>
     <string name="icloud_profile_unsupported">iCloud profile is not support on current platform</string>
     <string name="search">Search</string>
-    <string name="urltest">URLTest</string>
+    <string name="urltest" translatable="false">URLTest</string>
     <string name="expand">Expand</string>
     <string name="http_proxy">HTTP Proxy</string>
     <string name="title_scan_vpn">Scan VPN apps</string>
@@ -185,9 +182,7 @@
     <string name="vpn_core_type_unknown">Unknown</string>
     <string name="no_updates_available">No updates available</string>
     <string name="sponsor">Sponsor</string>
-    <string name="sponsor_play">Sponsor via Play Store</string>
     <string name="sponsor_message">If I\'ve defended your modern life, please consider sponsoring me.</string>
-    <string name="other_methods">Other methods</string>
     <string name="action_start">Start</string>
     <string name="location_permission_title">Location permission</string>
     <string name="location_permission_description"><![CDATA[Your profile contains <strong><tt>wifi_ssid</tt> or <tt>wifi_bssid</tt> routing rules</strong>. To make them work, sing-box uses the <strong>location</strong> permission <strong>in the background</strong> to get information about the connected Wi-Fi network. The information will be used <strong>for routing purposes only</strong>.]]></string>

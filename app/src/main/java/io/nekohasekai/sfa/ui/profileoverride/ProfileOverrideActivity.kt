@@ -33,7 +33,8 @@ class ProfileOverrideActivity :
 
         binding.perAppProxyUpdateOnChange.addTextChangedListener {
             lifecycleScope.launch(Dispatchers.IO) {
-                Settings.perAppProxyUpdateOnChange = PerAppProxyUpdateType.valueOf(it).value()
+                Settings.perAppProxyUpdateOnChange =
+                    PerAppProxyUpdateType.valueOf(this@ProfileOverrideActivity, it).value()
             }
         }
 
@@ -49,7 +50,8 @@ class ProfileOverrideActivity :
         val perAppUpdateOnChange = Settings.perAppProxyUpdateOnChange
         withContext(Dispatchers.Main) {
             binding.perAppProxyUpdateOnChange.text =
-                PerAppProxyUpdateType.valueOf(perAppUpdateOnChange).name
+                PerAppProxyUpdateType.valueOf(perAppUpdateOnChange)
+                    .getString(this@ProfileOverrideActivity)
             binding.perAppProxyUpdateOnChange.setSimpleItems(R.array.per_app_proxy_update_on_change_value)
         }
     }

@@ -304,7 +304,7 @@ class PerAppProxyActivity : AbstractActivity<ActivityPerAppProxyBinding>() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.per_app_menu0, menu)
+        menuInflater.inflate(R.menu.per_app_menu, menu)
 
         if (menu != null) {
             val searchView = menu.findItem(R.id.action_search).actionView as SearchView

@@ -11,11 +11,13 @@ import android.net.wifi.WifiManager
 import android.os.PowerManager
 import androidx.core.content.getSystemService
 import go.Seq
+import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.bg.AppChangeReceiver
 import io.nekohasekai.sfa.bg.UpdateProfileWork
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.util.Locale
 import io.nekohasekai.sfa.Application as BoxApplication
 
 class Application : Application() {
@@ -29,6 +31,7 @@ class Application : Application() {
         super.onCreate()
 
         Seq.setContext(this)
+        Libbox.setLocale(Locale.getDefault().toLanguageTag().replace("-", "_"))
 
         @Suppress("OPT_IN_USAGE")
         GlobalScope.launch(Dispatchers.IO) {

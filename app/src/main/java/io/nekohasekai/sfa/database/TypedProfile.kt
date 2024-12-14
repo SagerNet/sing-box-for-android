@@ -1,8 +1,11 @@
 package io.nekohasekai.sfa.database
 
+import android.content.Context
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.room.TypeConverter
+import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.database.TypedProfile.Type.values
 import io.nekohasekai.sfa.ktx.marshall
 import io.nekohasekai.sfa.ktx.unmarshall
 import java.util.Date
@@ -11,6 +14,13 @@ class TypedProfile() : Parcelable {
 
     enum class Type {
         Local, Remote;
+
+        fun getString(context: Context): String {
+            return when (this) {
+                Local -> context.getString(R.string.profile_type_local)
+                Remote -> context.getString(R.string.profile_type_remote)
+            }
+        }
 
         companion object {
             fun valueOf(value: Int): Type {
