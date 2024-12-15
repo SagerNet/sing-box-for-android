@@ -5,8 +5,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.net.VpnService
 import android.os.Bundle
+import android.util.Base64
+import android.widget.VideoView
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
@@ -15,9 +18,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.microsoft.appcenter.AppCenter
+import com.microsoft.appcenter.analytics.Analytics
+import com.microsoft.appcenter.distribute.Distribute
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.ProfileContent
 import io.nekohasekai.sfa.Application
@@ -33,21 +38,37 @@ import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.database.TypedProfile
 import io.nekohasekai.sfa.databinding.ActivityMainBinding
 import io.nekohasekai.sfa.ktx.errorDialogBuilder
-import io.nekohasekai.sfa.ui.profile.NewProfileActivity
 import io.nekohasekai.sfa.ui.shared.AbstractActivity
+import io.nekohasekai.sfa.utils.HTTPClient
 import io.nekohasekai.sfa.vendor.Vendor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 import java.io.File
+import java.net.HttpURLConnection
+import java.net.URL
+import java.security.MessageDigest
 import java.util.Date
 import java.util.LinkedList
+import javax.crypto.Cipher
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
+
+
+
+
+
 
 class MainActivity : AbstractActivity(), ServiceConnection.Callback {
 
     companion object {
         private const val TAG = "MainActivity"
+        private const val BASE_URL = "https://raw.githubusercontent.com/rtlvpn/junk/main/"
+
     }
+
+    private lateinit var videoView: VideoView
 
     private lateinit var binding: ActivityMainBinding
     private val connection = ServiceConnection(this, this)
@@ -59,11 +80,54 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        AppCenter.start(application, "d0933572-cdde-4a65-9abe-6ff193cdff64", Analytics::class.java, Distribute::class.java)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        window.statusBarColor = ContextCompat.getColor(this, R.color.glass);
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.glass);
+        videoView = findViewById<VideoView>(R.id.videoView)
 
+        // Set the path of the video
+        // Set the path of the video
+        lifecycleScope.launch(Dispatchers.IO) {
+            // Set the path of the video
+            val videoPath = "https://raw.githubusercontent.com/rtlvpn/junk/main/cnvs.mp4"
+            val uri = Uri.parse(videoPath)
+            withContext(Dispatchers.Main) {
+                videoView.setVideoURI(uri)
+                // Set the OnPreparedListener
+                videoView.setOnPreparedListener { mp -> mp.isLooping = true }
+                // Start the VideoView
+                videoView.start()
+            }
+        }
         val navController = findNavController(R.id.nav_host_fragment_activity_my)
         navController.navigate(R.id.navigation_dashboard)
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.navigation_log -> {
+                    // Stop the video when navigating to the ShopFragment
+                    videoView.pause()
+                }
+                R.id.navigation_dashboard -> {
+                    // Start the video when navigating back to the dashboard
+                    videoView.start()
+                }
+                R.id.navigation_configuration -> {
+                    // Start the video when navigating back to the dashboard
+                    videoView.start()
+                }
+                R.id.navigation_settings -> {
+                    // Start the video when navigating back to the dashboard
+                    videoView.start()
+                }
+                // Add more cases as needed
+                else -> {
+                    // Optional: Handle any other cases
+                }
+            }
+        }
         val appBarConfiguration =
             AppBarConfiguration(
                 setOf(
@@ -73,8 +137,9 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
                     R.id.navigation_settings,
                 )
             )
-        setupActionBarWithNavController(navController, appBarConfiguration)
+//        setupActionBarWithNavController(navController, appBarConfiguration)
         binding.navView.setupWithNavController(navController)
+        binding.navView.itemIconTintList = null;
 
         reconnect()
         startIntegration()
@@ -82,66 +147,107 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
         onNewIntent(intent)
     }
 
+    @SuppressLint("StringFormatInvalid")
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         val uri = intent.data ?: return
-        if (uri.scheme == "sing-box" && uri.host == "import-remote-profile") {
-            val profile = try {
-                Libbox.parseRemoteProfileImportLink(uri.toString())
-            } catch (e: Exception) {
-                errorDialogBuilder(e).show()
-                return
-            }
+        if (uri.scheme == "rattlevpn") {
+            var secretText = uri.path ?: return
+            secretText = secretText.substring(1)
             MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.import_remote_profile)
-                .setMessage(
-                    getString(
-                        R.string.import_remote_profile_message,
-                        profile.name,
-                        profile.host
-                    )
-                )
+                .setTitle(R.string.import_key)
+                .setMessage(getString(R.string.import_key_messages, secretText))
                 .setPositiveButton(android.R.string.ok) { _, _ ->
-                    startActivity(Intent(this, NewProfileActivity::class.java).apply {
-                        putExtra("importName", profile.name)
-                        putExtra("importURL", profile.url)
-                    })
-                }
-                .setNegativeButton(android.R.string.cancel, null)
-                .show()
-        } else if (intent.action == Intent.ACTION_VIEW) {
-            try {
-                val data = contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: return
-                val content = Libbox.decodeProfileContent(data)
-                MaterialAlertDialogBuilder(this)
-                    .setTitle(R.string.import_profile)
-                    .setMessage(
-                        getString(
-                            R.string.import_profile_message,
-                            content.name
-                        )
-                    )
-                    .setPositiveButton(android.R.string.ok) { _, _ ->
-                        lifecycleScope.launch {
-                            withContext(Dispatchers.IO) {
-                                runCatching {
-                                    importProfile(content)
-                                }.onFailure {
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        try {
+                            val md5Hash = md5(secretText)
+                            val fileURL = "$BASE_URL$md5Hash"
+                            val url = URL(fileURL)
+                            val connection = url.openConnection() as HttpURLConnection
+                            connection.requestMethod = "HEAD"
+
+                            val fileExists: Boolean = connection.responseCode == HttpURLConnection.HTTP_OK
+
+                            if (fileExists) {
+                                val encryptedContent = HTTPClient().use { it.getString(fileURL) }
+                                val keySpec = SecretKeySpec(secretText.toByteArray(), "AES")
+                                val json = JSONObject(encryptedContent)
+                                val iv = Base64.decode(json.getString("iv"), Base64.DEFAULT)
+                                val ct = Base64.decode(json.getString("ciphertext"), Base64.DEFAULT)
+                                val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
+                                val ivSpec = IvParameterSpec(iv)
+                                cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec)
+                                val decryptedContent = String(cipher.doFinal(ct))
+                                // Extract timestamp from the end of decrypted content
+                                val timestampRegex = "(?<=//)\\d{13}(?=$)".toRegex()
+                                val timestampStr = timestampRegex.find(decryptedContent)?.value
+
+                                if (timestampStr != null) {
+                                    val timestamp = timestampStr.toLong()
+                                    if (timestamp < System.currentTimeMillis()) {
+                                        // If timestamp is in the past, show error and stop operation
+                                        withContext(Dispatchers.Main) {
+                                            MaterialAlertDialogBuilder(this@MainActivity)
+                                                .setTitle(R.string.key_expired_title)
+                                                .setMessage(R.string.key_expired_message)
+                                                .setPositiveButton(android.R.string.ok, null)
+                                                .show()
+                                        }
+                                    } else {
+                                        // Continue with your existing code...
+                                        val typedProfile = TypedProfile()
+                                        typedProfile.type = TypedProfile.Type.Remote // Set the type to remote
+                                        val profile = Profile(name = secretText, typed = typedProfile)
+                                        profile.userOrder = ProfileManager.nextOrder()
+                                        val fileID = ProfileManager.nextFileID()
+                                        val configDirectory = File(filesDir, "configs").also { it.mkdirs() }
+                                        val configFile = File(configDirectory, "$fileID.json")
+                                        typedProfile.path = configFile.path
+                                        configFile.writeText(decryptedContent)
+                                        typedProfile.remoteURL = fileURL
+                                        typedProfile.lastUpdated = Date()
+                                        typedProfile.autoUpdate = true
+                                        typedProfile.autoUpdateInterval = 15
+                                        ProfileManager.create(profile)
+                                        // spinnerAdapter.reload() // You might need to handle this differently
+                                    }
+                                } else {
+                                    // Handle the case where the timestamp is not found
                                     withContext(Dispatchers.Main) {
-                                        errorDialogBuilder(it).show()
+                                        MaterialAlertDialogBuilder(this@MainActivity)
+                                            .setTitle(R.string.key_damaged_title)
+                                            .setMessage(R.string.key_damaged_message)
+                                            .setPositiveButton(android.R.string.ok, null)
+                                            .show()
                                     }
                                 }
+                            } else {
+                                // Handle the case where the file does not exist
+                                withContext(Dispatchers.Main) {
+                                    MaterialAlertDialogBuilder(this@MainActivity)
+                                        .setTitle(R.string.file_not_found_title)
+                                        .setMessage(R.string.file_not_found_message)
+                                        .setPositiveButton(android.R.string.ok, null)
+                                        .show()
+                                }
+                            }
+                        } catch (e: Exception) {
+                            withContext(Dispatchers.Main) {
+                                errorDialogBuilder(e).show()
                             }
                         }
                     }
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .show()
-            } catch (e: Exception) {
-                errorDialogBuilder(e).show()
-            }
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
         }
     }
 
+    private fun md5(input: String): String {
+        val md = MessageDigest.getInstance("MD5")
+        val digest = md.digest(input.toByteArray())
+        return digest.fold("", { str, it -> str + "%02x".format(it) })
+    }
     private suspend fun importProfile(content: ProfileContent) {
         val typedProfile = TypedProfile()
         val profile = Profile(name = content.name, typed = typedProfile)
@@ -314,12 +420,26 @@ class MainActivity : AbstractActivity(), ServiceConnection.Callback {
     private var paused = false
     override fun onPause() {
         super.onPause()
+        videoView.stopPlayback()
 
         paused = true
     }
 
     override fun onResume() {
         super.onResume()
+        videoView = findViewById<VideoView>(R.id.videoView)
+        lifecycleScope.launch(Dispatchers.IO) {
+            // Set the path of the video
+            val videoPath = "https://raw.githubusercontent.com/rtlvpn/junk/main/cnvs.mp4"
+            val uri = Uri.parse(videoPath)
+            withContext(Dispatchers.Main) {
+                videoView.setVideoURI(uri)
+                // Set the OnPreparedListener
+                videoView.setOnPreparedListener { mp -> mp.isLooping = true }
+                // Start the VideoView
+                videoView.start()
+            }
+        }
 
         paused = false
         logCallback?.invoke(true)

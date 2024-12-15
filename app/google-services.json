@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "250656869542",
+    "project_id": "rtln-7857e",
+    "storage_bucket": "rtln-7857e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:250656869542:android:66fa8dec7c7cc0b8c3b867",
+        "android_client_info": {
+          "package_name": "io.rtlvpn.rtla"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIJWekD5wkjYNCh7gWET3bZ-qp3FmSJtA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -59,9 +59,8 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data
-                    android:host="import-remote-profile"
-                    android:scheme="sing-box" />
+                <data android:scheme="rattlevpn" />
+
 
             </intent-filter>
 
@@ -129,7 +128,7 @@
             android:name=".bg.TileService"
             android:directBootAware="true"
             android:exported="true"
-            android:icon="@drawable/ic_menu"
+            android:icon="@drawable/ic_stat_name"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
             tools:targetApi="n">
             <intent-filter>
@@ -178,6 +177,14 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/cache_paths" />
+        </provider>
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data android:name="app.rive.runtime.kotlin.RiveInitializer"
+                android:value="androidx.startup" />
         </provider>
 
     </application>

@@ -17,7 +17,8 @@
     <androidx.core.widget.NestedScrollView
         android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -25,8 +26,43 @@
             android:clipChildren="false"
             android:clipToPadding="false"
             android:orientation="vertical"
+            android:gravity="bottom"
             android:padding="16dp">
 
+<!--            <com.airbnb.lottie.LottieAnimationView-->
+<!--                android:id="@+id/lottieButton"-->
+<!--                android:layout_width="150dp"-->
+<!--                android:layout_height="150dp"-->
+<!--                app:lottie_autoPlay="true"-->
+<!--                app:lottie_loop="true"-->
+<!--                android:layout_alignParentTop="true"-->
+<!--                android:layout_gravity="center"-->
+<!--                app:lottie_fileName="off.json" />-->
+            <FrameLayout
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_alignParentTop="true"
+                android:layout_gravity="center">
+
+                <app.rive.runtime.kotlin.RiveAnimationView
+                    android:id="@+id/lottieButtonanim"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clickable="false"
+                    android:focusable="false"
+                    app:riveAutoPlay="true"
+                    app:riveStateMachine="State Machine 1"
+                    app:riveResource="@raw/untitled" />
+
+                <FrameLayout
+                    android:id="@+id/lottieButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="@android:color/transparent" />
+
+            </FrameLayout>
             <LinearLayout
                 android:id="@+id/statusContainer"
                 android:layout_width="match_parent"
@@ -40,13 +76,20 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:clipChildren="false"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:visibility="gone"
+                    tools:visibility="invisible">
 
                     <com.google.android.material.card.MaterialCardView
                         style="?attr/materialCardViewElevatedStyle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1">
+                        android:layout_weight="1"
+                        app:cardBackgroundColor="#635FF6FE"
+                        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.MyApp.MaterialCardView.Cut"
+                        app:strokeColor="#5ff6fe"
+                        app:strokeWidth="1dp"
+                        tools:ignore="ExtraText">>
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -136,7 +179,11 @@
                         style="?attr/materialCardViewElevatedStyle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1">
+                        android:layout_weight="1"
+                        app:cardBackgroundColor="#635FF6FE"
+                        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.MyApp.MaterialCardView.Cut"
+                        app:strokeColor="#5ff6fe"
+                        app:strokeWidth="1dp">>
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -235,7 +282,11 @@
                         style="?attr/materialCardViewElevatedStyle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1">
+                        android:layout_weight="1"
+                        app:cardBackgroundColor="#635FF6FE"
+                        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.MyApp.MaterialCardView.Cut"
+                        app:strokeColor="#5ff6fe"
+                        app:strokeWidth="1dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -258,10 +309,15 @@
                                 android:orientation="horizontal">
 
                                 <TextView
-                                    style="?attr/textAppearanceBodySmall"
-                                    android:layout_width="wrap_content"
+                                    android:letterSpacing="0.00333333"
+                                    android:lineHeight="16sp"
+                                    android:textSize="11sp"                                    android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="@string/status_uplink" />
+                                    android:shadowColor="#c0e3dc"
+                                    android:shadowDx="0.0"
+                                    android:shadowDy="0.0"
+                                    android:shadowRadius="8"
+                                    android:text="@string/status_uplink"/>
 
                                 <LinearLayout
                                     android:layout_width="match_parent"
@@ -271,9 +327,14 @@
 
                                     <TextView
                                         android:id="@+id/uplinkText"
-                                        style="?attr/textAppearanceBodySmall"
-                                        android:layout_width="wrap_content"
+                                        android:letterSpacing="0.03333333"
+                                        android:lineHeight="16sp"
+                                        android:textSize="12sp"                                        android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
+                                        android:shadowColor="#c0e3dc"
+                                        android:shadowDx="0.0"
+                                        android:shadowDy="0.0"
+                                        android:shadowRadius="8"
                                         android:text="@string/loading"
                                         android:textColor="?android:colorForeground" />
 
@@ -288,9 +349,15 @@
                                 android:orientation="horizontal">
 
                                 <TextView
-                                    style="?attr/textAppearanceBodySmall"
+                                    android:letterSpacing="0.000033333"
+                                    android:lineHeight="16sp"
+                                    android:textSize="11sp"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:shadowColor="#c0e3dc"
+                                    android:shadowDx="0.0"
+                                    android:shadowDy="0.0"
+                                    android:shadowRadius="8"
                                     android:text="@string/status_downlink" />
 
                                 <LinearLayout
@@ -301,9 +368,14 @@
 
                                     <TextView
                                         android:id="@+id/downlinkText"
-                                        style="?attr/textAppearanceBodySmall"
-                                        android:layout_width="wrap_content"
+                                        android:letterSpacing="0.03333333"
+                                        android:lineHeight="16sp"
+                                        android:textSize="12sp"                                        android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
+                                        android:shadowColor="#c0e3dc"
+                                        android:shadowDx="0.0"
+                                        android:shadowDy="0.0"
+                                        android:shadowRadius="8"
                                         android:text="@string/loading"
                                         android:textColor="?android:colorForeground" />
 
@@ -325,7 +397,11 @@
                         style="?attr/materialCardViewElevatedStyle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1">
+                        android:layout_weight="1"
+                        app:cardBackgroundColor="#635FF6FE"
+                        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.MyApp.MaterialCardView.Cut"
+                        app:strokeColor="#5ff6fe"
+                        app:strokeWidth="1dp">>
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -348,9 +424,14 @@
                                 android:orientation="horizontal">
 
                                 <TextView
-                                    style="?attr/textAppearanceBodySmall"
-                                    android:layout_width="wrap_content"
+                                    android:letterSpacing="0.03333333"
+                                    android:lineHeight="16sp"
+                                    android:textSize="12sp"                                    android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:shadowColor="#c0e3dc"
+                                    android:shadowDx="0.0"
+                                    android:shadowDy="0.0"
+                                    android:shadowRadius="8"
                                     android:text="@string/status_uplink" />
 
                                 <LinearLayout
@@ -361,9 +442,14 @@
 
                                     <TextView
                                         android:id="@+id/uplinkTotalText"
-                                        style="?attr/textAppearanceBodySmall"
-                                        android:layout_width="wrap_content"
+                                        android:letterSpacing="0.03333333"
+                                        android:lineHeight="16sp"
+                                        android:textSize="11sp"                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
+                                        android:shadowColor="#c0e3dc"
+                                        android:shadowDx="0.0"
+                                        android:shadowDy="0.0"
+                                        android:shadowRadius="8"
                                         android:text="@string/loading"
                                         android:textColor="?android:colorForeground" />
 
@@ -378,9 +464,14 @@
                                 android:orientation="horizontal">
 
                                 <TextView
-                                    style="?attr/textAppearanceBodySmall"
-                                    android:layout_width="wrap_content"
+                                    android:letterSpacing="0.00333333"
+                                    android:lineHeight="16sp"
+                                    android:textSize="11sp"                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:shadowColor="#c0e3dc"
+                                    android:shadowDx="0.0"
+                                    android:shadowDy="0.0"
+                                    android:shadowRadius="8"
                                     android:text="@string/status_downlink" />
 
                                 <LinearLayout
@@ -391,9 +482,14 @@
 
                                     <TextView
                                         android:id="@+id/downlinkTotalText"
-                                        style="?attr/textAppearanceBodySmall"
-                                        android:layout_width="wrap_content"
+                                        android:letterSpacing="0.03333333"
+                                        android:lineHeight="16sp"
+                                        android:textSize="12sp"                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
+                                        android:shadowColor="#c0e3dc"
+                                        android:shadowDx="0.0"
+                                        android:shadowDy="0.0"
+                                        android:shadowRadius="8"
                                         android:text="@string/loading"
                                         android:textColor="?android:colorForeground" />
 
@@ -411,45 +507,45 @@
 
             </LinearLayout>
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/clashModeCard"
-                style="?attr/materialCardViewElevatedStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:visibility="gone"
-                tools:visibility="visible">
+<!--            <com.google.android.material.card.MaterialCardView-->
+<!--                android:id="@+id/clashModeCard"-->
+<!--                style="?attr/materialCardViewElevatedStyle"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="16dp"-->
+<!--                android:visibility="gone"-->
+<!--                tools:visibility="visible">-->
 
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:orientation="vertical">-->
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingHorizontal="16dp"
-                        android:paddingTop="16dp"
-                        android:text="Mode"
-                        android:textAppearance="?attr/textAppearanceTitleSmall">
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:paddingHorizontal="16dp"-->
+<!--                        android:paddingTop="16dp"-->
+<!--                        android:text="Mode"-->
+<!--                        android:textAppearance="?attr/textAppearanceTitleSmall">-->
 
-                    </TextView>
+<!--                    </TextView>-->
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/clashModeList"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:nestedScrollingEnabled="false"
-                        android:padding="8dp"
-                        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                        app:spanCount="3"
+<!--                    <androidx.recyclerview.widget.RecyclerView-->
+<!--                        android:id="@+id/clashModeList"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:nestedScrollingEnabled="false"-->
+<!--                        android:padding="8dp"-->
+<!--                        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"-->
+<!--                        app:spanCount="3"-->
 
-                        tools:itemCount="3"
-                        tools:listitem="@layout/view_clash_mode_button" />
+<!--                        tools:itemCount="3"-->
+<!--                        tools:listitem="@layout/view_clash_mode_button" />-->
 
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+<!--                </LinearLayout>-->
+<!--            </com.google.android.material.card.MaterialCardView>-->
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/systemProxyCard"
@@ -483,7 +579,11 @@
                 style="?attr/materialCardViewElevatedStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp">
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="#C1F3830C"
+                app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.MyApp.MaterialCardView.Cut"
+                app:strokeColor="#F3830C"
+                app:strokeWidth="2dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -499,12 +599,37 @@
 
                     </TextView>
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal">
+
+                        <Spinner
+                            android:id="@+id/spinner2"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_weight="1"
+                            android:popupBackground="#5C000000" />
+
+                        <ImageButton
+                            android:id="@+id/button"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="end"
+
+                            android:background="@android:color/transparent"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/key" />
+                    </LinearLayout>
+
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/profileList"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginTop="16dp"
 
+                        android:visibility="gone"
                         tools:itemCount="3"
                         tools:listitem="@layout/view_profile_item" />
 
@@ -525,7 +650,9 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:backgroundTint="@color/blue_grey_600"
+        android:visibility="gone"
         app:srcCompat="@drawable/ic_play_arrow_24"
-        app:tint="@android:color/white" />
+        app:tint="@android:color/white"
+        tools:visibility="gone" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

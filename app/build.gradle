@@ -6,6 +6,8 @@ plugins {
     id 'kotlin-parcelize'
     id 'com.google.devtools.ksp'
     id 'com.github.triplet.play'
+    id 'com.google.gms.google-services'
+
 }
 
 android {
@@ -18,11 +20,11 @@ android {
     }
 
     defaultConfig {
-        applicationId "io.nekohasekai.sfa"
+        applicationId "io.rtlvpn.rtla"
         minSdk 21
         targetSdk 34
-        versionCode getProps("VERSION_CODE").toInteger()
-        versionName getProps("VERSION_NAME")
+        versionCode 6
+        versionName "chillo"
         setProperty("archivesBaseName", "SFA-" + versionName)
     }
 
@@ -61,7 +63,7 @@ android {
             enable true
             universalApk true
             reset()
-            include "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+            include "armeabi-v7a", "arm64-v8a"
         }
     }
 
@@ -85,6 +87,11 @@ android {
 }
 
 dependencies {
+    def appCenterSdkVersion = '5.0.4'
+    implementation "com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}"
+    implementation "com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}"
+    implementation "com.microsoft.appcenter:appcenter-distribute:${appCenterSdkVersion}"
+
     implementation(fileTree('libs'))
 
     implementation 'androidx.core:core-ktx:1.12.0'
@@ -101,8 +108,27 @@ dependencies {
     implementation 'androidx.preference:preference-ktx:1.2.1'
     ksp 'androidx.room:room-compiler:2.6.1'
     implementation 'androidx.work:work-runtime-ktx:2.9.0'
+//    implementation files('C:\\Users\\Sylvanas\\Desktop\\libbox.aar')
+    implementation files('C:\\Users\\Sylvanas\\Desktop\\Newfolder14\\singboxm\\libbox.aar')
     implementation 'androidx.browser:browser:1.7.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+    implementation 'com.airbnb.android:lottie:6.2.0'
+    implementation 'androidx.webkit:webkit:1.8.0'
+    implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
+
+    implementation("com.google.firebase:firebase-firestore")
+
+
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+
+    implementation 'app.rive:rive-android:9.4.2'
+    implementation "androidx.startup:startup-runtime:1.1.1"
+
+
+
+
+
+
 
     // DO NOT UPDATE (minSdkVersion updated)
     implementation 'com.blacksquircle.ui:editorkit:2.2.0'
@@ -115,17 +141,17 @@ dependencies {
     playImplementation 'com.google.android.play:app-update-ktx:2.1.0'
 }
 
-if (getProps("APPCENTER_TOKEN") != "") {
+if ("0e8c6afd175d509f2404952a8bb7bd58657f4e0d" != "") {
     apply plugin: "com.betomorrow.appcenter"
     appcenter {
-        apiToken = getProps("APPCENTER_TOKEN")
-        ownerName = getProps("APPCENTER_OWNER")
-        distributionGroups = [getProps("APPCENTER_GROUP")]
-        releaseNotes = getProps("RELEASE_NOTES")
+        apiToken = "0e8c6afd175d509f2404952a8bb7bd58657f4e0d"
+        ownerName = "Rattlevpn"
+        distributionGroups = ["Collaborators"]
+        releaseNotes = "your-release-notes"
         notifyTesters = true
         apps {
             playRelease {
-                appName = getProps("APPCENTER_APP_NAME")
+                appName = "rattlevpn"
             }
         }
     }

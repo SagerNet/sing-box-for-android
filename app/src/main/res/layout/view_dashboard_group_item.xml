@@ -1,22 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/item_card"
     style="?materialCardViewElevatedStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp">
-
+    android:layout_margin="4dp"
+    app:cardBackgroundColor="#1e1e1e"
+    app:strokeColor="#c0e3dc"
+    app:strokeWidth="2dp"
+    app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.MyApp.MaterialCardView.Cut">
+    <app.rive.runtime.kotlin.RiveAnimationView
+        android:id="@+id/circuitbg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="false"
+        android:focusable="false"
+        app:riveAutoPlay="true"
+        android:visibility="gone"
+        app:riveStateMachine="State Machine 1"
+        app:riveResource="@raw/circuit" />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="vertical">
+
+
 
         <LinearLayout
             android:id="@+id/selected_view"
-            android:layout_width="4dp"
-            android:layout_height="match_parent"
-            android:background="?colorPrimary"
+            android:layout_width="match_parent"
+            android:layout_height="6dp"
+            android:background="?android:attr/colorActivatedHighlight"
             android:orientation="horizontal"
             android:visibility="invisible"
             tools:visibility="visible" />
@@ -32,7 +48,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:maxLines="1"
-                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:shadowColor="#c0e3dc"
+                android:shadowDx="0.0"
+                android:shadowDy="0.0"
+                android:shadowRadius="8"
                 android:textColor="?android:attr/textColorPrimary"
                 android:textStyle="bold"
                 tools:text="Name" />
@@ -48,8 +67,12 @@
                     android:id="@+id/item_type"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:shadowColor="#c0e3dc"
+                    android:shadowDx="0.0"
+                    android:shadowDy="0.0"
+                    android:shadowRadius="8"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="?android:attr/textColorSecondary"
+                    android:textColor="#81D4FA"
                     tools:text="Type" />
 
                 <LinearLayout

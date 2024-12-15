@@ -13,4 +13,5 @@
     <color name="log_white">#ececec</color>
 
     <color name="divider">#cfcfcf</color>
+    <color name="glass">#A8000000</color>
 </resources>

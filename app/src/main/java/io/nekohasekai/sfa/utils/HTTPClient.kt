@@ -8,11 +8,11 @@ class HTTPClient : Closeable {
 
     companion object {
         val userAgent by lazy {
-            var userAgent = "SFA/"
+            var userAgent = "rtla/"
             userAgent += BuildConfig.VERSION_NAME
             userAgent += " ("
             userAgent += BuildConfig.VERSION_CODE
-            userAgent += "; sing-box "
+            userAgent += "; rattle-box "
             userAgent += Libbox.version()
             userAgent += ")"
             userAgent

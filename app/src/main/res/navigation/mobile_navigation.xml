@@ -13,21 +13,21 @@
 
     <fragment
         android:id="@+id/navigation_log"
-        android:name="io.nekohasekai.sfa.ui.main.LogFragment"
+        android:name="io.nekohasekai.sfa.ui.main.ShopFragment"
         android:label="@string/title_log"
-        tools:layout="@layout/fragment_log" />
+        tools:layout="@layout/fragment_shop" />
 
     <fragment
         android:id="@+id/navigation_configuration"
-        android:name="io.nekohasekai.sfa.ui.main.ConfigurationFragment"
+        android:name="io.nekohasekai.sfa.ui.main.RattleFragment"
         android:label="@string/title_configuration"
-        tools:layout="@layout/fragment_configuration" />
+        tools:layout="@layout/fragment_rattle" />
 
     <fragment
         android:id="@+id/navigation_settings"
-        android:name="io.nekohasekai.sfa.ui.main.SettingsFragment"
+        android:name="io.nekohasekai.sfa.ui.main.RattleFragment"
         android:label="@string/title_settings"
-        tools:layout="@layout/fragment_settings" />
+        tools:layout="@layout/fragment_rattle" />
 
     <!--<fragment
         android:id="@+id/navigation_settings"

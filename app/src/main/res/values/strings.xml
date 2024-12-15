@@ -1,19 +1,19 @@
 <resources>
-    <string name="app_name">sing-box</string>
+    <string name="app_name">RattleVPN</string>
 
     <string name="stop">Stop</string>
     <string name="ok">Ok</string>
     <string name="no_thanks">No, thanks</string>
 
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_configuration">Profiles</string>
-    <string name="title_log">Logs</string>
-    <string name="title_settings">Settings</string>
+    <string name="title_dashboard">Gateway</string>
+    <string name="title_configuration">Analog</string>
+    <string name="title_log">Shop</string>
+    <string name="title_settings">Tavern</string>
     <string name="title_new_profile">New Profile</string>
     <string name="title_edit_profile">Edit Profile</string>
     <string name="title_edit_configuration">Edit Configuration</string>
-    <string name="title_overview">Overview</string>
-    <string name="title_groups">Groups</string>
+    <string name="title_overview">Main</string>
+    <string name="title_groups">Gates</string>
     <string name="title_debug">Debug</string>
 
     <string name="quick_toggle">Toggle</string>
@@ -74,12 +74,12 @@
     <string name="status_connections">Connections</string>
     <string name="status_connections_inbound">Inbound</string>
     <string name="status_connections_outbound">Outbound</string>
-    <string name="status_uplink">Uplink</string>
-    <string name="status_downlink">Downlink</string>
-    <string name="status_traffic">Traffic</string>
-    <string name="status_traffic_total">Traffic Total</string>
+    <string name="status_uplink">Upload</string>
+    <string name="status_downlink">Download</string>
+    <string name="status_traffic">Usage</string>
+    <string name="status_traffic_total">Total Usage</string>
 
-    <string name="profile">Profile</string>
+    <string name="profile">Keys</string>
     <string name="core_version">Version</string>
     <string name="core">Core</string>
     <string name="dynamic_notification">Display realtime speed in notification</string>
@@ -140,6 +140,16 @@
     <string name="vpn_app_type_other">Other</string>
     <string name="vpn_core_type_unknown">Unknown</string>
     <string name="no_updates_available">No updates available</string>
+    <string name="import_key">import key</string>
+    <string name="import_key_messages">you are entering the key: %s</string>
+    <string name="file_not_found_title">This Key is Broken</string>
+    <string name="file_not_found_message">this is key is appear to be wrong or broken.</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="key_expired_title">Key Expired!</string>
+    <string name="key_expired_message">The key you are trying to enter is expired try new one.</string>
+    <string name="key_damaged_title">Key is damaged</string>
+    <string name="key_damaged_message">The key is damaged and is not made from analog network</string>
 
 
 </resources>

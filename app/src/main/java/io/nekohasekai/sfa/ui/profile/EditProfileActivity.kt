@@ -27,6 +27,12 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.text.DateFormat
 import java.util.Date
+import javax.crypto.Cipher
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
+import org.json.JSONObject
+import android.util.Base64
+import java.security.MessageDigest
 
 class EditProfileActivity : AbstractActivity() {
 
@@ -179,15 +185,24 @@ class EditProfileActivity : AbstractActivity() {
             }
         }
     }
-
     private fun updateProfile(view: View) {
         val binding = binding ?: return
         binding.progressView.isVisible = true
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val content = HTTPClient().use { it.getString(profile.typed.remoteURL) }
-                Libbox.checkConfig(content)
-                File(profile.typed.path).writeText(content)
+                val encryptedContent = HTTPClient().use { it.getString(profile.typed.remoteURL) }
+                // The key is now the profile name
+                val keySpec = SecretKeySpec(profile.name.toByteArray(), "AES")
+                // Decrypt the AES
+                val json = JSONObject(encryptedContent)
+                val iv = Base64.decode(json.getString("iv"), Base64.DEFAULT)
+                val ct = Base64.decode(json.getString("ciphertext"), Base64.DEFAULT)
+                val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
+                val ivSpec = IvParameterSpec(iv)
+                cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec)
+                val decryptedContent = String(cipher.doFinal(ct))
+                Libbox.checkConfig(decryptedContent)
+                File(profile.typed.path).writeText(decryptedContent)
                 profile.typed.lastUpdated = Date()
                 ProfileManager.update(profile)
             } catch (e: Exception) {

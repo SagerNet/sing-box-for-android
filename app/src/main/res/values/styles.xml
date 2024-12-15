@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="ShapeAppearanceOverlay.MyApp.MaterialCardView.Cut" parent="">
+        <item name="cornerFamily">cut</item>
+        <item name="cornerSizeBottomLeft">25%</item>
+        <item name="cornerSizeTopLeft">0dp</item>
+        <item name="cornerSizeTopRight">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
+    <style name="GlowEffect" parent="">
+        <item name="android:shadowColor">#FF8C00</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">0</item>
+        <item name="android:shadowRadius">5</item>
+    </style>
+    <style name="MyBottomNavStyle" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="android:background">?android:attr/windowBackground</item>
+        <item name="itemIconTint">@null</item>
+        <item name="itemBackground">@null</item>
+        <item name="labelVisibilityMode">auto</item>
+        <item name="android:layout_height">wrap_content</item>
+
+    </style>
+</resources>

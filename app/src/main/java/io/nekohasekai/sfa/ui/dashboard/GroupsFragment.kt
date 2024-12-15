@@ -8,6 +8,7 @@ import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -135,7 +136,7 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
         lateinit var adapter: ItemAdapter
         fun bind(group: OutboundGroup) {
             this.group = group
-            binding.groupName.text = group.tag
+            binding.groupName.text = "Gate List"
             binding.groupType.text = Libbox.proxyDisplayType(group.type)
             binding.urlTestButton.setOnClickListener {
                 GlobalScope.launch {
@@ -249,7 +250,10 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
             if (group.selectable) {
                 binding.itemCard.setOnClickListener {
                     binding.selectedView.isVisible = true
+                    binding.circuitbg.isVisible = true
+
                     groupView.updateSelected(group, item)
+
                     GlobalScope.launch {
                         runCatching {
                             Libbox.newStandaloneCommandClient().selectOutbound(group.tag, item.tag)
@@ -261,9 +265,28 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
                     }
                 }
             }
+
+
+
+
+
             binding.selectedView.isInvisible = group.selected != item.tag
+            binding.circuitbg.isGone = group.selected != item.tag
             binding.itemName.text = item.tag
-            binding.itemType.text = Libbox.proxyDisplayType(item.type)
+            binding.itemType.text =  when (Libbox.proxyDisplayType(item.type)) {
+                "Direct" -> "CypherSilk"
+                "Block" -> "Block"
+                "SOCKS" -> "RetroRelay"
+                "HTTP" -> "RetroRelay"
+                "Shadowsocks" -> "Spectre"
+                "VMess" -> "PhantomPulse"
+                "Wireguard" -> "WireWakizashi"
+                "VLESS" -> "NetRunner"
+                "ShadowTLS" -> "VirtuCrypt"
+                "TUIC" -> "WinterMute"
+                "Hysteria2" -> "CyberDelic"
+                else -> Libbox.proxyDisplayType(item.type)
+            }
             binding.itemStatus.isVisible = item.urlTestTime > 0
             if (item.urlTestTime > 0) {
                 binding.itemStatus.text = "${item.urlTestDelay}ms"

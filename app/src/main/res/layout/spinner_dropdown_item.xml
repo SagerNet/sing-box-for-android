@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    app:cardBackgroundColor="#333333"
+    app:strokeColor="#EF820D"
+    app:strokeWidth="1dp"
+    app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.MyApp.MaterialCardView.Cut">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+        <TextView
+        android:id="@+id/spinner_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_weight="1" />
+
+        <ImageButton
+        android:id="@+id/remove_button"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@android:color/transparent"
+        android:padding="4dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/delete" />
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

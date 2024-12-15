@@ -10,3 +10,12 @@
 local.properties
 /app/libs/
 /service-account-credentials.json
+# Files for the ART/Dalvik VM
+*.dex
+
+# Java class files
+*.class
+# Built application files
+*.apk
+*.aar
+*.ap_

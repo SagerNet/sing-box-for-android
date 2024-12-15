@@ -4,6 +4,16 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <io.nekohasekai.sfa.ui.FullScreenVideoView
+        android:id="@+id/videoView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:clickable="false"
+        android:fadeScrollbars="false"
+        android:fitsSystemWindows="true"
+        android:soundEffectsEnabled="false"
+        app:layout_dodgeInsetEdges="all" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -21,9 +31,10 @@
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/nav_view"
+            style="@style/MyBottomNavStyle"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?android:attr/windowBackground"
+            android:layout_height="70dp"
+            app:itemIconSize="35dp"
             app:menu="@menu/bottom_nav_menu" />
 
     </LinearLayout>

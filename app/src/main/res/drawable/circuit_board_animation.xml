@@ -1,0 +1,5 @@
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:oneshot="false">
+    <item android:drawable="@drawable/circuit_board_pattern" android:duration="50" />
+    <item android:drawable="@android:color/transparent" android:duration="50" />
+</animation-list>

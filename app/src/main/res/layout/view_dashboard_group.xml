@@ -25,6 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:visibility="invisible"
             tools:text="Group Name" />
 
         <LinearLayout
@@ -50,6 +51,7 @@
                 android:layout_marginStart="4dp"
                 android:backgroundTint="?colorSurface"
                 android:contentDescription="@string/urltest"
+                android:visibility="gone"
                 android:src="@drawable/ic_electric_bolt_24"
                 app:tint="?colorControlNormal" />
 

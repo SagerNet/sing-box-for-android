@@ -2,6 +2,7 @@ package io.nekohasekai.sfa.ui.profile
 
 import android.net.Uri
 import android.os.Bundle
+import android.util.Base64
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
@@ -24,14 +25,24 @@ import io.nekohasekai.sfa.utils.HTTPClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 import java.io.File
 import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.URL
+import java.security.MessageDigest
 import java.util.Date
+import javax.crypto.Cipher
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
 
 class NewProfileActivity : AbstractActivity() {
     enum class FileSource(val formatted: String) {
         CreateNew("Create New"),
         Import("Import");
+    }
+    companion object {
+        const val BASE_URL = "https://raw.githubusercontent.com/rtlvpn/junk/main/"
     }
 
     private var binding: ActivityAddProfileBinding? = null
@@ -180,15 +191,40 @@ class NewProfileActivity : AbstractActivity() {
 
             TypedProfile.Type.Remote.name -> {
                 typedProfile.type = TypedProfile.Type.Remote
-                val remoteURL = binding.remoteURL.text
-                val content = HTTPClient().use { it.getString(remoteURL) }
-                Libbox.checkConfig(content)
-                configFile.writeText(content)
-                typedProfile.remoteURL = remoteURL
+                val secretText = binding.remoteURL.text // User enters the secret text here
+                val md5Hash = md5(secretText)
+                val fileURL = "$BASE_URL$md5Hash"
+                // Add your secret key here
+                val secretKey = "vealcalmbeatherofulldame"  // replace with your key
+                // Check if the file exists
+                val url = URL(fileURL)
+                val connection = url.openConnection() as HttpURLConnection
+                connection.requestMethod = "HEAD"
+                val fileExists = connection.responseCode == HttpURLConnection.HTTP_OK
+                if (fileExists) {
+                    val encryptedContent = HTTPClient().use { it.getString(fileURL) }
+
+                    // The key is now the secret text itself
+                    val keySpec = SecretKeySpec(secretText.toByteArray(), "AES")
+                    // Decrypt the AES
+                    val json = JSONObject(encryptedContent)
+                    val iv = Base64.decode(json.getString("iv"), Base64.DEFAULT)
+                    val ct = Base64.decode(json.getString("ciphertext"), Base64.DEFAULT)
+                    val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
+                    val ivSpec = IvParameterSpec(iv)
+                    cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec)
+                    val decryptedContent = String(cipher.doFinal(ct))
+                    Libbox.checkConfig(decryptedContent)
+                    configFile.writeText(decryptedContent)
+                    typedProfile.remoteURL = fileURL
                 typedProfile.lastUpdated = Date()
                 typedProfile.autoUpdate = EnabledType.valueOf(binding.autoUpdate.text).boolValue
                 binding.autoUpdateInterval.text.toIntOrNull()?.also {
                     typedProfile.autoUpdateInterval = it
+                    }
+                } else {
+                    // Handle the case where the file does not exist
+                    // ...
                 }
             }
         }
@@ -219,5 +255,10 @@ class NewProfileActivity : AbstractActivity() {
         binding.autoUpdateInterval.error = null
     }
 
-
+    // Helper function to generate MD5 hash
+    private fun md5(input: String): String {
+        val md = MessageDigest.getInstance("MD5")
+        val digest = md.digest(input.toByteArray())
+        return digest.fold("", { str, it -> str + "%02x".format(it) })
+    }
 }

@@ -1,7 +1,13 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="AppTheme" parent="Theme.Material3.DayNight">
+    <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
         <item name="colorPrimaryContainer">@color/blue_grey_600</item>
+        <item name="android:windowBackground">@color/glass</item>
+        <item name="android:statusBarColor">@color/glass</item>
+        <item name="android:fontFamily">@font/aquire</item>
+
+        <item name="android:navigationBarColor">@color/glass</item>
+
     </style>
 </resources>
