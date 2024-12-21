@@ -2,6 +2,7 @@ package io.nekohasekai.sfa.bg
 
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.net.Network
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Process
@@ -12,6 +13,8 @@ import io.nekohasekai.libbox.InterfaceUpdateListener
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.NetworkInterfaceIterator
 import io.nekohasekai.libbox.PlatformInterface
+import io.nekohasekai.libbox.RawNetwork
+import io.nekohasekai.libbox.RawNetworkIterator
 import io.nekohasekai.libbox.StringIterator
 import io.nekohasekai.libbox.TunOptions
 import io.nekohasekai.libbox.WIFIState
@@ -140,9 +143,13 @@ interface PlatformInterfaceWrapper : PlatformInterface {
             boxInterface.flags = dumpFlags
             boxInterface.metered =
                 !networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)
+            boxInterface.rawNetwork = NetworkWrapper(network)
             interfaces.add(boxInterface)
         }
         return InterfaceArray(interfaces.iterator())
+    }
+
+    override fun setUnderlyingNetworks(networks: RawNetworkIterator) {
     }
 
     override fun underNetworkExtension(): Boolean {
@@ -197,6 +204,8 @@ interface PlatformInterfaceWrapper : PlatformInterface {
             return iterator.next()
         }
     }
+
+    data class NetworkWrapper(val network: Network) : RawNetwork
 
     private fun InterfaceAddress.toPrefix(): String {
         return if (address is Inet6Address) {
