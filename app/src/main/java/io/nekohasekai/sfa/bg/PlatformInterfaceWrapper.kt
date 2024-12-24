@@ -38,6 +38,10 @@ interface PlatformInterfaceWrapper : PlatformInterface {
         error("invalid argument")
     }
 
+    override fun updateRouteOptions(options: TunOptions?) {
+        error("not implemented")
+    }
+
     override fun useProcFS(): Boolean {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
     }
