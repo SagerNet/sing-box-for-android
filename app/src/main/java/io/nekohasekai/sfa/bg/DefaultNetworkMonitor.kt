@@ -4,7 +4,7 @@ import android.net.Network
 import android.os.Build
 import io.nekohasekai.libbox.InterfaceUpdateListener
 import io.nekohasekai.sfa.Application
-import io.nekohasekai.sfa.BuildConfig
+import io.nekohasekai.sfa.constant.Bugs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -59,9 +59,7 @@ object DefaultNetworkMonitor {
                     Thread.sleep(100)
                     continue
                 }
-                // TODO: remove launch after fixed
-                // https://github.com/golang/go/issues/68760
-                if (BuildConfig.DEBUG) {
+                if (Bugs.fixAndroidStack) {
                     GlobalScope.launch(Dispatchers.IO) {
                         listener.updateDefaultInterface(interfaceName, interfaceIndex)
                     }
@@ -70,7 +68,7 @@ object DefaultNetworkMonitor {
                 }
             }
         } else {
-            if (BuildConfig.DEBUG) {
+            if (Bugs.fixAndroidStack) {
                 GlobalScope.launch(Dispatchers.IO) {
                     listener.updateDefaultInterface("", -1)
                 }
