@@ -2,13 +2,11 @@ package io.nekohasekai.sfa.bg
 
 import android.content.Intent
 import android.content.pm.PackageManager.NameNotFoundException
-import android.net.Network
 import android.net.ProxyInfo
 import android.net.VpnService
 import android.os.Build
 import android.os.IBinder
 import io.nekohasekai.libbox.Notification
-import io.nekohasekai.libbox.RawNetworkIterator
 import io.nekohasekai.libbox.TunOptions
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.ktx.toIpPrefix
@@ -183,51 +181,10 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
             systemProxyEnabled = false
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            synchronized(this) {
-                val underlyingNetworks = underlyingNetworksCache
-                if (underlyingNetworks != null) {
-                    builder.setUnderlyingNetworks(underlyingNetworks)
-                    underlyingNetworksCache = null
-                }
-                val pfd =
-                    builder.establish()
-                        ?: error("android: the application is not prepared or is revoked")
-                service.fileDescriptor = pfd
-                return pfd.fd
-            }
-        } else {
-            val pfd =
-                builder.establish()
-                    ?: error("android: the application is not prepared or is revoked")
-            service.fileDescriptor = pfd
-            return pfd.fd
-        }
-    }
-
-    @Volatile
-    private var underlyingNetworksCache: Array<Network>? = null
-
-    override fun setUnderlyingNetworks(networkIterator: RawNetworkIterator) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            synchronized(this) {
-                val defaultNetwork = runBlocking { DefaultNetworkListener.get() }
-                var networks = mutableListOf<Network>()
-                while (networkIterator.hasNext()) {
-                    val network =
-                        (networkIterator.next() as PlatformInterfaceWrapper.NetworkWrapper).network
-                    if (network == defaultNetwork) {
-                        networks.add(0, network)
-                    } else {
-                        networks.add(network)
-                    }
-                }
-                val newNetworks = networks.toTypedArray()
-                if (!setUnderlyingNetworks(newNetworks)) {
-                    underlyingNetworksCache = newNetworks
-                }
-            }
-        }
+        val pfd =
+            builder.establish() ?: error("android: the application is not prepared or is revoked")
+        service.fileDescriptor = pfd
+        return pfd.fd
     }
 
     override fun writeLog(message: String) = service.writeLog(message)
