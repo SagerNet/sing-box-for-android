@@ -14,6 +14,11 @@ android {
 
     ndkVersion "28.0.12674087"
 
+    def ndkPathFromEnv = System.getenv("ANDROID_NDK_HOME")
+    if (ndkPathFromEnv != null) {
+        ndkPath ndkPathFromEnv
+    }
+
     ksp {
         arg("room.incremental", "true")
         arg("room.schemaLocation", "$projectDir/schemas")
