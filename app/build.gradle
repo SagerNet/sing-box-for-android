@@ -121,7 +121,7 @@ dependencies {
 
     // DO NOT UPDATE (minSdkVersion updated)
     implementation "com.blacksquircle.ui:editorkit:2.9.0"
-    implementation "com.blacksquircle.ui:language-json:2.2.0"
+    implementation "com.blacksquircle.ui:language-json:2.9.0"
 
     implementation("com.android.tools.smali:smali-dexlib2:3.0.9") {
         exclude group: "com.google.guava", module: "guava"
