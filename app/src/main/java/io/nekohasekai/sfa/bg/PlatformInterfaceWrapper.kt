@@ -10,6 +10,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import io.nekohasekai.libbox.InterfaceUpdateListener
 import io.nekohasekai.libbox.Libbox
+import io.nekohasekai.libbox.LocalDNSTransport
 import io.nekohasekai.libbox.NetworkInterfaceIterator
 import io.nekohasekai.libbox.PlatformInterface
 import io.nekohasekai.libbox.StringIterator
@@ -167,6 +168,10 @@ interface PlatformInterfaceWrapper : PlatformInterface {
             ssid = ssid.substring(1, ssid.length - 1)
         }
         return WIFIState(ssid, wifiInfo.bssid)
+    }
+
+    override fun localDNSTransport(): LocalDNSTransport? {
+        return LocalResolver
     }
 
     private class InterfaceArray(private val iterator: Iterator<LibboxNetworkInterface>) :
