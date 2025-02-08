@@ -69,6 +69,7 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
+        commandClient.disconnect()
     }
 
     private var displayed = false

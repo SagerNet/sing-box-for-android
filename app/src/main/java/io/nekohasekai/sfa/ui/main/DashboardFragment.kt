@@ -40,10 +40,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
         return binding.root
     }
 
+    private val adapter by lazy { Adapter(this) }
     private fun onCreate() {
         val activity = activity ?: return
         val binding = binding ?: return
-        binding.dashboardPager.adapter = Adapter(this)
+        binding.dashboardPager.adapter = adapter
         binding.dashboardPager.offscreenPageLimit = Page.values().size
         activity.serviceStatus.observe(viewLifecycleOwner) {
             when (it) {
@@ -107,6 +108,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
         super.onDestroyView()
         mediator?.detach()
         mediator = null
+        binding?.dashboardPager?.adapter = null
         binding = null
     }
 
