@@ -138,9 +138,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
             builder.setPositiveButton(R.string.ok) { _, _ ->
                 loopShowDeprecatedNotes(notes)
             }
-            builder.setNeutralButton(R.string.service_error_deprecated_warning_documentation) { _, _ ->
-                requireContext().launchCustomTab(note.migrationLink)
-                loopShowDeprecatedNotes(notes)
+            if (!note.migrationLink.isNullOrBlank()) {
+                builder.setNeutralButton(R.string.service_error_deprecated_warning_documentation) { _, _ ->
+                    requireContext().launchCustomTab(note.migrationLink)
+                    loopShowDeprecatedNotes(notes)
+                }
             }
             builder.show()
         }
