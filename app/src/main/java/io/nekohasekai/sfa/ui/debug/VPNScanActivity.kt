@@ -7,7 +7,10 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.ViewGroup
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -16,6 +19,7 @@ import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.databinding.ActivityVpnScanBinding
 import io.nekohasekai.sfa.databinding.ViewVpnAppItemBinding
+import io.nekohasekai.sfa.ktx.dp2px
 import io.nekohasekai.sfa.ktx.toStringIterator
 import io.nekohasekai.sfa.ui.shared.AbstractActivity
 import kotlinx.coroutines.Dispatchers
@@ -33,6 +37,13 @@ class VPNScanActivity : AbstractActivity<ActivityVpnScanBinding>() {
         super.onCreate(savedInstanceState)
 
         setTitle(R.string.title_scan_vpn)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.scanVPNResult) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.updatePadding(bottom = insets.bottom + dp2px(16))
+            WindowInsetsCompat.CONSUMED
+        }
+
         binding.scanVPNResult.adapter = Adapter().also {
             adapter = it
         }
