@@ -16,7 +16,10 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile
@@ -85,6 +88,12 @@ class PerAppProxyActivity : AbstractActivity<ActivityPerAppProxyBinding>() {
         super.onCreate(savedInstanceState)
 
         setTitle(R.string.title_per_app_proxy)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.appList) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.updatePadding(bottom = insets.bottom)
+            WindowInsetsCompat.CONSUMED
+        }
 
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
