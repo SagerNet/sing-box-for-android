@@ -217,8 +217,19 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
 
     @SuppressLint("NewApi")
     fun startService() {
-        if (!ServiceNotification.checkPermission()) {
-            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        if (!Settings.notificationTipShown && !ServiceNotification.checkPermission()) {
+            Settings.notificationTipShown = true
+            MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.notification_permission_title)
+                .setMessage(R.string.notification_permission_description)
+                .setPositiveButton(R.string.ok) { _, _ ->
+                    notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+                .setNegativeButton(R.string.no_thanks) { _, _ ->
+                    startService()
+                }
+                .setCancelable(false)
+                .show()
             return
         }
 
@@ -241,11 +252,7 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
     private val notificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) {
-        if (it) {
-            startService()
-        } else {
-            onServiceAlert(Alert.RequestNotificationPermission, null)
-        }
+        startService()
     }
 
     private val locationPermissionLauncher =
