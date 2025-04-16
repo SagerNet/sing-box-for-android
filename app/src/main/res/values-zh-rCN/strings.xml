@@ -108,7 +108,7 @@
     <string name="per_app_proxy_sort_mode_package_name">包名</string>
     <string name="per_app_proxy_sort_mode_uid">UID</string>
     <string name="per_app_proxy_sort_mode_install_time">安装时间</string>
-    <string name="per_app_proxy_sort_mode_update_time">更新shijian</string>
+    <string name="per_app_proxy_sort_mode_update_time">更新时间</string>
     <string name="per_app_proxy_sort_mode_reverse">反转</string>
     <string name="per_app_proxy_filter">过滤</string>
     <string name="per_app_proxy_hide_system_apps">隐藏系统应用</string>
