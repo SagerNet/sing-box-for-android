@@ -17,7 +17,6 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
-import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -215,10 +214,8 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
         }
     }
 
-    @SuppressLint("NewApi")
     fun startService() {
-        if (!ServiceNotification.checkPermission()) {
-            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        if (!checkNotificationPermission()) {
             return
         }
 
@@ -238,13 +235,40 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
         }
     }
 
+    @SuppressLint("NewApi")
+    private fun checkNotificationPermission(): Boolean {
+        if (ServiceNotification.checkPermission()
+            || (Settings.notificationTipShown && !Settings.dynamicNotification)) {
+            return true
+        }
+        if (Settings.notificationTipShown) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            return false
+        }
+        Settings.notificationTipShown = true
+        val dialogBuilder = MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.notification_permission_title)
+            .setMessage(R.string.notification_permission_description)
+            .setPositiveButton(R.string.ok) { _, _ ->
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+            .setCancelable(false)
+        if (!Settings.dynamicNotification) {
+            dialogBuilder.setNegativeButton(R.string.no_thanks) { _, _ ->
+                startService()
+            }
+        }
+        dialogBuilder.show()
+        return false
+    }
+
     private val notificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) {
-        if (it) {
-            startService()
-        } else {
+        if (Settings.dynamicNotification && !it) {
             onServiceAlert(Alert.RequestNotificationPermission, null)
+        } else {
+            startService()
         }
     }
 
@@ -304,6 +328,8 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
     }
 
     override fun onServiceAlert(type: Alert, message: String?) {
+        serviceStatus.value = Status.Stopped
+
         when (type) {
             Alert.RequestLocationPermission -> {
                 return requestLocationPermission()
@@ -320,7 +346,8 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
             }
 
             Alert.RequestNotificationPermission -> {
-                builder.setMessage(getString(R.string.service_error_missing_notification_permission))
+                builder.setTitle(R.string.notification_permission_title)
+                builder.setMessage(R.string.notification_permission_required_description)
             }
 
             Alert.EmptyConfiguration -> {
