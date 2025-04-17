@@ -7,6 +7,7 @@ object SettingsKey {
     const val CHECK_UPDATE_ENABLED = "check_update_enabled"
     const val DISABLE_MEMORY_LIMIT = "disable_memory_limit"
     const val DYNAMIC_NOTIFICATION = "dynamic_notification"
+    const val NOTIFICATION_TIP_SHOWN = "notification_tip_shown"
 
     const val PER_APP_PROXY_ENABLED = "per_app_proxy_enabled"
     const val PER_APP_PROXY_MODE = "per_app_proxy_mode"
