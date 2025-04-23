@@ -161,4 +161,6 @@
     <string name="location_permission_description"><![CDATA[您的个人资料包含 <strong><tt>wifi_ssid</tt> 或 <tt>wifi_bssid</tt> 路由规则</strong>。为了使它们正常工作，sing-box 在<strong>后台</strong>使用 <strong>位置</strong> 权限来获取有关所连接 Wi-Fi 网络的信息。该信息将<strong>仅用于路由目的</strong>。]]></string>
     <string name="location_permission_background_description"><![CDATA[在 Android 10 及更高版本中，需要<strong>后台位置</strong>权限。选择<strong>始终允许</strong>以授予权限。]]></string>
     <string name="open_settings">打开设置</string>
+    <string name="notification_permission_title">通知权限</string>
+    <string name="notification_permission_required_description">sing-box 无法在没有发送通知权限的情况下显示实时网速。请授予权限或禁用实时网速通知后再启动服务。</string>
 </resources>

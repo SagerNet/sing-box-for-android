@@ -188,6 +188,6 @@
     <string name="location_permission_description"><![CDATA[Your profile contains <strong><tt>wifi_ssid</tt> or <tt>wifi_bssid</tt> routing rules</strong>. To make them work, sing-box uses the <strong>location</strong> permission <strong>in the background</strong> to get information about the connected Wi-Fi network. The information will be used <strong>for routing purposes only</strong>.]]></string>
     <string name="location_permission_background_description"><![CDATA[On Android 10 and up, <strong>background location</strong> permission is required. Select <strong>Allow all the time</strong> to grant the permission.]]></string>
     <string name="open_settings">Open Settings</string>
-
-
+    <string name="notification_permission_title">Notification permission</string>
+    <string name="notification_permission_required_description">sing-box is unable to show real-time network speeds without the permission to send notifications. Please grant the permission or disable real-time network speeds notification before starting the service.</string>
 </resources>

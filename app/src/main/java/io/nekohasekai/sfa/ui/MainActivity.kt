@@ -221,7 +221,10 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
             notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             return
         }
+        startService0()
+    }
 
+    private fun startService0() {
         lifecycleScope.launch(Dispatchers.IO) {
             if (Settings.rebuildServiceMode()) {
                 reconnect()
@@ -241,10 +244,10 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
     private val notificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) {
-        if (it) {
-            startService()
-        } else {
+        if (Settings.dynamicNotification && !it) {
             onServiceAlert(Alert.RequestNotificationPermission, null)
+        } else {
+            startService0()
         }
     }
 
@@ -304,6 +307,8 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
     }
 
     override fun onServiceAlert(type: Alert, message: String?) {
+        serviceStatus.value = Status.Stopped
+
         when (type) {
             Alert.RequestLocationPermission -> {
                 return requestLocationPermission()
@@ -320,7 +325,8 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
             }
 
             Alert.RequestNotificationPermission -> {
-                builder.setMessage(getString(R.string.service_error_missing_notification_permission))
+                builder.setTitle(R.string.notification_permission_title)
+                builder.setMessage(R.string.notification_permission_required_description)
             }
 
             Alert.EmptyConfiguration -> {
