@@ -95,7 +95,7 @@ class ServiceNotification(
     }
 
     suspend fun start() {
-        if (Settings.dynamicNotification) {
+        if (Settings.dynamicNotification && checkPermission()) {
             commandClient.connect()
             withContext(Dispatchers.Main) {
                 registerReceiver()
