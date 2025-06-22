@@ -635,6 +635,7 @@ class PerAppProxyActivity : AbstractActivity<ActivityPerAppProxyBinding>() {
             "com.microsoft",
             "com.apple",
             "com.zhiliaoapp.musically", // Banned by China
+            "com.android.providers.downloads",
         )
 
         private val chinaAppPrefixList = listOf(
