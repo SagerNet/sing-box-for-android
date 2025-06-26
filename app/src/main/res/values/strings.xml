@@ -15,8 +15,11 @@
     <string name="title_overview">Overview</string>
     <string name="title_groups">Groups</string>
     <string name="title_debug">Debug</string>
+    <string name="title_shortcuts">Quick Actions</string>
 
     <string name="quick_toggle">Toggle</string>
+    <string name="quick_start">Start</string>
+    <string name="quick_stop">Stop</string>
     <string name="profile_name">Name</string>
     <string name="profile_type">Type</string>
     <string name="profile_source">Source</string>

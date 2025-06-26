@@ -6,7 +6,27 @@
         android:shortcutLongLabel="@string/quick_toggle"
         android:shortcutShortLabel="@string/quick_toggle">
         <intent
-            android:action="android.intent.action.MAIN"
+            android:action="io.nekohasekai.sfa.QUICK_TOGGLE"
+            android:targetClass="io.nekohasekai.sfa.ui.ShortcutActivity"
+            android:targetPackage="io.nekohasekai.sfa" />
+    </shortcut>
+    <shortcut
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutId="start"
+        android:shortcutLongLabel="@string/quick_start"
+        android:shortcutShortLabel="@string/quick_start">
+        <intent
+            android:action="io.nekohasekai.sfa.QUICK_START"
+            android:targetClass="io.nekohasekai.sfa.ui.ShortcutActivity"
+            android:targetPackage="io.nekohasekai.sfa" />
+    </shortcut>
+    <shortcut
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutId="stop"
+        android:shortcutLongLabel="@string/quick_stop"
+        android:shortcutShortLabel="@string/quick_stop">
+        <intent
+            android:action="io.nekohasekai.sfa.QUICK_STOP"
             android:targetClass="io.nekohasekai.sfa.ui.ShortcutActivity"
             android:targetPackage="io.nekohasekai.sfa" />
     </shortcut>
