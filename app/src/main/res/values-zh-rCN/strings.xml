@@ -12,7 +12,10 @@
     <string name="title_overview">概述</string>
     <string name="title_groups">组</string>
     <string name="title_debug">调试</string>
+    <string name="title_shortcuts">快捷操作</string>
     <string name="quick_toggle">切换</string>
+    <string name="quick_start">启动</string>
+    <string name="quick_stop">停止</string>
     <string name="profile_name">名称</string>
     <string name="profile_type">类型</string>
     <string name="profile_source">源</string>
