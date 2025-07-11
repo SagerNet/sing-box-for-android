@@ -19,11 +19,6 @@ android {
         ndkPath ndkPathFromEnv
     }
 
-    ksp {
-        arg("room.incremental", "true")
-        arg("room.schemaLocation", "$projectDir/schemas")
-    }
-
     defaultConfig {
         applicationId "io.nekohasekai.sfa"
         minSdk 21
@@ -94,6 +89,11 @@ android {
             outputFileName = (outputFileName as String).replace("-other", "-foss")
         }
     }
+}
+
+ksp {
+    arg("room.incremental", "true")
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 dependencies {
