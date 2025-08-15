@@ -12,11 +12,14 @@ import android.os.PowerManager
 import androidx.core.content.getSystemService
 import go.Seq
 import io.nekohasekai.libbox.Libbox
+import io.nekohasekai.libbox.SetupOptions
 import io.nekohasekai.sfa.bg.AppChangeReceiver
 import io.nekohasekai.sfa.bg.UpdateProfileWork
+import io.nekohasekai.sfa.constant.Bugs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.io.File
 import java.util.Locale
 import io.nekohasekai.sfa.Application as BoxApplication
 
@@ -35,6 +38,7 @@ class Application : Application() {
 
         @Suppress("OPT_IN_USAGE")
         GlobalScope.launch(Dispatchers.IO) {
+            initialize()
             UpdateProfileWork.reconfigureUpdater()
         }
 
@@ -42,6 +46,23 @@ class Application : Application() {
             addAction(Intent.ACTION_PACKAGE_ADDED)
             addDataScheme("package")
         })
+
+    }
+
+    private fun initialize() {
+        val baseDir = filesDir
+        baseDir.mkdirs()
+        val workingDir = getExternalFilesDir(null) ?: return
+        workingDir.mkdirs()
+        val tempDir = cacheDir
+        tempDir.mkdirs()
+        Libbox.setup(SetupOptions().also {
+            it.basePath = baseDir.path
+            it.workingPath = workingDir.path
+            it.tempPath = tempDir.path
+            it.fixAndroidStack = Bugs.fixAndroidStack
+        })
+        Libbox.redirectStderr(File(workingDir, "stderr.log").path)
     }
 
     companion object {
