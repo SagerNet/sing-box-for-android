@@ -27,7 +27,6 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 import io.nekohasekai.libbox.NetworkInterface as LibboxNetworkInterface
 
 interface PlatformInterfaceWrapper : PlatformInterface {
-
     override fun usePlatformAutoDetectInterfaceControl(): Boolean {
         return true
     }
@@ -49,14 +48,15 @@ interface PlatformInterfaceWrapper : PlatformInterface {
         sourceAddress: String,
         sourcePort: Int,
         destinationAddress: String,
-        destinationPort: Int
+        destinationPort: Int,
     ): Int {
         try {
-            val uid = Application.connectivity.getConnectionOwnerUid(
-                ipProtocol,
-                InetSocketAddress(sourceAddress, sourcePort),
-                InetSocketAddress(destinationAddress, destinationPort)
-            )
+            val uid =
+                Application.connectivity.getConnectionOwnerUid(
+                    ipProtocol,
+                    InetSocketAddress(sourceAddress, sourcePort),
+                    InetSocketAddress(destinationAddress, destinationPort),
+                )
             if (uid == Process.INVALID_UID) error("android: connection owner not found")
             return uid
         } catch (e: Exception) {
@@ -77,7 +77,8 @@ interface PlatformInterfaceWrapper : PlatformInterface {
         return try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 Application.packageManager.getPackageUid(
-                    packageName, PackageManager.PackageInfoFlags.of(0)
+                    packageName,
+                    PackageManager.PackageInfoFlags.of(0),
                 )
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 Application.packageManager.getPackageUid(packageName, 0)
@@ -111,23 +112,28 @@ interface PlatformInterfaceWrapper : PlatformInterface {
                 networkInterfaces.find { it.name == boxInterface.name } ?: continue
             boxInterface.dnsServer =
                 StringArray(linkProperties.dnsServers.mapNotNull { it.hostAddress }.iterator())
-            boxInterface.type = when {
-                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> Libbox.InterfaceTypeWIFI
-                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> Libbox.InterfaceTypeCellular
-                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> Libbox.InterfaceTypeEthernet
-                else -> Libbox.InterfaceTypeOther
-            }
+            boxInterface.type =
+                when {
+                    networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> Libbox.InterfaceTypeWIFI
+                    networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> Libbox.InterfaceTypeCellular
+                    networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> Libbox.InterfaceTypeEthernet
+                    else -> Libbox.InterfaceTypeOther
+                }
             boxInterface.index = networkInterface.index
             runCatching {
                 boxInterface.mtu = networkInterface.mtu
             }.onFailure {
                 Log.e(
-                    "PlatformInterface", "failed to get mtu for interface ${boxInterface.name}", it
+                    "PlatformInterface",
+                    "failed to get mtu for interface ${boxInterface.name}",
+                    it,
                 )
             }
             boxInterface.addresses =
-                StringArray(networkInterface.interfaceAddresses.mapTo(mutableListOf()) { it.toPrefix() }
-                    .iterator())
+                StringArray(
+                    networkInterface.interfaceAddresses.mapTo(mutableListOf()) { it.toPrefix() }
+                        .iterator(),
+                )
             var dumpFlags = 0
             if (networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
                 dumpFlags = OsConstants.IFF_UP or OsConstants.IFF_RUNNING
@@ -161,7 +167,8 @@ interface PlatformInterfaceWrapper : PlatformInterface {
     }
 
     override fun readWIFIState(): WIFIState? {
-        @Suppress("DEPRECATION") val wifiInfo =
+        @Suppress("DEPRECATION")
+        val wifiInfo =
             Application.wifiManager.connectionInfo ?: return null
         var ssid = wifiInfo.ssid
         if (ssid == "<unknown ssid>") {
@@ -182,12 +189,12 @@ interface PlatformInterfaceWrapper : PlatformInterface {
         val certificates = mutableListOf<String>()
         val keyStore = KeyStore.getInstance("AndroidCAStore")
         if (keyStore != null) {
-            keyStore.load(null, null);
+            keyStore.load(null, null)
             val aliases = keyStore.aliases()
             while (aliases.hasMoreElements()) {
                 val cert = keyStore.getCertificate(aliases.nextElement())
                 certificates.add(
-                    "-----BEGIN CERTIFICATE-----\n" + Base64.encode(cert.encoded) + "\n-----END CERTIFICATE-----"
+                    "-----BEGIN CERTIFICATE-----\n" + Base64.encode(cert.encoded) + "\n-----END CERTIFICATE-----",
                 )
             }
         }
@@ -196,7 +203,6 @@ interface PlatformInterfaceWrapper : PlatformInterface {
 
     private class InterfaceArray(private val iterator: Iterator<LibboxNetworkInterface>) :
         NetworkInterfaceIterator {
-
         override fun hasNext(): Boolean {
             return iterator.hasNext()
         }
@@ -204,11 +210,9 @@ interface PlatformInterfaceWrapper : PlatformInterface {
         override fun next(): LibboxNetworkInterface {
             return iterator.next()
         }
-
     }
 
-    private class StringArray(private val iterator: Iterator<String>) : StringIterator {
-
+    class StringArray(private val iterator: Iterator<String>) : StringIterator {
         override fun len(): Int {
             // not used by core
             return 0
@@ -225,14 +229,15 @@ interface PlatformInterfaceWrapper : PlatformInterface {
 
     private fun InterfaceAddress.toPrefix(): String {
         return if (address is Inet6Address) {
-            "${Inet6Address.getByAddress(address.address).hostAddress}/${networkPrefixLength}"
+            "${Inet6Address.getByAddress(address.address).hostAddress}/$networkPrefixLength"
         } else {
-            "${address.hostAddress}/${networkPrefixLength}"
+            "${address.hostAddress}/$networkPrefixLength"
         }
     }
 
     private val NetworkInterface.flags: Int
-        @SuppressLint("SoonBlockedPrivateApi") get() {
+        @SuppressLint("SoonBlockedPrivateApi")
+        get() {
             val getFlagsMethod = NetworkInterface::class.java.getDeclaredMethod("getFlags")
             return getFlagsMethod.invoke(this) as Int
         }

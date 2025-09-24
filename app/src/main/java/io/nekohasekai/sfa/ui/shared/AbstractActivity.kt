@@ -19,7 +19,6 @@ import io.nekohasekai.sfa.utils.MIUIUtils
 import java.lang.reflect.ParameterizedType
 
 abstract class AbstractActivity<Binding : ViewBinding> : AppCompatActivity() {
-
     private var _binding: Binding? = null
     internal val binding get() = _binding!!
 
@@ -32,34 +31,40 @@ abstract class AbstractActivity<Binding : ViewBinding> : AppCompatActivity() {
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.O) {
             val nightFlag = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
             if (nightFlag != Configuration.UI_MODE_NIGHT_YES) {
-                val insetsController = WindowCompat.getInsetsController(
-                    window,
-                    window.decorView
-                )
+                val insetsController =
+                    WindowCompat.getInsetsController(
+                        window,
+                        window.decorView,
+                    )
                 insetsController.isAppearanceLightNavigationBars = true
             }
         }
 
-        _binding = createBindingInstance(layoutInflater).also {
-            setContentView(it.root)
-        }
+        _binding =
+            createBindingInstance(layoutInflater).also {
+                setContentView(it.root)
+            }
 
         findViewById<MaterialToolbar>(R.id.toolbar)?.also {
             setSupportActionBar(it)
         }
 
         // MIUI overrides colorSurfaceContainer to colorSurface without below flags
-        @Suppress("DEPRECATION") if (MIUIUtils.isMIUI) {
+        @Suppress("DEPRECATION")
+        if (MIUIUtils.isMIUI) {
             window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
             window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
         }
 
         if (this !is MainActivity) {
-            supportActionBar?.setHomeAsUpIndicator(AppCompatResources.getDrawable(
-                this@AbstractActivity, R.drawable.ic_arrow_back_24
-            )!!.apply {
-                setTint(getAttrColor(com.google.android.material.R.attr.colorOnSurface))
-            })
+            supportActionBar?.setHomeAsUpIndicator(
+                AppCompatResources.getDrawable(
+                    this@AbstractActivity,
+                    R.drawable.ic_arrow_back_24,
+                )!!.apply {
+                    setTint(getAttrColor(com.google.android.material.R.attr.colorOnSurface))
+                },
+            )
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
         }
     }
@@ -75,13 +80,10 @@ abstract class AbstractActivity<Binding : ViewBinding> : AppCompatActivity() {
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun createBindingInstance(
-        inflater: LayoutInflater,
-    ): Binding {
+    private fun createBindingInstance(inflater: LayoutInflater): Binding {
         val vbType = (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0]
         val vbClass = vbType as Class<Binding>
         val method = vbClass.getMethod("inflate", LayoutInflater::class.java)
         return method.invoke(null, inflater) as Binding
     }
-
 }

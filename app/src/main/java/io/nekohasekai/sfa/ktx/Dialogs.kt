@@ -5,7 +5,9 @@ import androidx.annotation.StringRes
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.nekohasekai.sfa.R
 
-fun Context.errorDialogBuilder(@StringRes messageId: Int): MaterialAlertDialogBuilder {
+fun Context.errorDialogBuilder(
+    @StringRes messageId: Int,
+): MaterialAlertDialogBuilder {
     return MaterialAlertDialogBuilder(this)
         .setTitle(R.string.error_title)
         .setMessage(messageId)

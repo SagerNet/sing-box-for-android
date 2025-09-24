@@ -1,6 +1,7 @@
 package io.nekohasekai.sfa.database
 
 import android.os.Parcelable
+import androidx.room.ColumnInfo
 import androidx.room.Delete
 import androidx.room.Entity
 import androidx.room.Insert
@@ -19,12 +20,11 @@ class Profile(
     @PrimaryKey(autoGenerate = true) var id: Long = 0L,
     var userOrder: Long = 0L,
     var name: String = "",
-    var typed: TypedProfile = TypedProfile()
+    @ColumnInfo(defaultValue = "NULL") var icon: String? = null,
+    var typed: TypedProfile = TypedProfile(),
 ) : Parcelable {
-
     @androidx.room.Dao
     interface Dao {
-
         @Insert
         fun insert(profile: Profile): Long
 
@@ -54,8 +54,5 @@ class Profile(
 
         @Query("SELECT MAX(id) + 1 FROM profiles")
         fun nextFileID(): Long?
-
     }
-
 }
-

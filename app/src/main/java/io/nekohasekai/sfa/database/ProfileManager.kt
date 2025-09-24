@@ -9,7 +9,6 @@ import kotlinx.coroutines.launch
 
 @Suppress("RedundantSuspendModifier")
 object ProfileManager {
-
     private val callbacks = mutableListOf<() -> Unit>()
 
     fun registerCallback(callback: () -> Unit) {
@@ -27,9 +26,10 @@ object ProfileManager {
             .databaseBuilder(
                 Application.application,
                 ProfileDatabase::class.java,
-                Path.PROFILES_DATABASE_PATH
+                Path.PROFILES_DATABASE_PATH,
             )
-            .fallbackToDestructiveMigration()
+            .addMigrations(ProfileDatabase.MIGRATION_1_2)
+            .fallbackToDestructiveMigrationOnDowngrade()
             .enableMultiInstanceInvalidation()
             .setQueryExecutor { GlobalScope.launch { it.run() } }
             .build()
@@ -42,7 +42,6 @@ object ProfileManager {
     suspend fun nextFileID(): Long {
         return instance.profileDao().nextFileID() ?: 1
     }
-
 
     suspend fun get(id: Long): Profile? {
         return instance.profileDao().get(id)
@@ -99,5 +98,4 @@ object ProfileManager {
     suspend fun list(): List<Profile> {
         return instance.profileDao().list()
     }
-
 }

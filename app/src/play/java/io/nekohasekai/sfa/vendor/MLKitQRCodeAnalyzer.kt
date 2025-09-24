@@ -15,10 +15,9 @@ class MLKitQRCodeAnalyzer(
     private val onSuccess: ((String) -> Unit),
     private val onFailure: ((Exception) -> Unit),
 ) : ImageAnalysis.Analyzer {
-
     private val barcodeScanner =
         BarcodeScanning.getClient(
-            BarcodeScannerOptions.Builder().setBarcodeFormats(Barcode.FORMAT_QR_CODE).build()
+            BarcodeScannerOptions.Builder().setBarcodeFormats(Barcode.FORMAT_QR_CODE).build(),
         )
 
     @Volatile
@@ -60,6 +59,5 @@ class MLKitQRCodeAnalyzer(
 
     @ExperimentalGetImage
     @Suppress("UnsafeCallOnNullableType")
-    private fun ImageProxy.toInputImage() =
-        InputImage.fromMediaImage(image!!, imageInfo.rotationDegrees)
+    private fun ImageProxy.toInputImage() = InputImage.fromMediaImage(image!!, imageInfo.rotationDegrees)
 }

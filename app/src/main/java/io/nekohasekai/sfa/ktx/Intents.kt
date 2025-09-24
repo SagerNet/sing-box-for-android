@@ -7,7 +7,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.nekohasekai.sfa.R
 
 fun Activity.startFilesForResult(
-    launcher: ActivityResultLauncher<String>, input: String
+    launcher: ActivityResultLauncher<String>,
+    input: String,
 ) {
     try {
         return launcher.launch(input)

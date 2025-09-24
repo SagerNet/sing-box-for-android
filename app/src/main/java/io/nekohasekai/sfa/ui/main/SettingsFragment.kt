@@ -33,10 +33,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class SettingsFragment : Fragment() {
-
     private lateinit var binding: FragmentSettingsBinding
+
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentSettingsBinding.inflate(inflater, container, false)
         onCreate()
@@ -44,13 +46,14 @@ class SettingsFragment : Fragment() {
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
-    private val requestIgnoreBatteryOptimizations = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (Application.powerManager.isIgnoringBatteryOptimizations(Application.application.packageName)) {
-            binding.backgroundPermissionCard.isGone = true
+    private val requestIgnoreBatteryOptimizations =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            if (Application.powerManager.isIgnoringBatteryOptimizations(Application.application.packageName)) {
+                binding.backgroundPermissionCard.isGone = true
+            }
         }
-    }
 
     @SuppressLint("BatteryLife")
     private fun onCreate() {
@@ -61,6 +64,21 @@ class SettingsFragment : Fragment() {
             lifecycleScope.launch(Dispatchers.IO) {
                 activity.getExternalFilesDir(null)?.deleteRecursively()
                 reloadSettings()
+            }
+        }
+        binding.useComposeUIEnabled.addTextChangedListener {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val newValue = EnabledType.valueOf(requireContext(), it).boolValue
+                Settings.useComposeUI = newValue
+                if (newValue) {
+                    withContext(Dispatchers.Main) {
+                        // Restart with Compose UI
+                        val intent = Intent(requireContext(), Class.forName("io.nekohasekai.sfa.compose.ComposeActivity"))
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
+                        activity.finish()
+                    }
+                }
             }
         }
         if (!Vendor.checkUpdateAvailable()) {
@@ -101,8 +119,8 @@ class SettingsFragment : Fragment() {
                 requestIgnoreBatteryOptimizations.launch(
                     Intent(
                         android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
-                        Uri.parse("package:${Application.application.packageName}")
-                    )
+                        Uri.parse("package:${Application.application.packageName}"),
+                    ),
                 )
             }
         }
@@ -123,17 +141,20 @@ class SettingsFragment : Fragment() {
     private suspend fun reloadSettings() {
         val activity = activity ?: return
         val binding = binding ?: return
-        val dataSize = Libbox.formatBytes(
-            (activity.getExternalFilesDir(null) ?: activity.filesDir)
-                .walkTopDown().filter { it.isFile }.map { it.length() }.sum()
-        )
+        val dataSize =
+            Libbox.formatBytes(
+                (activity.getExternalFilesDir(null) ?: activity.filesDir)
+                    .walkTopDown().filter { it.isFile }.map { it.length() }.sum(),
+            )
         val checkUpdateEnabled = Settings.checkUpdateEnabled
-        val removeBackgroundPermissionPage = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Application.powerManager.isIgnoringBatteryOptimizations(Application.application.packageName)
-        } else {
-            true
-        }
+        val removeBackgroundPermissionPage =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Application.powerManager.isIgnoringBatteryOptimizations(Application.application.packageName)
+            } else {
+                true
+            }
         val dynamicNotification = Settings.dynamicNotification
+        val useComposeUI = Settings.useComposeUI
         withContext(Dispatchers.Main) {
             binding.dataSizeText.text = dataSize
             binding.checkUpdateEnabled.text =
@@ -146,7 +167,9 @@ class SettingsFragment : Fragment() {
             binding.dynamicNotificationEnabled.text =
                 EnabledType.from(dynamicNotification).getString(requireContext())
             binding.dynamicNotificationEnabled.setSimpleItems(R.array.enabled)
+            binding.useComposeUIEnabled.text =
+                EnabledType.from(useComposeUI).getString(requireContext())
+            binding.useComposeUIEnabled.setSimpleItems(R.array.enabled)
         }
     }
-
 }

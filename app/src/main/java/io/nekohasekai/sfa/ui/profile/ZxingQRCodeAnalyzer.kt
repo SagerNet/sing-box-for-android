@@ -13,8 +13,8 @@ class ZxingQRCodeAnalyzer(
     private val onSuccess: ((String) -> Unit),
     private val onFailure: ((Exception) -> Unit),
 ) : ImageAnalysis.Analyzer {
-
     private val qrCodeReader = QRCodeReader()
+
     override fun analyze(image: ImageProxy) {
         try {
             val bitmap = image.toBitmap()
@@ -26,18 +26,19 @@ class ZxingQRCodeAnalyzer(
                 0,
                 0,
                 bitmap.getWidth(),
-                bitmap.getHeight()
+                bitmap.getHeight(),
             )
             val source = RGBLuminanceSource(bitmap.getWidth(), bitmap.getHeight(), intArray)
-            val result = try {
-                qrCodeReader.decode(BinaryBitmap(GlobalHistogramBinarizer(source)))
-            } catch (e: NotFoundException) {
+            val result =
                 try {
-                    qrCodeReader.decode(BinaryBitmap(GlobalHistogramBinarizer(source.invert())))
-                } catch (ignore: NotFoundException) {
-                    return
+                    qrCodeReader.decode(BinaryBitmap(GlobalHistogramBinarizer(source)))
+                } catch (e: NotFoundException) {
+                    try {
+                        qrCodeReader.decode(BinaryBitmap(GlobalHistogramBinarizer(source.invert())))
+                    } catch (ignore: NotFoundException) {
+                        return
+                    }
                 }
-            }
             Log.d("ZxingQRCodeAnalyzer", "barcode decode success: ${result.text}")
             onSuccess(result.text)
         } catch (e: Exception) {

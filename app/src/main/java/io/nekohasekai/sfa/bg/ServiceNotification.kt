@@ -16,11 +16,11 @@ import androidx.lifecycle.MutableLiveData
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.StatusMessage
 import io.nekohasekai.sfa.Application
+import io.nekohasekai.sfa.LauncherActivity
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.constant.Action
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.database.Settings
-import io.nekohasekai.sfa.ui.MainActivity
 import io.nekohasekai.sfa.utils.CommandClient
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -28,7 +28,8 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.withContext
 
 class ServiceNotification(
-    private val status: MutableLiveData<Status>, private val service: Service
+    private val status: MutableLiveData<Status>,
+    private val service: Service,
 ) : BroadcastReceiver(), CommandClient.Handler {
     companion object {
         private const val notificationId = 1
@@ -60,37 +61,45 @@ class ServiceNotification(
                     0,
                     Intent(
                         service,
-                        MainActivity::class.java
+                        LauncherActivity::class.java,
                     ).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT),
-                    flags
-                )
+                    flags,
+                ),
             )
             .setPriority(NotificationCompat.PRIORITY_LOW).apply {
                 addAction(
                     NotificationCompat.Action.Builder(
-                        0, service.getText(R.string.stop), PendingIntent.getBroadcast(
+                        0,
+                        service.getText(R.string.stop),
+                        PendingIntent.getBroadcast(
                             service,
                             0,
                             Intent(Action.SERVICE_CLOSE).setPackage(service.packageName),
-                            flags
-                        )
-                    ).build()
+                            flags,
+                        ),
+                    ).build(),
                 )
             }
     }
 
-    fun show(lastProfileName: String, @StringRes contentTextId: Int) {
+    fun show(
+        lastProfileName: String,
+        @StringRes contentTextId: Int,
+    ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Application.notification.createNotificationChannel(
                 NotificationChannel(
-                    notificationChannel, "Service Notifications", NotificationManager.IMPORTANCE_LOW
-                )
+                    notificationChannel,
+                    "Service Notifications",
+                    NotificationManager.IMPORTANCE_LOW,
+                ),
             )
         }
         service.startForeground(
-            notificationId, notificationBuilder
+            notificationId,
+            notificationBuilder
                 .setContentTitle(lastProfileName.takeIf { it.isNotBlank() } ?: "sing-box")
-                .setContentText(service.getString(contentTextId)).build()
+                .setContentText(service.getString(contentTextId)).build(),
         )
     }
 
@@ -104,10 +113,13 @@ class ServiceNotification(
     }
 
     private fun registerReceiver() {
-        service.registerReceiver(this, IntentFilter().apply {
-            addAction(Intent.ACTION_SCREEN_ON)
-            addAction(Intent.ACTION_SCREEN_OFF)
-        })
+        service.registerReceiver(
+            this,
+            IntentFilter().apply {
+                addAction(Intent.ACTION_SCREEN_ON)
+                addAction(Intent.ACTION_SCREEN_OFF)
+            },
+        )
         receiverRegistered = true
     }
 
@@ -116,11 +128,14 @@ class ServiceNotification(
             Libbox.formatBytes(status.uplink) + "/s ↑\t" + Libbox.formatBytes(status.downlink) + "/s ↓"
         Application.notificationManager.notify(
             notificationId,
-            notificationBuilder.setContentText(content).build()
+            notificationBuilder.setContentText(content).build(),
         )
     }
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         when (intent.action) {
             Intent.ACTION_SCREEN_ON -> {
                 commandClient.connect()

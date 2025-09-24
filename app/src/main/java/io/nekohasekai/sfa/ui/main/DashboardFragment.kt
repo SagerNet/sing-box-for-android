@@ -27,12 +27,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
-
     private val activity: MainActivity? get() = super.getActivity() as MainActivity?
     private var binding: FragmentDashboardBinding? = null
     private var mediator: TabLayoutMediator? = null
+
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         val binding = FragmentDashboardBinding.inflate(inflater, container, false)
         this.binding = binding
@@ -41,6 +43,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
     }
 
     private val adapter by lazy { Adapter(this) }
+
     private fun onCreate() {
         val activity = activity ?: return
         val binding = binding ?: return
@@ -96,12 +99,13 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
         val activityBinding = activity?.binding ?: return
         val binding = binding ?: return
         if (mediator != null) return
-        mediator = TabLayoutMediator(
-            activityBinding.dashboardTabLayout,
-            binding.dashboardPager
-        ) { tab, position ->
-            tab.setText(Page.values()[position].titleRes)
-        }.apply { attach() }
+        mediator =
+            TabLayoutMediator(
+                activityBinding.dashboardTabLayout,
+                binding.dashboardPager,
+            ) { tab, position ->
+                tab.setText(Page.values()[position].titleRes)
+            }.apply { attach() }
     }
 
     override fun onDestroyView() {
@@ -163,9 +167,12 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
         binding.dashboardPager.setCurrentItem(0, false)
     }
 
-    enum class Page(@StringRes val titleRes: Int, val fragmentClass: Class<out Fragment>) {
+    enum class Page(
+        @StringRes val titleRes: Int,
+        val fragmentClass: Class<out Fragment>,
+    ) {
         Overview(R.string.title_overview, OverviewFragment::class.java),
-        Groups(R.string.title_groups, GroupsFragment::class.java);
+        Groups(R.string.title_groups, GroupsFragment::class.java),
     }
 
     class Adapter(parent: Fragment) : FragmentStateAdapter(parent) {
@@ -177,5 +184,4 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
             return Page.entries[position].fragmentClass.getConstructor().newInstance()
         }
     }
-
 }

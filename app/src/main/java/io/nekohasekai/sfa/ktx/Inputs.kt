@@ -18,8 +18,9 @@ var TextInputLayout.error: String
         editText?.error = value
     }
 
-
-fun TextInputLayout.setSimpleItems(@ArrayRes redId: Int) {
+fun TextInputLayout.setSimpleItems(
+    @ArrayRes redId: Int,
+) {
     (editText as? MaterialAutoCompleteTextView)?.setSimpleItems(redId)
 }
 
@@ -40,7 +41,6 @@ fun TextInputLayout.showErrorIfEmpty(): Boolean {
     }
     return false
 }
-
 
 fun TextInputLayout.addTextChangedListener(listener: (String) -> Unit) {
     addOnEditTextAttachedListener {

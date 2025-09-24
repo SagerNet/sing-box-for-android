@@ -42,7 +42,7 @@
                             android:id="@+id/switchPerAppProxy"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/title_per_app_proxy"
+                            android:text="@string/per_app_proxy"
                             android:textAppearance="?attr/textAppearanceTitleLarge" />
 
                     </LinearLayout>

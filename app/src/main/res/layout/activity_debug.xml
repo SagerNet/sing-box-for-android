@@ -60,7 +60,7 @@
                         style="@style/Widget.Material3.Button.TextButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/action_scan_vpn" />
+                        android:text="@string/per_app_proxy_scan" />
 
                 </LinearLayout>
 

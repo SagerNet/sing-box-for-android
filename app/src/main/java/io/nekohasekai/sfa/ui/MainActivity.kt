@@ -52,9 +52,9 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.Date
 
-class MainActivity : AbstractActivity<ActivityMainBinding>(),
+class MainActivity :
+    AbstractActivity<ActivityMainBinding>(),
     ServiceConnection.Callback {
-
     companion object {
         private const val TAG = "MainActivity"
     }
@@ -82,7 +82,7 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
                     R.id.navigation_log,
                     R.id.navigation_configuration,
                     R.id.navigation_settings,
-                )
+                ),
             )
         setupActionBarWithNavController(navController, appBarConfiguration)
         binding.navView.setupWithNavController(navController)
@@ -100,13 +100,13 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
     private fun onDestinationChanged(
         navController: NavController,
         navDestination: NavDestination,
-        bundle: Bundle?
+        bundle: Bundle?,
     ) {
         val destinationId = navDestination.id
         binding.dashboardTabContainer.isVisible = destinationId == R.id.navigation_dashboard
     }
 
-    override public fun onNewIntent(intent: Intent) {
+    public override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         val uri = intent.data ?: return
         when (intent.action) {
@@ -116,26 +116,29 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
             }
         }
         if (uri.scheme == "sing-box" && uri.host == "import-remote-profile") {
-            val profile = try {
-                Libbox.parseRemoteProfileImportLink(uri.toString())
-            } catch (e: Exception) {
-                errorDialogBuilder(e).show()
-                return
-            }
+            val profile =
+                try {
+                    Libbox.parseRemoteProfileImportLink(uri.toString())
+                } catch (e: Exception) {
+                    errorDialogBuilder(e).show()
+                    return
+                }
             MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.import_remote_profile)
                 .setMessage(
                     getString(
                         R.string.import_remote_profile_message,
                         profile.name,
-                        profile.host
-                    )
+                        profile.host,
+                    ),
                 )
                 .setPositiveButton(R.string.ok) { _, _ ->
-                    startActivity(Intent(this, NewProfileActivity::class.java).apply {
-                        putExtra("importName", profile.name)
-                        putExtra("importURL", profile.url)
-                    })
+                    startActivity(
+                        Intent(this, NewProfileActivity::class.java).apply {
+                            putExtra("importName", profile.name)
+                            putExtra("importURL", profile.url)
+                        },
+                    )
                 }
                 .setNegativeButton(android.R.string.cancel, null)
                 .show()
@@ -148,8 +151,8 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
                     .setMessage(
                         getString(
                             R.string.import_profile_message,
-                            content.name
-                        )
+                            content.name,
+                        ),
                     )
                     .setPositiveButton(R.string.ok) { _, _ ->
                         lifecycleScope.launch {
@@ -241,15 +244,16 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
         }
     }
 
-    private val notificationPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) {
-        if (Settings.dynamicNotification && !it) {
-            onServiceAlert(Alert.RequestNotificationPermission, null)
-        } else {
-            startService0()
+    private val notificationPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission(),
+        ) {
+            if (Settings.dynamicNotification && !it) {
+                onServiceAlert(Alert.RequestNotificationPermission, null)
+            } else {
+                startService0()
+            }
         }
-    }
 
     private val locationPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) {
@@ -269,46 +273,55 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
             }
         }
 
-    private val prepareLauncher = registerForActivityResult(PrepareService()) {
-        if (it) {
-            startService()
-        } else {
-            onServiceAlert(Alert.RequestVPNPermission, null)
+    private val prepareLauncher =
+        registerForActivityResult(PrepareService()) {
+            if (it) {
+                startService()
+            } else {
+                onServiceAlert(Alert.RequestVPNPermission, null)
+            }
         }
-    }
 
     private class PrepareService : ActivityResultContract<Intent, Boolean>() {
-        override fun createIntent(context: Context, input: Intent): Intent {
+        override fun createIntent(
+            context: Context,
+            input: Intent,
+        ): Intent {
             return input
         }
 
-        override fun parseResult(resultCode: Int, intent: Intent?): Boolean {
+        override fun parseResult(
+            resultCode: Int,
+            intent: Intent?,
+        ): Boolean {
             return resultCode == RESULT_OK
         }
     }
 
-    private suspend fun prepare() = withContext(Dispatchers.Main) {
-        try {
-            val intent = VpnService.prepare(this@MainActivity)
-            if (intent != null) {
-                prepareLauncher.launch(intent)
-                true
-            } else {
+    private suspend fun prepare() =
+        withContext(Dispatchers.Main) {
+            try {
+                val intent = VpnService.prepare(this@MainActivity)
+                if (intent != null) {
+                    prepareLauncher.launch(intent)
+                    true
+                } else {
+                    false
+                }
+            } catch (e: Exception) {
+                onServiceAlert(Alert.RequestVPNPermission, e.message)
                 false
             }
-        } catch (e: Exception) {
-            onServiceAlert(Alert.RequestVPNPermission, e.message)
-            false
         }
-    }
 
     override fun onServiceStatusChanged(status: Status) {
         serviceStatus.postValue(status)
     }
 
-    override fun onServiceAlert(type: Alert, message: String?) {
-        serviceStatus.value = Status.Stopped
-
+    override fun onServiceAlert(
+        type: Alert,
+        message: String?,
+    ) {
         when (type) {
             Alert.RequestLocationPermission -> {
                 return requestLocationPermission()
@@ -346,7 +359,6 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
             Alert.StartService -> {
                 builder.setTitle(getString(R.string.service_error_title_start_service))
                 builder.setMessage(message)
-
             }
 
             else -> {}
@@ -363,15 +375,16 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
     }
 
     private fun requestFineLocationPermission() {
-        val message = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            Html.fromHtml(
-                getString(R.string.location_permission_description),
-                Html.FROM_HTML_MODE_LEGACY
-            )
-        } else {
-            @Suppress("DEPRECATION")
-            Html.fromHtml(getString(R.string.location_permission_description))
-        }
+        val message =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                Html.fromHtml(
+                    getString(R.string.location_permission_description),
+                    Html.FROM_HTML_MODE_LEGACY,
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                Html.fromHtml(getString(R.string.location_permission_description))
+            }
         MaterialAlertDialogBuilder(this)
             .setTitle(R.string.location_permission_title)
             .setMessage(message)
@@ -398,8 +411,8 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
             .setMessage(
                 Html.fromHtml(
                     getString(R.string.location_permission_background_description),
-                    Html.FROM_HTML_MODE_LEGACY
-                )
+                    Html.FROM_HTML_MODE_LEGACY,
+                ),
             )
             .setPositiveButton(R.string.ok) { _, _ ->
                 backgroundLocationPermissionLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
@@ -431,5 +444,4 @@ class MainActivity : AbstractActivity<ActivityMainBinding>(),
         connection.disconnect()
         super.onDestroy()
     }
-
 }

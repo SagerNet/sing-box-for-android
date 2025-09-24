@@ -14,13 +14,13 @@ fun Context.launchCustomTab(link: String) {
             CustomTabsIntent.COLOR_SCHEME_LIGHT,
             CustomTabColorSchemeParams.Builder().apply {
                 setToolbarColor(color)
-            }.build()
+            }.build(),
         )
         setColorSchemeParams(
             CustomTabsIntent.COLOR_SCHEME_DARK,
             CustomTabColorSchemeParams.Builder().apply {
                 setToolbarColor(color)
-            }.build()
+            }.build(),
         )
     }.build().launchUrl(this, Uri.parse(link))
 }

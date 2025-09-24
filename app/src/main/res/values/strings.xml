@@ -1,10 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name" translatable="false">sing-box</string>
-
     <string name="stop">Stop</string>
     <string name="ok">OK</string>
     <string name="no_thanks">No, thanks</string>
-
     <string name="title_dashboard">Dashboard</string>
     <string name="title_configuration">Profiles</string>
     <string name="title_log">Logs</string>
@@ -15,7 +14,24 @@
     <string name="title_overview">Overview</string>
     <string name="title_groups">Groups</string>
     <string name="title_debug">Debug</string>
-
+    <string name="title_connections">Connections</string>
+    <string name="title_others">Others</string>
+    <string name="title_experimental_features">Experimental Features</string>
+    <string name="message_experimental_features">Try out new features that are still in development</string>
+    <string name="use_compose_ui">Use New Material You UI (Beta)</string>
+    <string name="no_profiles">No profiles configured</string>
+    <string name="status">Status</string>
+    <string name="memory">Memory</string>
+    <string name="goroutines">Goroutines</string>
+    <string name="traffic">Traffic</string>
+    <string name="upload">Upload</string>
+    <string name="download">Download</string>
+    <string name="connections_in">Inbound</string>
+    <string name="connections_out">Outbound</string>
+    <string name="clash_mode">Clash Mode</string>
+    <string name="mode">Mode</string>
+    <string name="system_proxy">System Proxy</string>
+    <string name="url_test">Test</string>
     <string name="quick_toggle">Toggle</string>
     <string name="profile_name">Name</string>
     <string name="profile_type">Type</string>
@@ -29,75 +45,89 @@
     <string name="profile_share_url">Share URL as QR Code</string>
     <string name="profile_input_required">Required</string>
     <string name="profile_empty">Empty profiles</string>
-    <string name="profile_item_last_updated">Last Updated: %s</string>
     <string name="profile_last_updated">Last Updated</string>
+    <string name="time_just_now">Just now</string>
+    <string name="time_yesterday">Yesterday</string>
+    <string name="time_now">Now</string>
+    <string name="time_yesterday_short">1d</string>
+    <string name="time_minutes_short">%dm</string>
+    <string name="time_hours_short">%dh</string>
+    <string name="time_days_short">%dd</string>
+    <plurals name="time_minutes_ago">
+        <item quantity="one">%d minute ago</item>
+        <item quantity="other">%d minutes ago</item>
+    </plurals>
+    <plurals name="time_hours_ago">
+        <item quantity="one">%d hour ago</item>
+        <item quantity="other">%d hours ago</item>
+    </plurals>
+    <plurals name="time_days_ago">
+        <item quantity="one">%d day ago</item>
+        <item quantity="other">%d days ago</item>
+    </plurals>
     <string name="profile_update">Update</string>
     <string name="profile_auto_update">Auto Update</string>
     <string name="profile_auto_update_interval">Auto Update Interval (Minutes)</string>
     <string name="profile_auto_update_interval_minimum_hint">Minimum value is 15</string>
-
     <string name="profile_type_local">Local</string>
     <string name="profile_type_remote">Remote</string>
     <string name="profile_source_create_new">Create New</string>
     <string name="profile_source_import">Import</string>
-
     <string name="profile_add_import_file">Import from file</string>
     <string name="profile_add_scan_qr_code">Scan QR code</string>
     <string name="profile_add_scan_use_front_camera">Front camera</string>
     <string name="profile_add_scan_use_vendor_analyzer">MLKit analyzer</string>
     <string name="profile_add_scan_enable_torch">Torch</string>
-
     <string name="profile_add_create_manually">Create Manually</string>
-
     <string name="menu_undo">Undo</string>
     <string name="menu_redo">Redo</string>
     <string name="menu_format">Format</string>
     <string name="menu_delete">Delete</string>
     <string name="menu_share">Share</string>
-
     <string name="status_default">Service not started</string>
     <string name="status_starting">Service starting…</string>
     <string name="status_stopping">Service stopping…</string>
     <string name="status_started">Service started</string>
-
     <string name="enabled">Enabled</string>
     <string name="disabled">Disabled</string>
-
     <string name="settings_clear_working_directory">Clear Working Directory</string>
-
     <string name="error_title">Error</string>
     <string name="file_manager_missing">Your device lacks an Android standard file selector, please install one, such as Material Files.</string>
     <string name="loading">Loading…</string>
-
     <string name="service_error_missing_permission">Missiong VPN permission</string>
-    <string name="service_error_missing_notification_permission">Missing notification permission</string>
     <string name="service_error_empty_configuration">Empty configuration</string>
+    <string name="error_empty_file">Empty file</string>
+    <string name="error_decode_profile">Failed to decode profile: %s</string>
+    <string name="error_invalid_configuration">Invalid sing-box configuration: %s</string>
     <string name="service_error_title_start_command_server">Start command server</string>
     <string name="service_error_title_create_service">Create service</string>
     <string name="service_error_title_start_service">Start service</string>
     <string name="service_error_title_deprecated_warning">Deprecated Warning</string>
     <string name="service_error_deprecated_warning_documentation">Documentation</string>
-
-    <string name="status_status">Status</string>
-    <string name="status_memory">Memory</string>
-    <string name="status_goroutines" translatable="false">Goroutines</string>
-    <string name="status_connections">Connections</string>
-    <string name="status_connections_inbound">Inbound</string>
-    <string name="status_connections_outbound">Outbound</string>
     <string name="status_uplink">Uplink</string>
     <string name="status_downlink">Downlink</string>
-    <string name="status_traffic">Traffic</string>
     <string name="status_traffic_total">Traffic Total</string>
-
     <string name="group_selected_title">Selected</string>
-
     <string name="profile">Profile</string>
     <string name="core_version">Version</string>
+    <string name="core_version_title">Core Version</string>
     <string name="core">Core</string>
     <string name="dynamic_notification">Display realtime speed in notification</string>
     <string name="core_data_size">Data Size</string>
+    <string name="calculating">Calculating...</string>
+    <string name="options">Options</string>
+    <string name="disable_deprecated_warnings">Disable Deprecated Warnings</string>
+    <string name="working_directory">Working Directory</string>
+    <string name="destroy">Destroy</string>
+    <string name="ignore_memory_limit">Ignore Memory Limit</string>
+    <string name="ignore_memory_limit_description">Do not enforce memory limits on sing-box.</string>
+    <string name="auto_redirect">Auto Redirect</string>
+    <string name="auto_redirect_description">ROOT permission required</string>
+    <string name="per_app_proxy">Per-App Proxy</string>
+    <string name="unavailable">Unavailable</string>
     <string name="check_update_automatic">Automatic Update Check</string>
     <string name="check_update">Check Update</string>
+    <string name="no_updates_available">No updates available</string>
     <string name="privacy_policy">Privacy Policy</string>
     <string name="title_app_settings">App</string>
     <string name="memory_limit">Memory Limit</string>
@@ -107,12 +137,9 @@
     <string name="request_background_permission">Ignore Battery Optimizations</string>
     <string name="import_remote_profile">Import remote profile</string>
     <string name="import_remote_profile_message">Are you sure to import remote profile %1$s? You will connect to %2$s to download the configuration.</string>
-
-    <string name="title_profile_override">Profile Override</string>
+    <string name="profile_override">Profile Override</string>
     <string name="profile_override_description">Overrides profile configuration items with platform-specific values.</string>
     <string name="profile_override_configure">Configure</string>
-
-    <string name="title_per_app_proxy">Per-app Proxy</string>
     <string name="per_app_proxy_description">Override include_package and exclude_package in the configuration.</string>
     <string name="per_app_proxy_mode">Proxy Mode</string>
     <string name="per_app_proxy_mode_include">Include</string>
@@ -120,10 +147,8 @@
     <string name="per_app_proxy_mode_exclude">Exclude</string>
     <string name="per_app_proxy_mode_exclude_description">Selected apps will be excluded from VPN</string>
     <string name="per_app_proxy_action_copy">Copy</string>
-    <string name="per_app_proxy_action_copy_application_label">Name</string>
     <string name="per_app_proxy_action_copy_package_name">Package Name</string>
     <string name="per_app_proxy_action_copy_uid">UID</string>
-
     <string name="per_app_proxy_sort_mode">Sort By</string>
     <string name="per_app_proxy_sort_mode_name">By name</string>
     <string name="per_app_proxy_sort_mode_package_name">By package name</string>
@@ -131,35 +156,26 @@
     <string name="per_app_proxy_sort_mode_install_time">By install time</string>
     <string name="per_app_proxy_sort_mode_update_time">By update time</string>
     <string name="per_app_proxy_sort_mode_reverse">Reverse</string>
-
     <string name="per_app_proxy_filter">Filter</string>
     <string name="per_app_proxy_hide_system_apps">Hide system apps</string>
     <string name="per_app_proxy_hide_offline_apps">Hide offline apps</string>
     <string name="per_app_proxy_hide_disabled_apps">Hide disabled apps</string>
-
     <string name="per_app_proxy_select">Select</string>
     <string name="per_app_proxy_select_all">Select all</string>
     <string name="per_app_proxy_select_none">Deselect all</string>
-
     <string name="per_app_proxy_backup">Backup</string>
     <string name="per_app_proxy_import">Import from clipboard</string>
     <string name="per_app_proxy_export">Export to clipboard</string>
-
     <string name="per_app_proxy_scan">Scan</string>
     <string name="per_app_proxy_scan_china_apps">China apps</string>
-
     <string name="content_description_app_icon">App icon</string>
     <string name="toast_clipboard_empty">Clipboard is empty</string>
-    <string name="toast_app_list_empty">App list is empty</string>
     <string name="toast_copied_to_clipboard">Exported to clipboard</string>
     <string name="toast_imported_from_clipboard">Imported from clipboard</string>
-    <string name="message_import_from_clipboard">Importing app list from clipboard will overwrite your current list. Are you sure to continue?</string>
     <string name="message_scanning">Scanning…</string>
-    <string name="message_scan_app_error">Error scanning apps</string>
     <string name="message_scan_app_no_apps_found">No matching apps found</string>
     <string name="message_scan_app_found">Found the following apps, please choose the action you want.</string>
     <string name="title_scan_result">Scan Result</string>
-    <string name="action_select">Select</string>
     <string name="action_deselect">Deselect</string>
     <string name="per_app_proxy_update_on_change">Update on new China App Installed</string>
     <string name="import_profile">Import profile</string>
@@ -168,10 +184,18 @@
     <string name="search">Search</string>
     <string name="urltest" translatable="false">URLTest</string>
     <string name="expand">Expand</string>
+    <string name="collapse">Collapse</string>
+    <string name="expand_all">Expand All</string>
+    <string name="collapse_all">Collapse All</string>
+    <string name="close">Close</string>
+    <string name="close_connections_confirm">Close all connections?</string>
+    <string name="icon_count_format">%d icons</string>
+    <string name="no_icons_found">No icons found</string>
+    <string name="no_icons_match">No icons match \"%s\"</string>
     <string name="http_proxy">HTTP Proxy</string>
+    <string name="system_http_proxy">System HTTP Proxy</string>
     <string name="title_scan_vpn">Scan VPN apps</string>
     <string name="message_scan_vpn">Check the VPN installed on the device and its contents</string>
-    <string name="action_scan_vpn">Scan</string>
     <string name="message_debug_tools">Some debug utilities</string>
     <string name="action_open">Open</string>
     <string name="vpn_app_type">App Type</string>
@@ -180,14 +204,112 @@
     <string name="vpn_golang_version">Go Version</string>
     <string name="vpn_app_type_other">Other</string>
     <string name="vpn_core_type_unknown">Unknown</string>
-    <string name="no_updates_available">No updates available</string>
     <string name="sponsor">Sponsor</string>
     <string name="sponsor_message">If I\'ve defended your modern life, please consider sponsoring me.</string>
     <string name="action_start">Start</string>
     <string name="location_permission_title">Location permission</string>
-    <string name="location_permission_description"><![CDATA[Your profile contains <strong><tt>wifi_ssid</tt> or <tt>wifi_bssid</tt> routing rules</strong>. To make them work, sing-box uses the <strong>location</strong> permission <strong>in the background</strong> to get information about the connected Wi-Fi network. The information will be used <strong>for routing purposes only</strong>.]]></string>
-    <string name="location_permission_background_description"><![CDATA[On Android 10 and up, <strong>background location</strong> permission is required. Select <strong>Allow all the time</strong> to grant the permission.]]></string>
-    <string name="open_settings">Open Settings</string>
+    <string name="location_permission_description">Your profile contains &lt;strong&gt;&lt;tt&gt;wifi_ssid&lt;/tt&gt; or &lt;tt&gt;wifi_bssid&lt;/tt&gt; routing rules&lt;/strong&gt;. To make them work, sing-box uses the &lt;strong&gt;location&lt;/strong&gt; permission &lt;strong&gt;in the background&lt;/strong&gt; to get information about the connected Wi-Fi network. The information will be used &lt;strong&gt;for routing purposes only&lt;/strong&gt;.</string>
+    <string name="location_permission_background_description">On Android 10 and up, &lt;strong&gt;background location&lt;/strong&gt; permission is required. Select &lt;strong&gt;Allow all the time&lt;/strong&gt; to grant the permission.</string>
     <string name="notification_permission_title">Notification permission</string>
     <string name="notification_permission_required_description">sing-box is unable to show real-time network speeds without the permission to send notifications. Please grant the permission or disable real-time network speeds notification before starting the service.</string>
+    <string name="per_app_proxy_disabled_play_store">Unavailable in the Play Store version</string>
+    <string name="per_app_proxy_disabled_message">Google Play refuses to allow us to use the QUERY_ALL_PACKAGES permission (while not prohibiting other similar apps from doing so), which is required for listing apps.</string>
+    <string name="root_access_required">Root access required</string>
+    <string name="dashboard_items">Dashboard Items</string>
+    <string name="reset_order">Reset order</string>
+    <string name="reset">Reset</string>
+    <string name="drag_handle_to_reorder">Drag handle to reorder items</string>
+    <string name="drag_to_reorder">Drag to reorder</string>
+    <string name="add_profile">Add Profile</string>
+    <string name="import_from_file_description">Import configuration from a local file</string>
+    <string name="scan_qr_code_description">Scan a configuration QR code</string>
+    <string name="create_new_profile_description">Create a new profile from scratch</string>
+    <string name="profile_saved_successfully">Profile saved successfully</string>
+    <string name="profile_save_failed">Failed to save profile: %s</string>
+    <string name="profile_type_remote_updated">Remote • %s</string>
+    <string name="update_successful">Update successful</string>
+    <string name="update_profile">Update profile</string>
+    <string name="more_options">More options</string>
+    <string name="edit">Edit</string>
+    <string name="save_as_file">Save As File</string>
+    <string name="share_as_file">Share As File</string>
+    <string name="service">Service</string>
+    <string name="about">About</string>
+    <string name="source_code">Source Code</string>
+    <string name="switch_to_legacy_ui">Switch to legacy UI</string>
+    <string name="unsaved_changes">Unsaved Changes</string>
+    <string name="unsaved_changes_message">You have unsaved changes. Do you want to discard them?</string>
+    <string name="discard">Discard</string>
+    <string name="save">Save</string>
+    <string name="share_profile">Share Profile</string>
+    <string name="cancel">Cancel</string>
+    <string name="logs_copied_to_clipboard">Logs copied to clipboard</string>
+    <string name="no_logs_to_copy">No logs to copy</string>
+    <string name="logs_saved_successfully">Logs saved successfully</string>
+    <string name="failed_to_save_logs">Failed to save logs: %s</string>
+    <string name="failed_to_share_logs">Failed to share logs: %s</string>
+    <string name="no_logs_to_share">No logs to share</string>
+    <string name="copied_to_clipboard">Copied to clipboard</string>
+    <string name="qr_code_saved_to_gallery">QR code saved to gallery</string>
+    <string name="failed_to_save_qr_code">Failed to save QR code: %s</string>
+    <string name="failed_to_share_qr_code">Failed to share QR code: %s</string>
+    <string name="content_description_back">Back</string>
+    <string name="content_description_scroll_to_bottom">Scroll to bottom</string>
+    <string name="content_description_exit_selection_mode">Exit selection mode</string>
+    <string name="content_description_copy_selected">Copy selected</string>
+    <string name="content_description_clear_search">Clear search</string>
+    <string name="content_description_qr_code">QR Code</string>
+    <string name="search_logs_placeholder">Search logs…</string>
+    <string name="intent_share_logs">Share Logs</string>
+    <string name="intent_share_qr_code">Share QR Code</string>
+    <string name="content_description_resume_logs">Resume logs</string>
+    <string name="content_description_pause_logs">Pause logs</string>
+    <string name="content_description_collapse_search">Collapse search</string>
+    <string name="content_description_search_logs">Search logs</string>
+    <string name="profile_qr_code_text">Profile QR Code: %s</string>
+    <!-- Profile Edit Screen -->
+    <string name="basic_information">Basic Information</string>
+    <string name="icon">Icon</string>
+    <string name="custom">Custom</string>
+    <string name="default_text">Default</string>
+    <string name="remote_configuration">Remote Configuration</string>
+    <string name="last_updated_format">Last updated: %s</string>
+    <string name="content">Content</string>
+    <string name="json_viewer">JSON Viewer</string>
+    <string name="json_editor">JSON Editor</string>
+    <string name="success">Success</string>
+    <string name="configuration_file_not_found">Configuration file not found</string>
+    <string name="configuration_export_failed">Export failed: %s</string>
+    <string name="configuration_exported_successfully">Configuration exported successfully</string>
+    <string name="failed_to_read_configuration">Failed to read configuration: %s</string>
+    <!-- Profile Content Editor -->
+    <string name="view_configuration">View Configuration</string>
+    <string name="clear">Clear</string>
+    <string name="previous">Previous</string>
+    <string name="next">Next</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="configuration_saved">Configuration saved</string>
+    <string name="search_placeholder">Find in document</string>
+    <!-- Icon Selection -->
+    <string name="profile_icon">Profile Icon</string>
+    <string name="select_icon">Select Icon</string>
+    <string name="search_icons_placeholder">Search icons...</string>
+    <string name="close_search">Close search</string>
+    <string name="search_icons">Search icons</string>
+    <string name="current_icon_format">Current: %s</string>
+    <string name="categories">Categories</string>
+    <string name="all_icons">All Icons</string>
+    <string name="back_to_categories">Back to categories</string>
+    <string name="select_profile_icon">Select Profile Icon</string>
+    <string name="auto">Auto</string>
+    <!-- New Profile Screen -->
+    <!-- Log Screen -->
+    <string name="filter_label">Filter: %s</string>
+    <string name="clear_filter">Clear</string>
+    <string name="log_level">Log Level</string>
+    <string name="save_to_clipboard">To Clipboard</string>
+    <string name="save_to_file">To File</string>
+    <string name="clear_logs">Clear Logs</string>
+    <string name="selected_count">%d selected</string>
+    <string name="not_selected">Not selected</string>
 </resources>

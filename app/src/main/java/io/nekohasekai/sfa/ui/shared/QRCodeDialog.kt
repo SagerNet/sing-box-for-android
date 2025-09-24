@@ -14,7 +14,7 @@ class QRCodeDialog(private val bitmap: Bitmap) :
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         val binding = FragmentQrcodeDialogBinding.inflate(inflater, container, false)
         val behavior = BottomSheetBehavior.from(binding.qrcodeLayout)
@@ -22,5 +22,4 @@ class QRCodeDialog(private val bitmap: Bitmap) :
         binding.qrCode.setImageBitmap(bitmap)
         return binding.root
     }
-
 }

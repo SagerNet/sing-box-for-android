@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "b7bfa362ec191b0a18660e615da81e46",
+    "identityHash": "24de05fe91b147c75b870f91b2f4871b",
     "entities": [
       {
         "tableName": "profiles",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `userOrder` INTEGER NOT NULL, `name` TEXT NOT NULL, `typed` BLOB NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `userOrder` INTEGER NOT NULL, `name` TEXT NOT NULL, `icon` TEXT, `typed` BLOB NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -27,6 +27,11 @@
             "notNull": true
           },
           {
+            "fieldPath": "icon",
+            "columnName": "icon",
+            "affinity": "TEXT"
+          },
+          {
             "fieldPath": "typed",
             "columnName": "typed",
             "affinity": "BLOB",
@@ -38,15 +43,12 @@
           "columnNames": [
             "id"
           ]
-        },
-        "indices": [],
-        "foreignKeys": []
+        }
       }
     ],
-    "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b7bfa362ec191b0a18660e615da81e46')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '24de05fe91b147c75b870f91b2f4871b')"
     ]
   }
 }

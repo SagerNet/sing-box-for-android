@@ -11,7 +11,7 @@
         <menu>
             <item
                 android:id="@+id/action_copy_application_label"
-                android:title="@string/per_app_proxy_action_copy_application_label" />
+                android:title="@string/profile_name" />
             <item
                 android:id="@+id/action_copy_package_name"
                 android:title="@string/per_app_proxy_action_copy_package_name" />

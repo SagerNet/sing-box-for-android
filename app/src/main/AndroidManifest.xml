@@ -21,6 +21,10 @@
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
 
+    <!-- For saving images to gallery on older Android versions -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+
     <uses-permission
         android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
@@ -41,18 +45,10 @@
             android:resource="@xml/shortcuts" />
 
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".LauncherActivity"
             android:exported="true"
             android:icon="@mipmap/ic_launcher"
-            android:launchMode="singleTask">
-
-            <meta-data
-                android:name="android.app.shortcuts"
-                android:resource="@xml/shortcuts" />
-
-            <meta-data
-                android:name="firebase_crashlytics_collection_enabled"
-                android:value="false" />
+            android:theme="@style/AppTheme.Translucent">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -100,6 +96,33 @@
         </activity>
 
         <activity
+            android:name=".ui.MainActivity"
+            android:exported="false"
+            android:icon="@mipmap/ic_launcher"
+            android:launchMode="singleTask">
+
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
+
+            <meta-data
+                android:name="firebase_crashlytics_collection_enabled"
+                android:value="false" />
+        </activity>
+
+        <activity
+            android:name=".compose.ComposeActivity"
+            android:exported="false"
+            android:icon="@mipmap/ic_launcher"
+            android:launchMode="singleTask"
+            android:theme="@style/AppTheme">
+
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
+        </activity>
+
+        <activity
             android:name=".ui.ShortcutActivity"
             android:excludeFromRecents="true"
             android:exported="true"
@@ -114,6 +137,18 @@
         <activity
             android:name="io.nekohasekai.sfa.ui.profile.NewProfileActivity"
             android:exported="false" />
+        <activity
+            android:name="io.nekohasekai.sfa.compose.NewProfileComposeActivity"
+            android:exported="false"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name="io.nekohasekai.sfa.compose.EditProfileComposeActivity"
+            android:exported="false"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name="io.nekohasekai.sfa.compose.GroupsComposeActivity"
+            android:exported="false"
+            android:theme="@style/AppTheme" />
         <activity
             android:name="io.nekohasekai.sfa.ui.profile.EditProfileActivity"
             android:exported="false" />

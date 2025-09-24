@@ -17,11 +17,10 @@ import kotlinx.coroutines.withContext
 
 class ProfileOverrideActivity :
     AbstractActivity<ActivityConfigOverrideBinding>() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setTitle(R.string.title_profile_override)
+        setTitle(R.string.profile_override)
         binding.switchPerAppProxy.isChecked = Settings.perAppProxyEnabled
         binding.switchPerAppProxy.setOnCheckedChangeListener { _, isChecked ->
             Settings.perAppProxyEnabled = isChecked

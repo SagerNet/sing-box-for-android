@@ -46,17 +46,18 @@ suspend fun Context.shareProfile(profile: Profile) {
                 Intent(Intent.ACTION_SEND).setType("application/octet-stream")
                     .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     .putExtra(Intent.EXTRA_STREAM, uri),
-                getString(R.string.abc_shareactionprovider_share_with)
-            )
+                getString(R.string.abc_shareactionprovider_share_with),
+            ),
         )
     }
 }
 
 fun FragmentActivity.shareProfileURL(profile: Profile) {
-    val link = Libbox.generateRemoteProfileImportLink(
-        profile.name,
-        profile.typed.remoteURL
-    )
+    val link =
+        Libbox.generateRemoteProfileImportLink(
+            profile.name,
+            profile.typed.remoteURL,
+        )
     val imageSize = dp2px(256)
     val color = getAttrColor(com.google.android.material.R.attr.colorPrimary)
     val image = QRCodeWriter().encode(link, BarcodeFormat.QR_CODE, imageSize, imageSize, null)
@@ -67,7 +68,6 @@ fun FragmentActivity.shareProfileURL(profile: Profile) {
         val offset = y * imageWidth
         for (x in 0 until imageWidth) {
             imageArray[offset + x] = if (image.get(x, y)) color else Color.TRANSPARENT
-
         }
     }
     val bitmap = Bitmap.createBitmap(imageWidth, imageHeight, Bitmap.Config.ARGB_8888)

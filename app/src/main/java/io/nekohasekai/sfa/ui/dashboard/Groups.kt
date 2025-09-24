@@ -1,5 +1,6 @@
 package io.nekohasekai.sfa.ui.dashboard
 
+import androidx.compose.runtime.Immutable
 import io.nekohasekai.libbox.OutboundGroup
 import io.nekohasekai.libbox.OutboundGroupItem
 import io.nekohasekai.libbox.OutboundGroupItemIterator
@@ -10,7 +11,7 @@ data class Group(
     val selectable: Boolean,
     var selected: String,
     var isExpand: Boolean,
-    var items: List<GroupItem>,
+    val items: List<GroupItem>,
 ) {
     constructor(item: OutboundGroup) : this(
         item.tag,
@@ -22,6 +23,7 @@ data class Group(
     )
 }
 
+@Immutable
 data class GroupItem(
     val tag: String,
     val type: String,
