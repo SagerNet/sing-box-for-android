@@ -1,5 +1,7 @@
 package io.nekohasekai.sfa.bg
 
+import android.app.KeyguardManager
+import android.content.Context
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import androidx.annotation.RequiresApi
@@ -32,15 +34,20 @@ class TileService : TileService(), ServiceConnection.Callback {
     }
 
     override fun onClick() {
+        val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+        if (keyguardManager.isKeyguardLocked) {
+            unlockAndRun {
+                toggleService()
+            }
+        } else {
+            toggleService()
+        }
+    }
+
+    private fun toggleService() {
         when (connection.status) {
-            Status.Stopped -> {
-                BoxService.start()
-            }
-
-            Status.Started -> {
-                BoxService.stop()
-            }
-
+            Status.Stopped -> BoxService.start()
+            Status.Started -> BoxService.stop()
             else -> {}
         }
     }

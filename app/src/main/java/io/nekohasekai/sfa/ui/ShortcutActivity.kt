@@ -1,6 +1,7 @@
 package io.nekohasekai.sfa.ui
 
 import android.app.Activity
+import android.app.KeyguardManager
 import android.content.Intent
 import android.content.pm.ShortcutManager
 import android.os.Build
@@ -43,10 +44,36 @@ class ShortcutActivity : Activity(), ServiceConnection.Callback {
             )
             finish()
         } else {
-            connection.connect()
-            if (Build.VERSION.SDK_INT >= 25) {
-                getSystemService<ShortcutManager>()?.reportShortcutUsed("toggle")
+            val keyguardManager = getSystemService<KeyguardManager>()
+            if (keyguardManager?.isKeyguardLocked == true) {
+                if (Build.VERSION.SDK_INT >= 26) {
+                    keyguardManager.requestDismissKeyguard(this, object : KeyguardManager.KeyguardDismissCallback() {
+                        override fun onDismissSucceeded() {
+                            super.onDismissSucceeded()
+                            connectAndToggle()
+                        }
+                        override fun onDismissCancelled() {
+                            super.onDismissCancelled()
+                            finish()
+                        }
+                        override fun onDismissError() {
+                            super.onDismissError()
+                            finish()
+                        }
+                    })
+                } else {
+                    finish()
+                }
+            } else {
+                connectAndToggle()
             }
+        }
+    }
+
+    private fun connectAndToggle() {
+        connection.connect()
+        if (Build.VERSION.SDK_INT >= 25) {
+            getSystemService<ShortcutManager>()?.reportShortcutUsed("toggle")
         }
     }
 
