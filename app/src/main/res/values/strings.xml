@@ -69,7 +69,7 @@
     <string name="file_manager_missing">Your device lacks an Android standard file selector, please install one, such as Material Files.</string>
     <string name="loading">Loading…</string>
 
-    <string name="service_error_missing_permission">Missiong VPN permission</string>
+    <string name="service_error_missing_permission">Missing VPN permission</string>
     <string name="service_error_missing_notification_permission">Missing notification permission</string>
     <string name="service_error_empty_configuration">Empty configuration</string>
     <string name="service_error_title_start_command_server">Start command server</string>
