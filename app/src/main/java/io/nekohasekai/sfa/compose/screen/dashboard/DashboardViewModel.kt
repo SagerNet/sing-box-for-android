@@ -53,6 +53,7 @@ data class DashboardUiState(
     val deprecatedNotes: List<DeprecatedNote> = emptyList(),
     val showDeprecatedDialog: Boolean = false,
     val showAddProfileSheet: Boolean = false,
+    val showProfilePickerSheet: Boolean = false,
     val updatingProfileId: Long? = null,
     val updatedProfileId: Long? = null,
     // Status
@@ -426,6 +427,14 @@ class DashboardViewModel : BaseViewModel<DashboardUiState, UiEvent>(), CommandCl
 
     fun hideAddProfileSheet() {
         updateState { copy(showAddProfileSheet = false) }
+    }
+
+    fun showProfilePickerSheet() {
+        updateState { copy(showProfilePickerSheet = true) }
+    }
+
+    fun hideProfilePickerSheet() {
+        updateState { copy(showProfilePickerSheet = false) }
     }
 
     fun updateServiceStatus(status: Status) {

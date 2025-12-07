@@ -231,6 +231,7 @@
     <string name="update_profile">Update profile</string>
     <string name="more_options">More options</string>
     <string name="edit">Edit</string>
+    <string name="done">Done</string>
     <string name="save_as_file">Save As File</string>
     <string name="share_as_file">Share As File</string>
     <string name="service">Service</string>

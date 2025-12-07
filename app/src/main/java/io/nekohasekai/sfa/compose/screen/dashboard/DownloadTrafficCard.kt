@@ -46,7 +46,7 @@ fun DownloadTrafficCard(
                     imageVector = Icons.Outlined.Download,
                     contentDescription = null,
                     modifier = Modifier.size(20.dp),
-                    tint = MaterialTheme.colorScheme.secondary,
+                    tint = MaterialTheme.colorScheme.primary,
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
@@ -75,7 +75,7 @@ fun DownloadTrafficCard(
 
             LineChart(
                 data = downlinkHistory,
-                lineColor = MaterialTheme.colorScheme.secondary,
+                lineColor = MaterialTheme.colorScheme.primary,
                 animate = false,
                 modifier = Modifier.fillMaxWidth(),
             )

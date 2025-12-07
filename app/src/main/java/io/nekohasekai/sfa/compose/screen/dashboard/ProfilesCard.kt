@@ -5,9 +5,6 @@ import android.graphics.Bitmap
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,39 +13,29 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.IosShare
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Save
-import androidx.compose.material.icons.filled.Update
 import androidx.compose.material.icons.outlined.CreateNewFolder
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.FileUpload
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -56,7 +43,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -66,10 +52,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.ProfileContent
@@ -77,11 +63,9 @@ import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.NewProfileComposeActivity
 import io.nekohasekai.sfa.compose.screen.configuration.ProfileImportHandler
 import io.nekohasekai.sfa.compose.screen.configuration.QRCodeDialog
-import io.nekohasekai.sfa.compose.util.ProfileIcons
 import io.nekohasekai.sfa.compose.util.QRCodeGenerator
 import io.nekohasekai.sfa.compose.util.RelativeTimeFormatter
 import io.nekohasekai.sfa.database.Profile
-import io.nekohasekai.sfa.database.ProfileManager
 import io.nekohasekai.sfa.database.TypedProfile
 import io.nekohasekai.sfa.ktx.errorDialogBuilder
 import io.nekohasekai.sfa.ktx.shareProfile
@@ -89,16 +73,15 @@ import io.nekohasekai.sfa.ui.profile.QRScanActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import sh.calvin.reorderable.ReorderableItem
-import sh.calvin.reorderable.rememberReorderableLazyListState
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfilesCard(
     profiles: List<Profile>,
     selectedProfileId: Long,
     isLoading: Boolean,
     showAddProfileSheet: Boolean,
+    showProfilePickerSheet: Boolean,
     updatingProfileId: Long? = null,
     updatedProfileId: Long? = null,
     onProfileSelected: (Long) -> Unit,
@@ -110,6 +93,8 @@ fun ProfilesCard(
     onProfileMove: (Int, Int) -> Unit,
     onShowAddProfileSheet: () -> Unit,
     onHideAddProfileSheet: () -> Unit,
+    onShowProfilePickerSheet: () -> Unit,
+    onHideProfilePickerSheet: () -> Unit,
     onImportFromFile: () -> Unit,
     onScanQrCode: () -> Unit,
     onCreateManually: () -> Unit,
@@ -119,14 +104,11 @@ fun ProfilesCard(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    // Import handler
     val importHandler = remember { ProfileImportHandler(context) }
 
-    // QR code dialog state
     var showQRCodeDialog by remember { mutableStateOf(false) }
     var qrCodeProfile by remember { mutableStateOf<Profile?>(null) }
 
-    // Activity result launchers
     val newProfileLauncher =
         rememberLauncherForActivityResult(
             ActivityResultContracts.StartActivityForResult(),
@@ -134,11 +116,10 @@ fun ProfilesCard(
             if (result.resultCode == android.app.Activity.RESULT_OK) {
                 val profileId = result.data?.getLongExtra(NewProfileComposeActivity.EXTRA_PROFILE_ID, -1L)
                 if (profileId != null && profileId != -1L) {
-                    // Find the profile and open edit screen
                     coroutineScope.launch {
                         val profile =
                             withContext(Dispatchers.IO) {
-                                ProfileManager.get(profileId)
+                                io.nekohasekai.sfa.database.ProfileManager.get(profileId)
                             }
                         profile?.let {
                             withContext(Dispatchers.Main) {
@@ -158,7 +139,6 @@ fun ProfilesCard(
                 coroutineScope.launch {
                     when (val result = importHandler.importFromUri(uri)) {
                         is ProfileImportHandler.ImportResult.Success -> {
-                            // Profile imported successfully, open edit screen
                             withContext(Dispatchers.Main) {
                                 onProfileEdit(result.profile)
                             }
@@ -220,21 +200,52 @@ fun ProfilesCard(
             }
         }
 
-    // Handle import events
-    LaunchedEffect(onImportFromFile, onScanQrCode) {
-        // These are just to trigger the launchers
+    val saveFileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/octet-stream"),
+    ) { uri ->
+        if (uri != null) {
+            val selectedProfile = profiles.find { it.id == selectedProfileId }
+            if (selectedProfile != null) {
+                coroutineScope.launch(Dispatchers.IO) {
+                    try {
+                        val profileData = createProfileContent(selectedProfile)
+                        context.contentResolver.openOutputStream(uri)?.use { outputStream ->
+                            outputStream.write(profileData)
+                        }
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.profile_saved_successfully),
+                                Toast.LENGTH_SHORT,
+                            ).show()
+                        }
+                    } catch (e: Exception) {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(
+                                context,
+                                "${context.getString(R.string.profile_save_failed)}: ${e.message}",
+                                Toast.LENGTH_SHORT,
+                            ).show()
+                        }
+                    }
+                }
+            }
+        }
     }
+
+    LaunchedEffect(onImportFromFile, onScanQrCode) {
+    }
+
+    val selectedProfile = profiles.find { it.id == selectedProfileId }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
         ) {
-            // Header with title and add button
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -269,7 +280,7 @@ fun ProfilesCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             if (profiles.isEmpty()) {
                 Text(
@@ -279,42 +290,66 @@ fun ProfilesCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             } else {
-                ProfileList(
-                    profiles = profiles,
-                    selectedProfileId = selectedProfileId,
-                    isLoading = isLoading,
-                    updatingProfileId = updatingProfileId,
-                    updatedProfileId = updatedProfileId,
-                    onProfileClick = { profile ->
-                        if (profile.id != selectedProfileId) {
-                            onProfileSelected(profile.id)
-                        }
-                    },
-                    onEditProfile = onProfileEdit,
-                    onDeleteProfile = onProfileDelete,
-                    onShareProfile = { profile ->
-                        coroutineScope.launch(Dispatchers.IO) {
-                            try {
-                                context.shareProfile(profile)
-                            } catch (e: Exception) {
-                                withContext(Dispatchers.Main) {
-                                    context.errorDialogBuilder(e).show()
+                ProfileSelectorButton(
+                    selectedProfile = selectedProfile,
+                    onClick = onShowProfilePickerSheet,
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                ProfileInfoRow(profile = selectedProfile)
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                ProfileActionRow(
+                    profile = selectedProfile,
+                    isUpdating = selectedProfile?.id == updatingProfileId,
+                    showUpdateSuccess = selectedProfile?.id == updatedProfileId,
+                    onEdit = { selectedProfile?.let { onProfileEdit(it) } },
+                    onUpdate = { selectedProfile?.let { onProfileUpdate(it) } },
+                    onShareFile = {
+                        selectedProfile?.let {
+                            coroutineScope.launch(Dispatchers.IO) {
+                                try {
+                                    context.shareProfile(it)
+                                } catch (e: Exception) {
+                                    withContext(Dispatchers.Main) {
+                                        context.errorDialogBuilder(e).show()
+                                    }
                                 }
                             }
                         }
                     },
-                    onShareProfileURL = { profile ->
-                        qrCodeProfile = profile
-                        showQRCodeDialog = true
+                    onSaveFile = {
+                        selectedProfile?.let {
+                            saveFileLauncher.launch("${it.name}.bpf")
+                        }
                     },
-                    onUpdateProfile = onProfileUpdate,
-                    onMove = onProfileMove,
+                    onShareURL = {
+                        selectedProfile?.let {
+                            qrCodeProfile = it
+                            showQRCodeDialog = true
+                        }
+                    },
                 )
             }
         }
     }
 
-    // Add profile bottom sheet
+    if (showProfilePickerSheet) {
+        ProfilePickerSheet(
+            profiles = profiles,
+            selectedProfileId = selectedProfileId,
+            onProfileSelected = { profile -> onProfileSelected(profile.id) },
+            onProfileEdit = onProfileEdit,
+            onProfileDelete = onProfileDelete,
+            onProfileMove = onProfileMove,
+            onDismiss = onHideProfilePickerSheet,
+            shareQRCodeImage = shareQRCodeImage,
+            saveQRCodeToGallery = saveQRCodeToGallery,
+        )
+    }
+
     if (showAddProfileSheet) {
         ModalBottomSheet(
             onDismissRequest = onHideAddProfileSheet,
@@ -322,10 +357,9 @@ fun ProfilesCard(
             contentColor = MaterialTheme.colorScheme.onSurface,
         ) {
             Column(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 32.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 32.dp),
             ) {
                 Text(
                     text = stringResource(R.string.add_profile),
@@ -334,12 +368,10 @@ fun ProfilesCard(
                 )
 
                 ListItem(
-                    modifier =
-                        Modifier.clickable {
-                            onHideAddProfileSheet()
-                            // Accept any file type to support both JSON and encoded profile files
-                            importFromFileLauncher.launch("*/*")
-                        },
+                    modifier = Modifier.clickable {
+                        onHideAddProfileSheet()
+                        importFromFileLauncher.launch("*/*")
+                    },
                     leadingContent = {
                         Icon(
                             imageVector = Icons.Outlined.FileUpload,
@@ -356,11 +388,10 @@ fun ProfilesCard(
                 )
 
                 ListItem(
-                    modifier =
-                        Modifier.clickable {
-                            onHideAddProfileSheet()
-                            scanQrCodeLauncher.launch(null)
-                        },
+                    modifier = Modifier.clickable {
+                        onHideAddProfileSheet()
+                        scanQrCodeLauncher.launch(null)
+                    },
                     leadingContent = {
                         Icon(
                             imageVector = Icons.Default.QrCodeScanner,
@@ -377,12 +408,11 @@ fun ProfilesCard(
                 )
 
                 ListItem(
-                    modifier =
-                        Modifier.clickable {
-                            onHideAddProfileSheet()
-                            val intent = Intent(context, NewProfileComposeActivity::class.java)
-                            newProfileLauncher.launch(intent)
-                        },
+                    modifier = Modifier.clickable {
+                        onHideAddProfileSheet()
+                        val intent = Intent(context, NewProfileComposeActivity::class.java)
+                        newProfileLauncher.launch(intent)
+                    },
                     leadingContent = {
                         Icon(
                             imageVector = Icons.Outlined.CreateNewFolder,
@@ -401,20 +431,17 @@ fun ProfilesCard(
         }
     }
 
-    // QR Code dialog
     if (showQRCodeDialog && qrCodeProfile != null) {
         val profile = qrCodeProfile!!
-        val link =
-            remember(profile) {
-                Libbox.generateRemoteProfileImportLink(
-                    profile.name,
-                    profile.typed.remoteURL,
-                )
-            }
-        val qrBitmap =
-            remember(link) {
-                QRCodeGenerator.generate(link)
-            }
+        val link = remember(profile) {
+            Libbox.generateRemoteProfileImportLink(
+                profile.name,
+                profile.typed.remoteURL,
+            )
+        }
+        val qrBitmap = remember(link) {
+            QRCodeGenerator.generate(link)
+        }
 
         QRCodeDialog(
             bitmap = qrBitmap,
@@ -440,63 +467,6 @@ fun ProfilesCard(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun ProfileList(
-    profiles: List<Profile>,
-    selectedProfileId: Long,
-    isLoading: Boolean,
-    updatingProfileId: Long? = null,
-    updatedProfileId: Long? = null,
-    onProfileClick: (Profile) -> Unit,
-    onEditProfile: (Profile) -> Unit,
-    onDeleteProfile: (Profile) -> Unit,
-    onShareProfile: (Profile) -> Unit,
-    onShareProfileURL: (Profile) -> Unit,
-    onUpdateProfile: (Profile) -> Unit,
-    onMove: (Int, Int) -> Unit,
-) {
-    val lazyListState = rememberLazyListState()
-    val reorderableLazyListState =
-        rememberReorderableLazyListState(lazyListState) { from, to ->
-            onMove(from.index, to.index)
-        }
-
-    LazyColumn(
-        state = lazyListState,
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .heightIn(min = 60.dp, max = 400.dp),
-        // Flexible height with min/max constraints
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-        userScrollEnabled = profiles.size > 6, // Only enable scroll if more than 6 profiles
-    ) {
-        itemsIndexed(profiles, key = { _, profile -> profile.id }) { index, profile ->
-            ReorderableItem(
-                reorderableLazyListState,
-                key = profile.id,
-            ) { isDragging ->
-                ProfileItem(
-                    profile = profile,
-                    isSelected = profile.id == selectedProfileId,
-                    isDragging = isDragging,
-                    isLoading = isLoading,
-                    isUpdating = profile.id == updatingProfileId,
-                    showUpdateSuccess = profile.id == updatedProfileId,
-                    onProfileClick = onProfileClick,
-                    onEditProfile = onEditProfile,
-                    onDeleteProfile = onDeleteProfile,
-                    onShareProfile = onShareProfile,
-                    onShareProfileURL = onShareProfileURL,
-                    onUpdateProfile = onUpdateProfile,
-                    modifier = Modifier.longPressDraggableHandle(),
-                )
-            }
-        }
-    }
-}
-
 private suspend fun createProfileContent(profile: Profile): ByteArray {
     val content = ProfileContent()
     content.name = profile.name
@@ -516,361 +486,208 @@ private suspend fun createProfileContent(profile: Profile): ByteArray {
     return content.encode()
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ProfileItem(
-    profile: Profile,
-    isSelected: Boolean,
-    isDragging: Boolean,
-    isLoading: Boolean,
-    isUpdating: Boolean = false,
-    showUpdateSuccess: Boolean = false,
-    onProfileClick: (Profile) -> Unit,
-    onEditProfile: (Profile) -> Unit,
-    onDeleteProfile: (Profile) -> Unit,
-    onShareProfile: (Profile) -> Unit,
-    onShareProfileURL: (Profile) -> Unit,
-    onUpdateProfile: (Profile) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    var showMenu by remember { mutableStateOf(false) }
-    var expandedShareSubmenu by remember { mutableStateOf(false) }
+private fun ProfileInfoRow(profile: Profile?) {
+    if (profile == null) return
+
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
 
-    // Animated values for visual feedback
-    val animatedElevation by animateFloatAsState(
-        targetValue =
-            when {
-                isDragging -> 8.dp.value
-                isSelected -> 3.dp.value
-                else -> 1.dp.value
-            },
-        animationSpec = tween(300),
-        label = "Elevation",
-    )
-
-    val animatedBorderAlpha by animateFloatAsState(
-        targetValue = if (isSelected) 0.8f else 0.3f,
-        animationSpec = tween(300),
-        label = "BorderAlpha",
-    )
-
-    // File save launcher
-    val saveFileLauncher =
-        rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.CreateDocument("application/octet-stream"),
-        ) { uri ->
-            if (uri != null) {
-                coroutineScope.launch(Dispatchers.IO) {
-                    try {
-                        val profileData = createProfileContent(profile)
-                        context.contentResolver.openOutputStream(uri)?.use { outputStream ->
-                            outputStream.write(profileData)
-                        }
-                        withContext(Dispatchers.Main) {
-                            val successMessage = context.getString(R.string.profile_saved_successfully)
-                            Toast.makeText(
-                                context,
-                                successMessage,
-                                Toast.LENGTH_SHORT,
-                            ).show()
-                        }
-                    } catch (e: Exception) {
-                        withContext(Dispatchers.Main) {
-                            val failedMessage = context.getString(R.string.profile_save_failed)
-                            Toast.makeText(
-                                context,
-                                "$failedMessage: ${e.message}",
-                                Toast.LENGTH_SHORT,
-                            ).show()
-                        }
-                    }
-                }
-            }
-        }
-
-    Surface(
-        onClick = { if (!isLoading) onProfileClick(profile) },
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(8.dp),
-        color =
-            when {
-                isDragging -> MaterialTheme.colorScheme.tertiaryContainer
-                isSelected -> MaterialTheme.colorScheme.primaryContainer
-                else -> MaterialTheme.colorScheme.surface
-            },
-        tonalElevation = animatedElevation.dp,
-        border =
-            androidx.compose.foundation.BorderStroke(
-                width = if (isSelected) 2.dp else 1.dp,
-                color =
-                    when {
-                        isSelected -> MaterialTheme.colorScheme.primary.copy(alpha = animatedBorderAlpha)
-                        else -> MaterialTheme.colorScheme.outline.copy(alpha = animatedBorderAlpha)
-                    },
-            ),
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            // Profile icon - use custom icon if set, otherwise default
-            val profileIcon =
-                ProfileIcons.getIconById(profile.icon)
-                    ?: Icons.AutoMirrored.Default.InsertDriveFile
-
             Icon(
-                imageVector = profileIcon,
+                imageVector = if (profile.typed.type == TypedProfile.Type.Remote) {
+                    Icons.Default.Cloud
+                } else {
+                    Icons.Outlined.Description
+                },
                 contentDescription = null,
-                modifier = Modifier.size(24.dp),
-                tint =
-                    if (isSelected) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    },
+                modifier = Modifier.size(14.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+            Text(
+                text = if (profile.typed.type == TypedProfile.Type.Remote) {
+                    stringResource(R.string.profile_type_remote)
+                } else {
+                    stringResource(R.string.profile_type_local)
+                },
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
 
-            Spacer(modifier = Modifier.width(12.dp))
-
-            // Profile info
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(2.dp),
+        if (profile.typed.type == TypedProfile.Type.Remote) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                // Profile name
-                Text(
-                    text = profile.name,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
-                    color =
-                        if (isSelected) {
-                            MaterialTheme.colorScheme.onPrimaryContainer
-                        } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        },
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
+                Icon(
+                    imageVector = Icons.Default.AccessTime,
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-
-                // Second line: Type and last updated
-                val context = LocalContext.current
                 Text(
-                    text =
-                        when (profile.typed.type) {
-                            TypedProfile.Type.Local -> stringResource(R.string.profile_type_local)
-                            TypedProfile.Type.Remote ->
-                                stringResource(
-                                    R.string.profile_type_remote_updated,
-                                    RelativeTimeFormatter.format(context, profile.typed.lastUpdated),
-                                )
-                        },
+                    text = RelativeTimeFormatter.format(context, profile.typed.lastUpdated),
                     style = MaterialTheme.typography.labelSmall,
-                    color =
-                        if (isSelected) {
-                            MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-                        } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                        },
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
+        }
+    }
+}
 
-            // Update button for remote profiles
-            if (profile.typed.type == TypedProfile.Type.Remote) {
-                IconButton(
-                    onClick = {
-                        if (!isUpdating && !showUpdateSuccess) {
-                            onUpdateProfile(profile)
-                        }
+@Composable
+private fun ProfileActionRow(
+    profile: Profile?,
+    isUpdating: Boolean,
+    showUpdateSuccess: Boolean,
+    onEdit: () -> Unit,
+    onUpdate: () -> Unit,
+    onShareFile: () -> Unit,
+    onSaveFile: () -> Unit,
+    onShareURL: () -> Unit,
+) {
+    if (profile == null) return
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        ActionButton(
+            icon = Icons.Default.Edit,
+            contentDescription = stringResource(R.string.edit),
+            onClick = onEdit,
+        )
+
+        if (profile.typed.type == TypedProfile.Type.Remote) {
+            ActionButton(
+                icon = when {
+                    showUpdateSuccess -> Icons.Default.Check
+                    else -> Icons.Default.Refresh
+                },
+                contentDescription = stringResource(R.string.update_profile),
+                onClick = onUpdate,
+                enabled = !isUpdating && !showUpdateSuccess,
+                isLoading = isUpdating,
+            )
+        }
+
+        ShareButton(
+            profile = profile,
+            onShareFile = onShareFile,
+            onSaveFile = onSaveFile,
+            onShareURL = onShareURL,
+        )
+    }
+}
+
+@Composable
+private fun ActionButton(
+    icon: ImageVector,
+    contentDescription: String,
+    onClick: () -> Unit,
+    enabled: Boolean = true,
+    isLoading: Boolean = false,
+) {
+    Surface(
+        onClick = onClick,
+        enabled = enabled,
+        shape = CircleShape,
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+        modifier = Modifier.size(44.dp),
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            } else {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = contentDescription,
+                    modifier = Modifier.size(20.dp),
+                    tint = if (enabled) {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
                     },
-                    modifier = Modifier.size(32.dp),
-                    enabled = !isUpdating && !showUpdateSuccess,
-                ) {
-                    when {
-                        isUpdating -> {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(18.dp),
-                                strokeWidth = 2.dp,
-                                color = MaterialTheme.colorScheme.primary,
-                            )
-                        }
-
-                        showUpdateSuccess -> {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = stringResource(R.string.update_successful),
-                                modifier = Modifier.size(20.dp),
-                                tint = MaterialTheme.colorScheme.primary,
-                            )
-                        }
-
-                        else -> {
-                            Icon(
-                                imageVector = Icons.Default.Update,
-                                contentDescription = stringResource(R.string.update_profile),
-                                modifier = Modifier.size(20.dp),
-                                tint = MaterialTheme.colorScheme.primary,
-                            )
-                        }
-                    }
-                }
+                )
             }
+        }
+    }
+}
 
-            // More options button
-            Spacer(modifier = Modifier.width(4.dp))
+@Composable
+private fun ShareButton(
+    profile: Profile,
+    onShareFile: () -> Unit,
+    onSaveFile: () -> Unit,
+    onShareURL: () -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
 
-            Box {
-                IconButton(
-                    onClick = {
-                        showMenu = true
-                        expandedShareSubmenu = false // Always start with submenu collapsed
-                    },
-                    modifier = Modifier.size(32.dp),
-                ) {
+    Box {
+        ActionButton(
+            icon = Icons.Default.IosShare,
+            contentDescription = stringResource(R.string.menu_share),
+            onClick = { expanded = true },
+        )
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+        ) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.save_as_file)) },
+                onClick = {
+                    expanded = false
+                    onSaveFile()
+                },
+                leadingIcon = {
                     Icon(
-                        imageVector = Icons.Default.MoreVert,
-                        contentDescription = stringResource(R.string.more_options),
-                        modifier = Modifier.size(20.dp),
-                        tint =
-                            if (isSelected) {
-                                MaterialTheme.colorScheme.onPrimaryContainer
-                            } else {
-                                MaterialTheme.colorScheme.onSurfaceVariant
-                            },
+                        imageVector = Icons.Default.Save,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
                     )
-                }
-
-                DropdownMenu(
-                    expanded = showMenu,
-                    onDismissRequest = {
-                        showMenu = false
-                        expandedShareSubmenu = false // Reset submenu state when closing
+                },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.share_as_file)) },
+                onClick = {
+                    expanded = false
+                    onShareFile()
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.IosShare,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                },
+            )
+            if (profile.typed.type == TypedProfile.Type.Remote) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.profile_share_url)) },
+                    onClick = {
+                        expanded = false
+                        onShareURL()
                     },
-                    modifier = Modifier.widthIn(min = 200.dp),
-                ) {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.edit)) },
-                        onClick = {
-                            showMenu = false
-                            onEditProfile(profile)
-                        },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                            )
-                        },
-                    )
-
-                    // Share submenu header
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.menu_share)) },
-                        onClick = {
-                            expandedShareSubmenu = !expandedShareSubmenu
-                        },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.IosShare,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                            )
-                        },
-                        trailingIcon = {
-                            Icon(
-                                imageVector =
-                                    if (expandedShareSubmenu) {
-                                        Icons.Default.ExpandLess
-                                    } else {
-                                        Icons.Default.ExpandMore
-                                    },
-                                contentDescription = null,
-                            )
-                        },
-                    )
-
-                    // Share submenu items (shown inline when expanded)
-                    if (expandedShareSubmenu) {
-                        // Save As File
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.save_as_file)) },
-                            onClick = {
-                                showMenu = false
-                                saveFileLauncher.launch("${profile.name}.bpf")
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = Icons.Default.Save,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.padding(start = 24.dp),
-                                )
-                            },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.QrCode2,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
                         )
-
-                        // Share As File
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.share_as_file)) },
-                            onClick = {
-                                showMenu = false
-                                onShareProfile(profile)
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = Icons.Default.IosShare,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.padding(start = 24.dp),
-                                )
-                            },
-                        )
-
-                        // Share URL as QR Code (only for remote profiles)
-                        if (profile.typed.type == TypedProfile.Type.Remote) {
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.profile_share_url)) },
-                                onClick = {
-                                    showMenu = false
-                                    onShareProfileURL(profile)
-                                },
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Default.QrCode2,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.padding(start = 24.dp),
-                                    )
-                                },
-                            )
-                        }
-                    }
-
-                    HorizontalDivider()
-
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                stringResource(R.string.menu_delete),
-                                color = MaterialTheme.colorScheme.error,
-                            )
-                        },
-                        onClick = {
-                            showMenu = false
-                            onDeleteProfile(profile)
-                        },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.error,
-                            )
-                        },
-                    )
-                }
+                    },
+                )
             }
         }
     }
