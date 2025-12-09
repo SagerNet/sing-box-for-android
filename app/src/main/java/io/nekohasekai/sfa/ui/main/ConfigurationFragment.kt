@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.database.Profile
 import io.nekohasekai.sfa.database.ProfileManager
@@ -91,6 +93,14 @@ class ConfigurationFragment : Fragment() {
 
         private val scanQrCode =
             registerForActivityResult(QRScanActivity.Contract(), ::onScanResult)
+
+        override fun onStart() {
+            super.onStart()
+            (dialog as? BottomSheetDialog)?.let { dialog ->
+                dialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+                dialog.behavior.skipCollapsed = true
+            }
+        }
 
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
