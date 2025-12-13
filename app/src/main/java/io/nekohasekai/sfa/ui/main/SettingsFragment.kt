@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.Application
+import io.nekohasekai.sfa.BuildConfig
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.constant.EnabledType
 import io.nekohasekai.sfa.database.Settings
@@ -167,6 +168,7 @@ class SettingsFragment : Fragment() {
             binding.dynamicNotificationEnabled.text =
                 EnabledType.from(dynamicNotification).getString(requireContext())
             binding.dynamicNotificationEnabled.setSimpleItems(R.array.enabled)
+            binding.experimentalFeaturesCard.isVisible = BuildConfig.DEBUG
             binding.useComposeUIEnabled.text =
                 EnabledType.from(useComposeUI).getString(requireContext())
             binding.useComposeUIEnabled.setSimpleItems(R.array.enabled)

@@ -12,16 +12,12 @@ class LauncherActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val useComposeUI =
-            runBlocking {
-                Settings.useComposeUI
-            }
-
         val targetActivity =
-            if (useComposeUI) {
-                ComposeActivity::class.java
+            if (BuildConfig.DEBUG) {
+                val useComposeUI = runBlocking { Settings.useComposeUI }
+                if (useComposeUI) ComposeActivity::class.java else MainActivity::class.java
             } else {
-                MainActivity::class.java
+                ComposeActivity::class.java
             }
 
         val launchIntent =
