@@ -93,8 +93,8 @@ android {
     applicationVariants.configureEach { variant ->
         variant.outputs.configureEach {
             outputFileName = (outputFileName as String).replace("-release", "")
-            outputFileName = (outputFileName as String).replace("-play", "")
-            outputFileName = (outputFileName as String).replace("-other", "-foss")
+            outputFileName = (outputFileName as String).replace("-play", "-play")
+            outputFileName = (outputFileName as String).replace("-other", "")
         }
     }
 }
