@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import io.nekohasekai.libbox.LogEntry
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.bg.BoxService
 import io.nekohasekai.sfa.constant.Status
@@ -30,7 +31,9 @@ class LogFragment : Fragment(), CommandClient.Handler {
     private val logList = LinkedList<String>()
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         val binding = FragmentLogBinding.inflate(inflater, container, false)
         this.binding = binding
@@ -89,7 +92,10 @@ class LogFragment : Fragment(), CommandClient.Handler {
         }
     }
 
-    private fun updateViews(removeLen: Int = 0, insertLen: Int = 0) {
+    private fun updateViews(
+        removeLen: Int = 0,
+        insertLen: Int = 0,
+    ) {
         val activity = activity ?: return
         val logAdapter = adapter ?: return
         val binding = binding ?: return
@@ -135,11 +141,18 @@ class LogFragment : Fragment(), CommandClient.Handler {
         }
     }
 
-    override fun appendLogs(messageList: List<String>) {
+    private var defaultLogLevel = 0
+
+    override fun setDefaultLogLevel(level: Int) {
+        defaultLogLevel = level
+    }
+
+    override fun appendLogs(messageList: List<LogEntry>) {
+        val messageList = messageList.filter { it.level <= defaultLogLevel }
         lifecycleScope.launch(Dispatchers.Main) {
             val messageLen = messageList.size
             val removeLen = logList.size + messageLen - 300
-            logList.addAll(messageList)
+            logList.addAll(messageList.map { it.message })
             if (removeLen > 0) {
                 repeat(removeLen) {
                     logList.removeFirst()
@@ -149,33 +162,37 @@ class LogFragment : Fragment(), CommandClient.Handler {
         }
     }
 
-
     class Adapter(private val logList: LinkedList<String>) :
         RecyclerView.Adapter<LogViewHolder>() {
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LogViewHolder {
+        override fun onCreateViewHolder(
+            parent: ViewGroup,
+            viewType: Int,
+        ): LogViewHolder {
             return LogViewHolder(
                 ViewLogTextItemBinding.inflate(
-                    LayoutInflater.from(parent.context), parent, false
-                )
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                ),
             )
         }
 
-        override fun onBindViewHolder(holder: LogViewHolder, position: Int) {
+        override fun onBindViewHolder(
+            holder: LogViewHolder,
+            position: Int,
+        ) {
             holder.bind(logList.getOrElse(position) { "" })
         }
 
         override fun getItemCount(): Int {
             return logList.size
         }
-
     }
 
     class LogViewHolder(private val binding: ViewLogTextItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-
         fun bind(message: String) {
             binding.text.text = ColorUtils.ansiEscapeToSpannable(binding.root.context, message)
         }
     }
-
 }

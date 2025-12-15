@@ -9,19 +9,21 @@ import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import com.google.android.material.color.MaterialColors
 
-
 @ColorInt
 fun Context.getAttrColor(
     @AttrRes attrColor: Int,
     typedValue: TypedValue = TypedValue(),
-    resolveRefs: Boolean = true
+    resolveRefs: Boolean = true,
 ): Int {
     theme.resolveAttribute(attrColor, typedValue, resolveRefs)
     return typedValue.data
 }
 
 @ColorInt
-fun colorForURLTestDelay(context: Context, urlTestDelay: Int): Int {
+fun colorForURLTestDelay(
+    context: Context,
+    urlTestDelay: Int,
+): Int {
     if (urlTestDelay <= 0) {
         return Color.GRAY
     }

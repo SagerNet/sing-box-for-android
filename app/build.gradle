@@ -7,6 +7,7 @@ plugins {
     id "com.google.devtools.ksp"
     id "org.jetbrains.kotlin.plugin.compose"
     id "com.github.triplet.play"
+    id "org.jlleitschuh.gradle.ktlint"
 }
 
 android {
@@ -132,7 +133,8 @@ dependencies {
     playImplementation "com.google.android.play:app-update-ktx:2.1.0"
     playImplementation "com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.1"
 
-    def composeBom = platform('androidx.compose:compose-bom:2025.07.00')
+    // Compose dependencies
+    def composeBom = platform('androidx.compose:compose-bom:2024.09.00')
     implementation composeBom
     androidTestImplementation composeBom
     implementation 'androidx.compose.material3:material3'
@@ -144,6 +146,10 @@ dependencies {
     implementation 'androidx.activity:activity-compose:1.10.1'
     implementation 'me.zhanghai.compose.preference:library:1.1.1'
     implementation "androidx.navigation:navigation-compose:2.9.3"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.9.2"
+    implementation "androidx.compose.runtime:runtime-livedata"
+    implementation "sh.calvin.reorderable:reorderable:2.3.3"
+
 }
 
 def playCredentialsJSON = rootProject.file("service-account-credentials.json")
@@ -199,4 +205,16 @@ def getVersionProps(String propName) {
         }
     }
     return ""
+}
+
+ktlint {
+    android = false
+    version = "1.0.1"
+    verbose = true
+    outputToConsole = true
+    reporters {
+        reporter "plain"
+        reporter "checkstyle"
+        reporter "html"
+    }
 }

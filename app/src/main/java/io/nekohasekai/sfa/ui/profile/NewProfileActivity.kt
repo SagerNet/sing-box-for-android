@@ -31,9 +31,12 @@ import java.io.InputStream
 import java.util.Date
 
 class NewProfileActivity : AbstractActivity<ActivityAddProfileBinding>() {
-    enum class FileSource(@StringRes val formattedRes: Int) {
+    enum class FileSource(
+        @StringRes val formattedRes: Int,
+    ) {
         CreateNew(R.string.profile_source_create_new),
-        Import(R.string.profile_source_import);
+        Import(R.string.profile_source_import),
+        ;
 
         fun formatted(context: Context): String {
             return context.getString(formattedRes)
@@ -100,7 +103,9 @@ class NewProfileActivity : AbstractActivity<ActivityAddProfileBinding>() {
         binding.autoUpdateInterval.addTextChangedListener(this::updateAutoUpdateInterval)
     }
 
-    private fun createProfile(@Suppress("UNUSED_PARAMETER") view: View) {
+    private fun createProfile(
+        @Suppress("UNUSED_PARAMETER") view: View,
+    ) {
         if (binding.name.showErrorIfEmpty()) {
             return
         }
@@ -154,17 +159,18 @@ class NewProfileActivity : AbstractActivity<ActivityAddProfileBinding>() {
 
                     FileSource.Import.formatted(this) -> {
                         val sourceURL = binding.sourceURL.text
-                        val content = if (sourceURL.startsWith("content://")) {
-                            val inputStream =
-                                contentResolver.openInputStream(Uri.parse(sourceURL)) as InputStream
-                            inputStream.use { it.bufferedReader().readText() }
-                        } else if (sourceURL.startsWith("file://")) {
-                            File(sourceURL).readText()
-                        } else if (sourceURL.startsWith("http://") || sourceURL.startsWith("https://")) {
-                            HTTPClient().use { it.getString(sourceURL) }
-                        } else {
-                            error("unsupported source: $sourceURL")
-                        }
+                        val content =
+                            if (sourceURL.startsWith("content://")) {
+                                val inputStream =
+                                    contentResolver.openInputStream(Uri.parse(sourceURL)) as InputStream
+                                inputStream.use { it.bufferedReader().readText() }
+                            } else if (sourceURL.startsWith("file://")) {
+                                File(sourceURL).readText()
+                            } else if (sourceURL.startsWith("http://") || sourceURL.startsWith("https://")) {
+                                HTTPClient().use { it.getString(sourceURL) }
+                            } else {
+                                error("unsupported source: $sourceURL")
+                            }
                         Libbox.checkConfig(content)
                         configFile.writeText(content)
                     }
@@ -198,12 +204,13 @@ class NewProfileActivity : AbstractActivity<ActivityAddProfileBinding>() {
             binding.autoUpdateInterval.error = getString(R.string.profile_input_required)
             return
         }
-        val intValue = try {
-            newValue.toInt()
-        } catch (e: Exception) {
-            binding.autoUpdateInterval.error = e.localizedMessage
-            return
-        }
+        val intValue =
+            try {
+                newValue.toInt()
+            } catch (e: Exception) {
+                binding.autoUpdateInterval.error = e.localizedMessage
+                return
+            }
         if (intValue < 15) {
             binding.autoUpdateInterval.error =
                 getString(R.string.profile_auto_update_interval_minimum_hint)
@@ -211,6 +218,4 @@ class NewProfileActivity : AbstractActivity<ActivityAddProfileBinding>() {
         }
         binding.autoUpdateInterval.error = null
     }
-
-
 }

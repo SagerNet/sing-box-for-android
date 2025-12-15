@@ -11,9 +11,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class BootReceiver : BroadcastReceiver() {
-
     @OptIn(DelicateCoroutinesApi::class)
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         when (intent.action) {
             Intent.ACTION_BOOT_COMPLETED, Intent.ACTION_MY_PACKAGE_REPLACED -> {
             }
@@ -28,5 +30,4 @@ class BootReceiver : BroadcastReceiver() {
             }
         }
     }
-
 }

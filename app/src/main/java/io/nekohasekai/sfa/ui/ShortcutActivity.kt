@@ -16,31 +16,31 @@ import io.nekohasekai.sfa.bg.ServiceConnection
 import io.nekohasekai.sfa.constant.Status
 
 class ShortcutActivity : Activity(), ServiceConnection.Callback {
-
     private val connection = ServiceConnection(this, this, false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (intent.action == Intent.ACTION_CREATE_SHORTCUT) {
             setResult(
-                RESULT_OK, ShortcutManagerCompat.createShortcutResultIntent(
+                RESULT_OK,
+                ShortcutManagerCompat.createShortcutResultIntent(
                     this,
                     ShortcutInfoCompat.Builder(this, "toggle")
                         .setIntent(
                             Intent(
                                 this,
-                                ShortcutActivity::class.java
-                            ).setAction(Intent.ACTION_MAIN)
+                                ShortcutActivity::class.java,
+                            ).setAction(Intent.ACTION_MAIN),
                         )
                         .setIcon(
                             IconCompat.createWithResource(
                                 this,
-                                R.mipmap.ic_launcher
-                            )
+                                R.mipmap.ic_launcher,
+                            ),
                         )
                         .setShortLabel(getString(R.string.quick_toggle))
-                        .build()
-                )
+                        .build(),
+                ),
             )
             finish()
         } else {
@@ -90,5 +90,4 @@ class ShortcutActivity : Activity(), ServiceConnection.Callback {
         connection.disconnect()
         super.onDestroy()
     }
-
 }

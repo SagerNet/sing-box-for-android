@@ -55,7 +55,7 @@ fun PreferenceDataStore.stringToLong(
 
 fun PreferenceDataStore.stringSet(
     name: String,
-    defaultValue: () -> Set<String> = { emptySet() }
+    defaultValue: () -> Set<String> = { emptySet() },
 ) = PreferenceProxy(name, defaultValue, ::getStringSet, ::putStringSet)
 
 class PreferenceProxy<T>(
@@ -64,8 +64,14 @@ class PreferenceProxy<T>(
     val getter: (String, T) -> T?,
     val setter: (String, value: T) -> Unit,
 ) {
+    operator fun setValue(
+        thisObj: Any?,
+        property: KProperty<*>,
+        value: T,
+    ) = setter(name, value)
 
-    operator fun setValue(thisObj: Any?, property: KProperty<*>, value: T) = setter(name, value)
-    operator fun getValue(thisObj: Any?, property: KProperty<*>) = getter(name, defaultValue())!!
-
+    operator fun getValue(
+        thisObj: Any?,
+        property: KProperty<*>,
+    ) = getter(name, defaultValue())!!
 }

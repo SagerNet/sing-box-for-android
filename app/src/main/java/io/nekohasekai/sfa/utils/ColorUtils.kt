@@ -14,10 +14,12 @@ import io.nekohasekai.sfa.R
 import java.util.Stack
 
 object ColorUtils {
-
     private val ansiRegex by lazy { Regex("\u001B\\[[;\\d]*m") }
 
-    fun ansiEscapeToSpannable(context: Context, text: String): Spannable {
+    fun ansiEscapeToSpannable(
+        context: Context,
+        text: String,
+    ): Spannable {
         val spannable = SpannableString(text.replace(ansiRegex, ""))
         val stack = Stack<AnsiSpan>()
         val spans = mutableListOf<AnsiSpan>()
@@ -33,11 +35,12 @@ object ColorUtils {
             if (ansiInstruction.decorationCode == "0" && stack.isNotEmpty()) {
                 spans.add(stack.pop().copy(end = end - offset))
             } else {
-                val span = AnsiSpan(
-                    AnsiInstruction(context, stringCode),
-                    start - if (offset > start) start else offset - 1,
-                    0
-                )
+                val span =
+                    AnsiSpan(
+                        AnsiInstruction(context, stringCode),
+                        start - if (offset > start) start else offset - 1,
+                        0,
+                    )
                 stack.push(span)
             }
         }
@@ -48,7 +51,7 @@ object ColorUtils {
                     it,
                     ansiSpan.start,
                     ansiSpan.end,
-                    Spannable.SPAN_EXCLUSIVE_INCLUSIVE
+                    Spannable.SPAN_EXCLUSIVE_INCLUSIVE,
                 )
             }
         }
@@ -57,14 +60,16 @@ object ColorUtils {
     }
 
     private data class AnsiSpan(
-        val instruction: AnsiInstruction, val start: Int, val end: Int
+        val instruction: AnsiInstruction,
+        val start: Int,
+        val end: Int,
     )
 
     private class AnsiInstruction(context: Context, code: String) {
-
         val spans: List<ParcelableSpan> by lazy {
             listOfNotNull(
-                getSpan(colorCode, context), getSpan(decorationCode, context)
+                getSpan(colorCode, context),
+                getSpan(decorationCode, context),
             )
         }
 
@@ -93,29 +98,33 @@ object ColorUtils {
         }
     }
 
-    private fun getSpan(code: String?, context: Context): ParcelableSpan? = when (code) {
-        "0", null -> null
-        "1" -> StyleSpan(Typeface.NORMAL)
-        "3" -> StyleSpan(Typeface.ITALIC)
-        "4" -> UnderlineSpan()
-        "30" -> ForegroundColorSpan(Color.BLACK)
-        "31" -> ForegroundColorSpan(ContextCompat.getColor(context, R.color.log_red))
-        "32" -> ForegroundColorSpan(ContextCompat.getColor(context, R.color.log_green))
-        "33" -> ForegroundColorSpan(ContextCompat.getColor(context, R.color.log_yellow))
-        "34" -> ForegroundColorSpan(ContextCompat.getColor(context, R.color.log_blue))
-        "35" -> ForegroundColorSpan(ContextCompat.getColor(context, R.color.log_purple))
-        "36" -> ForegroundColorSpan(ContextCompat.getColor(context, R.color.log_blue_light))
-        "37" -> ForegroundColorSpan(ContextCompat.getColor(context, R.color.log_white))
-        else -> {
-            var codeInt = code.toIntOrNull()
-            if (codeInt != null) {
-                codeInt %= 125
-                val row = codeInt / 36
-                val column = codeInt % 36
-                ForegroundColorSpan(Color.rgb(row * 51, column / 6 * 51, column % 6 * 51))
-            } else {
-                null
+    private fun getSpan(
+        code: String?,
+        context: Context,
+    ): ParcelableSpan? =
+        when (code) {
+            "0", null -> null
+            "1" -> StyleSpan(Typeface.NORMAL)
+            "3" -> StyleSpan(Typeface.ITALIC)
+            "4" -> UnderlineSpan()
+            "30" -> ForegroundColorSpan(Color.BLACK)
+            "31" -> ForegroundColorSpan(ContextCompat.getColor(context, R.color.log_red))
+            "32" -> ForegroundColorSpan(ContextCompat.getColor(context, R.color.log_green))
+            "33" -> ForegroundColorSpan(ContextCompat.getColor(context, R.color.log_yellow))
+            "34" -> ForegroundColorSpan(ContextCompat.getColor(context, R.color.log_blue))
+            "35" -> ForegroundColorSpan(ContextCompat.getColor(context, R.color.log_purple))
+            "36" -> ForegroundColorSpan(ContextCompat.getColor(context, R.color.log_blue_light))
+            "37" -> ForegroundColorSpan(ContextCompat.getColor(context, R.color.log_white))
+            else -> {
+                var codeInt = code.toIntOrNull()
+                if (codeInt != null) {
+                    codeInt %= 125
+                    val row = codeInt / 36
+                    val column = codeInt % 36
+                    ForegroundColorSpan(Color.rgb(row * 51, column / 6 * 51, column % 6 * 51))
+                } else {
+                    null
+                }
             }
         }
-    }
 }

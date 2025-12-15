@@ -39,11 +39,12 @@ import java.text.DateFormat
 import java.util.Collections
 
 class ConfigurationFragment : Fragment() {
-
     private var adapter: Adapter? = null
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         val binding = FragmentConfigurationBinding.inflate(inflater, container, false)
         val adapter = Adapter(binding)
@@ -51,30 +52,34 @@ class ConfigurationFragment : Fragment() {
         binding.profileList.also {
             it.layoutManager = LinearLayoutManager(requireContext())
             it.adapter = adapter
-            ItemTouchHelper(object :
-                ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {
-
-                override fun onMove(
-                    recyclerView: RecyclerView,
-                    viewHolder: RecyclerView.ViewHolder,
-                    target: RecyclerView.ViewHolder
-                ): Boolean {
-                    return adapter.move(viewHolder.adapterPosition, target.adapterPosition)
-                }
-
-                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                }
-
-                override fun onSelectedChanged(
-                    viewHolder: RecyclerView.ViewHolder?,
-                    actionState: Int
-                ) {
-                    super.onSelectedChanged(viewHolder, actionState)
-                    if (actionState == ItemTouchHelper.ACTION_STATE_IDLE) {
-                        adapter.updateUserOrder()
+            ItemTouchHelper(
+                object :
+                    ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {
+                    override fun onMove(
+                        recyclerView: RecyclerView,
+                        viewHolder: RecyclerView.ViewHolder,
+                        target: RecyclerView.ViewHolder,
+                    ): Boolean {
+                        return adapter.move(viewHolder.adapterPosition, target.adapterPosition)
                     }
-                }
-            }).attachToRecyclerView(it)
+
+                    override fun onSwiped(
+                        viewHolder: RecyclerView.ViewHolder,
+                        direction: Int,
+                    ) {
+                    }
+
+                    override fun onSelectedChanged(
+                        viewHolder: RecyclerView.ViewHolder?,
+                        actionState: Int,
+                    ) {
+                        super.onSelectedChanged(viewHolder, actionState)
+                        if (actionState == ItemTouchHelper.ACTION_STATE_IDLE) {
+                            adapter.updateUserOrder()
+                        }
+                    }
+                },
+            ).attachToRecyclerView(it)
         }
         adapter.reload()
         binding.fab.setOnClickListener {
@@ -85,14 +90,16 @@ class ConfigurationFragment : Fragment() {
     }
 
     class AddProfileDialog : BottomSheetDialogFragment(R.layout.sheet_add_profile) {
-
         private val importFromFile =
             registerForActivityResult(ActivityResultContracts.GetContent(), ::onImportResult)
 
         private val scanQrCode =
             registerForActivityResult(QRScanActivity.Contract(), ::onScanResult)
 
-        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        override fun onViewCreated(
+            view: View,
+            savedInstanceState: Bundle?,
+        ) {
             super.onViewCreated(view, savedInstanceState)
             val binding = SheetAddProfileBinding.bind(view)
             binding.importFromFile.setOnClickListener {
@@ -134,10 +141,9 @@ class ConfigurationFragment : Fragment() {
     }
 
     inner class Adapter(
-        private val parent: FragmentConfigurationBinding
+        private val parent: FragmentConfigurationBinding,
     ) :
         RecyclerView.Adapter<Holder>() {
-
         internal var items: MutableList<Profile> = mutableListOf()
         internal val scope = lifecycleScope
         internal val fragmentActivity = requireActivity()
@@ -160,7 +166,10 @@ class ConfigurationFragment : Fragment() {
             }
         }
 
-        internal fun move(from: Int, to: Int): Boolean {
+        internal fun move(
+            from: Int,
+            to: Int,
+        ): Boolean {
             if (from < to) {
                 for (i in from until to) {
                     Collections.swap(items, i, i + 1)
@@ -184,38 +193,43 @@ class ConfigurationFragment : Fragment() {
             }
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
+        override fun onCreateViewHolder(
+            parent: ViewGroup,
+            viewType: Int,
+        ): Holder {
             return Holder(
                 this,
                 ViewConfigutationItemBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
-                    false
-                )
+                    false,
+                ),
             )
         }
 
-        override fun onBindViewHolder(holder: Holder, position: Int) {
+        override fun onBindViewHolder(
+            holder: Holder,
+            position: Int,
+        ) {
             holder.bind(items[position])
         }
 
         override fun getItemCount(): Int {
             return items.size
         }
-
     }
 
     class Holder(private val adapter: Adapter, private val binding: ViewConfigutationItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-
         internal fun bind(profile: Profile) {
             binding.profileName.text = profile.name
             if (profile.typed.type == TypedProfile.Type.Remote) {
                 binding.profileLastUpdated.isVisible = true
-                binding.profileLastUpdated.text = binding.root.context.getString(
-                    R.string.profile_item_last_updated,
-                    DateFormat.getDateTimeInstance().format(profile.typed.lastUpdated)
-                )
+                binding.profileLastUpdated.text =
+                    binding.root.context.getString(
+                        R.string.last_updated_format,
+                        DateFormat.getDateTimeInstance().format(profile.typed.lastUpdated),
+                    )
             } else {
                 binding.profileLastUpdated.isVisible = false
             }
@@ -277,5 +291,4 @@ class ConfigurationFragment : Fragment() {
             }
         }
     }
-
 }

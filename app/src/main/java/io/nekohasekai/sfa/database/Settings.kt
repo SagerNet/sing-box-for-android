@@ -21,14 +21,13 @@ import org.json.JSONObject
 import java.io.File
 
 object Settings {
-
     @OptIn(DelicateCoroutinesApi::class)
     private val instance by lazy {
         Application.application.getDatabasePath(Path.SETTINGS_DATABASE_PATH).parentFile?.mkdirs()
         Room.databaseBuilder(
             Application.application,
             KeyValueDatabase::class.java,
-            Path.SETTINGS_DATABASE_PATH
+            Path.SETTINGS_DATABASE_PATH,
         ).allowMainThreadQueries()
             .fallbackToDestructiveMigration()
             .enableMultiInstanceInvalidation()
@@ -43,18 +42,23 @@ object Settings {
     var checkUpdateEnabled by dataStore.boolean(SettingsKey.CHECK_UPDATE_ENABLED) { true }
     var disableMemoryLimit by dataStore.boolean(SettingsKey.DISABLE_MEMORY_LIMIT)
     var dynamicNotification by dataStore.boolean(SettingsKey.DYNAMIC_NOTIFICATION) { true }
-
+    var useComposeUI by dataStore.boolean(SettingsKey.USE_COMPOSE_UI) { true }
+    var disableDeprecatedWarnings by dataStore.boolean(SettingsKey.DISABLE_DEPRECATED_WARNINGS) { false }
 
     const val PER_APP_PROXY_DISABLED = 0
     const val PER_APP_PROXY_EXCLUDE = 1
     const val PER_APP_PROXY_INCLUDE = 2
 
+    var autoRedirect by dataStore.boolean(SettingsKey.AUTO_REDIRECT) { false }
     var perAppProxyEnabled by dataStore.boolean(SettingsKey.PER_APP_PROXY_ENABLED) { false }
     var perAppProxyMode by dataStore.int(SettingsKey.PER_APP_PROXY_MODE) { PER_APP_PROXY_EXCLUDE }
     var perAppProxyList by dataStore.stringSet(SettingsKey.PER_APP_PROXY_LIST) { emptySet() }
     var perAppProxyUpdateOnChange by dataStore.int(SettingsKey.PER_APP_PROXY_UPDATE_ON_CHANGE) { PER_APP_PROXY_DISABLED }
 
     var systemProxyEnabled by dataStore.boolean(SettingsKey.SYSTEM_PROXY_ENABLED) { true }
+
+    var dashboardItemOrder by dataStore.string(SettingsKey.DASHBOARD_ITEM_ORDER) { "" }
+    var dashboardDisabledItems by dataStore.stringSet(SettingsKey.DASHBOARD_DISABLED_ITEMS) { emptySet() }
 
     fun serviceClass(): Class<*> {
         return when (serviceMode) {
@@ -92,5 +96,4 @@ object Settings {
         }
         return false
     }
-
 }

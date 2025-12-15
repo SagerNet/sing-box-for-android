@@ -19,7 +19,6 @@ import java.util.Date
 import java.util.concurrent.TimeUnit
 
 class UpdateProfileWork {
-
     companion object {
         private const val WORK_NAME = "UpdateProfile"
         private const val TAG = "UpdateProfileWork"
@@ -33,8 +32,9 @@ class UpdateProfileWork {
         }
 
         private suspend fun reconfigureUpdater0() {
-            val remoteProfiles = ProfileManager.list()
-                .filter { it.typed.type == TypedProfile.Type.Remote && it.typed.autoUpdate }
+            val remoteProfiles =
+                ProfileManager.list()
+                    .filter { it.typed.type == TypedProfile.Type.Remote && it.typed.autoUpdate }
             if (remoteProfiles.isEmpty()) {
                 WorkManager.getInstance(Application.application).cancelUniqueWork(WORK_NAME)
                 return
@@ -54,19 +54,20 @@ class UpdateProfileWork {
                         if (minInitDelay > 0) setInitialDelay(minInitDelay, TimeUnit.SECONDS)
                         setBackoffCriteria(BackoffPolicy.LINEAR, 15, TimeUnit.MINUTES)
                     }
-                    .build()
+                    .build(),
             )
         }
-
     }
 
     class UpdateTask(
-        appContext: Context, params: WorkerParameters
+        appContext: Context,
+        params: WorkerParameters,
     ) : CoroutineWorker(appContext, params) {
         override suspend fun doWork(): Result {
             var selectedProfileUpdated = false
-            val remoteProfiles = ProfileManager.list()
-                .filter { it.typed.type == TypedProfile.Type.Remote && it.typed.autoUpdate }
+            val remoteProfiles =
+                ProfileManager.list()
+                    .filter { it.typed.type == TypedProfile.Type.Remote && it.typed.autoUpdate }
             if (remoteProfiles.isEmpty()) return Result.success()
             var success = true
             val selectedProfile = Settings.selectedProfile
@@ -104,8 +105,5 @@ class UpdateProfileWork {
                 Result.retry()
             }
         }
-
     }
-
-
 }

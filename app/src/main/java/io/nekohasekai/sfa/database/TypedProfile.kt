@@ -11,9 +11,10 @@ import io.nekohasekai.sfa.ktx.unmarshall
 import java.util.Date
 
 class TypedProfile() : Parcelable {
-
     enum class Type {
-        Local, Remote;
+        Local,
+        Remote,
+        ;
 
         fun getString(context: Context): String {
             return when (this) {
@@ -53,7 +54,10 @@ class TypedProfile() : Parcelable {
         }
     }
 
-    override fun writeToParcel(writer: Parcel, flags: Int) {
+    override fun writeToParcel(
+        writer: Parcel,
+        flags: Int,
+    ) {
         writer.writeInt(1)
         writer.writeString(path)
         writer.writeInt(type.ordinal)
@@ -78,14 +82,10 @@ class TypedProfile() : Parcelable {
     }
 
     class Convertor {
-
         @TypeConverter
         fun marshall(profile: TypedProfile) = profile.marshall()
 
         @TypeConverter
-        fun unmarshall(content: ByteArray) =
-            content.unmarshall(::TypedProfile)
-
+        fun unmarshall(content: ByteArray) = content.unmarshall(::TypedProfile)
     }
-
 }

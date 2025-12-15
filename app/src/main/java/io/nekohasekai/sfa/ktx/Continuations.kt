@@ -2,7 +2,6 @@ package io.nekohasekai.sfa.ktx
 
 import kotlin.coroutines.Continuation
 
-
 fun <T> Continuation<T>.tryResume(value: T) {
     try {
         resumeWith(Result.success(value))

@@ -62,7 +62,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="4dp"
-                                android:text="@string/status_status"
+                                android:text="@string/status"
                                 android:textAppearance="?attr/textAppearanceTitleSmall">
 
                             </TextView>
@@ -77,7 +77,7 @@
                                     style="?attr/textAppearanceBodySmall"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="@string/status_memory" />
+                                    android:text="@string/memory" />
 
                                 <LinearLayout
                                     android:layout_width="match_parent"
@@ -107,7 +107,7 @@
                                     style="?attr/textAppearanceBodySmall"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="@string/status_goroutines" />
+                                    android:text="@string/goroutines" />
 
                                 <LinearLayout
                                     android:layout_width="match_parent"
@@ -154,7 +154,7 @@
 
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="4dp"
-                                android:text="@string/status_connections"
+                                android:text="@string/title_connections"
                                 android:textAppearance="?attr/textAppearanceTitleSmall">
 
                             </TextView>
@@ -169,7 +169,7 @@
                                     style="?attr/textAppearanceBodySmall"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="@string/status_connections_inbound" />
+                                    android:text="@string/connections_in" />
 
                                 <LinearLayout
                                     android:layout_width="match_parent"
@@ -199,7 +199,7 @@
                                     style="?attr/textAppearanceBodySmall"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="@string/status_connections_outbound" />
+                                    android:text="@string/connections_out" />
 
                                 <LinearLayout
                                     android:layout_width="match_parent"
@@ -255,7 +255,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="4dp"
-                                android:text="@string/status_traffic"
+                                android:text="@string/traffic"
                                 android:textAppearance="?attr/textAppearanceTitleSmall">
 
                             </TextView>
@@ -441,7 +441,7 @@
                         android:layout_height="wrap_content"
                         android:paddingHorizontal="16dp"
                         android:paddingTop="16dp"
-                        android:text="Mode"
+                        android:text="@string/mode"
                         android:textAppearance="?attr/textAppearanceTitleSmall">
 
                     </TextView>

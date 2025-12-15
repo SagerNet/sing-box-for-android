@@ -3,6 +3,8 @@ package io.nekohasekai.sfa.ktx
 import android.net.IpPrefix
 import android.os.Build
 import androidx.annotation.RequiresApi
+import io.nekohasekai.libbox.LogEntry
+import io.nekohasekai.libbox.LogIterator
 import io.nekohasekai.libbox.RoutePrefix
 import io.nekohasekai.libbox.StringBox
 import io.nekohasekai.libbox.StringIterator
@@ -35,6 +37,14 @@ fun Iterable<String>.toStringIterator(): StringIterator {
 
 fun StringIterator.toList(): List<String> {
     return mutableListOf<String>().apply {
+        while (hasNext()) {
+            add(next())
+        }
+    }
+}
+
+fun LogIterator.toList(): List<LogEntry> {
+    return mutableListOf<LogEntry>().apply {
         while (hasNext()) {
             add(next())
         }

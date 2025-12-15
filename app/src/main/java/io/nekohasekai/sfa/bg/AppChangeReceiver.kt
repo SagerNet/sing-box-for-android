@@ -8,12 +8,14 @@ import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.ui.profileoverride.PerAppProxyActivity
 
 class AppChangeReceiver : BroadcastReceiver() {
-
     companion object {
         private const val TAG = "AppChangeReceiver"
     }
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         Log.d(TAG, "onReceive: ${intent.action}")
         checkUpdate(intent)
     }
@@ -47,5 +49,4 @@ class AppChangeReceiver : BroadcastReceiver() {
             Log.d(TAG, "removed from list")
         }
     }
-
 }

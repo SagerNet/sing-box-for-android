@@ -36,7 +36,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class OverviewFragment : Fragment() {
-
     private val activity: MainActivity? get() = super.getActivity() as MainActivity?
     private var binding: FragmentDashboardOverviewBinding? = null
     private val statusClient =
@@ -45,8 +44,11 @@ class OverviewFragment : Fragment() {
         CommandClient(lifecycleScope, CommandClient.ConnectionType.ClashMode, ClashModeClient())
 
     private var adapter: Adapter? = null
+
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         val binding = FragmentDashboardOverviewBinding.inflate(inflater, container, false)
         this.binding = binding
@@ -57,10 +59,11 @@ class OverviewFragment : Fragment() {
     private fun onCreate() {
         val activity = activity ?: return
         val binding = binding ?: return
-        binding.profileList.adapter = Adapter(lifecycleScope, binding).apply {
-            adapter = this
-            reload()
-        }
+        binding.profileList.adapter =
+            Adapter(lifecycleScope, binding).apply {
+                adapter = this
+                reload()
+            }
         binding.profileList.layoutManager = LinearLayoutManager(requireContext())
         val divider = MaterialDividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL)
         divider.isLastItemDecorated = false
@@ -71,14 +74,12 @@ class OverviewFragment : Fragment() {
                 Status.Stopped -> {
                     binding.clashModeCard.isVisible = false
                     binding.systemProxyCard.isVisible = false
-
                 }
 
                 Status.Started -> {
                     statusClient.connect()
                     clashModeClient.connect()
                     reloadSystemProxyStatus()
-
                 }
 
                 else -> {}
@@ -136,7 +137,6 @@ class OverviewFragment : Fragment() {
     }
 
     inner class StatusClient : CommandClient.Handler {
-
         override fun onConnected() {
             val binding = binding ?: return
             lifecycleScope.launch(Dispatchers.Main) {
@@ -170,12 +170,13 @@ class OverviewFragment : Fragment() {
                 }
             }
         }
-
     }
 
     inner class ClashModeClient : CommandClient.Handler {
-
-        override fun initializeClashMode(modeList: List<String>, currentMode: String) {
+        override fun initializeClashMode(
+            modeList: List<String>,
+            currentMode: String,
+        ) {
             val binding = binding ?: return
             if (modeList.size > 1) {
                 lifecycleScope.launch(Dispatchers.Main) {
@@ -184,7 +185,7 @@ class OverviewFragment : Fragment() {
                     binding.clashModeList.layoutManager =
                         GridLayoutManager(
                             requireContext(),
-                            if (modeList.size < 3) modeList.size else 3
+                            if (modeList.size < 3) modeList.size else 3,
                         )
                 }
             } else {
@@ -203,22 +204,25 @@ class OverviewFragment : Fragment() {
                 adapter.notifyDataSetChanged()
             }
         }
-
     }
 
     private inner class ClashModeAdapter(
         val items: List<String>,
-        var selected: String
+        var selected: String,
     ) :
         RecyclerView.Adapter<ClashModeItemView>() {
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ClashModeItemView {
-            val view = ClashModeItemView(
-                ViewClashModeButtonBinding.inflate(
-                    LayoutInflater.from(parent.context),
-                    parent,
-                    false
+        override fun onCreateViewHolder(
+            parent: ViewGroup,
+            viewType: Int,
+        ): ClashModeItemView {
+            val view =
+                ClashModeItemView(
+                    ViewClashModeButtonBinding.inflate(
+                        LayoutInflater.from(parent.context),
+                        parent,
+                        false,
+                    ),
                 )
-            )
             view.binding.clashModeButton.clipToOutline = true
             return view
         }
@@ -227,20 +231,25 @@ class OverviewFragment : Fragment() {
             return items.size
         }
 
-        override fun onBindViewHolder(holder: ClashModeItemView, position: Int) {
+        override fun onBindViewHolder(
+            holder: ClashModeItemView,
+            position: Int,
+        ) {
             holder.bind(items[position], selected)
         }
     }
 
     private inner class ClashModeItemView(val binding: ViewClashModeButtonBinding) :
         RecyclerView.ViewHolder(binding.root) {
-
         @OptIn(DelicateCoroutinesApi::class)
-        fun bind(item: String, selected: String) {
+        fun bind(
+            item: String,
+            selected: String,
+        ) {
             binding.clashModeButtonText.text = item
             if (item != selected) {
                 binding.clashModeButtonText.setTextColor(
-                    binding.root.context.getAttrColor(com.google.android.material.R.attr.colorOnPrimaryContainer)
+                    binding.root.context.getAttrColor(com.google.android.material.R.attr.colorOnPrimaryContainer),
                 )
                 binding.clashModeButton.setBackgroundResource(R.drawable.bg_rounded_rectangle)
                 binding.clashModeButton.setOnClickListener {
@@ -255,25 +264,23 @@ class OverviewFragment : Fragment() {
                 }
             } else {
                 binding.clashModeButtonText.setTextColor(
-                    binding.root.context.getAttrColor(com.google.android.material.R.attr.colorOnPrimary)
+                    binding.root.context.getAttrColor(com.google.android.material.R.attr.colorOnPrimary),
                 )
                 binding.clashModeButton.setBackgroundResource(R.drawable.bg_rounded_rectangle_active)
                 binding.clashModeButton.isClickable = false
             }
-
         }
     }
 
-
     class Adapter(
         internal val scope: CoroutineScope,
-        internal val parent: FragmentDashboardOverviewBinding
+        internal val parent: FragmentDashboardOverviewBinding,
     ) :
         RecyclerView.Adapter<Holder>() {
-
         internal var items: MutableList<Profile> = mutableListOf()
         internal var selectedProfileID = -1L
         internal var lastSelectedIndex: Int? = null
+
         internal fun reload() {
             scope.launch(Dispatchers.IO) {
                 items = ProfileManager.list().toMutableList()
@@ -299,33 +306,37 @@ class OverviewFragment : Fragment() {
             }
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
+        override fun onCreateViewHolder(
+            parent: ViewGroup,
+            viewType: Int,
+        ): Holder {
             return Holder(
                 this,
                 ViewProfileItemBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
-                    false
-                )
+                    false,
+                ),
             )
         }
 
-        override fun onBindViewHolder(holder: Holder, position: Int) {
+        override fun onBindViewHolder(
+            holder: Holder,
+            position: Int,
+        ) {
             holder.bind(items[position])
         }
 
         override fun getItemCount(): Int {
             return items.size
         }
-
     }
 
     class Holder(
         private val adapter: Adapter,
-        private val binding: ViewProfileItemBinding
+        private val binding: ViewProfileItemBinding,
     ) :
         RecyclerView.ViewHolder(binding.root) {
-
         internal fun bind(profile: Profile) {
             binding.profileName.text = profile.name
             binding.profileSelected.setOnCheckedChangeListener(null)
@@ -375,5 +386,4 @@ class OverviewFragment : Fragment() {
             }
         }
     }
-
 }

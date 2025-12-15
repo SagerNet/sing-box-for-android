@@ -8,6 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.bg.UpdateProfileWork
+import io.nekohasekai.sfa.compose.util.RelativeTimeFormatter
 import io.nekohasekai.sfa.constant.EnabledType
 import io.nekohasekai.sfa.database.Profile
 import io.nekohasekai.sfa.database.ProfileManager
@@ -25,12 +26,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.text.DateFormat
 import java.util.Date
 
 class EditProfileActivity : AbstractActivity<ActivityEditProfileBinding>() {
-
     private lateinit var profile: Profile
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -72,10 +72,11 @@ class EditProfileActivity : AbstractActivity<ActivityEditProfileBinding>() {
                 startActivity(
                     Intent(
                         this@EditProfileActivity,
-                        EditProfileContentActivity::class.java
+                        EditProfileContentActivity::class.java,
                     ).apply {
                         putExtra("profile_id", profile.id)
-                    })
+                    },
+                )
             }
             when (profile.typed.type) {
                 TypedProfile.Type.Local -> {
@@ -88,9 +89,10 @@ class EditProfileActivity : AbstractActivity<ActivityEditProfileBinding>() {
                     binding.remoteFields.isVisible = true
                     binding.remoteURL.text = profile.typed.remoteURL
                     binding.lastUpdated.text =
-                        DateFormat.getDateTimeInstance().format(profile.typed.lastUpdated)
-                    binding.autoUpdate.text = EnabledType.from(profile.typed.autoUpdate)
-                        .getString(this@EditProfileActivity)
+                        RelativeTimeFormatter.format(this@EditProfileActivity, profile.typed.lastUpdated)
+                    binding.autoUpdate.text =
+                        EnabledType.from(profile.typed.autoUpdate)
+                            .getString(this@EditProfileActivity)
                     binding.autoUpdate.setSimpleItems(R.array.enabled)
                     binding.autoUpdateInterval.isVisible = profile.typed.autoUpdate
                     binding.autoUpdateInterval.text = profile.typed.autoUpdateInterval.toString()
@@ -104,7 +106,6 @@ class EditProfileActivity : AbstractActivity<ActivityEditProfileBinding>() {
             binding.progressView.isVisible = false
         }
     }
-
 
     private fun updateRemoteURL(newValue: String) {
         profile.typed.remoteURL = newValue
@@ -131,12 +132,13 @@ class EditProfileActivity : AbstractActivity<ActivityEditProfileBinding>() {
             binding.autoUpdateInterval.error = getString(R.string.profile_input_required)
             return
         }
-        val intValue = try {
-            newValue.toInt()
-        } catch (e: Exception) {
-            binding.autoUpdateInterval.error = e.localizedMessage
-            return
-        }
+        val intValue =
+            try {
+                newValue.toInt()
+            } catch (e: Exception) {
+                binding.autoUpdateInterval.error = e.localizedMessage
+                return
+            }
         if (intValue < 15) {
             binding.autoUpdateInterval.error =
                 getString(R.string.profile_auto_update_interval_minimum_hint)
@@ -188,7 +190,7 @@ class EditProfileActivity : AbstractActivity<ActivityEditProfileBinding>() {
             }
             withContext(Dispatchers.Main) {
                 binding.lastUpdated.text =
-                    DateFormat.getDateTimeInstance().format(profile.typed.lastUpdated)
+                    RelativeTimeFormatter.format(this@EditProfileActivity, profile.typed.lastUpdated)
                 binding.progressView.isVisible = false
             }
             if (selectedProfileUpdated) {
@@ -198,5 +200,4 @@ class EditProfileActivity : AbstractActivity<ActivityEditProfileBinding>() {
             }
         }
     }
-
 }

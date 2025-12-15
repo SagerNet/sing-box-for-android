@@ -30,8 +30,8 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class QRScanActivity : AbstractActivity<ActivityQrScanBinding>() {
-
     private lateinit var analysisExecutor: ExecutorService
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -46,7 +46,7 @@ class QRScanActivity : AbstractActivity<ActivityQrScanBinding>() {
             }
         }
         if (ContextCompat.checkSelfPermission(
-                this, Manifest.permission.CAMERA
+                this, Manifest.permission.CAMERA,
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             startCamera()
@@ -81,6 +81,7 @@ class QRScanActivity : AbstractActivity<ActivityQrScanBinding>() {
     }
     private val vendorAnalyzer = Vendor.createQRCodeAnalyzer(onSuccess, onFailure)
     private var useVendorAnalyzer = vendorAnalyzer != null
+
     private fun resetAnalyzer() {
         if (useVendorAnalyzer) {
             useVendorAnalyzer = false
@@ -95,31 +96,35 @@ class QRScanActivity : AbstractActivity<ActivityQrScanBinding>() {
     private lateinit var camera: Camera
 
     private fun startCamera() {
-        val cameraProviderFuture = try {
-            ProcessCameraProvider.getInstance(this)
-        } catch (e: Exception) {
-            fatalError(e)
-            return
-        }
-        cameraProviderFuture.addListener({
-            cameraProvider = try {
-                cameraProviderFuture.get()
+        val cameraProviderFuture =
+            try {
+                ProcessCameraProvider.getInstance(this)
             } catch (e: Exception) {
                 fatalError(e)
-                return@addListener
+                return
             }
+        cameraProviderFuture.addListener({
+            cameraProvider =
+                try {
+                    cameraProviderFuture.get()
+                } catch (e: Exception) {
+                    fatalError(e)
+                    return@addListener
+                }
 
-            cameraPreview = Preview.Builder().build()
-                .also { it.setSurfaceProvider(binding.previewView.surfaceProvider) }
+            cameraPreview =
+                Preview.Builder().build()
+                    .also { it.setSurfaceProvider(binding.previewView.surfaceProvider) }
             imageAnalysis = ImageAnalysis.Builder().build()
             imageAnalyzer = vendorAnalyzer ?: ZxingQRCodeAnalyzer(onSuccess, onFailure)
             imageAnalysis.setAnalyzer(analysisExecutor, imageAnalyzer)
             cameraProvider.unbindAll()
 
             try {
-                camera = cameraProvider.bindToLifecycle(
-                    this, CameraSelector.DEFAULT_BACK_CAMERA, cameraPreview, imageAnalysis
-                )
+                camera =
+                    cameraProvider.bindToLifecycle(
+                        this, CameraSelector.DEFAULT_BACK_CAMERA, cameraPreview, imageAnalysis,
+                    )
             } catch (e: Exception) {
                 fatalError(e)
             }
@@ -151,9 +156,12 @@ class QRScanActivity : AbstractActivity<ActivityQrScanBinding>() {
         val uri = Uri.parse(uriString)
         if (uri.scheme != "sing-box" || uri.host != "import-remote-profile") error("Not a valid sing-box remote profile URI")
         Libbox.parseRemoteProfileImportLink(uri.toString())
-        setResult(RESULT_OK, Intent().apply {
-            setData(uri)
-        })
+        setResult(
+            RESULT_OK,
+            Intent().apply {
+                setData(uri)
+            },
+        )
         finish()
     }
 
@@ -181,12 +189,13 @@ class QRScanActivity : AbstractActivity<ActivityQrScanBinding>() {
                 item.isChecked = !item.isChecked
                 cameraProvider.unbindAll()
                 try {
-                    camera = cameraProvider.bindToLifecycle(
-                        this,
-                        if (!item.isChecked) CameraSelector.DEFAULT_BACK_CAMERA else CameraSelector.DEFAULT_FRONT_CAMERA,
-                        cameraPreview,
-                        imageAnalysis
-                    )
+                    camera =
+                        cameraProvider.bindToLifecycle(
+                            this,
+                            if (!item.isChecked) CameraSelector.DEFAULT_BACK_CAMERA else CameraSelector.DEFAULT_FRONT_CAMERA,
+                            cameraPreview,
+                            imageAnalysis,
+                        )
                 } catch (e: Exception) {
                     fatalError(e)
                 }
@@ -200,11 +209,12 @@ class QRScanActivity : AbstractActivity<ActivityQrScanBinding>() {
             R.id.action_use_vendor_analyzer -> {
                 item.isChecked = !item.isChecked
                 imageAnalysis.clearAnalyzer()
-                imageAnalyzer = if (item.isChecked) {
-                    vendorAnalyzer!!
-                } else {
-                    ZxingQRCodeAnalyzer(onSuccess, onFailure)
-                }
+                imageAnalyzer =
+                    if (item.isChecked) {
+                        vendorAnalyzer!!
+                    } else {
+                        ZxingQRCodeAnalyzer(onSuccess, onFailure)
+                    }
                 imageAnalysis.setAnalyzer(analysisExecutor, imageAnalyzer)
             }
 
@@ -213,23 +223,25 @@ class QRScanActivity : AbstractActivity<ActivityQrScanBinding>() {
         return true
     }
 
-
     override fun onDestroy() {
         super.onDestroy()
         analysisExecutor.shutdown()
     }
 
     class Contract : ActivityResultContract<Nothing?, Intent?>() {
+        override fun createIntent(
+            context: Context,
+            input: Nothing?,
+        ): Intent = Intent(context, QRScanActivity::class.java)
 
-        override fun createIntent(context: Context, input: Nothing?): Intent =
-            Intent(context, QRScanActivity::class.java)
-
-        override fun parseResult(resultCode: Int, intent: Intent?): Intent? {
+        override fun parseResult(
+            resultCode: Int,
+            intent: Intent?,
+        ): Intent? {
             return when (resultCode) {
                 RESULT_OK -> intent
                 else -> null
             }
         }
     }
-
 }

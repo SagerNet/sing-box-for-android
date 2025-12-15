@@ -7,5 +7,5 @@ enum class Alert {
     EmptyConfiguration,
     StartCommandServer,
     CreateService,
-    StartService
+    StartService,
 }

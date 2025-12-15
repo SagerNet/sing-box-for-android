@@ -34,18 +34,17 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-
 class GroupsFragment : Fragment(), CommandClient.Handler {
-
     private val activity: MainActivity? get() = super.getActivity() as MainActivity?
     private var binding: FragmentDashboardGroupsBinding? = null
     private var adapter: Adapter? = null
     private val commandClient =
         CommandClient(lifecycleScope, CommandClient.ConnectionType.Groups, this)
 
-
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         val binding = FragmentDashboardGroupsBinding.inflate(inflater, container, false)
         this.binding = binding
@@ -73,6 +72,7 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
     }
 
     private var displayed = false
+
     private fun updateDisplayed(newValue: Boolean) {
         val binding = binding ?: return
         if (displayed != newValue) {
@@ -104,7 +104,6 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
     }
 
     private class Adapter : RecyclerView.Adapter<GroupView>() {
-
         private lateinit var groups: MutableList<Group>
 
         @SuppressLint("NotifyDataSetChanged")
@@ -122,12 +121,15 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
             }
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GroupView {
+        override fun onCreateViewHolder(
+            parent: ViewGroup,
+            viewType: Int,
+        ): GroupView {
             return GroupView(
                 ViewDashboardGroupBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
-                    false
+                    false,
                 ),
             )
         }
@@ -139,14 +141,16 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
             return groups.size
         }
 
-        override fun onBindViewHolder(holder: GroupView, position: Int) {
+        override fun onBindViewHolder(
+            holder: GroupView,
+            position: Int,
+        ) {
             holder.bind(groups[position])
         }
     }
 
     private class GroupView(val binding: ViewDashboardGroupBinding) :
         RecyclerView.ViewHolder(binding.root) {
-
         private lateinit var group: Group
         private lateinit var items: List<GroupItem>
         private lateinit var adapter: ItemAdapter
@@ -208,22 +212,23 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
                 binding.groupSelected.isEnabled = group.selectable
                 if (group.selectable) {
                     textView.setSimpleItems(group.items.toList().map { it.tag }.toTypedArray())
-                    textWatcher = textView.addTextChangedListener {
-                        val selected = textView.text.toString()
-                        if (selected != group.selected) {
-                            updateSelected(group, selected)
-                        }
-                        GlobalScope.launch {
-                            runCatching {
-                                Libbox.newStandaloneCommandClient()
-                                    .selectOutbound(group.tag, selected)
-                            }.onFailure {
-                                withContext(Dispatchers.Main) {
-                                    binding.root.context.errorDialogBuilder(it).show()
+                    textWatcher =
+                        textView.addTextChangedListener {
+                            val selected = textView.text.toString()
+                            if (selected != group.selected) {
+                                updateSelected(group, selected)
+                            }
+                            GlobalScope.launch {
+                                runCatching {
+                                    Libbox.newStandaloneCommandClient()
+                                        .selectOutbound(group.tag, selected)
+                                }.onFailure {
+                                    withContext(Dispatchers.Main) {
+                                        binding.root.context.errorDialogBuilder(it).show()
+                                    }
                                 }
                             }
                         }
-                    }
                 }
             }
             if (newExpandStatus) {
@@ -238,7 +243,10 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
             }
         }
 
-        fun updateSelected(group: Group, itemTag: String) {
+        fun updateSelected(
+            group: Group,
+            itemTag: String,
+        ) {
             val oldSelected = items.indexOfFirst { it.tag == group.selected }
             group.selected = itemTag
             if (oldSelected != -1) {
@@ -250,10 +258,9 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
     private class ItemAdapter(
         val groupView: GroupView,
         var group: Group,
-        private var items: MutableList<GroupItem> = mutableListOf()
+        private var items: MutableList<GroupItem> = mutableListOf(),
     ) :
         RecyclerView.Adapter<ItemGroupView>() {
-
         @SuppressLint("NotifyDataSetChanged")
         fun setItems(newItems: List<GroupItem>) {
             if (items.size != newItems.size) {
@@ -269,13 +276,16 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
             }
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemGroupView {
+        override fun onCreateViewHolder(
+            parent: ViewGroup,
+            viewType: Int,
+        ): ItemGroupView {
             return ItemGroupView(
                 ViewDashboardGroupItemBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
-                    false
-                )
+                    false,
+                ),
             )
         }
 
@@ -283,16 +293,22 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
             return items.size
         }
 
-        override fun onBindViewHolder(holder: ItemGroupView, position: Int) {
+        override fun onBindViewHolder(
+            holder: ItemGroupView,
+            position: Int,
+        ) {
             holder.bind(groupView, group, items[position])
         }
     }
 
     private class ItemGroupView(val binding: ViewDashboardGroupItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-
         @OptIn(DelicateCoroutinesApi::class)
-        fun bind(groupView: GroupView, group: Group, item: GroupItem) {
+        fun bind(
+            groupView: GroupView,
+            group: Group,
+            item: GroupItem,
+        ) {
             if (group.selectable) {
                 binding.itemCard.setOnClickListener {
                     binding.selectedView.isVisible = true
@@ -318,11 +334,10 @@ class GroupsFragment : Fragment(), CommandClient.Handler {
                 binding.itemStatus.setTextColor(
                     colorForURLTestDelay(
                         binding.root.context,
-                        item.urlTestDelay
-                    )
+                        item.urlTestDelay,
+                    ),
                 )
             }
         }
     }
 }
-

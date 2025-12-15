@@ -9,16 +9,16 @@ import io.nekohasekai.sfa.constant.Status
 
 @RequiresApi(24)
 class TileService : TileService(), ServiceConnection.Callback {
-
     private val connection = ServiceConnection(this, this)
 
     override fun onServiceStatusChanged(status: Status) {
         qsTile?.apply {
-            state = when (status) {
-                Status.Started -> Tile.STATE_ACTIVE
-                Status.Stopped -> Tile.STATE_INACTIVE
-                else -> Tile.STATE_UNAVAILABLE
-            }
+            state =
+                when (status) {
+                    Status.Started -> Tile.STATE_ACTIVE
+                    Status.Stopped -> Tile.STATE_INACTIVE
+                    else -> Tile.STATE_UNAVAILABLE
+                }
             updateTile()
         }
     }
@@ -51,5 +51,4 @@ class TileService : TileService(), ServiceConnection.Callback {
             else -> {}
         }
     }
-
 }

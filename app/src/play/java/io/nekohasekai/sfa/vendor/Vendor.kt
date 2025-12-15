@@ -14,13 +14,16 @@ import com.google.mlkit.common.MlKitException
 import io.nekohasekai.sfa.R
 
 object Vendor : VendorInterface {
-
     private const val TAG = "Vendor"
+
     override fun checkUpdateAvailable(): Boolean {
         return true
     }
 
-    override fun checkUpdate(activity: Activity, byUser: Boolean) {
+    override fun checkUpdate(
+        activity: Activity,
+        byUser: Boolean,
+    ) {
         val appUpdateManager = AppUpdateManagerFactory.create(activity)
         val appUpdateInfoTask = appUpdateManager.appUpdateInfo
         appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
@@ -45,13 +48,13 @@ object Vendor : VendorInterface {
                         appUpdateManager.startUpdateFlow(
                             appUpdateInfo,
                             activity,
-                            AppUpdateOptions.newBuilder(AppUpdateType.FLEXIBLE).build()
+                            AppUpdateOptions.newBuilder(AppUpdateType.FLEXIBLE).build(),
                         )
                     } else if (appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
                         appUpdateManager.startUpdateFlow(
                             appUpdateInfo,
                             activity,
-                            AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build()
+                            AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build(),
                         )
                     }
                 }
@@ -78,7 +81,7 @@ object Vendor : VendorInterface {
 
     override fun createQRCodeAnalyzer(
         onSuccess: (String) -> Unit,
-        onFailure: (Exception) -> Unit
+        onFailure: (Exception) -> Unit,
     ): ImageAnalysis.Analyzer? {
         try {
             return MLKitQRCodeAnalyzer(onSuccess, onFailure)
@@ -90,4 +93,8 @@ object Vendor : VendorInterface {
         }
     }
 
+    override fun isPerAppProxyAvailable(): Boolean {
+        // Per-app Proxy is disabled for Play Store builds due to QUERY_ALL_PACKAGES permission restriction
+        return false
+    }
 }

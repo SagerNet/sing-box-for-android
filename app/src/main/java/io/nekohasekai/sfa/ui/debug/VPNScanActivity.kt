@@ -30,9 +30,9 @@ import java.util.zip.ZipFile
 import kotlin.math.roundToInt
 
 class VPNScanActivity : AbstractActivity<ActivityVpnScanBinding>() {
-
     private var adapter: Adapter? = null
     private val appInfoList = mutableListOf<AppInfo>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -44,9 +44,10 @@ class VPNScanActivity : AbstractActivity<ActivityVpnScanBinding>() {
             WindowInsetsCompat.CONSUMED
         }
 
-        binding.scanVPNResult.adapter = Adapter().also {
-            adapter = it
-        }
+        binding.scanVPNResult.adapter =
+            Adapter().also {
+                adapter = it
+            }
         binding.scanVPNResult.layoutManager = LinearLayoutManager(this)
         lifecycleScope.launch(Dispatchers.IO) {
             scanVPN()
@@ -61,7 +62,7 @@ class VPNScanActivity : AbstractActivity<ActivityVpnScanBinding>() {
     class VPNCoreType(
         val coreType: String,
         val corePath: String,
-        val goVersion: String
+        val goVersion: String,
     )
 
     class AppInfo(
@@ -70,7 +71,10 @@ class VPNScanActivity : AbstractActivity<ActivityVpnScanBinding>() {
     )
 
     inner class Adapter : RecyclerView.Adapter<Holder>() {
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
+        override fun onCreateViewHolder(
+            parent: ViewGroup,
+            viewType: Int,
+        ): Holder {
             return Holder(ViewVpnAppItemBinding.inflate(layoutInflater, parent, false))
         }
 
@@ -78,16 +82,18 @@ class VPNScanActivity : AbstractActivity<ActivityVpnScanBinding>() {
             return appInfoList.size
         }
 
-        override fun onBindViewHolder(holder: Holder, position: Int) {
+        override fun onBindViewHolder(
+            holder: Holder,
+            position: Int,
+        ) {
             holder.bind(appInfoList[position])
         }
     }
 
     class Holder(
-        private val binding: ViewVpnAppItemBinding
+        private val binding: ViewVpnAppItemBinding,
     ) :
         RecyclerView.ViewHolder(binding.root) {
-
         fun bind(element: AppInfo) {
             binding.appIcon.setImageDrawable(element.packageInfo.applicationInfo!!.loadIcon(binding.root.context.packageManager))
             binding.appName.text =
@@ -126,18 +132,20 @@ class VPNScanActivity : AbstractActivity<ActivityVpnScanBinding>() {
     private suspend fun scanVPN() {
         val adapter = adapter ?: return
         val flag =
-            PackageManager.GET_SERVICES or if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                PackageManager.MATCH_UNINSTALLED_PACKAGES
+            PackageManager.GET_SERVICES or
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    PackageManager.MATCH_UNINSTALLED_PACKAGES
+                } else {
+                    @Suppress("DEPRECATION")
+                    PackageManager.GET_UNINSTALLED_PACKAGES
+                }
+        val installedPackages =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                packageManager.getInstalledPackages(PackageManager.PackageInfoFlags.of(flag.toLong()))
             } else {
                 @Suppress("DEPRECATION")
-                PackageManager.GET_UNINSTALLED_PACKAGES
+                packageManager.getInstalledPackages(flag)
             }
-        val installedPackages = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            packageManager.getInstalledPackages(PackageManager.PackageInfoFlags.of(flag.toLong()))
-        } else {
-            @Suppress("DEPRECATION")
-            packageManager.getInstalledPackages(flag)
-        }
         val vpnAppList =
             installedPackages.filter {
                 it.services?.any { it.permission == Manifest.permission.BIND_VPN_SERVICE && it.applicationInfo != null }
@@ -152,7 +160,7 @@ class VPNScanActivity : AbstractActivity<ActivityVpnScanBinding>() {
                 binding.scanVPNResult.scrollToPosition(index)
                 binding.scanVPNProgress.setProgressCompat(
                     (((index + 1).toFloat() / vpnAppList.size.toFloat()) * 100).roundToInt(),
-                    true
+                    true,
                 )
             }
             System.gc()
@@ -163,41 +171,48 @@ class VPNScanActivity : AbstractActivity<ActivityVpnScanBinding>() {
     }
 
     companion object {
+        private val v2rayNGClasses =
+            listOf(
+                "com.v2ray.ang",
+                ".dto.V2rayConfig",
+                ".service.V2RayVpnService",
+            )
 
-        private val v2rayNGClasses = listOf(
-            "com.v2ray.ang",
-            ".dto.V2rayConfig",
-            ".service.V2RayVpnService",
-        )
+        private val clashForAndroidClasses =
+            listOf(
+                "com.github.kr328.clash",
+                ".core.Clash",
+                ".service.TunService",
+            )
 
-        private val clashForAndroidClasses = listOf(
-            "com.github.kr328.clash",
-            ".core.Clash",
-            ".service.TunService",
-        )
+        private val sfaClasses =
+            listOf(
+                "io.nekohasekai.sfa",
+            )
 
-        private val sfaClasses = listOf(
-            "io.nekohasekai.sfa"
-        )
+        private val legacySagerNetClasses =
+            listOf(
+                "io.nekohasekai.sagernet",
+                ".fmt.ConfigBuilder",
+            )
 
-        private val legacySagerNetClasses = listOf(
-            "io.nekohasekai.sagernet",
-            ".fmt.ConfigBuilder"
-        )
-
-        private val shadowsocksAndroidClasses = listOf(
-            "com.github.shadowsocks",
-            ".bg.VpnService",
-            "GuardedProcessPool"
-        )
+        private val shadowsocksAndroidClasses =
+            listOf(
+                "com.github.shadowsocks",
+                ".bg.VpnService",
+                "GuardedProcessPool",
+            )
     }
 
     private fun getVPNAppType(packageInfo: PackageInfo): String? {
         ZipFile(File(packageInfo.applicationInfo!!.publicSourceDir)).use { packageFile ->
             for (packageEntry in packageFile.entries()) {
-                if (!(packageEntry.name.startsWith("classes") && packageEntry.name.endsWith(
-                        ".dex"
-                    ))
+                if (!(
+                        packageEntry.name.startsWith("classes") &&
+                            packageEntry.name.endsWith(
+                                ".dex",
+                            )
+                    )
                 ) {
                     continue
                 }
@@ -205,16 +220,18 @@ class VPNScanActivity : AbstractActivity<ActivityVpnScanBinding>() {
                     continue
                 }
                 val input = packageFile.getInputStream(packageEntry).buffered()
-                val dexFile = try {
-                    DexBackedDexFile.fromInputStream(null, input)
-                } catch (e: Exception) {
-                    Log.e("VPNScanActivity", "Failed to read dex file", e)
-                    continue
-                }
+                val dexFile =
+                    try {
+                        DexBackedDexFile.fromInputStream(null, input)
+                    } catch (e: Exception) {
+                        Log.e("VPNScanActivity", "Failed to read dex file", e)
+                        continue
+                    }
                 for (clazz in dexFile.classes) {
-                    val clazzName = clazz.type.substring(1, clazz.type.length - 1)
-                        .replace("/", ".")
-                        .replace("$", ".")
+                    val clazzName =
+                        clazz.type.substring(1, clazz.type.length - 1)
+                            .replace("/", ".")
+                            .replace("$", ".")
                     for (v2rayNGClass in v2rayNGClasses) {
                         if (clazzName.contains(v2rayNGClass)) {
                             return "V2RayNG"
@@ -251,12 +268,12 @@ class VPNScanActivity : AbstractActivity<ActivityVpnScanBinding>() {
         packageInfo.applicationInfo!!.splitPublicSourceDirs?.also {
             packageFiles.addAll(it)
         }
-        val vpnType = try {
-            Libbox.readAndroidVPNType(packageFiles.toStringIterator())
-        } catch (ignored: Exception) {
-            return null
-        }
+        val vpnType =
+            try {
+                Libbox.readAndroidVPNType(packageFiles.toStringIterator())
+            } catch (ignored: Exception) {
+                return null
+            }
         return VPNCoreType(vpnType.coreType, vpnType.corePath, vpnType.goVersion)
     }
-
 }

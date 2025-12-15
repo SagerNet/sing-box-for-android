@@ -22,20 +22,20 @@ class KeyValueEntity() : Parcelable {
         const val TYPE_STRING_SET = 5
 
         @JvmField
-        val CREATOR = object : Parcelable.Creator<KeyValueEntity> {
-            override fun createFromParcel(parcel: Parcel): KeyValueEntity {
-                return KeyValueEntity(parcel)
-            }
+        val CREATOR =
+            object : Parcelable.Creator<KeyValueEntity> {
+                override fun createFromParcel(parcel: Parcel): KeyValueEntity {
+                    return KeyValueEntity(parcel)
+                }
 
-            override fun newArray(size: Int): Array<KeyValueEntity?> {
-                return arrayOfNulls(size)
+                override fun newArray(size: Int): Array<KeyValueEntity?> {
+                    return arrayOfNulls(size)
+                }
             }
-        }
     }
 
     @androidx.room.Dao
     interface Dao {
-
         @Query("SELECT * FROM KeyValueEntity")
         fun all(): List<KeyValueEntity>
 
@@ -71,16 +71,19 @@ class KeyValueEntity() : Parcelable {
     val string: String?
         get() = if (valueType == TYPE_STRING) String(value) else null
     val stringSet: Set<String>?
-        get() = if (valueType == TYPE_STRING_SET) {
-            val buffer = ByteBuffer.wrap(value)
-            val result = HashSet<String>()
-            while (buffer.hasRemaining()) {
-                val chArr = ByteArray(buffer.int)
-                buffer.get(chArr)
-                result.add(String(chArr))
+        get() =
+            if (valueType == TYPE_STRING_SET) {
+                val buffer = ByteBuffer.wrap(value)
+                val result = HashSet<String>()
+                while (buffer.hasRemaining()) {
+                    val chArr = ByteArray(buffer.int)
+                    buffer.get(chArr)
+                    result.add(String(chArr))
+                }
+                result
+            } else {
+                null
             }
-            result
-        } else null
 
     @Ignore
     constructor(key: String) : this() {
@@ -143,7 +146,10 @@ class KeyValueEntity() : Parcelable {
         value = parcel.createByteArray()!!
     }
 
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
+    override fun writeToParcel(
+        parcel: Parcel,
+        flags: Int,
+    ) {
         parcel.writeString(key)
         parcel.writeInt(valueType)
         parcel.writeByteArray(value)
@@ -152,5 +158,4 @@ class KeyValueEntity() : Parcelable {
     override fun describeContents(): Int {
         return 0
     }
-
 }

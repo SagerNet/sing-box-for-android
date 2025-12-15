@@ -7,7 +7,6 @@ import io.nekohasekai.sfa.databinding.ActivityDebugBinding
 import io.nekohasekai.sfa.ui.shared.AbstractActivity
 
 class DebugActivity : AbstractActivity<ActivityDebugBinding>() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

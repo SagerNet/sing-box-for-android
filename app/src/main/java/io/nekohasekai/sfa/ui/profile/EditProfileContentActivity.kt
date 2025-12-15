@@ -23,8 +23,8 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 class EditProfileContentActivity : AbstractActivity<ActivityEditProfileContentBinding>() {
-
     private var profile: Profile? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -135,5 +135,4 @@ class EditProfileContentActivity : AbstractActivity<ActivityEditProfileContentBi
             binding.progressView.isInvisible = true
         }
     }
-
 }
