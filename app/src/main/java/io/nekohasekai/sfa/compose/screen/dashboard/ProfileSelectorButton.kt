@@ -16,6 +16,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,7 +38,11 @@ fun ProfileSelectorButton(
         onClick = onClick,
         modifier = modifier.fillMaxWidth().height(48.dp),
         shape = RoundedCornerShape(12.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+        color = if (isSystemInDarkTheme()) {
+            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        } else {
+            MaterialTheme.colorScheme.surfaceDim
+        },
     ) {
         Row(
             modifier = Modifier

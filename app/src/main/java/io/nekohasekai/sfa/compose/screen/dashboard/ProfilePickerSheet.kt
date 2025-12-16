@@ -43,6 +43,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -283,7 +284,11 @@ private fun ProfilePickerRow(
         shape = RoundedCornerShape(8.dp),
         color = when {
             isDragging -> MaterialTheme.colorScheme.tertiaryContainer
-            isSelected -> MaterialTheme.colorScheme.primaryContainer
+            isSelected -> if (isSystemInDarkTheme()) {
+                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            } else {
+                MaterialTheme.colorScheme.surfaceDim
+            }
             else -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
         },
         tonalElevation = animatedElevation.dp,
@@ -302,11 +307,7 @@ private fun ProfilePickerRow(
                 imageVector = profileIcon,
                 contentDescription = null,
                 modifier = Modifier.size(24.dp),
-                tint = if (isSelected) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                },
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             Spacer(modifier = Modifier.width(12.dp))
@@ -319,11 +320,7 @@ private fun ProfilePickerRow(
                     text = profile.name,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
-                    color = if (isSelected) {
-                        MaterialTheme.colorScheme.onPrimaryContainer
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    },
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -337,11 +334,7 @@ private fun ProfilePickerRow(
                         )
                     },
                     style = MaterialTheme.typography.labelSmall,
-                    color = if (isSelected) {
-                        MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                    },
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                 )
             }
 
@@ -371,11 +364,7 @@ private fun ProfilePickerRow(
                             imageVector = Icons.Default.MoreVert,
                             contentDescription = stringResource(R.string.more_options),
                             modifier = Modifier.size(20.dp),
-                            tint = if (isSelected) {
-                                MaterialTheme.colorScheme.onPrimaryContainer
-                            } else {
-                                MaterialTheme.colorScheme.onSurfaceVariant
-                            },
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
 
