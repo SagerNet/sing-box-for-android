@@ -64,6 +64,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import io.nekohasekai.sfa.BuildConfig
 import io.nekohasekai.sfa.R
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -77,13 +78,17 @@ fun DashboardSettingsBottomSheet(
     onResetOrder: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    var reorderedList by remember(cardOrder) { mutableStateOf(cardOrder) }
-    var currentVisibleCards by remember(visibleCards) { mutableStateOf(visibleCards) }
+    val filteredCardOrder =
+        if (BuildConfig.DEBUG) cardOrder else cardOrder.filter { it != CardGroup.Debug }
+    val filteredVisibleCards =
+        if (BuildConfig.DEBUG) visibleCards else visibleCards.filter { it != CardGroup.Debug }.toSet()
+    var reorderedList by remember(filteredCardOrder) { mutableStateOf(filteredCardOrder) }
+    var currentVisibleCards by remember(filteredVisibleCards) { mutableStateOf(filteredVisibleCards) }
 
     // Update local state when props change (e.g., after reset)
-    LaunchedEffect(cardOrder, visibleCards) {
-        reorderedList = cardOrder
-        currentVisibleCards = visibleCards
+    LaunchedEffect(filteredCardOrder, filteredVisibleCards) {
+        reorderedList = filteredCardOrder
+        currentVisibleCards = filteredVisibleCards
     }
 
     val hapticFeedback = LocalHapticFeedback.current
@@ -158,22 +163,22 @@ fun DashboardSettingsBottomSheet(
                 TextButton(
                     onClick = {
                         val defaultOrder =
-                            listOf(
+                            listOfNotNull(
                                 CardGroup.ClashMode,
                                 CardGroup.UploadTraffic,
                                 CardGroup.DownloadTraffic,
-                                CardGroup.Debug,
+                                if (BuildConfig.DEBUG) CardGroup.Debug else null,
                                 CardGroup.Connections,
                                 CardGroup.SystemProxy,
                                 CardGroup.Profiles,
                                 CardGroup.Groups,
                             )
                         val allCardsEnabled =
-                            setOf(
+                            setOfNotNull(
                                 CardGroup.ClashMode,
                                 CardGroup.UploadTraffic,
                                 CardGroup.DownloadTraffic,
-                                CardGroup.Debug,
+                                if (BuildConfig.DEBUG) CardGroup.Debug else null,
                                 CardGroup.Connections,
                                 CardGroup.SystemProxy,
                                 CardGroup.Profiles,
