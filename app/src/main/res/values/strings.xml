@@ -128,6 +128,15 @@
     <string name="check_update_automatic">Automatic Update Check</string>
     <string name="check_update">Check Update</string>
     <string name="no_updates_available">No updates available</string>
+    <string name="new_version_available">New version available: %s</string>
+    <string name="update">Update</string>
+    <string name="update_track">Update Track</string>
+    <string name="update_track_stable">Stable</string>
+    <string name="update_track_beta">Beta</string>
+    <string name="update_track_not_supported">Current track does not support update checking yet</string>
+    <string name="app_version">Version %s</string>
+    <string name="app_version_title">App version</string>
+    <string name="action">Action</string>
     <string name="privacy_policy">Privacy Policy</string>
     <string name="title_app_settings">App</string>
     <string name="memory_limit">Memory Limit</string>

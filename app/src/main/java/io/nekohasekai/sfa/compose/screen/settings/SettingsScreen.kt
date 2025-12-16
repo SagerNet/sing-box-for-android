@@ -17,9 +17,11 @@ import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FilterAlt
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.SwapHoriz
 import androidx.compose.material.icons.outlined.Tune
+import androidx.compose.material3.Badge
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,6 +31,7 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,6 +43,7 @@ import androidx.navigation.NavController
 import io.nekohasekai.sfa.BuildConfig
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.database.Settings
+import io.nekohasekai.sfa.update.UpdateState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -48,6 +52,7 @@ import kotlinx.coroutines.launch
 fun SettingsScreen(navController: NavController) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val hasUpdate by UpdateState.hasUpdate
 
     Column(
         modifier =
@@ -72,6 +77,35 @@ fun SettingsScreen(navController: NavController) {
                 ListItem(
                     headlineContent = {
                         Text(
+                            stringResource(R.string.title_app_settings),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    },
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Outlined.Info,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    },
+                    trailingContent = {
+                        if (hasUpdate) {
+                            Badge()
+                        }
+                    },
+                    modifier =
+                        Modifier
+                            .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+                            .clickable { navController.navigate("settings/app") },
+                    colors =
+                        ListItemDefaults.colors(
+                            containerColor = Color.Transparent,
+                        ),
+                )
+
+                ListItem(
+                    headlineContent = {
+                        Text(
                             stringResource(R.string.core),
                             style = MaterialTheme.typography.bodyLarge,
                         )
@@ -85,7 +119,6 @@ fun SettingsScreen(navController: NavController) {
                     },
                     modifier =
                         Modifier
-                            .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
                             .clickable { navController.navigate("settings/core") },
                     colors =
                         ListItemDefaults.colors(

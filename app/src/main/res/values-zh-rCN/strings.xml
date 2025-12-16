@@ -86,6 +86,15 @@
     <string name="check_update_automatic">自动检查更新</string>
     <string name="check_update">检查更新</string>
     <string name="no_updates_available">没有可用的更新</string>
+    <string name="new_version_available">有新版本可用：%s</string>
+    <string name="update">更新</string>
+    <string name="update_track">更新轨道</string>
+    <string name="update_track_stable">稳定版</string>
+    <string name="update_track_beta">测试版</string>
+    <string name="update_track_not_supported">当前轨道尚不支持检查更新</string>
+    <string name="app_version">版本 %s</string>
+    <string name="app_version_title">应用版本</string>
+    <string name="action">操作</string>
     <string name="privacy_policy">隐私政策</string>
     <string name="title_app_settings">应用</string>
     <string name="memory_limit">内存限制</string>
@@ -225,6 +234,7 @@
     <string name="update_profile">更新配置文件</string>
     <string name="more_options">更多选项</string>
     <string name="edit">编辑</string>
+    <string name="done">完成</string>
     <string name="save_as_file">另存为文件</string>
     <string name="share_as_file">分享为文件</string>
     <string name="service">服务</string>

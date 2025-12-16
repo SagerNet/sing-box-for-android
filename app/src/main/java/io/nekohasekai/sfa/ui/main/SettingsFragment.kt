@@ -82,10 +82,6 @@ class SettingsFragment : Fragment() {
                 }
             }
         }
-        if (!Vendor.checkUpdateAvailable()) {
-            binding.checkUpdateEnabled.isVisible = false
-            binding.checkUpdateButton.isVisible = false
-        }
         binding.checkUpdateEnabled.addTextChangedListener {
             lifecycleScope.launch(Dispatchers.IO) {
                 val newValue = EnabledType.valueOf(requireContext(), it).boolValue

@@ -40,6 +40,7 @@ object Settings {
     var startedByUser by dataStore.boolean(SettingsKey.STARTED_BY_USER)
 
     var checkUpdateEnabled by dataStore.boolean(SettingsKey.CHECK_UPDATE_ENABLED) { true }
+    var updateTrack by dataStore.string(SettingsKey.UPDATE_TRACK) { "stable" }
     var disableMemoryLimit by dataStore.boolean(SettingsKey.DISABLE_MEMORY_LIMIT)
     var dynamicNotification by dataStore.boolean(SettingsKey.DYNAMIC_NOTIFICATION) { true }
     var useComposeUI by dataStore.boolean(SettingsKey.USE_COMPOSE_UI) { true }

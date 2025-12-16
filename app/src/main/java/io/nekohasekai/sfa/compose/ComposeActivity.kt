@@ -21,6 +21,8 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -58,6 +60,7 @@ import io.nekohasekai.sfa.bg.ServiceConnection
 import io.nekohasekai.sfa.bg.ServiceNotification
 import io.nekohasekai.sfa.compose.base.GlobalEventBus
 import io.nekohasekai.sfa.compose.base.UiEvent
+import io.nekohasekai.sfa.compose.component.UpdateAvailableDialog
 import io.nekohasekai.sfa.compose.navigation.SFANavHost
 import io.nekohasekai.sfa.compose.navigation.Screen
 import io.nekohasekai.sfa.compose.navigation.bottomNavigationScreens
@@ -71,6 +74,8 @@ import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.ktx.hasPermission
 import io.nekohasekai.sfa.ktx.launchCustomTab
+import io.nekohasekai.sfa.update.UpdateState
+import io.nekohasekai.sfa.vendor.Vendor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -128,6 +133,16 @@ class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
         enableEdgeToEdge()
 
         connection.reconnect()
+
+        if (Settings.checkUpdateEnabled) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                try {
+                    val updateInfo = Vendor.checkUpdateAsync()
+                    UpdateState.setUpdate(updateInfo)
+                } catch (_: Exception) {
+                }
+            }
+        }
 
         setContent {
             SFATheme {
@@ -236,6 +251,16 @@ class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
             }, onDismiss = { showBackgroundLocationDialog = false })
         }
 
+        // Handle update available dialog
+        val updateInfo by UpdateState.updateInfo
+        var showUpdateDialog by remember { mutableStateOf(true) }
+        if (showUpdateDialog && updateInfo != null) {
+            UpdateAvailableDialog(
+                updateInfo = updateInfo!!,
+                onDismiss = { showUpdateDialog = false },
+            )
+        }
+
         // Initialize the dashboard view model and store reference
         val dashboardViewModel: DashboardViewModel = viewModel()
         if (!::dashboardViewModel.isInitialized) {
@@ -253,6 +278,7 @@ class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
         val isSettingsSubScreen = currentDestination?.route?.startsWith("settings/") == true
         val settingsScreenTitle =
             when (currentDestination?.route) {
+                "settings/app" -> stringResource(R.string.title_app_settings)
                 "settings/core" -> stringResource(R.string.core)
                 "settings/service" -> stringResource(R.string.service)
                 "settings/profile_override" -> stringResource(R.string.profile_override)
@@ -443,10 +469,19 @@ class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
             bottomBar = {
                 // Only show bottom bar when not in settings sub-screens
                 if (!isSettingsSubScreen) {
+                    val hasUpdate by UpdateState.hasUpdate
                     NavigationBar {
                         bottomNavigationScreens.forEach { screen ->
                             NavigationBarItem(
-                                icon = { Icon(screen.icon, contentDescription = null) },
+                                icon = {
+                                    if (screen == Screen.Settings && hasUpdate) {
+                                        BadgedBox(badge = { Badge() }) {
+                                            Icon(screen.icon, contentDescription = null)
+                                        }
+                                    } else {
+                                        Icon(screen.icon, contentDescription = null)
+                                    }
+                                },
                                 selected =
                                     currentDestination?.hierarchy?.any {
                                         it.route == screen.route

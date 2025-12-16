@@ -11,6 +11,7 @@ import io.nekohasekai.sfa.compose.screen.dashboard.DashboardScreen
 import io.nekohasekai.sfa.compose.screen.dashboard.DashboardViewModel
 import io.nekohasekai.sfa.compose.screen.log.LogScreen
 import io.nekohasekai.sfa.compose.screen.log.LogViewModel
+import io.nekohasekai.sfa.compose.screen.settings.AppSettingsScreen
 import io.nekohasekai.sfa.compose.screen.settings.CoreSettingsScreen
 import io.nekohasekai.sfa.compose.screen.settings.ProfileOverrideScreen
 import io.nekohasekai.sfa.compose.screen.settings.ServiceSettingsScreen
@@ -57,6 +58,36 @@ fun SFANavHost(
         }
 
         // Settings subscreens with slide animations
+        composable(
+            route = "settings/app",
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(300),
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(300),
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(300),
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(300),
+                )
+            },
+        ) {
+            AppSettingsScreen(navController = navController)
+        }
+
         composable(
             route = "settings/core",
             enterTransition = {

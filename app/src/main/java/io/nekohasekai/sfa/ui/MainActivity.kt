@@ -209,11 +209,9 @@ class MainActivity :
     }
 
     private fun startIntegration() {
-        if (Vendor.checkUpdateAvailable()) {
-            lifecycleScope.launch(Dispatchers.IO) {
-                if (Settings.checkUpdateEnabled) {
-                    Vendor.checkUpdate(this@MainActivity, false)
-                }
+        lifecycleScope.launch(Dispatchers.IO) {
+            if (Settings.checkUpdateEnabled) {
+                Vendor.checkUpdate(this@MainActivity, false)
             }
         }
     }
