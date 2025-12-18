@@ -51,6 +51,7 @@ fun ProfileOverrideScreen(navController: NavController) {
     val scope = rememberCoroutineScope()
 
     var autoRedirect by remember { mutableStateOf(Settings.autoRedirect) }
+    var perAppProxyEnabled by remember { mutableStateOf(Settings.perAppProxyEnabled) }
     var showPerAppProxyDialog by remember { mutableStateOf(false) }
 
     Column(
@@ -171,6 +172,19 @@ fun ProfileOverrideScreen(navController: NavController) {
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary,
                         )
+                    },
+                    trailingContent = {
+                        if (isPerAppProxyAvailable) {
+                            Switch(
+                                checked = perAppProxyEnabled,
+                                onCheckedChange = { checked ->
+                                    perAppProxyEnabled = checked
+                                    scope.launch(Dispatchers.IO) {
+                                        Settings.perAppProxyEnabled = checked
+                                    }
+                                },
+                            )
+                        }
                     },
                     modifier =
                         Modifier
