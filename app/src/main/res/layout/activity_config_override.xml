@@ -54,24 +54,6 @@
                         android:layout_marginTop="8dp"
                         android:text="@string/per_app_proxy_description" />
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/perAppProxyUpdateOnChange"
-                        style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:hint="@string/per_app_proxy_update_on_change">
-
-                        <AutoCompleteTextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="none"
-                            android:text="@string/disabled"
-                            app:simpleItems="@array/per_app_proxy_update_on_change_value" />
-
-
-                    </com.google.android.material.textfield.TextInputLayout>
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

@@ -145,7 +145,7 @@ class BoxService(
                     OverrideOptions().apply {
                         autoRedirect = Settings.autoRedirect
                         if (Vendor.isPerAppProxyAvailable() && Settings.perAppProxyEnabled) {
-                            val appList = Settings.perAppProxyList
+                            val appList = Settings.getEffectivePerAppProxyList()
                             if (Settings.perAppProxyMode == Settings.PER_APP_PROXY_INCLUDE) {
                                 includePackage =
                                     PlatformInterfaceWrapper.StringArray(appList.iterator())
@@ -228,7 +228,7 @@ class BoxService(
                 OverrideOptions().apply {
                     autoRedirect = Settings.autoRedirect
                     if (Vendor.isPerAppProxyAvailable() && Settings.perAppProxyEnabled) {
-                        val appList = Settings.perAppProxyList
+                        val appList = Settings.getEffectivePerAppProxyList()
                         if (Settings.perAppProxyMode == Settings.PER_APP_PROXY_INCLUDE) {
                             includePackage = PlatformInterfaceWrapper.StringArray(appList.iterator())
                         } else {

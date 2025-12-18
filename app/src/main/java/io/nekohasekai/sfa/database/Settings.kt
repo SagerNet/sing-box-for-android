@@ -40,7 +40,8 @@ object Settings {
     var serviceMode by dataStore.string(SettingsKey.SERVICE_MODE) { ServiceMode.NORMAL }
     var startedByUser by dataStore.boolean(SettingsKey.STARTED_BY_USER)
 
-    var checkUpdateEnabled by dataStore.boolean(SettingsKey.CHECK_UPDATE_ENABLED) { true }
+    var checkUpdateEnabled by dataStore.boolean(SettingsKey.CHECK_UPDATE_ENABLED) { false }
+    var updateCheckPrompted by dataStore.boolean(SettingsKey.UPDATE_CHECK_PROMPTED) { false }
     var updateTrack by dataStore.string(SettingsKey.UPDATE_TRACK) {
         val versionName = BuildConfig.VERSION_NAME.lowercase()
         if (versionName.contains("-alpha") ||
@@ -52,6 +53,9 @@ object Settings {
             "stable"
         }
     }
+    var silentInstallEnabled by dataStore.boolean(SettingsKey.SILENT_INSTALL_ENABLED) { false }
+    var silentInstallMethod by dataStore.string(SettingsKey.SILENT_INSTALL_METHOD) { "PACKAGE_INSTALLER" }
+    var autoUpdateEnabled by dataStore.boolean(SettingsKey.AUTO_UPDATE_ENABLED) { false }
     var disableMemoryLimit by dataStore.boolean(SettingsKey.DISABLE_MEMORY_LIMIT)
     var dynamicNotification by dataStore.boolean(SettingsKey.DYNAMIC_NOTIFICATION) { true }
     var useComposeUI by dataStore.boolean(SettingsKey.USE_COMPOSE_UI) { true }
@@ -65,12 +69,25 @@ object Settings {
     var perAppProxyEnabled by dataStore.boolean(SettingsKey.PER_APP_PROXY_ENABLED) { false }
     var perAppProxyMode by dataStore.int(SettingsKey.PER_APP_PROXY_MODE) { PER_APP_PROXY_EXCLUDE }
     var perAppProxyList by dataStore.stringSet(SettingsKey.PER_APP_PROXY_LIST) { emptySet() }
-    var perAppProxyUpdateOnChange by dataStore.int(SettingsKey.PER_APP_PROXY_UPDATE_ON_CHANGE) { PER_APP_PROXY_DISABLED }
+    var perAppProxyManagedMode by dataStore.boolean(SettingsKey.PER_APP_PROXY_MANAGED_MODE) { false }
+    var perAppProxyManagedList by dataStore.stringSet(SettingsKey.PER_APP_PROXY_MANAGED_LIST) { emptySet() }
+
+    fun getEffectivePerAppProxyList(): Set<String> {
+        return if (perAppProxyManagedMode) {
+            perAppProxyList union perAppProxyManagedList
+        } else {
+            perAppProxyList
+        }
+    }
 
     var systemProxyEnabled by dataStore.boolean(SettingsKey.SYSTEM_PROXY_ENABLED) { true }
 
     var dashboardItemOrder by dataStore.string(SettingsKey.DASHBOARD_ITEM_ORDER) { "" }
     var dashboardDisabledItems by dataStore.stringSet(SettingsKey.DASHBOARD_DISABLED_ITEMS) { emptySet() }
+
+    var cachedUpdateInfo by dataStore.string(SettingsKey.CACHED_UPDATE_INFO) { "" }
+    var cachedApkPath by dataStore.string(SettingsKey.CACHED_APK_PATH) { "" }
+    var lastShownUpdateVersion by dataStore.int(SettingsKey.LAST_SHOWN_UPDATE_VERSION) { 0 }
 
     fun serviceClass(): Class<*> {
         return when (serviceMode) {

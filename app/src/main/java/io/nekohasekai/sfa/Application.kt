@@ -49,6 +49,7 @@ class Application : Application() {
                 AppChangeReceiver(),
                 IntentFilter().apply {
                     addAction(Intent.ACTION_PACKAGE_ADDED)
+                    addAction(Intent.ACTION_PACKAGE_REPLACED)
                     addDataScheme("package")
                 },
             )

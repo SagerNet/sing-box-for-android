@@ -12,9 +12,4 @@
         <item>@string/enabled</item>
         <item>@string/disabled</item>
     </array>
-    <array name="per_app_proxy_update_on_change_value">
-        <item>@string/disabled</item>
-        <item>@string/per_app_proxy_select</item>
-        <item>@string/action_deselect</item>
-    </array>
 </resources>

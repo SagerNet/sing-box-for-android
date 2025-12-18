@@ -144,7 +144,9 @@
     <string name="message_scan_app_found">找到以下应用程序，请选择您想要的操作。</string>
     <string name="title_scan_result">扫描结果</string>
     <string name="action_deselect">取消选择</string>
-    <string name="per_app_proxy_update_on_change">新中国应用安装时更新</string>
+    <string name="per_app_proxy_manage">管理</string>
+    <string name="per_app_proxy_managed_mode">托管模式</string>
+    <string name="per_app_proxy_managed_mode_description">自动排除中国应用</string>
     <string name="import_profile">导入配置</string>
     <string name="import_profile_message">您确定要导入配置文件 %s 吗？</string>
     <string name="icloud_profile_unsupported">当前平台不支持 iCloud 配置文件</string>
