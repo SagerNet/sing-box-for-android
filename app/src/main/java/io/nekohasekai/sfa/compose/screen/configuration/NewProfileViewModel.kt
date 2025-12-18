@@ -9,7 +9,6 @@ import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.bg.UpdateProfileWork
 import io.nekohasekai.sfa.database.Profile
 import io.nekohasekai.sfa.database.ProfileManager
-import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.database.TypedProfile
 import io.nekohasekai.sfa.utils.HTTPClient
 import kotlinx.coroutines.Dispatchers
@@ -258,13 +257,8 @@ class NewProfileViewModel(application: Application) : AndroidViewModel(applicati
         Libbox.checkConfig(configContent)
         configFile.writeText(configContent)
 
-        // Create profile in database
-        ProfileManager.create(profile)
-
-        // If no profile is currently selected, select this one
-        if (Settings.selectedProfile == -1L) {
-            Settings.selectedProfile = profile.id
-        }
+        // Create profile in database and select it
+        ProfileManager.create(profile, andSelect = true)
 
         return profile
     }
@@ -297,13 +291,8 @@ class NewProfileViewModel(application: Application) : AndroidViewModel(applicati
 
         configFile.writeText(configContent)
 
-        // Create profile in database
-        ProfileManager.create(profile)
-
-        // If no profile is currently selected, select this one
-        if (Settings.selectedProfile == -1L) {
-            Settings.selectedProfile = profile.id
-        }
+        // Create profile in database and select it
+        ProfileManager.create(profile, andSelect = true)
 
         // Reconfigure updater if auto-update is enabled
         if (state.autoUpdate) {

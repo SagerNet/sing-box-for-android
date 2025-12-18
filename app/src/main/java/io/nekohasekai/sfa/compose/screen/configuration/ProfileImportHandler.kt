@@ -8,7 +8,6 @@ import io.nekohasekai.libbox.ProfileContent
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.database.Profile
 import io.nekohasekai.sfa.database.ProfileManager
-import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.database.TypedProfile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -178,13 +177,8 @@ class ProfileImportHandler(private val context: Context) {
         configFile.writeText(content.config)
         typedProfile.path = configFile.path
 
-        // Create profile in database
-        ProfileManager.create(profile)
-
-        // If no profile is currently selected, select this one
-        if (Settings.selectedProfile == -1L) {
-            Settings.selectedProfile = profile.id
-        }
+        // Create profile in database and select it
+        ProfileManager.create(profile, andSelect = true)
 
         return ImportResult.Success(profile)
     }
@@ -213,12 +207,8 @@ class ProfileImportHandler(private val context: Context) {
         configFile.writeText("{}")
         typedProfile.path = configFile.path
 
-        ProfileManager.create(profile)
-
-        // If no profile is currently selected, select this one
-        if (Settings.selectedProfile == -1L) {
-            Settings.selectedProfile = profile.id
-        }
+        // Create profile in database and select it
+        ProfileManager.create(profile, andSelect = true)
 
         return ImportResult.Success(profile)
     }
@@ -324,8 +314,8 @@ class ProfileImportHandler(private val context: Context) {
             configFile.writeText(jsonContent)
             typedProfile.path = configFile.path
 
-            // Create profile in database
-            ProfileManager.create(profile)
+            // Create profile in database and select it
+            ProfileManager.create(profile, andSelect = true)
 
             ImportResult.Success(profile)
         } catch (e: Exception) {
