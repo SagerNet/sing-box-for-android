@@ -50,6 +50,7 @@ class GitHubUpdateChecker : Closeable {
             releaseUrl = release.htmlUrl,
             releaseNotes = release.body,
             isPrerelease = release.prerelease,
+            fileSize = apkAsset?.size ?: 0,
         )
     }
 

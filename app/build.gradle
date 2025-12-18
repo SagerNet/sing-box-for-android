@@ -104,6 +104,7 @@ dependencies {
     implementation(fileTree("libs"))
 
     implementation "androidx.core:core-ktx:1.16.0"
+    implementation 'androidx.compose.ui:ui'
     implementation "androidx.appcompat:appcompat:1.7.1"
     implementation "com.google.android.material:material:1.12.0"
     implementation "androidx.constraintlayout:constraintlayout:2.2.1"
@@ -135,11 +136,17 @@ dependencies {
     playImplementation "com.google.android.play:app-update-ktx:2.1.0"
     playImplementation "com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.1"
 
+    // Shizuku for silent install (other flavor only)
+    otherImplementation 'dev.rikka.shizuku:api:13.1.5'
+    otherImplementation 'dev.rikka.shizuku:provider:13.1.5'
+    otherImplementation 'org.lsposed.hiddenapibypass:hiddenapibypass:4.3'
+
     // Compose dependencies
-    def composeBom = platform('androidx.compose:compose-bom:2024.09.00')
+    def composeBom = platform('androidx.compose:compose-bom:2025.01.01')
     implementation composeBom
     androidTestImplementation composeBom
     implementation 'androidx.compose.material3:material3'
+    implementation 'androidx.compose.ui:ui'
     implementation 'androidx.compose.ui:ui-tooling-preview'
     debugImplementation 'androidx.compose.ui:ui-tooling'
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
@@ -151,6 +158,8 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.9.2"
     implementation "androidx.compose.runtime:runtime-livedata"
     implementation "sh.calvin.reorderable:reorderable:2.3.3"
+    implementation "com.github.jeziellago:compose-markdown:0.5.4"
+    implementation "org.kodein.emoji:emoji-kt:2.3.0"
 
 }
 

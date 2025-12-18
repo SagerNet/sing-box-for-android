@@ -20,8 +20,18 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
+import dev.jeziellago.compose.markdowntext.MarkdownText
 import androidx.compose.material3.Badge
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.Job
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -55,6 +65,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.Application
+import io.nekohasekai.sfa.BuildConfig
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.bg.ServiceConnection
 import io.nekohasekai.sfa.bg.ServiceNotification
@@ -134,6 +145,7 @@ class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
 
         connection.reconnect()
 
+        UpdateState.loadFromCache()
         if (Settings.checkUpdateEnabled) {
             lifecycleScope.launch(Dispatchers.IO) {
                 try {
@@ -251,13 +263,126 @@ class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
             }, onDismiss = { showBackgroundLocationDialog = false })
         }
 
+        // Handle update check prompt dialog (shown only once on first launch)
+        var showUpdateCheckPrompt by remember { mutableStateOf(!Settings.updateCheckPrompted) }
+        if (showUpdateCheckPrompt) {
+            AlertDialog(
+                onDismissRequest = {
+                    Settings.updateCheckPrompted = true
+                    showUpdateCheckPrompt = false
+                },
+                title = { Text(stringResource(R.string.check_update)) },
+                text = {
+                    MarkdownText(
+                        markdown = stringResource(
+                            if (BuildConfig.FLAVOR == "play") R.string.check_update_prompt_play
+                            else R.string.check_update_prompt_github
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        Settings.updateCheckPrompted = true
+                        Settings.checkUpdateEnabled = true
+                        showUpdateCheckPrompt = false
+                        scope.launch(Dispatchers.IO) {
+                            try {
+                                val result = Vendor.checkUpdateAsync()
+                                UpdateState.setUpdate(result)
+                            } catch (_: Exception) {
+                            }
+                        }
+                    }) {
+                        Text(stringResource(R.string.ok))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = {
+                        Settings.updateCheckPrompted = true
+                        showUpdateCheckPrompt = false
+                    }) {
+                        Text(stringResource(R.string.no_thanks))
+                    }
+                },
+            )
+        }
+
         // Handle update available dialog
         val updateInfo by UpdateState.updateInfo
+        val shouldShowUpdateDialog = updateInfo != null &&
+            updateInfo!!.versionCode > Settings.lastShownUpdateVersion
         var showUpdateDialog by remember { mutableStateOf(true) }
-        if (showUpdateDialog && updateInfo != null) {
+
+        // Download dialog state
+        var showDownloadDialog by remember { mutableStateOf(false) }
+        var downloadJob by remember { mutableStateOf<Job?>(null) }
+        var downloadError by remember { mutableStateOf<String?>(null) }
+
+        if (showUpdateDialog && shouldShowUpdateDialog) {
             UpdateAvailableDialog(
                 updateInfo = updateInfo!!,
-                onDismiss = { showUpdateDialog = false },
+                onDismiss = {
+                    Settings.lastShownUpdateVersion = updateInfo!!.versionCode
+                    showUpdateDialog = false
+                },
+                onUpdate = {
+                    showDownloadDialog = true
+                    downloadError = null
+                    downloadJob = scope.launch {
+                        try {
+                            val result = withContext(Dispatchers.IO) {
+                                Vendor.downloadAndInstall(
+                                    this@ComposeActivity,
+                                    updateInfo!!.downloadUrl,
+                                )
+                            }
+                            if (result.isFailure) {
+                                downloadError = result.exceptionOrNull()?.message
+                            } else {
+                                showDownloadDialog = false
+                            }
+                        } catch (e: Exception) {
+                            downloadError = e.message
+                        }
+                    }
+                },
+            )
+        }
+
+        // Download progress dialog
+        if (showDownloadDialog) {
+            AlertDialog(
+                onDismissRequest = {},
+                title = { Text(stringResource(R.string.update)) },
+                text = {
+                    Column {
+                        if (downloadError != null) {
+                            Text(
+                                downloadError!!,
+                                color = MaterialTheme.colorScheme.error,
+                            )
+                        } else {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Text(stringResource(R.string.downloading))
+                            }
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            downloadJob?.cancel()
+                            downloadJob = null
+                            showDownloadDialog = false
+                            downloadError = null
+                        },
+                    ) {
+                        Text(stringResource(if (downloadError != null) R.string.ok else android.R.string.cancel))
+                    }
+                },
             )
         }
 

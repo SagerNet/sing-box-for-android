@@ -32,4 +32,37 @@ interface VendorInterface {
      * @return UpdateInfo if update is available, null otherwise
      */
     fun checkUpdateAsync(): UpdateInfo? = null
+
+    /**
+     * Check if silent install feature is available
+     * @return true if silent install is supported (Other flavor only)
+     */
+    fun supportsSilentInstall(): Boolean = false
+
+    /**
+     * Check if auto update feature is available
+     * @return true if auto update is supported (Other flavor only)
+     */
+    fun supportsAutoUpdate(): Boolean = false
+
+    /**
+     * Schedule auto update worker
+     */
+    fun scheduleAutoUpdate() {}
+
+    /**
+     * Verify if the specified silent install method is available
+     * @param method The install method (SHIZUKU or ROOT)
+     * @return true if the method is available and working
+     */
+    suspend fun verifySilentInstallMethod(method: String): Boolean = false
+
+    /**
+     * Download and install an APK update
+     * @param context The context
+     * @param downloadUrl The URL to download the APK from
+     * @return Result indicating success or failure
+     */
+    suspend fun downloadAndInstall(context: android.content.Context, downloadUrl: String): Result<Unit> =
+        Result.failure(UnsupportedOperationException("Not supported in this flavor"))
 }

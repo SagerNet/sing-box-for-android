@@ -6,10 +6,12 @@ import android.net.Uri
 import android.util.Log
 import androidx.camera.core.ImageAnalysis
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.update.UpdateCheckException
 import io.nekohasekai.sfa.update.UpdateInfo
+import io.nekohasekai.sfa.update.UpdateState
 import io.nekohasekai.sfa.update.UpdateTrack
 
 object Vendor : VendorInterface {
@@ -105,6 +107,53 @@ object Vendor : VendorInterface {
         val track = UpdateTrack.fromString(Settings.updateTrack)
         return GitHubUpdateChecker().use { checker ->
             checker.checkUpdate(track)
+        }
+    }
+
+    override fun supportsSilentInstall(): Boolean {
+        return true
+    }
+
+    override fun supportsAutoUpdate(): Boolean {
+        return true
+    }
+
+    override fun scheduleAutoUpdate() {
+        UpdateWorker.schedule(io.nekohasekai.sfa.Application.application)
+    }
+
+    override suspend fun verifySilentInstallMethod(method: String): Boolean {
+        return when (method) {
+            "PACKAGE_INSTALLER" -> {
+                ApkInstaller.canSystemSilentInstall() &&
+                    Application.application.packageManager.canRequestPackageInstalls()
+            }
+            "SHIZUKU" -> {
+                if (!ShizukuInstaller.isAvailable()) {
+                    return false
+                }
+                if (!ShizukuInstaller.checkPermission()) {
+                    ShizukuInstaller.requestPermission()
+                    return false
+                }
+                true
+            }
+            "ROOT" -> RootInstaller.checkAccess()
+            else -> false
+        }
+    }
+
+    override suspend fun downloadAndInstall(context: android.content.Context, downloadUrl: String): Result<Unit> {
+        return try {
+            val cachedApk = UpdateState.cachedApkFile.value
+            val apkFile = if (cachedApk != null && cachedApk.exists() && cachedApk.length() > 0) {
+                cachedApk
+            } else {
+                ApkDownloader().use { it.download(downloadUrl) }
+            }
+            ApkInstaller.install(context, apkFile)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 }
