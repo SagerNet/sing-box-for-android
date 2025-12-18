@@ -143,7 +143,7 @@
     <string name="background_permission">Background permission</string>
     <string name="background_permission_description">Apply for the necessary permissions in order for the VPN to function properly.\n\nIf you are using a device made by a Chinese company, the card may not disappear after the permission is granted.</string>
     <string name="read_more">Read More</string>
-    <string name="request_background_permission">Ignore Battery Optimizations</string>
+    <string name="request_background_permission">Ignore</string>
     <string name="import_remote_profile">Import remote profile</string>
     <string name="import_remote_profile_message">Are you sure to import remote profile %1$s? You will connect to %2$s to download the configuration.</string>
     <string name="profile_override">Profile Override</string>
