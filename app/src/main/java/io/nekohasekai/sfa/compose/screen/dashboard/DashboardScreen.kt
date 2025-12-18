@@ -258,6 +258,7 @@ fun DashboardScreen(
             ServiceControlFAB(
                 status = uiState.serviceStatus,
                 onToggle = { viewModel.toggleService() },
+                enabled = uiState.selectedProfileId != -1L,
             )
         }
     }
@@ -268,11 +269,17 @@ fun ServiceControlFAB(
     status: Status,
     onToggle: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     FloatingActionButton(
-        onClick = onToggle,
+        onClick = { if (enabled) onToggle() },
         modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.primary,
+        containerColor =
+            if (enabled) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.surfaceVariant
+            },
     ) {
         Icon(
             imageVector =
