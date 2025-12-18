@@ -142,7 +142,7 @@ fun AppSettingsScreen(navController: NavController) {
                     },
                     trailingContent = {
                         if (hasUpdate) {
-                            Badge { Text("New") }
+                            Badge(containerColor = MaterialTheme.colorScheme.primary) { Text("New") }
                         }
                     },
                     modifier =

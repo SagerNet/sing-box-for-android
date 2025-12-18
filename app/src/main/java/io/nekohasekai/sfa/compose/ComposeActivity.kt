@@ -475,7 +475,7 @@ class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
                             NavigationBarItem(
                                 icon = {
                                     if (screen == Screen.Settings && hasUpdate) {
-                                        BadgedBox(badge = { Badge() }) {
+                                        BadgedBox(badge = { Badge(containerColor = MaterialTheme.colorScheme.primary) }) {
                                             Icon(screen.icon, contentDescription = null)
                                         }
                                     } else {

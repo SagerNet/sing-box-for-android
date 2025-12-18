@@ -2,6 +2,7 @@ package io.nekohasekai.sfa.database
 
 import androidx.room.Room
 import io.nekohasekai.sfa.Application
+import io.nekohasekai.sfa.BuildConfig
 import io.nekohasekai.sfa.bg.ProxyService
 import io.nekohasekai.sfa.bg.VPNService
 import io.nekohasekai.sfa.constant.Path
@@ -40,7 +41,17 @@ object Settings {
     var startedByUser by dataStore.boolean(SettingsKey.STARTED_BY_USER)
 
     var checkUpdateEnabled by dataStore.boolean(SettingsKey.CHECK_UPDATE_ENABLED) { true }
-    var updateTrack by dataStore.string(SettingsKey.UPDATE_TRACK) { "stable" }
+    var updateTrack by dataStore.string(SettingsKey.UPDATE_TRACK) {
+        val versionName = BuildConfig.VERSION_NAME.lowercase()
+        if (versionName.contains("-alpha") ||
+            versionName.contains("-beta") ||
+            versionName.contains("-rc")
+        ) {
+            "beta"
+        } else {
+            "stable"
+        }
+    }
     var disableMemoryLimit by dataStore.boolean(SettingsKey.DISABLE_MEMORY_LIMIT)
     var dynamicNotification by dataStore.boolean(SettingsKey.DYNAMIC_NOTIFICATION) { true }
     var useComposeUI by dataStore.boolean(SettingsKey.USE_COMPOSE_UI) { true }

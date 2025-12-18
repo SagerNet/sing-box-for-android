@@ -105,7 +105,7 @@ fun SettingsScreen(navController: NavController) {
                     },
                     trailingContent = {
                         if (hasUpdate) {
-                            Badge()
+                            Badge(containerColor = MaterialTheme.colorScheme.primary)
                         }
                     },
                     modifier =
