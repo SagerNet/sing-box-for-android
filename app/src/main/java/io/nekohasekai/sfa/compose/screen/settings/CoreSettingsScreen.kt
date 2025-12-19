@@ -11,8 +11,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.Intent
+import android.provider.DocumentsContract
+import android.widget.Toast
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DeleteForever
+import androidx.compose.material.icons.outlined.FolderOpen
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material.icons.outlined.WarningAmber
@@ -217,7 +223,7 @@ fun CoreSettingsScreen(navController: NavController) {
             modifier = Modifier.padding(horizontal = 32.dp, vertical = 8.dp),
         )
 
-        // Destroy Data Card - No dialog, immediate deletion
+        // Working Directory Card
         Card(
             modifier =
                 Modifier
@@ -225,9 +231,37 @@ fun CoreSettingsScreen(navController: NavController) {
                     .padding(horizontal = 16.dp),
             colors =
                 CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f),
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
                 ),
         ) {
+            // Browse
+            ListItem(
+                headlineContent = {
+                    Text(
+                        stringResource(R.string.browse),
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                },
+                leadingContent = {
+                    Icon(
+                        imageVector = Icons.Outlined.FolderOpen,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                },
+                modifier =
+                    Modifier
+                        .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+                        .clickable {
+                            openInFileManager(context)
+                        },
+                colors =
+                    ListItemDefaults.colors(
+                        containerColor = Color.Transparent,
+                    ),
+            )
+
+            // Destroy
             ListItem(
                 headlineContent = {
                     Text(
@@ -245,7 +279,7 @@ fun CoreSettingsScreen(navController: NavController) {
                 },
                 modifier =
                     Modifier
-                        .clip(RoundedCornerShape(12.dp))
+                        .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
                         .clickable {
                             scope.launch(Dispatchers.IO) {
                                 val filesDir = context.getExternalFilesDir(null) ?: context.filesDir
@@ -270,5 +304,26 @@ fun CoreSettingsScreen(navController: NavController) {
         }
 
         Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+private fun openInFileManager(context: Context) {
+    val authority = "${context.packageName}.workingdir"
+    val rootUri = DocumentsContract.buildRootUri(authority, "working_directory")
+
+    val intent = Intent(Intent.ACTION_VIEW).apply {
+        setDataAndType(rootUri, DocumentsContract.Document.MIME_TYPE_DIR)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+    }
+
+    try {
+        context.startActivity(intent)
+    } catch (e: ActivityNotFoundException) {
+        Toast.makeText(
+            context,
+            context.getString(R.string.no_file_manager),
+            Toast.LENGTH_SHORT
+        ).show()
     }
 }

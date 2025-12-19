@@ -225,6 +225,17 @@
                 android:resource="@xml/cache_paths" />
         </provider>
 
+        <provider
+            android:name=".WorkingDirectoryProvider"
+            android:authorities="${applicationId}.workingdir"
+            android:exported="true"
+            android:grantUriPermissions="true"
+            android:permission="android.permission.MANAGE_DOCUMENTS">
+            <intent-filter>
+                <action android:name="android.content.action.DOCUMENTS_PROVIDER" />
+            </intent-filter>
+        </provider>
+
     </application>
 
 </manifest>

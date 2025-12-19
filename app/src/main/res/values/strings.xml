@@ -348,4 +348,6 @@
     <string name="clear_logs">Clear Logs</string>
     <string name="selected_count">%d selected</string>
     <string name="not_selected">Not selected</string>
+    <string name="browse">Browse</string>
+    <string name="no_file_manager">No file manager found</string>
 </resources>
