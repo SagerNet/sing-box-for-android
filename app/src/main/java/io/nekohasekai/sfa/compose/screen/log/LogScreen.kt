@@ -1,6 +1,7 @@
 package io.nekohasekai.sfa.compose.screen.log
 
 import android.content.ClipData
+import android.os.Build
 import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -10,6 +11,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -721,10 +724,11 @@ fun LogScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             // Scroll to bottom FAB
+            // Use fade animation on API 23 to avoid OpenGLRenderer crash with scale transforms
             AnimatedVisibility(
                 visible = !isAtBottom && !uiState.isSelectionMode && uiState.logs.isNotEmpty(),
-                enter = androidx.compose.animation.scaleIn(),
-                exit = androidx.compose.animation.scaleOut(),
+                enter = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) scaleIn() else fadeIn(),
+                exit = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) scaleOut() else fadeOut(),
             ) {
                 FloatingActionButton(
                     onClick = { viewModel.scrollToBottom() },
@@ -738,10 +742,11 @@ fun LogScreen(
             }
 
             // Start/Stop Service FAB
+            // Use fade animation on API 23 to avoid OpenGLRenderer crash with scale transforms
             AnimatedVisibility(
                 visible = serviceStatus != Status.Stopping && !uiState.isSelectionMode,
-                enter = androidx.compose.animation.scaleIn(),
-                exit = androidx.compose.animation.scaleOut(),
+                enter = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) scaleIn() else fadeIn(),
+                exit = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) scaleOut() else fadeOut(),
             ) {
                 FloatingActionButton(
                     onClick = {
