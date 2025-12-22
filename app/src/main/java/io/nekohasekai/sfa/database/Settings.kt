@@ -1,5 +1,6 @@
 package io.nekohasekai.sfa.database
 
+import android.os.Build
 import androidx.room.Room
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.BuildConfig
@@ -54,7 +55,13 @@ object Settings {
         }
     }
     var silentInstallEnabled by dataStore.boolean(SettingsKey.SILENT_INSTALL_ENABLED) { false }
-    var silentInstallMethod by dataStore.string(SettingsKey.SILENT_INSTALL_METHOD) { "PACKAGE_INSTALLER" }
+    var silentInstallMethod by dataStore.string(SettingsKey.SILENT_INSTALL_METHOD) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            "PACKAGE_INSTALLER"
+        } else {
+            "SHIZUKU"
+        }
+    }
     var autoUpdateEnabled by dataStore.boolean(SettingsKey.AUTO_UPDATE_ENABLED) { false }
     var disableMemoryLimit by dataStore.boolean(SettingsKey.DISABLE_MEMORY_LIMIT)
     var dynamicNotification by dataStore.boolean(SettingsKey.DYNAMIC_NOTIFICATION) { true }
