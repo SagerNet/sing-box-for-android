@@ -208,15 +208,32 @@ fun ProfileOverrideScreen(navController: NavController) {
                     },
                     trailingContent = {
                         if (isPerAppProxyAvailable) {
-                            Switch(
-                                checked = perAppProxyEnabled,
-                                onCheckedChange = { checked ->
-                                    perAppProxyEnabled = checked
-                                    scope.launch(Dispatchers.IO) {
-                                        Settings.perAppProxyEnabled = checked
-                                    }
-                                },
-                            )
+                            if (isScanning) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(24.dp),
+                                    strokeWidth = 2.dp,
+                                )
+                            } else {
+                                Switch(
+                                    checked = perAppProxyEnabled,
+                                    onCheckedChange = { checked ->
+                                        perAppProxyEnabled = checked
+                                        scope.launch(Dispatchers.IO) {
+                                            Settings.perAppProxyEnabled = checked
+                                        }
+                                        if (checked && managedModeEnabled) {
+                                            isScanning = true
+                                            scope.launch {
+                                                val chinaApps = scanAllChinaApps()
+                                                withContext(Dispatchers.IO) {
+                                                    Settings.perAppProxyManagedList = chinaApps
+                                                }
+                                                isScanning = false
+                                            }
+                                        }
+                                    },
+                                )
+                            }
                         }
                     },
                     modifier =
