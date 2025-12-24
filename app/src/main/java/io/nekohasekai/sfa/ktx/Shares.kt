@@ -6,7 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import androidx.core.content.FileProvider
 import androidx.fragment.app.FragmentActivity
-import com.google.android.material.R
+import androidx.appcompat.R as AppCompatR
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
 import io.nekohasekai.libbox.Libbox
@@ -46,7 +46,7 @@ suspend fun Context.shareProfile(profile: Profile) {
                 Intent(Intent.ACTION_SEND).setType("application/octet-stream")
                     .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     .putExtra(Intent.EXTRA_STREAM, uri),
-                getString(R.string.abc_shareactionprovider_share_with),
+                getString(AppCompatR.string.abc_shareactionprovider_share_with),
             ),
         )
     }
@@ -59,7 +59,7 @@ fun FragmentActivity.shareProfileURL(profile: Profile) {
             profile.typed.remoteURL,
         )
     val imageSize = dp2px(256)
-    val color = getAttrColor(com.google.android.material.R.attr.colorPrimary)
+    val color = getAttrColor(androidx.appcompat.R.attr.colorPrimary)
     val image = QRCodeWriter().encode(link, BarcodeFormat.QR_CODE, imageSize, imageSize, null)
     val imageWidth = image.width
     val imageHeight = image.height

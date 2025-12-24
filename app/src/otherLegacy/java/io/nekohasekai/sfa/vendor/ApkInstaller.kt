@@ -6,7 +6,6 @@ import java.io.File
 
 enum class InstallMethod {
     PACKAGE_INSTALLER,
-    SHIZUKU,
     ROOT,
 }
 
@@ -14,7 +13,8 @@ object ApkInstaller {
 
     fun getConfiguredMethod(): InstallMethod {
         return if (Settings.silentInstallEnabled) {
-            InstallMethod.valueOf(Settings.silentInstallMethod)
+            val method = Settings.silentInstallMethod
+            if (method == "SHIZUKU") InstallMethod.ROOT else InstallMethod.valueOf(method)
         } else {
             InstallMethod.PACKAGE_INSTALLER
         }
@@ -22,7 +22,6 @@ object ApkInstaller {
 
     suspend fun install(context: Context, apkFile: File, method: InstallMethod = getConfiguredMethod()): Result<Unit> {
         return when (method) {
-            InstallMethod.SHIZUKU -> ShizukuInstaller.install(apkFile)
             InstallMethod.ROOT -> RootInstaller.install(apkFile)
             InstallMethod.PACKAGE_INSTALLER -> SystemPackageInstaller.install(context, apkFile)
         }
@@ -36,7 +35,6 @@ object ApkInstaller {
         val method = getConfiguredMethod()
         return when (method) {
             InstallMethod.PACKAGE_INSTALLER -> canSystemSilentInstall()
-            InstallMethod.SHIZUKU -> ShizukuInstaller.isAvailable() && ShizukuInstaller.checkPermission()
             InstallMethod.ROOT -> RootInstaller.checkAccess()
         }
     }

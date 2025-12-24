@@ -66,8 +66,25 @@ android {
     flavorDimensions "vendor"
     productFlavors {
         play {
+            minSdk 23
         }
         other {
+            minSdk 23
+        }
+        otherLegacy {
+            minSdk 21
+        }
+    }
+
+    sourceSets {
+        play {
+            java.srcDirs += ['src/minApi23/java']
+        }
+        other {
+            java.srcDirs += ['src/minApi23/java', 'src/github/java']
+        }
+        otherLegacy {
+            java.srcDirs += ['src/minApi21/java', 'src/github/java']
         }
     }
 
@@ -95,72 +112,145 @@ android {
         variant.outputs.configureEach {
             outputFileName = (outputFileName as String).replace("-release", "")
             outputFileName = (outputFileName as String).replace("-play", "-play")
+            outputFileName = (outputFileName as String).replace("-otherLegacy", "-legacy-android-5")
             outputFileName = (outputFileName as String).replace("-other", "")
         }
     }
 }
 
 dependencies {
-    implementation(fileTree("libs"))
+    // libbox
+    playImplementation(files("libs/libbox.aar"))
+    otherImplementation(files("libs/libbox.aar"))
+    otherLegacyImplementation(files("libs/libbox-legacy.aar"))
 
-    implementation "androidx.core:core-ktx:1.16.0"
-    implementation 'androidx.compose.ui:ui'
+    // API level specific versions
+    def lifecycleVersion23 = "2.10.0"
+    def roomVersion23 = "2.8.4"
+    def workVersion23 = "2.11.0"
+    def cameraVersion23 = "1.5.2"
+    def browserVersion23 = "1.9.0"
+
+    def lifecycleVersion21 = "2.9.4"
+    def roomVersion21 = "2.7.2"
+    def workVersion21 = "2.10.5"
+    def cameraVersion21 = "1.4.2"
+    def browserVersion21 = "1.9.0"
+
+    // Common dependencies (no API level difference)
+    implementation "androidx.core:core-ktx:1.17.0"
     implementation "androidx.appcompat:appcompat:1.7.1"
-    implementation "com.google.android.material:material:1.12.0"
+    implementation "com.google.android.material:material:1.13.0"
     implementation "androidx.constraintlayout:constraintlayout:2.2.1"
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.9.2"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.2"
-    implementation "androidx.navigation:navigation-fragment-ktx:2.9.3"
-    implementation "androidx.navigation:navigation-ui-ktx:2.9.3"
-    implementation "com.google.zxing:core:3.5.3"
-    implementation "androidx.room:room-runtime:2.7.2"
+    implementation "androidx.navigation:navigation-fragment-ktx:2.9.6"
+    implementation "androidx.navigation:navigation-ui-ktx:2.9.6"
+    implementation "com.google.zxing:core:3.5.4"
     implementation "androidx.coordinatorlayout:coordinatorlayout:1.3.0"
     implementation "androidx.preference:preference-ktx:1.2.1"
-    implementation "androidx.camera:camera-view:1.4.2"
-    implementation "androidx.camera:camera-lifecycle:1.4.2"
-    implementation "androidx.camera:camera-camera2:1.4.2"
-    ksp "androidx.room:room-compiler:2.7.2"
-    implementation "androidx.work:work-runtime-ktx:2.10.3"
-    implementation "androidx.browser:browser:1.9.0"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2"
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3"
-
-    // DO NOT UPDATE (minSdkVersion updated)
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0"
     implementation "com.blacksquircle.ui:editorkit:2.2.0"
     implementation "com.blacksquircle.ui:language-json:2.2.0"
-
     implementation("com.android.tools.smali:smali-dexlib2:3.0.9") {
         exclude group: "com.google.guava", module: "guava"
     }
-    implementation "com.google.guava:guava:33.4.8-android"
+    implementation "com.google.guava:guava:33.5.0-android"
+
+    // API 23+ dependencies (play/other)
+    playImplementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion23"
+    playImplementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion23"
+    playImplementation "androidx.room:room-runtime:$roomVersion23"
+    playImplementation "androidx.work:work-runtime-ktx:$workVersion23"
+    playImplementation "androidx.camera:camera-view:$cameraVersion23"
+    playImplementation "androidx.camera:camera-lifecycle:$cameraVersion23"
+    playImplementation "androidx.camera:camera-camera2:$cameraVersion23"
+    playImplementation "androidx.browser:browser:$browserVersion23"
+    playAnnotationProcessor "androidx.room:room-compiler:$roomVersion23"
+    kspPlay "androidx.room:room-compiler:$roomVersion23"
+
+    otherImplementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion23"
+    otherImplementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion23"
+    otherImplementation "androidx.room:room-runtime:$roomVersion23"
+    otherImplementation "androidx.work:work-runtime-ktx:$workVersion23"
+    otherImplementation "androidx.camera:camera-view:$cameraVersion23"
+    otherImplementation "androidx.camera:camera-lifecycle:$cameraVersion23"
+    otherImplementation "androidx.camera:camera-camera2:$cameraVersion23"
+    otherImplementation "androidx.browser:browser:$browserVersion23"
+    kspOther "androidx.room:room-compiler:$roomVersion23"
+
+    // API 21 dependencies (otherLegacy)
+    otherLegacyImplementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion21"
+    otherLegacyImplementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion21"
+    otherLegacyImplementation "androidx.room:room-runtime:$roomVersion21"
+    otherLegacyImplementation "androidx.work:work-runtime-ktx:$workVersion21"
+    otherLegacyImplementation "androidx.camera:camera-view:$cameraVersion21"
+    otherLegacyImplementation "androidx.camera:camera-lifecycle:$cameraVersion21"
+    otherLegacyImplementation "androidx.camera:camera-camera2:$cameraVersion21"
+    otherLegacyImplementation "androidx.browser:browser:$browserVersion21"
+    kspOtherLegacy "androidx.room:room-compiler:$roomVersion21"
+
+    // Play Store specific
     playImplementation "com.google.android.play:app-update-ktx:2.1.0"
     playImplementation "com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.1"
 
-    // Shizuku for silent install (other flavor only)
-    otherImplementation 'dev.rikka.shizuku:api:13.1.5'
-    otherImplementation 'dev.rikka.shizuku:provider:13.1.5'
+    // Shizuku (play and other flavors, API 23+ only)
+    def shizukuVersion = '12.2.0'
+    playImplementation "dev.rikka.shizuku:api:$shizukuVersion"
+    playImplementation "dev.rikka.shizuku:provider:$shizukuVersion"
+    playImplementation 'org.lsposed.hiddenapibypass:hiddenapibypass:4.3'
+    otherImplementation "dev.rikka.shizuku:api:$shizukuVersion"
+    otherImplementation "dev.rikka.shizuku:provider:$shizukuVersion"
     otherImplementation 'org.lsposed.hiddenapibypass:hiddenapibypass:4.3'
 
-    // Compose dependencies
-    def composeBom = platform('androidx.compose:compose-bom:2025.01.01')
-    implementation composeBom
-    androidTestImplementation composeBom
-    implementation 'androidx.compose.material3:material3'
-    implementation 'androidx.compose.ui:ui'
-    implementation 'androidx.compose.ui:ui-tooling-preview'
+    // Compose dependencies - API 23+ (play/other)
+    def composeBom23 = platform('androidx.compose:compose-bom:2025.12.01')
+    def activityVersion23 = "1.12.2"
+    def lifecycleComposeVersion23 = "2.10.0"
+
+    playImplementation composeBom23
+    playImplementation 'androidx.compose.material3:material3'
+    playImplementation 'androidx.compose.ui:ui'
+    playImplementation 'androidx.compose.ui:ui-tooling-preview'
+    playImplementation 'androidx.compose.material:material-icons-extended'
+    playImplementation "androidx.activity:activity-compose:$activityVersion23"
+    playImplementation "androidx.navigation:navigation-compose:2.9.6"
+    playImplementation "androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleComposeVersion23"
+    playImplementation 'androidx.compose.runtime:runtime-livedata'
+
+    otherImplementation composeBom23
+    otherImplementation 'androidx.compose.material3:material3'
+    otherImplementation 'androidx.compose.ui:ui'
+    otherImplementation 'androidx.compose.ui:ui-tooling-preview'
+    otherImplementation 'androidx.compose.material:material-icons-extended'
+    otherImplementation "androidx.activity:activity-compose:$activityVersion23"
+    otherImplementation "androidx.navigation:navigation-compose:2.9.6"
+    otherImplementation "androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleComposeVersion23"
+    otherImplementation 'androidx.compose.runtime:runtime-livedata'
+
+    // Compose dependencies - API 21 (otherLegacy)
+    def composeBom21 = platform('androidx.compose:compose-bom:2025.01.00')
+    def activityVersion21 = "1.11.0"
+    def lifecycleComposeVersion21 = "2.9.4"
+
+    otherLegacyImplementation composeBom21
+    otherLegacyImplementation 'androidx.compose.material3:material3'
+    otherLegacyImplementation 'androidx.compose.ui:ui'
+    otherLegacyImplementation 'androidx.compose.ui:ui-tooling-preview'
+    otherLegacyImplementation 'androidx.compose.material:material-icons-extended'
+    otherLegacyImplementation "androidx.activity:activity-compose:$activityVersion21"
+    otherLegacyImplementation "androidx.navigation:navigation-compose:2.9.6"
+    otherLegacyImplementation "androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleComposeVersion21"
+    otherLegacyImplementation 'androidx.compose.runtime:runtime-livedata'
+
+    // Debug/Test dependencies
     debugImplementation 'androidx.compose.ui:ui-tooling'
-    androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
-    implementation 'androidx.compose.material:material-icons-extended'
-    implementation 'androidx.activity:activity-compose:1.10.1'
-    implementation 'me.zhanghai.compose.preference:library:1.1.1'
-    implementation "androidx.navigation:navigation-compose:2.9.3"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.9.2"
-    implementation "androidx.compose.runtime:runtime-livedata"
-    implementation "sh.calvin.reorderable:reorderable:2.3.3"
+    androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
+
+    // Common Compose-related libraries
+    implementation "sh.calvin.reorderable:reorderable:3.0.0"
     implementation "com.github.jeziellago:compose-markdown:0.5.4"
     implementation "org.kodein.emoji:emoji-kt:2.3.0"
-
 }
 
 def playCredentialsJSON = rootProject.file("service-account-credentials.json")

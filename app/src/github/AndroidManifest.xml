@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission android:name="android.permission.UPDATE_PACKAGES_WITHOUT_USER_ACTION" />
+
+    <application>
+        <receiver
+            android:name=".vendor.InstallResultReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="io.nekohasekai.sfa.INSTALL_COMPLETE" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>

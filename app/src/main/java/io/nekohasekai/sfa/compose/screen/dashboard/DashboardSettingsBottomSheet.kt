@@ -5,7 +5,6 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
@@ -28,6 +27,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material.icons.filled.RestartAlt
+import io.nekohasekai.sfa.compat.animateItemCompat
 import androidx.compose.material.icons.outlined.BugReport
 import androidx.compose.material.icons.outlined.Cable
 import androidx.compose.material.icons.outlined.Download
@@ -67,7 +67,7 @@ import androidx.compose.ui.zIndex
 import io.nekohasekai.sfa.BuildConfig
 import io.nekohasekai.sfa.R
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardSettingsBottomSheet(
     sheetState: SheetState,
@@ -282,8 +282,8 @@ fun DashboardSettingsBottomSheet(
                             dragOffset = 0f
                         },
                         modifier =
-                            Modifier.animateItemPlacement(
-                                animationSpec =
+                            animateItemCompat(
+                                placementSpec =
                                     spring(
                                         dampingRatio = Spring.DampingRatioMediumBouncy,
                                         stiffness = Spring.StiffnessLow,

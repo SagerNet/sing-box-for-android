@@ -1,5 +1,6 @@
 package io.nekohasekai.sfa.vendor
 
+import android.os.Build
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.BuildConfig
 import io.nekohasekai.sfa.ktx.unwrap
@@ -39,8 +40,11 @@ class GitHubUpdateChecker : Closeable {
             return null
         }
 
+        val isLegacy = Build.VERSION.SDK_INT < Build.VERSION_CODES.M
         val apkAsset = release.assets.find { asset ->
-            asset.name.endsWith(".apk") && !asset.name.contains("play")
+            asset.name.endsWith(".apk") &&
+                !asset.name.contains("play") &&
+                asset.name.contains("legacy-android-5") == isLegacy
         }
 
         return UpdateInfo(
