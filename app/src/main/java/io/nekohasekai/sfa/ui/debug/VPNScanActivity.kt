@@ -22,6 +22,7 @@ import io.nekohasekai.sfa.databinding.ViewVpnAppItemBinding
 import io.nekohasekai.sfa.ktx.dp2px
 import io.nekohasekai.sfa.ktx.toStringIterator
 import io.nekohasekai.sfa.ui.shared.AbstractActivity
+import io.nekohasekai.sfa.vendor.PackageQueryManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -139,13 +140,7 @@ class VPNScanActivity : AbstractActivity<ActivityVpnScanBinding>() {
                     @Suppress("DEPRECATION")
                     PackageManager.GET_UNINSTALLED_PACKAGES
                 }
-        val installedPackages =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                packageManager.getInstalledPackages(PackageManager.PackageInfoFlags.of(flag.toLong()))
-            } else {
-                @Suppress("DEPRECATION")
-                packageManager.getInstalledPackages(flag)
-            }
+        val installedPackages = PackageQueryManager.getInstalledPackages(flag)
         val vpnAppList =
             installedPackages.filter {
                 it.services?.any { it.permission == Manifest.permission.BIND_VPN_SERVICE && it.applicationInfo != null }

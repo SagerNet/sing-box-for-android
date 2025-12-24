@@ -79,9 +79,11 @@ android {
     sourceSets {
         play {
             java.srcDirs += ['src/minApi23/java']
+            aidl.srcDirs += ['src/minApi23/aidl']
         }
         other {
             java.srcDirs += ['src/minApi23/java', 'src/github/java']
+            aidl.srcDirs += ['src/minApi23/aidl']
         }
         otherLegacy {
             java.srcDirs += ['src/minApi21/java', 'src/github/java']
@@ -201,6 +203,15 @@ dependencies {
     otherImplementation "dev.rikka.shizuku:api:$shizukuVersion"
     otherImplementation "dev.rikka.shizuku:provider:$shizukuVersion"
     otherImplementation 'org.lsposed.hiddenapibypass:hiddenapibypass:4.3'
+
+    // libsu for ROOT package query (all flavors)
+    def libsuVersion = '6.0.0'
+    playImplementation "com.github.topjohnwu.libsu:core:$libsuVersion"
+    playImplementation "com.github.topjohnwu.libsu:service:$libsuVersion"
+    otherImplementation "com.github.topjohnwu.libsu:core:$libsuVersion"
+    otherImplementation "com.github.topjohnwu.libsu:service:$libsuVersion"
+    otherLegacyImplementation "com.github.topjohnwu.libsu:core:$libsuVersion"
+    otherLegacyImplementation "com.github.topjohnwu.libsu:service:$libsuVersion"
 
     // Compose dependencies - API 23+ (play/other)
     def composeBom23 = platform('androidx.compose:compose-bom:2025.12.01')

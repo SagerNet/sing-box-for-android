@@ -2,15 +2,14 @@ package io.nekohasekai.sfa.compose.screen.settings
 
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -22,6 +21,7 @@ import androidx.compose.material.icons.outlined.AppShortcut
 import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material.icons.outlined.Route
 import androidx.compose.material.icons.outlined.SmartToy
+import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -30,10 +30,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,11 +50,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.ui.profileoverride.PerAppProxyActivity
-import io.nekohasekai.sfa.vendor.Vendor
+import io.nekohasekai.sfa.vendor.PackageQueryManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -66,7 +69,58 @@ fun ProfileOverrideScreen(navController: NavController) {
     var perAppProxyEnabled by remember { mutableStateOf(Settings.perAppProxyEnabled) }
     var managedModeEnabled by remember { mutableStateOf(Settings.perAppProxyManagedMode) }
     var isScanning by remember { mutableStateOf(false) }
-    var showPerAppProxyDialog by remember { mutableStateOf(false) }
+    var showShizukuDialog by remember { mutableStateOf(false) }
+    var showRootDialog by remember { mutableStateOf(false) }
+    var showModeDialog by remember { mutableStateOf(false) }
+
+    val needsPrivilegedQuery = PackageQueryManager.needsPrivilegedQuery
+    var packageQueryMode by remember { mutableStateOf(Settings.perAppProxyPackageQueryMode) }
+    val useRootMode = packageQueryMode == Settings.PACKAGE_QUERY_MODE_ROOT
+
+    val isShizukuInstalled by PackageQueryManager.shizukuInstalled.collectAsState()
+    val isShizukuBinderReady by PackageQueryManager.shizukuBinderReady.collectAsState()
+    val isShizukuPermissionGranted by PackageQueryManager.shizukuPermissionGranted.collectAsState()
+    val isShizukuAvailable = isShizukuBinderReady && isShizukuPermissionGranted
+
+    DisposableEffect(needsPrivilegedQuery) {
+        if (needsPrivilegedQuery) {
+            PackageQueryManager.registerListeners()
+        }
+        onDispose {
+            if (needsPrivilegedQuery) {
+                PackageQueryManager.unregisterListeners()
+            }
+        }
+    }
+
+    // Auto-disable per-app proxy if Shizuku authorization is revoked (only when using Shizuku mode)
+    LaunchedEffect(isShizukuAvailable, useRootMode) {
+        if (needsPrivilegedQuery && !useRootMode && !isShizukuAvailable && perAppProxyEnabled) {
+            perAppProxyEnabled = false
+            withContext(Dispatchers.IO) {
+                Settings.perAppProxyEnabled = false
+            }
+        }
+    }
+
+    // Auto-close dialog and enable feature when Shizuku becomes available
+    LaunchedEffect(isShizukuAvailable) {
+        if (needsPrivilegedQuery && isShizukuAvailable && showShizukuDialog) {
+            showShizukuDialog = false
+            perAppProxyEnabled = true
+            withContext(Dispatchers.IO) {
+                Settings.perAppProxyEnabled = true
+            }
+            if (managedModeEnabled) {
+                isScanning = true
+                val chinaApps = scanAllChinaApps()
+                withContext(Dispatchers.IO) {
+                    Settings.perAppProxyManagedList = chinaApps
+                }
+                isScanning = false
+            }
+        }
+    }
 
     Column(
         modifier =
@@ -158,7 +212,11 @@ fun ProfileOverrideScreen(navController: NavController) {
         }
 
         // Section: Per-App Proxy
-        val isPerAppProxyAvailable = Vendor.isPerAppProxyAvailable()
+        val canUsePerAppProxy = if (needsPrivilegedQuery) {
+            if (useRootMode) true else isShizukuAvailable
+        } else {
+            true
+        }
 
         Text(
             text = stringResource(R.string.per_app_proxy),
@@ -178,6 +236,52 @@ fun ProfileOverrideScreen(navController: NavController) {
                 ),
         ) {
             Column {
+                // Mode selector (only when privileged query is needed)
+                if (needsPrivilegedQuery) {
+                    val modeEnabled = !perAppProxyEnabled
+                    val disabledAlpha = 0.38f
+                    ListItem(
+                        headlineContent = {
+                            Text(
+                                stringResource(R.string.per_app_proxy_package_query_mode),
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = if (modeEnabled) Color.Unspecified
+                                else MaterialTheme.colorScheme.onSurface.copy(alpha = disabledAlpha),
+                            )
+                        },
+                        supportingContent = {
+                            Text(
+                                if (useRootMode) "ROOT" else "Shizuku",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = if (modeEnabled) MaterialTheme.colorScheme.onSurfaceVariant
+                                else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = disabledAlpha),
+                            )
+                        },
+                        leadingContent = {
+                            Icon(
+                                imageVector = Icons.Outlined.Tune,
+                                contentDescription = null,
+                                tint = if (modeEnabled) MaterialTheme.colorScheme.primary
+                                else MaterialTheme.colorScheme.onSurface.copy(alpha = disabledAlpha),
+                            )
+                        },
+                        trailingContent = {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
+                                contentDescription = null,
+                                tint = if (modeEnabled) MaterialTheme.colorScheme.onSurfaceVariant
+                                else MaterialTheme.colorScheme.onSurface.copy(alpha = disabledAlpha),
+                            )
+                        },
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+                            .clickable(enabled = modeEnabled) { showModeDialog = true },
+                        colors = ListItemDefaults.colors(
+                            containerColor = Color.Transparent,
+                        ),
+                    )
+                }
+
                 // Enabled toggle
                 ListItem(
                     headlineContent = {
@@ -186,19 +290,6 @@ fun ProfileOverrideScreen(navController: NavController) {
                             style = MaterialTheme.typography.bodyLarge,
                         )
                     },
-                    supportingContent =
-                        if (!isPerAppProxyAvailable) {
-                            {
-                                Text(
-                                    text = context.getString(R.string.per_app_proxy_disabled_play_store),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.error,
-                                    modifier = Modifier.padding(top = 4.dp),
-                                )
-                            }
-                        } else {
-                            null
-                        },
                     leadingContent = {
                         Icon(
                             imageVector = Icons.Outlined.FilterList,
@@ -207,38 +298,40 @@ fun ProfileOverrideScreen(navController: NavController) {
                         )
                     },
                     trailingContent = {
-                        if (isPerAppProxyAvailable) {
-                            if (isScanning) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(24.dp),
-                                    strokeWidth = 2.dp,
-                                )
-                            } else {
-                                Switch(
-                                    checked = perAppProxyEnabled,
-                                    onCheckedChange = { checked ->
-                                        perAppProxyEnabled = checked
-                                        scope.launch(Dispatchers.IO) {
-                                            Settings.perAppProxyEnabled = checked
-                                        }
-                                        if (checked && managedModeEnabled) {
-                                            isScanning = true
-                                            scope.launch {
-                                                val chinaApps = scanAllChinaApps()
-                                                withContext(Dispatchers.IO) {
-                                                    Settings.perAppProxyManagedList = chinaApps
-                                                }
-                                                isScanning = false
+                        Switch(
+                            checked = perAppProxyEnabled,
+                            onCheckedChange = { checked ->
+                                if (checked && needsPrivilegedQuery) {
+                                    if (useRootMode) {
+                                        showRootDialog = true
+                                    } else {
+                                        showShizukuDialog = true
+                                    }
+                                } else {
+                                    perAppProxyEnabled = checked
+                                    scope.launch(Dispatchers.IO) {
+                                        Settings.perAppProxyEnabled = checked
+                                    }
+                                    if (checked && managedModeEnabled) {
+                                        isScanning = true
+                                        scope.launch {
+                                            val chinaApps = scanAllChinaApps()
+                                            withContext(Dispatchers.IO) {
+                                                Settings.perAppProxyManagedList = chinaApps
                                             }
+                                            isScanning = false
                                         }
-                                    },
-                                )
-                            }
-                        }
+                                    }
+                                }
+                            },
+                            enabled = !isScanning,
+                        )
                     },
                     modifier =
                         Modifier.clip(
-                            if (perAppProxyEnabled && isPerAppProxyAvailable) {
+                            if (needsPrivilegedQuery) {
+                                RoundedCornerShape(0.dp)
+                            } else if (perAppProxyEnabled && canUsePerAppProxy) {
                                 RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
                             } else {
                                 RoundedCornerShape(12.dp)
@@ -250,7 +343,7 @@ fun ProfileOverrideScreen(navController: NavController) {
                         ),
                 )
 
-                if (perAppProxyEnabled && isPerAppProxyAvailable) {
+                if (perAppProxyEnabled && canUsePerAppProxy) {
                     // Manage entry
                     val manageEnabled = !managedModeEnabled
                     val disabledAlpha = 0.38f
@@ -366,23 +459,199 @@ fun ProfileOverrideScreen(navController: NavController) {
             }
         }
 
-        // Dialog for Per-app Proxy disabled message
-        if (showPerAppProxyDialog) {
+        // Shizuku dialog
+        if (showShizukuDialog) {
             AlertDialog(
-                onDismissRequest = { showPerAppProxyDialog = false },
+                onDismissRequest = { showShizukuDialog = false },
                 title = {
-                    Text(stringResource(R.string.unavailable))
+                    Text(stringResource(R.string.per_app_proxy))
                 },
                 text = {
-                    Text(context.getString(R.string.per_app_proxy_disabled_message))
+                    Text(stringResource(R.string.per_app_proxy_shizuku_required))
+                },
+                confirmButton = {
+                    when {
+                        isShizukuAvailable -> {
+                            TextButton(
+                                onClick = {
+                                    showShizukuDialog = false
+                                    perAppProxyEnabled = true
+                                    scope.launch(Dispatchers.IO) {
+                                        Settings.perAppProxyEnabled = true
+                                    }
+                                    if (managedModeEnabled) {
+                                        isScanning = true
+                                        scope.launch {
+                                            val chinaApps = scanAllChinaApps()
+                                            withContext(Dispatchers.IO) {
+                                                Settings.perAppProxyManagedList = chinaApps
+                                            }
+                                            isScanning = false
+                                        }
+                                    }
+                                },
+                            ) {
+                                Text(stringResource(R.string.ok))
+                            }
+                        }
+                        isShizukuBinderReady -> {
+                            TextButton(
+                                onClick = {
+                                    PackageQueryManager.requestShizukuPermission()
+                                },
+                            ) {
+                                Text(stringResource(R.string.request_shizuku))
+                            }
+                        }
+                        isShizukuInstalled -> {
+                            TextButton(
+                                onClick = {
+                                    showShizukuDialog = false
+                                    val intent = context.packageManager.getLaunchIntentForPackage("moe.shizuku.privileged.api")
+                                    if (intent != null) {
+                                        context.startActivity(intent)
+                                    }
+                                },
+                            ) {
+                                Text(stringResource(R.string.start_shizuku))
+                            }
+                        }
+                        else -> {
+                            TextButton(
+                                onClick = {
+                                    showShizukuDialog = false
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://shizuku.rikka.app/"))
+                                    context.startActivity(intent)
+                                },
+                            ) {
+                                Text(stringResource(R.string.get_shizuku))
+                            }
+                        }
+                    }
+                },
+                dismissButton = {
+                    if (!isShizukuAvailable) {
+                        TextButton(
+                            onClick = { showShizukuDialog = false },
+                        ) {
+                            Text(stringResource(R.string.cancel))
+                        }
+                    }
+                },
+            )
+        }
+
+        // ROOT dialog
+        if (showRootDialog) {
+            AlertDialog(
+                onDismissRequest = { showRootDialog = false },
+                title = {
+                    Text(stringResource(R.string.per_app_proxy))
+                },
+                text = {
+                    Text(stringResource(R.string.per_app_proxy_root_required))
                 },
                 confirmButton = {
                     TextButton(
-                        onClick = { showPerAppProxyDialog = false },
+                        onClick = {
+                            scope.launch {
+                                val hasRoot = PackageQueryManager.checkRootAvailable()
+                                if (hasRoot) {
+                                    showRootDialog = false
+                                    perAppProxyEnabled = true
+                                    withContext(Dispatchers.IO) {
+                                        Settings.perAppProxyEnabled = true
+                                    }
+                                    if (managedModeEnabled) {
+                                        isScanning = true
+                                        val chinaApps = scanAllChinaApps()
+                                        withContext(Dispatchers.IO) {
+                                            Settings.perAppProxyManagedList = chinaApps
+                                        }
+                                        isScanning = false
+                                    }
+                                } else {
+                                    showRootDialog = false
+                                    Toast.makeText(
+                                        context,
+                                        R.string.root_access_denied,
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            }
+                        },
                     ) {
-                        Text(context.getString(R.string.ok))
+                        Text(stringResource(R.string.ok))
                     }
                 },
+                dismissButton = {
+                    TextButton(
+                        onClick = { showRootDialog = false },
+                    ) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                },
+            )
+        }
+
+        // Mode selection dialog
+        if (showModeDialog) {
+            AlertDialog(
+                onDismissRequest = { showModeDialog = false },
+                title = {
+                    Text(stringResource(R.string.per_app_proxy_package_query_mode))
+                },
+                text = {
+                    Column {
+                        ListItem(
+                            headlineContent = { Text("Shizuku") },
+                            leadingContent = {
+                                RadioButton(
+                                    selected = packageQueryMode == Settings.PACKAGE_QUERY_MODE_SHIZUKU,
+                                    onClick = null,
+                                )
+                            },
+                            modifier = Modifier.clickable {
+                                packageQueryMode = Settings.PACKAGE_QUERY_MODE_SHIZUKU
+                                PackageQueryManager.setQueryMode(Settings.PACKAGE_QUERY_MODE_SHIZUKU)
+                                scope.launch(Dispatchers.IO) {
+                                    Settings.perAppProxyPackageQueryMode = Settings.PACKAGE_QUERY_MODE_SHIZUKU
+                                }
+                                if (perAppProxyEnabled && !isShizukuAvailable) {
+                                    perAppProxyEnabled = false
+                                    scope.launch(Dispatchers.IO) {
+                                        Settings.perAppProxyEnabled = false
+                                    }
+                                }
+                                showModeDialog = false
+                            },
+                            colors = ListItemDefaults.colors(
+                                containerColor = Color.Transparent,
+                            ),
+                        )
+                        ListItem(
+                            headlineContent = { Text("ROOT") },
+                            leadingContent = {
+                                RadioButton(
+                                    selected = packageQueryMode == Settings.PACKAGE_QUERY_MODE_ROOT,
+                                    onClick = null,
+                                )
+                            },
+                            modifier = Modifier.clickable {
+                                packageQueryMode = Settings.PACKAGE_QUERY_MODE_ROOT
+                                PackageQueryManager.setQueryMode(Settings.PACKAGE_QUERY_MODE_ROOT)
+                                scope.launch(Dispatchers.IO) {
+                                    Settings.perAppProxyPackageQueryMode = Settings.PACKAGE_QUERY_MODE_ROOT
+                                }
+                                showModeDialog = false
+                            },
+                            colors = ListItemDefaults.colors(
+                                containerColor = Color.Transparent,
+                            ),
+                        )
+                    }
+                },
+                confirmButton = {},
             )
         }
     }
@@ -390,25 +659,22 @@ fun ProfileOverrideScreen(navController: NavController) {
 
 private suspend fun scanAllChinaApps(): Set<String> = withContext(Dispatchers.Default) {
     val packageManagerFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        PackageManager.MATCH_UNINSTALLED_PACKAGES
+        PackageManager.MATCH_UNINSTALLED_PACKAGES or
+            PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES or
+            PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS
     } else {
         @Suppress("DEPRECATION")
-        PackageManager.GET_UNINSTALLED_PACKAGES
+        PackageManager.GET_UNINSTALLED_PACKAGES or
+            PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES or
+            PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS
     }
 
-    val installedPackages = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        Application.packageManager.getInstalledPackages(
-            PackageManager.PackageInfoFlags.of(packageManagerFlags.toLong())
-        )
-    } else {
-        @Suppress("DEPRECATION")
-        Application.packageManager.getInstalledPackages(packageManagerFlags)
-    }
+    val installedPackages = PackageQueryManager.getInstalledPackages(packageManagerFlags)
 
     val chinaApps = mutableSetOf<String>()
     installedPackages.map { packageInfo ->
         async {
-            if (PerAppProxyActivity.scanChinaPackage(packageInfo.packageName)) {
+            if (PerAppProxyActivity.scanChinaPackage(packageInfo)) {
                 synchronized(chinaApps) {
                     chinaApps.add(packageInfo.packageName)
                 }

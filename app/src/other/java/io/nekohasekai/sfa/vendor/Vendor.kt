@@ -95,10 +95,6 @@ object Vendor : VendorInterface {
         return null
     }
 
-    override fun isPerAppProxyAvailable(): Boolean {
-        return true
-    }
-
     override fun supportsTrackSelection(): Boolean {
         return true
     }

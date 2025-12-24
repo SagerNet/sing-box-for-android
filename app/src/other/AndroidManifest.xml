@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
-
-    <uses-permission android:name="moe.shizuku.manager.permission.API_V23" />
-
-    <uses-sdk tools:overrideLibrary="rikka.shizuku.provider,rikka.shizuku.api,rikka.shizuku.aidl,rikka.shizuku.shared" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application>
         <provider
@@ -13,6 +8,10 @@
             android:exported="true"
             android:multiprocess="false"
             android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
+
+        <service
+            android:name=".vendor.RootPackageManagerService"
+            android:exported="false" />
     </application>
 
 </manifest>

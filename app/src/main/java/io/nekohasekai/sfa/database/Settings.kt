@@ -79,6 +79,10 @@ object Settings {
     var perAppProxyManagedMode by dataStore.boolean(SettingsKey.PER_APP_PROXY_MANAGED_MODE) { false }
     var perAppProxyManagedList by dataStore.stringSet(SettingsKey.PER_APP_PROXY_MANAGED_LIST) { emptySet() }
 
+    const val PACKAGE_QUERY_MODE_SHIZUKU = "SHIZUKU"
+    const val PACKAGE_QUERY_MODE_ROOT = "ROOT"
+    var perAppProxyPackageQueryMode by dataStore.string(SettingsKey.PER_APP_PROXY_PACKAGE_QUERY_MODE) { PACKAGE_QUERY_MODE_SHIZUKU }
+
     fun getEffectivePerAppProxyList(): Set<String> {
         return if (perAppProxyManagedMode) {
             perAppProxyList union perAppProxyManagedList

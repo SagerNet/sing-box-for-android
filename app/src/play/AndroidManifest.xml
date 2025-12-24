@@ -7,4 +7,17 @@
         android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:node="remove" />
 
+    <application>
+        <provider
+            android:name="rikka.shizuku.ShizukuProvider"
+            android:authorities="${applicationId}.shizuku"
+            android:exported="true"
+            android:multiprocess="false"
+            android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
+
+        <service
+            android:name=".vendor.RootPackageManagerService"
+            android:exported="false" />
+    </application>
+
 </manifest>

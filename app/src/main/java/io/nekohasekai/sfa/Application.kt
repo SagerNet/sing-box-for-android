@@ -42,8 +42,6 @@ class Application : Application() {
             UpdateProfileWork.reconfigureUpdater()
         }
 
-        // Only register AppChangeReceiver if Per-app Proxy is available
-        // This receiver needs QUERY_ALL_PACKAGES permission to function
         if (Vendor.isPerAppProxyAvailable()) {
             registerReceiver(
                 AppChangeReceiver(),

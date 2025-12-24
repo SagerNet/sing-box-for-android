@@ -154,6 +154,8 @@
     <string name="shizuku_not_available">Shizuku is not installed or not running</string>
     <string name="shizuku_description">Shizuku allows apps to use system APIs directly with higher privileges</string>
     <string name="get_shizuku">Get Shizuku</string>
+    <string name="start_shizuku">Start Shizuku</string>
+    <string name="request_shizuku">Request Shizuku</string>
     <string name="silent_install_not_available">ROOT and Shizuku are not available</string>
     <string name="silent_install_verify_failed">%s is not available or permission denied</string>
     <string name="auto_update">Auto Update</string>
@@ -247,9 +249,13 @@
     <string name="location_permission_background_description">On Android 10 and up, &lt;strong&gt;background location&lt;/strong&gt; permission is required. Select &lt;strong&gt;Allow all the time&lt;/strong&gt; to grant the permission.</string>
     <string name="notification_permission_title">Notification permission</string>
     <string name="notification_permission_required_description">sing-box is unable to show real-time network speeds without the permission to send notifications. Please grant the permission or disable real-time network speeds notification before starting the service.</string>
-    <string name="per_app_proxy_disabled_play_store">Unavailable in the Play Store version</string>
-    <string name="per_app_proxy_disabled_message">Google Play refuses to allow us to use the QUERY_ALL_PACKAGES permission (while not prohibiting other similar apps from doing so), which is required for listing apps.</string>
+    <string name="per_app_proxy_package_query_mode">Mode</string>
+    <string name="per_app_proxy_shizuku_required">When installed from the Play Store, per-app proxy requires Shizuku. Google Play refuses to allow us to use the QUERY_ALL_PACKAGES permission (while not prohibiting other similar apps from doing so), which is required for listing apps.</string>
+    <string name="per_app_proxy_root_required">When installed from the Play Store, per-app proxy requires ROOT. Google Play refuses to allow us to use the QUERY_ALL_PACKAGES permission (while not prohibiting other similar apps from doing so), which is required for listing apps.</string>
+    <string name="per_app_proxy_shizuku_mode">Per-App Proxy (Shizuku mode)</string>
     <string name="root_access_required">Root access required</string>
+    <string name="root_access_denied">Root access denied</string>
+    <string name="privileged_access_required">Root or Shizuku access required to get the complete app list</string>
     <string name="dashboard_items">Dashboard Items</string>
     <string name="reset_order">Reset order</string>
     <string name="reset">Reset</string>

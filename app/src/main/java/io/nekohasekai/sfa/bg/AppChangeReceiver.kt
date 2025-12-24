@@ -3,9 +3,18 @@ package io.nekohasekai.sfa.bg
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.util.Log
+import android.widget.Toast
+import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.ui.profileoverride.PerAppProxyActivity
+import io.nekohasekai.sfa.vendor.PackageQueryManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AppChangeReceiver : BroadcastReceiver() {
     companion object {
@@ -17,10 +26,6 @@ class AppChangeReceiver : BroadcastReceiver() {
         intent: Intent,
     ) {
         Log.d(TAG, "onReceive: ${intent.action}")
-        checkUpdate(intent)
-    }
-
-    private fun checkUpdate(intent: Intent) {
         if (!Settings.perAppProxyEnabled) {
             Log.d(TAG, "per app proxy disabled")
             return
@@ -29,19 +34,41 @@ class AppChangeReceiver : BroadcastReceiver() {
             Log.d(TAG, "managed mode disabled")
             return
         }
-        val packageName = intent.dataString?.substringAfter("package:")
-        if (packageName.isNullOrBlank()) {
-            Log.d(TAG, "missing package name in intent")
-            return
+        val pendingResult = goAsync()
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                rescanAllApps()
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to rescan apps", e)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, R.string.error_title, Toast.LENGTH_SHORT).show()
+                }
+            } finally {
+                pendingResult.finish()
+            }
         }
-        val isChinaApp = PerAppProxyActivity.scanChinaPackage(packageName)
-        Log.d(TAG, "scan china app result for $packageName: $isChinaApp")
-        if (isChinaApp) {
-            Settings.perAppProxyManagedList += packageName
-            Log.d(TAG, "added to managed list")
+    }
+
+    private suspend fun rescanAllApps() {
+        Log.d(TAG, "rescanning all apps")
+        val packageManagerFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            PackageManager.MATCH_UNINSTALLED_PACKAGES or
+                PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES or
+                PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS
         } else {
-            Settings.perAppProxyManagedList -= packageName
-            Log.d(TAG, "removed from managed list")
+            @Suppress("DEPRECATION")
+            PackageManager.GET_UNINSTALLED_PACKAGES or
+                PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES or
+                PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS
         }
+        val installedPackages = PackageQueryManager.getInstalledPackages(packageManagerFlags)
+        val chinaApps = mutableSetOf<String>()
+        for (packageInfo in installedPackages) {
+            if (PerAppProxyActivity.scanChinaPackage(packageInfo)) {
+                chinaApps.add(packageInfo.packageName)
+            }
+        }
+        Settings.perAppProxyManagedList = chinaApps
+        Log.d(TAG, "rescan complete, found ${chinaApps.size} china apps")
     }
 }

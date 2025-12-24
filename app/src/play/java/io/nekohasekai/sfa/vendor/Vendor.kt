@@ -93,19 +93,11 @@ object Vendor : VendorInterface {
         }
     }
 
-    override fun isPerAppProxyAvailable(): Boolean {
-        // Per-app Proxy is disabled for Play Store builds due to QUERY_ALL_PACKAGES permission restriction
-        return false
-    }
-
     override fun supportsTrackSelection(): Boolean {
-        // Play Store doesn't support track selection
         return false
     }
 
     override fun checkUpdateAsync(): UpdateInfo? {
-        // Play Store updates are handled by the Play Core library
-        // We can't get version info in the same way as GitHub
         return null
     }
 }

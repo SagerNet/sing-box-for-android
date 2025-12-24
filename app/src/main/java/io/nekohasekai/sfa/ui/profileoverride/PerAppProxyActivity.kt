@@ -32,7 +32,8 @@ import io.nekohasekai.sfa.databinding.DialogProgressbarBinding
 import io.nekohasekai.sfa.databinding.ViewAppListItemBinding
 import io.nekohasekai.sfa.ktx.clipboardText
 import io.nekohasekai.sfa.ui.shared.AbstractActivity
-import io.nekohasekai.sfa.vendor.Vendor
+import io.nekohasekai.sfa.vendor.PackageQueryManager
+import io.nekohasekai.sfa.vendor.PrivilegedAccessRequiredException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -80,6 +81,8 @@ class PerAppProxyActivity : AbstractActivity<ActivityPerAppProxyBinding>() {
         val applicationLabel by lazy {
             appInfo.loadLabel(packageManager).toString()
         }
+
+        val info: PackageInfo get() = packageInfo
     }
 
     private lateinit var adapter: ApplicationAdapter
@@ -90,19 +93,6 @@ class PerAppProxyActivity : AbstractActivity<ActivityPerAppProxyBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Check if Per-app Proxy is available
-        if (!Vendor.isPerAppProxyAvailable()) {
-            MaterialAlertDialogBuilder(this)
-                .setTitle("Unavailable")
-                .setMessage(getString(R.string.per_app_proxy_disabled_message))
-                .setPositiveButton(R.string.ok) { _, _ ->
-                    finish()
-                }
-                .setCancelable(false)
-                .show()
-            return
-        }
 
         setTitle(R.string.per_app_proxy)
 
@@ -127,7 +117,9 @@ class PerAppProxyActivity : AbstractActivity<ActivityPerAppProxyBinding>() {
                         binding.perAppProxyMode.setText(R.string.per_app_proxy_mode_exclude_description)
                     }
                 }
-                reloadApplicationList()
+                if (!reloadApplicationList()) {
+                    return@withContext
+                }
                 filterApplicationList()
                 withContext(Dispatchers.Main) {
                     adapter = ApplicationAdapter(displayPackages)
@@ -139,25 +131,31 @@ class PerAppProxyActivity : AbstractActivity<ActivityPerAppProxyBinding>() {
         }
     }
 
-    private fun reloadApplicationList() {
+    private suspend fun reloadApplicationList(): Boolean {
         val packageManagerFlags =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                PackageManager.GET_PERMISSIONS or PackageManager.MATCH_UNINSTALLED_PACKAGES
+                PackageManager.GET_PERMISSIONS or PackageManager.MATCH_UNINSTALLED_PACKAGES or
+                    PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES or
+                    PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS
             } else {
                 @Suppress("DEPRECATION")
-                PackageManager.GET_PERMISSIONS or PackageManager.GET_UNINSTALLED_PACKAGES
+                PackageManager.GET_PERMISSIONS or PackageManager.GET_UNINSTALLED_PACKAGES or
+                    PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES or
+                    PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS
             }
-        val installedPackages =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                packageManager.getInstalledPackages(
-                    PackageManager.PackageInfoFlags.of(
-                        packageManagerFlags.toLong(),
-                    ),
-                )
-            } else {
-                @Suppress("DEPRECATION")
-                packageManager.getInstalledPackages(packageManagerFlags)
+        val installedPackages = try {
+            PackageQueryManager.getInstalledPackages(packageManagerFlags)
+        } catch (e: PrivilegedAccessRequiredException) {
+            withContext(Dispatchers.Main) {
+                Toast.makeText(
+                    this@PerAppProxyActivity,
+                    R.string.privileged_access_required,
+                    Toast.LENGTH_LONG
+                ).show()
+                finish()
             }
+            return false
+        }
         val packages = mutableListOf<PackageCache>()
         for (packageInfo in installedPackages) {
             if (packageInfo.packageName == packageName) continue
@@ -173,6 +171,7 @@ class PerAppProxyActivity : AbstractActivity<ActivityPerAppProxyBinding>() {
         }
         this.packages = packages
         this.selectedUIDs = selectedUIDs
+        return true
     }
 
     private fun filterApplicationList(selectedUIDs: Set<Int> = this.selectedUIDs) {
@@ -592,7 +591,7 @@ class PerAppProxyActivity : AbstractActivity<ActivityPerAppProxyBinding>() {
                         val progressInt = AtomicInteger()
                         currentPackages.map { it ->
                             async {
-                                if (scanChinaPackage(it.packageName)) {
+                                if (scanChinaPackage(it.info)) {
                                     foundApps[it.packageName] = it
                                 }
                                 runOnUiThread {
@@ -729,36 +728,17 @@ class PerAppProxyActivity : AbstractActivity<ActivityPerAppProxyBinding>() {
             ("(" + chinaAppPrefixList.joinToString("|").replace(".", "\\.") + ").*").toRegex()
         }
 
-        fun scanChinaPackage(packageName: String): Boolean {
+        fun scanChinaPackage(packageInfo: PackageInfo): Boolean {
+            val packageName = packageInfo.packageName
             skipPrefixList.forEach {
                 if (packageName == it || packageName.startsWith("$it.")) return false
             }
 
-            val packageManagerFlags =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    PackageManager.MATCH_UNINSTALLED_PACKAGES or PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES or PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS
-                } else {
-                    @Suppress("DEPRECATION")
-                    PackageManager.GET_UNINSTALLED_PACKAGES or PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES or PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS
-                }
             if (packageName.matches(chinaAppRegex)) {
                 Log.d("PerAppProxyActivity", "Match package name: $packageName")
                 return true
             }
             try {
-                val packageInfo =
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        Application.packageManager.getPackageInfo(
-                            packageName,
-                            PackageManager.PackageInfoFlags.of(packageManagerFlags.toLong()),
-                        )
-                    } else {
-                        @Suppress("DEPRECATION")
-                        Application.packageManager.getPackageInfo(
-                            packageName,
-                            packageManagerFlags,
-                        )
-                    }
                 val appInfo = packageInfo.applicationInfo ?: return false
                 packageInfo.services?.forEach {
                     if (it.name.matches(chinaAppRegex)) {
