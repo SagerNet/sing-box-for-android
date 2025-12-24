@@ -164,12 +164,12 @@ fun DashboardSettingsBottomSheet(
                     onClick = {
                         val defaultOrder =
                             listOfNotNull(
-                                CardGroup.ClashMode,
                                 CardGroup.UploadTraffic,
                                 CardGroup.DownloadTraffic,
                                 if (BuildConfig.DEBUG) CardGroup.Debug else null,
                                 CardGroup.Connections,
                                 CardGroup.SystemProxy,
+                                CardGroup.ClashMode,
                                 CardGroup.Profiles,
                                 CardGroup.Groups,
                             )
