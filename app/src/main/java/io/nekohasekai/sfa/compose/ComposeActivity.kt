@@ -525,13 +525,10 @@ class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
                             }
                         }
 
-                        // Show actions only for Log screen and when logs are not empty
                         if (currentScreen == Screen.Log && logViewModel != null) {
                             val logUiState by logViewModel.uiState.collectAsState()
 
-                            // Only show toolbar actions if logs are not empty and not in selection mode
-                            if (logUiState.logs.isNotEmpty() && !logUiState.isSelectionMode) {
-                                // Pause/Resume button
+                            if (!logUiState.isSelectionMode) {
                                 IconButton(onClick = { logViewModel.togglePause() }) {
                                     Icon(
                                         imageVector =
@@ -551,7 +548,6 @@ class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
                                     )
                                 }
 
-                                // Search button
                                 IconButton(onClick = { logViewModel.toggleSearch() }) {
                                     Icon(
                                         imageVector =
@@ -577,7 +573,6 @@ class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
                                     )
                                 }
 
-                                // Options menu button
                                 IconButton(onClick = { logViewModel.toggleOptionsMenu() }) {
                                     Icon(
                                         imageVector = Icons.Default.MoreVert,
@@ -585,7 +580,7 @@ class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
                                         tint = MaterialTheme.colorScheme.onSurface,
                                     )
                                 }
-                            } // End of logs.isNotEmpty() check
+                            }
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(),

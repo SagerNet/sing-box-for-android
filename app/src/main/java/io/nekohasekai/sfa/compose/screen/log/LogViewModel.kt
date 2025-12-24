@@ -83,8 +83,7 @@ class LogViewModel : ViewModel(), CommandClient.Handler {
             _searchQueryInternal
                 .debounce(300)
                 .distinctUntilChanged()
-                .collect { query ->
-                    _uiState.update { it.copy(searchQuery = query) }
+                .collect { _ ->
                     updateDisplayedLogs()
                 }
         }
@@ -201,6 +200,7 @@ class LogViewModel : ViewModel(), CommandClient.Handler {
     }
 
     fun updateSearchQuery(query: String) {
+        _uiState.update { it.copy(searchQuery = query) }
         _searchQueryInternal.value = query
     }
 
