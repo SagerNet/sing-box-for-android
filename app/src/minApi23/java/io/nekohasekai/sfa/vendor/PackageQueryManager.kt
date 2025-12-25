@@ -10,8 +10,6 @@ import io.nekohasekai.sfa.database.Settings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-class PrivilegedAccessRequiredException(message: String) : Exception(message)
-
 object PackageQueryManager {
 
     private const val TAG = "PackageQueryManager"

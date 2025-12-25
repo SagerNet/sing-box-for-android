@@ -17,7 +17,8 @@
 
         <service
             android:name=".vendor.RootPackageManagerService"
-            android:exported="false" />
+            android:exported="false"
+            tools:ignore="Instantiatable" />
     </application>
 
 </manifest>
