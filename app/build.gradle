@@ -110,6 +110,12 @@ android {
         compose true
     }
 
+    packaging {
+        jniLibs {
+            useLegacyPackaging true
+        }
+    }
+
     applicationVariants.configureEach { variant ->
         variant.outputs.configureEach {
             outputFileName = (outputFileName as String).replace("-release", "")
