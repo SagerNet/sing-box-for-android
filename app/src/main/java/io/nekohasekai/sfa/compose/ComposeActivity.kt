@@ -449,6 +449,7 @@ class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
                     is UiEvent.RestartToTakeEffect -> {
                         if (currentServiceStatus == Status.Started) {
                             scope.launch {
+                                snackbarHostState.currentSnackbarData?.dismiss()
                                 val result =
                                     snackbarHostState.showSnackbar(
                                         message = "Restart to take effect",
