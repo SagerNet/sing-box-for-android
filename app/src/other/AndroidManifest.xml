@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission android:name="android.permission.UPDATE_PACKAGES_WITHOUT_USER_ACTION" />
+
     <application>
         <provider
             android:name="rikka.shizuku.ShizukuProvider"
@@ -14,6 +17,14 @@
             android:name=".vendor.RootPackageManagerService"
             android:exported="false"
             tools:ignore="Instantiatable" />
+
+        <receiver
+            android:name=".vendor.InstallResultReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="io.nekohasekai.sfa.INSTALL_COMPLETE" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
