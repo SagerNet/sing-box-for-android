@@ -171,7 +171,6 @@ fun DashboardSettingsBottomSheet(
                                 CardGroup.SystemProxy,
                                 CardGroup.ClashMode,
                                 CardGroup.Profiles,
-                                CardGroup.Groups,
                             )
                         val allCardsEnabled =
                             setOfNotNull(
@@ -182,7 +181,6 @@ fun DashboardSettingsBottomSheet(
                                 CardGroup.Connections,
                                 CardGroup.SystemProxy,
                                 CardGroup.Profiles,
-                                CardGroup.Groups,
                             )
                         reorderedList = defaultOrder
                         currentVisibleCards = allCardsEnabled
@@ -396,7 +394,6 @@ fun DashboardItemCard(
                         CardGroup.ClashMode -> Icons.Outlined.Route
                         CardGroup.SystemProxy -> Icons.Outlined.SettingsEthernet
                         CardGroup.Profiles -> Icons.Outlined.Person
-                        CardGroup.Groups -> Icons.Outlined.Folder
                     },
                 contentDescription = null,
                 modifier =
@@ -428,7 +425,6 @@ fun DashboardItemCard(
                             CardGroup.ClashMode -> stringResource(R.string.clash_mode)
                             CardGroup.SystemProxy -> stringResource(R.string.system_proxy)
                             CardGroup.Profiles -> stringResource(R.string.title_configuration)
-                            CardGroup.Groups -> stringResource(R.string.title_groups)
                         },
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium,

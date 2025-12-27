@@ -22,6 +22,8 @@ import io.nekohasekai.sfa.constant.Status
 fun SFANavHost(
     navController: NavHostController,
     serviceStatus: Status = Status.Stopped,
+    showStartFab: Boolean = false,
+    showStatusBar: Boolean = false,
     dashboardViewModel: DashboardViewModel? = null,
     logViewModel: LogViewModel? = null,
     modifier: Modifier = Modifier,
@@ -46,10 +48,16 @@ fun SFANavHost(
             if (logViewModel != null) {
                 LogScreen(
                     serviceStatus = serviceStatus,
+                    showStartFab = showStartFab,
+                    showStatusBar = showStatusBar,
                     viewModel = logViewModel,
                 )
             } else {
-                LogScreen(serviceStatus = serviceStatus)
+                LogScreen(
+                    serviceStatus = serviceStatus,
+                    showStartFab = showStartFab,
+                    showStatusBar = showStatusBar,
+                )
             }
         }
 

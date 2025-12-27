@@ -35,7 +35,6 @@ enum class CardGroup {
     Connections,
     SystemProxy,
     Profiles,
-    Groups,
 }
 
 enum class CardWidth {
@@ -50,6 +49,8 @@ data class DashboardUiState(
     val selectedProfileName: String? = null,
     val isLoading: Boolean = false,
     val hasGroups: Boolean = false,
+    val groupsCount: Int = 0,
+    val serviceStartTime: Long? = null,
     val deprecatedNotes: List<DeprecatedNote> = emptyList(),
     val showDeprecatedDialog: Boolean = false,
     val showAddProfileSheet: Boolean = false,
@@ -98,7 +99,6 @@ data class DashboardUiState(
             CardGroup.SystemProxy,
             CardGroup.ClashMode,
             CardGroup.Profiles,
-            CardGroup.Groups,
         ),
     val cardWidths: Map<CardGroup, CardWidth> =
         mapOf(
@@ -109,7 +109,6 @@ data class DashboardUiState(
             CardGroup.Connections to CardWidth.Half,
             CardGroup.SystemProxy to CardWidth.Full,
             CardGroup.Profiles to CardWidth.Full,
-            CardGroup.Groups to CardWidth.Full,
         ),
     val showCardSettingsDialog: Boolean = false,
 ) {
@@ -143,17 +142,7 @@ class DashboardViewModel : BaseViewModel<DashboardUiState, UiEvent>(), CommandCl
 
         // Calculate visible items (all items minus disabled)
         val allItems = CardGroup.values().toSet()
-        // Check if this is a first-time user (no saved order means never configured)
-        val isFirstTimeUser = Settings.dashboardItemOrder.isBlank()
-        val actualDisabledItems =
-            if (isFirstTimeUser && Settings.dashboardDisabledItems.isEmpty()) {
-                // First time user - Groups disabled by default
-                setOf(CardGroup.Groups)
-            } else {
-                // User has configured settings, respect their choices
-                disabledItems
-            }
-        val visibleCards = allItems - actualDisabledItems
+        val visibleCards = allItems - disabledItems
 
         return DashboardUiState(
             cardOrder = savedOrder,
@@ -456,6 +445,9 @@ class DashboardViewModel : BaseViewModel<DashboardUiState, UiEvent>(), CommandCl
                 checkDeprecatedNotes()
                 commandClient.connect()
                 reloadSystemProxyStatus()
+                updateState {
+                    copy(serviceStartTime = System.currentTimeMillis())
+                }
             }
 
             Status.Stopped -> {
@@ -463,6 +455,8 @@ class DashboardViewModel : BaseViewModel<DashboardUiState, UiEvent>(), CommandCl
                 updateState {
                     copy(
                         hasGroups = false,
+                        groupsCount = 0,
+                        serviceStartTime = null,
                         clashModeVisible = false,
                         systemProxyVisible = false,
                         trafficVisible = false,
@@ -618,7 +612,7 @@ class DashboardViewModel : BaseViewModel<DashboardUiState, UiEvent>(), CommandCl
         viewModelScope.launch(Dispatchers.Main) {
             val hasGroups = newGroups.isNotEmpty()
             updateState {
-                copy(hasGroups = hasGroups)
+                copy(hasGroups = hasGroups, groupsCount = newGroups.size)
             }
         }
     }
@@ -688,7 +682,6 @@ class DashboardViewModel : BaseViewModel<DashboardUiState, UiEvent>(), CommandCl
             CardGroup.SystemProxy,
             CardGroup.ClashMode,
             CardGroup.Profiles,
-            CardGroup.Groups,
         )
 
     private fun loadItemOrder(): List<CardGroup> {

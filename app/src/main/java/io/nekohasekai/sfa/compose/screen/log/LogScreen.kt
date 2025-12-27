@@ -43,13 +43,11 @@ import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.RadioButtonChecked
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -88,8 +86,6 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.R
-import io.nekohasekai.sfa.bg.BoxService
-import io.nekohasekai.sfa.compose.ComposeActivity
 import io.nekohasekai.sfa.constant.Status
 import java.io.File
 import java.text.SimpleDateFormat
@@ -100,6 +96,8 @@ import java.util.Locale
 @Composable
 fun LogScreen(
     serviceStatus: Status = Status.Stopped,
+    showStartFab: Boolean = false,
+    showStatusBar: Boolean = false,
     viewModel: LogViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -374,6 +372,11 @@ fun LogScreen(
                 }
             } else {
                 // Log list
+                val extraBottomPadding = when {
+                    showStartFab -> 72.dp
+                    showStatusBar -> 58.dp
+                    else -> 0.dp
+                }
                 LazyColumn(
                     state = listState,
                     modifier = Modifier.fillMaxSize(),
@@ -382,7 +385,7 @@ fun LogScreen(
                             start = 8.dp,
                             end = 8.dp,
                             top = 8.dp,
-                            bottom = 88.dp, // Space for FAB
+                            bottom = 88.dp + extraBottomPadding, // Space for FAB
                         ),
                     verticalArrangement = Arrangement.spacedBy(2.dp),
                 ) {
@@ -716,11 +719,16 @@ fun LogScreen(
         }
 
         // FABs - Hide during selection mode
+        val fabBottomPadding = when {
+            showStartFab -> 88.dp
+            showStatusBar -> 74.dp
+            else -> 16.dp
+        }
         Column(
             modifier =
                 Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(16.dp),
+                    .padding(bottom = fabBottomPadding, end = 16.dp, top = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             // Scroll to bottom FAB
@@ -732,43 +740,12 @@ fun LogScreen(
             ) {
                 FloatingActionButton(
                     onClick = { viewModel.scrollToBottom() },
-                    containerColor = MaterialTheme.colorScheme.secondary,
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 ) {
                     Icon(
                         imageVector = Icons.Default.KeyboardArrowDown,
                         contentDescription = stringResource(R.string.content_description_scroll_to_bottom),
-                    )
-                }
-            }
-
-            // Start/Stop Service FAB
-            // Use fade animation on API 23 to avoid OpenGLRenderer crash with scale transforms
-            AnimatedVisibility(
-                visible = serviceStatus != Status.Stopping && !uiState.isSelectionMode,
-                enter = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) scaleIn() else fadeIn(),
-                exit = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) scaleOut() else fadeOut(),
-            ) {
-                FloatingActionButton(
-                    onClick = {
-                        when (serviceStatus) {
-                            Status.Started, Status.Starting -> BoxService.stop()
-                            Status.Stopped -> (context as ComposeActivity).startService()
-                            else -> {}
-                        }
-                    },
-                    containerColor = MaterialTheme.colorScheme.primary,
-                ) {
-                    Icon(
-                        imageVector =
-                            when (serviceStatus) {
-                                Status.Started, Status.Starting -> Icons.Default.Stop
-                                else -> Icons.Default.PlayArrow
-                            },
-                        contentDescription =
-                            when (serviceStatus) {
-                                Status.Started, Status.Starting -> stringResource(R.string.stop)
-                                else -> stringResource(R.string.action_start)
-                            },
                     )
                 }
             }

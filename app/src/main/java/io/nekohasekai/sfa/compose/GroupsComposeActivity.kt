@@ -101,7 +101,6 @@ class GroupsComposeActivity : ComponentActivity(), ServiceConnection.Callback {
         ) { paddingValues ->
             GroupsCard(
                 serviceStatus = currentServiceStatus,
-                isCardMode = false,
                 modifier = Modifier.padding(paddingValues),
             )
         }

@@ -131,16 +131,5 @@ fun DashboardCardRenderer(
                 saveQRCodeToGallery = saveQRCodeToGallery,
             )
         }
-
-        CardGroup.Groups -> {
-            if (uiState.hasGroups) {
-                GroupsCard(
-                    serviceStatus = serviceStatus,
-                    isCardMode = true,
-                    commandClient = commandClient,
-                    modifier = modifier,
-                )
-            }
-        }
     }
 }

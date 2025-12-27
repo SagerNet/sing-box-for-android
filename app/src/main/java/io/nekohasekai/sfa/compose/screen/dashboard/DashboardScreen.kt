@@ -1,6 +1,5 @@
 package io.nekohasekai.sfa.compose.screen.dashboard
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,14 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -244,55 +237,6 @@ fun DashboardScreen(
                 }
             }
         }
-
-        // FAB
-        AnimatedVisibility(
-            visible = uiState.serviceStatus != Status.Stopping,
-            enter = androidx.compose.animation.scaleIn(),
-            exit = androidx.compose.animation.scaleOut(),
-            modifier =
-                Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp),
-        ) {
-            ServiceControlFAB(
-                status = uiState.serviceStatus,
-                onToggle = { viewModel.toggleService() },
-                enabled = uiState.selectedProfileId != -1L,
-            )
-        }
-    }
-}
-
-@Composable
-fun ServiceControlFAB(
-    status: Status,
-    onToggle: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-) {
-    FloatingActionButton(
-        onClick = { if (enabled) onToggle() },
-        modifier = modifier,
-        containerColor =
-            if (enabled) {
-                MaterialTheme.colorScheme.primary
-            } else {
-                MaterialTheme.colorScheme.surfaceVariant
-            },
-    ) {
-        Icon(
-            imageVector =
-                when (status) {
-                    Status.Started, Status.Starting -> Icons.Default.Stop
-                    else -> Icons.Default.PlayArrow
-                },
-            contentDescription =
-                when (status) {
-                    Status.Started, Status.Starting -> stringResource(R.string.stop)
-                    else -> stringResource(R.string.action_start)
-                },
-        )
     }
 }
 
@@ -369,6 +313,5 @@ fun isCardAvailableWhenServiceRunning(
         CardGroup.Connections -> uiState.trafficVisible
         CardGroup.SystemProxy -> uiState.systemProxyVisible
         CardGroup.Profiles -> true // This shouldn't be called for Profiles, but return true for safety
-        CardGroup.Groups -> uiState.hasGroups // Groups card available when groups exist
     }
 }

@@ -21,14 +21,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.Speed
-import androidx.compose.material.icons.filled.UnfoldLess
-import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,9 +48,14 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -68,40 +72,39 @@ import io.nekohasekai.sfa.utils.CommandClient
 @Composable
 fun GroupsCard(
     serviceStatus: Status,
-    isCardMode: Boolean = true,
     commandClient: CommandClient? = null,
+    viewModel: GroupsViewModel? = null,
     modifier: Modifier = Modifier,
 ) {
-    val viewModel: GroupsViewModel =
-        viewModel(
-            factory =
-                object : ViewModelProvider.Factory {
-                    override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
-                        @Suppress("UNCHECKED_CAST")
-                        return GroupsViewModel(commandClient) as T
-                    }
-                },
-        )
+    val actualViewModel: GroupsViewModel = viewModel ?: viewModel(
+        factory =
+            object : ViewModelProvider.Factory {
+                override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                    @Suppress("UNCHECKED_CAST")
+                    return GroupsViewModel(commandClient) as T
+                }
+            },
+    )
     val snackbarHostState = remember { SnackbarHostState() }
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by actualViewModel.uiState.collectAsState()
 
     // Stable callbacks to prevent recomposition - use remember with viewModel as key
     val onToggleExpanded =
-        remember(viewModel) {
-            { groupTag: String -> viewModel.toggleGroupExpand(groupTag) }
+        remember(actualViewModel) {
+            { groupTag: String -> actualViewModel.toggleGroupExpand(groupTag) }
         }
     val onItemSelected =
-        remember(viewModel) {
-            { groupTag: String, itemTag: String -> viewModel.selectGroupItem(groupTag, itemTag) }
+        remember(actualViewModel) {
+            { groupTag: String, itemTag: String -> actualViewModel.selectGroupItem(groupTag, itemTag) }
         }
     val onUrlTest =
-        remember(viewModel) {
-            { groupTag: String -> viewModel.urlTest(groupTag) }
+        remember(actualViewModel) {
+            { groupTag: String -> actualViewModel.urlTest(groupTag) }
         }
 
     // Only update service status when it actually changes
     LaunchedEffect(serviceStatus) {
-        viewModel.updateServiceStatus(serviceStatus)
+        actualViewModel.updateServiceStatus(serviceStatus)
     }
 
     // Show snackbar when needed
@@ -116,109 +119,34 @@ fun GroupsCard(
                 )
             when (result) {
                 androidx.compose.material3.SnackbarResult.ActionPerformed -> {
-                    viewModel.closeConnections()
+                    actualViewModel.closeConnections()
                 }
 
                 androidx.compose.material3.SnackbarResult.Dismissed -> {
-                    viewModel.dismissCloseConnectionsSnackbar()
+                    actualViewModel.dismissCloseConnectionsSnackbar()
                 }
             }
         }
     }
 
-    if (isCardMode) {
-        // Card mode - wrapped in a card with header
-        Card(
-            modifier = modifier.fillMaxWidth(),
-        ) {
-            GroupsCardContent(
-                uiState = uiState,
-                isCardMode = true,
-                onToggleAllGroups = { viewModel.toggleAllGroups() },
-                onToggleExpanded = onToggleExpanded,
-                onItemSelected = onItemSelected,
-                onUrlTest = onUrlTest,
-            )
-        }
-    } else {
-        // Standalone mode - direct content without card wrapper
-        GroupsCardContent(
-            uiState = uiState,
-            isCardMode = false,
-            onToggleAllGroups = { viewModel.toggleAllGroups() },
-            onToggleExpanded = onToggleExpanded,
-            onItemSelected = onItemSelected,
-            onUrlTest = onUrlTest,
-            modifier = modifier,
-        )
-    }
+    GroupsCardContent(
+        uiState = uiState,
+        onToggleExpanded = onToggleExpanded,
+        onItemSelected = onItemSelected,
+        onUrlTest = onUrlTest,
+        modifier = modifier,
+    )
 }
 
 @Composable
 private fun GroupsCardContent(
     uiState: io.nekohasekai.sfa.compose.screen.dashboard.groups.GroupsUiState,
-    isCardMode: Boolean,
-    onToggleAllGroups: () -> Unit,
     onToggleExpanded: (String) -> Unit,
     onItemSelected: (String, String) -> Unit,
     onUrlTest: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
-        if (isCardMode) {
-            // Card header with title and collapse/expand all button
-            Row(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.FolderOpen,
-                        contentDescription = null,
-                        modifier = Modifier.size(24.dp),
-                        tint = MaterialTheme.colorScheme.primary,
-                    )
-                    Text(
-                        text = stringResource(R.string.title_groups),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                }
-
-                // Collapse/Expand all button in the top right
-                if (uiState.groups.isNotEmpty()) {
-                    val allCollapsed = uiState.expandedGroups.isEmpty()
-                    IconButton(
-                        onClick = onToggleAllGroups,
-                        modifier = Modifier.size(40.dp),
-                    ) {
-                        Icon(
-                            imageVector =
-                                if (allCollapsed) {
-                                    Icons.Default.UnfoldMore
-                                } else {
-                                    Icons.Default.UnfoldLess
-                                },
-                            contentDescription = if (allCollapsed) "Expand All" else "Collapse All",
-                            modifier = Modifier.size(20.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                }
-            }
-            HorizontalDivider(
-                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f),
-                thickness = 1.dp,
-            )
-        }
-
         // Groups content
         if (uiState.isLoading) {
             Box(
@@ -245,59 +173,34 @@ private fun GroupsCardContent(
                 )
             }
         } else {
-            if (isCardMode) {
-                // In card mode, show groups directly without LazyColumn
-                Column(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth(),
-                ) {
-                    uiState.groups.forEachIndexed { index, group ->
-                        // Add divider above each group (not for the first one in card mode)
-                        if (index > 0) {
-                            HorizontalDivider(
-                                modifier = Modifier.padding(horizontal = 16.dp),
-                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f),
-                                thickness = 1.dp,
-                            )
-                        }
-                        ProxyGroupItem(
-                            group = group,
-                            isExpanded = uiState.expandedGroups.contains(group.tag),
-                            onToggleExpanded = { onToggleExpanded(group.tag) },
-                            onItemSelected = { itemTag -> onItemSelected(group.tag, itemTag) },
-                            onUrlTest = { onUrlTest(group.tag) },
-                            showCard = false,
-                        )
-                    }
-                }
-            } else {
-                // In standalone mode, use LazyColumn for scrolling
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding =
-                        PaddingValues(
-                            start = 16.dp,
-                            end = 16.dp,
-                            top = 8.dp,
-                            bottom = 16.dp,
-                        ),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    items(
-                        items = uiState.groups,
-                        key = { it.tag },
-                        contentType = { "GroupCard" },
-                    ) { group ->
-                        ProxyGroupItem(
-                            group = group,
-                            isExpanded = uiState.expandedGroups.contains(group.tag),
-                            onToggleExpanded = { onToggleExpanded(group.tag) },
-                            onItemSelected = { itemTag -> onItemSelected(group.tag, itemTag) },
-                            onUrlTest = { onUrlTest(group.tag) },
-                            showCard = true,
-                        )
-                    }
+            val lazyListState = rememberLazyListState()
+            val bounceBlockingConnection = rememberBounceBlockingNestedScrollConnection(lazyListState)
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .nestedScroll(bounceBlockingConnection),
+                state = lazyListState,
+                contentPadding =
+                    PaddingValues(
+                        start = 16.dp,
+                        end = 16.dp,
+                        top = 8.dp,
+                        bottom = 16.dp,
+                    ),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                items(
+                    items = uiState.groups,
+                    key = { it.tag },
+                    contentType = { "GroupCard" },
+                ) { group ->
+                    ProxyGroupItem(
+                        group = group,
+                        isExpanded = uiState.expandedGroups.contains(group.tag),
+                        onToggleExpanded = { onToggleExpanded(group.tag) },
+                        onItemSelected = { itemTag -> onItemSelected(group.tag, itemTag) },
+                        onUrlTest = { onUrlTest(group.tag) },
+                    )
                 }
             }
         }
@@ -312,9 +215,10 @@ private fun ProxyGroupItem(
     onToggleExpanded: () -> Unit,
     onItemSelected: (String) -> Unit,
     onUrlTest: () -> Unit,
-    showCard: Boolean,
 ) {
-    val content = @Composable {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
         ) {
@@ -458,16 +362,6 @@ private fun ProxyGroupItem(
                 }
             }
         }
-    }
-
-    if (showCard) {
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            content()
-        }
-    } else {
-        content()
     }
 }
 
@@ -692,4 +586,27 @@ private fun ProxyLatencyBadge(
         color = latencyColor,
         modifier = modifier,
     )
+}
+
+@Composable
+private fun rememberBounceBlockingNestedScrollConnection(
+    lazyListState: LazyListState
+): NestedScrollConnection = remember(lazyListState) {
+    object : NestedScrollConnection {
+        override fun onPostScroll(
+            consumed: Offset,
+            available: Offset,
+            source: NestedScrollSource
+        ): Offset {
+            // Only block upward scroll (y < 0) at bottom to prevent sheet expansion
+            // Allow downward scroll (y > 0) at top to let sheet collapse
+            return if (available.y < 0) available else Offset.Zero
+        }
+
+        override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+            // Only block upward fling (y < 0) to prevent sheet expansion
+            // Allow downward fling (y > 0) to let sheet collapse
+            return if (available.y < 0) available else Velocity.Zero
+        }
+    }
 }

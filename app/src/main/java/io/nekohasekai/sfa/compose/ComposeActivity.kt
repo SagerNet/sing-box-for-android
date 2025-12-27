@@ -10,8 +10,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ExpandLess
@@ -20,11 +28,14 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.UnfoldLess
+import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import dev.jeziellago.compose.markdowntext.MarkdownText
@@ -37,15 +48,18 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -57,6 +71,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -71,12 +87,15 @@ import io.nekohasekai.sfa.bg.ServiceConnection
 import io.nekohasekai.sfa.bg.ServiceNotification
 import io.nekohasekai.sfa.compose.base.GlobalEventBus
 import io.nekohasekai.sfa.compose.base.UiEvent
+import io.nekohasekai.sfa.compose.component.ServiceStatusBar
 import io.nekohasekai.sfa.compose.component.UpdateAvailableDialog
 import io.nekohasekai.sfa.compose.navigation.SFANavHost
 import io.nekohasekai.sfa.compose.navigation.Screen
 import io.nekohasekai.sfa.compose.navigation.bottomNavigationScreens
 import io.nekohasekai.sfa.compose.screen.dashboard.CardGroup
 import io.nekohasekai.sfa.compose.screen.dashboard.DashboardViewModel
+import io.nekohasekai.sfa.compose.screen.dashboard.GroupsCard
+import io.nekohasekai.sfa.compose.screen.dashboard.groups.GroupsViewModel
 import io.nekohasekai.sfa.compose.screen.log.LogViewModel
 import io.nekohasekai.sfa.compose.theme.SFATheme
 import io.nekohasekai.sfa.constant.Alert
@@ -216,6 +235,9 @@ class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
 
         // Snackbar state
         val snackbarHostState = remember { SnackbarHostState() }
+
+        // Groups Sheet state
+        var showGroupsSheet by remember { mutableStateOf(false) }
 
         // Error dialog state for UiEvent.ShowError
         var showErrorDialog by remember { mutableStateOf(false) }
@@ -493,29 +515,8 @@ class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
                         }
                     },
                     actions = {
-                        // Show Groups and Others menu for Dashboard screen (but not in settings sub-screens)
+                        // Show Others menu for Dashboard screen (but not in settings sub-screens)
                         if (currentScreen == Screen.Dashboard && !isSettingsSubScreen) {
-                            // Groups button - only show when service is running, groups exist, and Groups card is disabled
-                            if ((currentServiceStatus == Status.Started || currentServiceStatus == Status.Starting) &&
-                                dashboardUiState.hasGroups &&
-                                !dashboardUiState.visibleCards.contains(CardGroup.Groups)
-                            ) {
-                                IconButton(onClick = {
-                                    val intent =
-                                        Intent(
-                                            this@ComposeActivity,
-                                            GroupsComposeActivity::class.java,
-                                        )
-                                    startActivity(intent)
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Folder,
-                                        contentDescription = stringResource(R.string.title_groups),
-                                        tint = MaterialTheme.colorScheme.onSurface,
-                                    )
-                                }
-                            }
-
                             // More options button
                             IconButton(onClick = { dashboardViewModel.toggleCardSettingsDialog() }) {
                                 Icon(
@@ -626,13 +627,123 @@ class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
                 }
             },
         ) { paddingValues ->
-            SFANavHost(
-                navController = navController,
-                serviceStatus = currentServiceStatus,
-                dashboardViewModel = dashboardViewModel,
-                logViewModel = logViewModel,
-                modifier = Modifier.padding(paddingValues),
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+            ) {
+                // Service Status Bar (shown when service is running or stopping)
+                val serviceRunning =
+                    currentServiceStatus == Status.Started || currentServiceStatus == Status.Starting
+                val showStatusBar = serviceRunning || currentServiceStatus == Status.Stopping
+                val showStartFab = !serviceRunning && dashboardUiState.selectedProfileId != -1L
+
+                SFANavHost(
+                    navController = navController,
+                    serviceStatus = currentServiceStatus,
+                    showStartFab = showStartFab,
+                    showStatusBar = showStatusBar,
+                    dashboardViewModel = dashboardViewModel,
+                    logViewModel = logViewModel,
+                    modifier = Modifier.fillMaxSize(),
+                )
+                ServiceStatusBar(
+                    visible = showStatusBar && !isSettingsSubScreen,
+                    serviceStatus = currentServiceStatus,
+                    startTime = dashboardUiState.serviceStartTime,
+                    groupsCount = dashboardUiState.groupsCount,
+                    hasGroups = dashboardUiState.hasGroups,
+                    onGroupsClick = { showGroupsSheet = true },
+                    onStopClick = { dashboardViewModel.toggleService() },
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                )
+
+                // Start FAB (shown when service is not running and a profile is selected)
+                AnimatedVisibility(
+                    visible = !serviceRunning && dashboardUiState.selectedProfileId != -1L && !isSettingsSubScreen,
+                    enter = scaleIn(),
+                    exit = scaleOut(),
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(16.dp),
+                ) {
+                    FloatingActionButton(
+                        onClick = { startService() },
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.PlayArrow,
+                            contentDescription = stringResource(R.string.action_start),
+                        )
+                    }
+                }
+            }
+        }
+
+        // Groups ModalBottomSheet
+        if (showGroupsSheet) {
+            val groupsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+            val groupsViewModel: GroupsViewModel = viewModel(
+                factory = object : ViewModelProvider.Factory {
+                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                        @Suppress("UNCHECKED_CAST")
+                        return GroupsViewModel(dashboardViewModel.commandClient) as T
+                    }
+                }
             )
+            val groupsUiState by groupsViewModel.uiState.collectAsState()
+            val allCollapsed = groupsUiState.expandedGroups.isEmpty()
+
+            ModalBottomSheet(
+                onDismissRequest = { showGroupsSheet = false },
+                sheetState = groupsSheetState,
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.9f),
+                ) {
+                    // Header
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp)
+                            .padding(bottom = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = stringResource(R.string.title_groups),
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        if (groupsUiState.groups.isNotEmpty()) {
+                            IconButton(onClick = { groupsViewModel.toggleAllGroups() }) {
+                                Icon(
+                                    imageVector = if (allCollapsed) Icons.Default.UnfoldMore
+                                                  else Icons.Default.UnfoldLess,
+                                    contentDescription = if (allCollapsed)
+                                        stringResource(R.string.expand_all)
+                                    else
+                                        stringResource(R.string.collapse_all),
+                                )
+                            }
+                        }
+                    }
+
+                    // Groups content
+                    GroupsCard(
+                        serviceStatus = currentServiceStatus,
+                        commandClient = dashboardViewModel.commandClient,
+                        viewModel = groupsViewModel,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
+            }
         }
     }
 

@@ -46,9 +46,9 @@
     <string name="menu_delete">删除</string>
     <string name="menu_share">分享</string>
     <string name="status_default">服务未启动</string>
-    <string name="status_starting">服务启动中...</string>
-    <string name="status_stopping">服务停止中...</string>
-    <string name="status_started">服务已启动</string>
+    <string name="status_starting">启动中</string>
+    <string name="status_stopping">停止中</string>
+    <string name="status_started">已启动</string>
     <string name="enabled">启用</string>
     <string name="disabled">禁用</string>
     <string name="settings_clear_working_directory">清理工作目录</string>

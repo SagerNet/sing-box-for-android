@@ -85,9 +85,9 @@
     <string name="menu_delete">Delete</string>
     <string name="menu_share">Share</string>
     <string name="status_default">Service not started</string>
-    <string name="status_starting">Service starting…</string>
-    <string name="status_stopping">Service stopping…</string>
-    <string name="status_started">Service started</string>
+    <string name="status_starting">Starting</string>
+    <string name="status_stopping">Stopping</string>
+    <string name="status_started">Started</string>
     <string name="enabled">Enabled</string>
     <string name="disabled">Disabled</string>
     <string name="settings_clear_working_directory">Clear Working Directory</string>

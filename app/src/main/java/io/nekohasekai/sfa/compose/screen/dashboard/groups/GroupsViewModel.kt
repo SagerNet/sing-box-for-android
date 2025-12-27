@@ -72,10 +72,10 @@ class GroupsViewModel(
 
     private fun handleServiceStatusChange(status: Status) {
         if (status == Status.Started) {
-            updateState {
-                copy(isLoading = true)
-            }
             if (!isUsingSharedClient) {
+                updateState {
+                    copy(isLoading = true)
+                }
                 connectionJob?.cancel()
                 connectionJob = viewModelScope.launch(Dispatchers.IO) {
                     while (isActive) {
@@ -115,25 +115,40 @@ class GroupsViewModel(
     }
 
     fun toggleGroupExpand(groupTag: String) {
+        val newExpanded = !uiState.value.expandedGroups.contains(groupTag)
         updateState {
-            val newExpandedGroups =
-                if (expandedGroups.contains(groupTag)) {
-                    expandedGroups - groupTag
-                } else {
-                    expandedGroups + groupTag
-                }
+            val newExpandedGroups = if (newExpanded) {
+                expandedGroups + groupTag
+            } else {
+                expandedGroups - groupTag
+            }
             copy(expandedGroups = newExpandedGroups)
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                Libbox.newStandaloneCommandClient().setGroupExpand(groupTag, newExpanded)
+            }
         }
     }
 
     fun toggleAllGroups() {
+        val groups = uiState.value.groups
+        val allCollapsed = uiState.value.expandedGroups.isEmpty()
+        val newExpanded = allCollapsed
+
         updateState {
-            if (expandedGroups.isEmpty()) {
-                // All are collapsed, expand all
+            if (allCollapsed) {
                 copy(expandedGroups = groups.map { it.tag }.toSet())
             } else {
-                // Some or all are expanded, collapse all
                 copy(expandedGroups = emptySet())
+            }
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            groups.forEach { group ->
+                runCatching {
+                    Libbox.newStandaloneCommandClient().setGroupExpand(group.tag, newExpanded)
+                }
             }
         }
     }
@@ -292,9 +307,14 @@ class GroupsViewModel(
 
             withContext(Dispatchers.Main) {
                 updateState {
-                    // Keep existing expanded state when groups are updated
+                    val initialExpandedGroups = if (expandedGroups.isEmpty() && currentGroups.isEmpty()) {
+                        mergedGroups.filter { it.isExpand }.map { it.tag }.toSet()
+                    } else {
+                        expandedGroups
+                    }
                     copy(
                         groups = mergedGroups,
+                        expandedGroups = initialExpandedGroups,
                         isLoading = false,
                     )
                 }
