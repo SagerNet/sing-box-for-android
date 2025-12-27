@@ -445,9 +445,7 @@ class DashboardViewModel : BaseViewModel<DashboardUiState, UiEvent>(), CommandCl
                 checkDeprecatedNotes()
                 commandClient.connect()
                 reloadSystemProxyStatus()
-                updateState {
-                    copy(serviceStartTime = System.currentTimeMillis())
-                }
+                reloadStartedAt()
             }
 
             Status.Stopped -> {
@@ -475,6 +473,20 @@ class DashboardViewModel : BaseViewModel<DashboardUiState, UiEvent>(), CommandCl
             }
 
             else -> {}
+        }
+    }
+
+    private fun reloadStartedAt() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val startedAt = Libbox.newStandaloneCommandClient().startedAt
+                withContext(Dispatchers.Main) {
+                    updateState {
+                        copy(serviceStartTime = startedAt)
+                    }
+                }
+            } catch (_: Exception) {
+            }
         }
     }
 
