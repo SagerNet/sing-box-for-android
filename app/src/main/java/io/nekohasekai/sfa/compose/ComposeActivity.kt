@@ -117,6 +117,8 @@ class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
     private var currentAlert by mutableStateOf<Pair<Alert, String?>?>(null)
     private var showLocationPermissionDialog by mutableStateOf(false)
     private var showBackgroundLocationDialog by mutableStateOf(false)
+    private var showImportProfileDialog by mutableStateOf(false)
+    private var pendingImportProfile by mutableStateOf<Triple<String, String, String>?>(null)
 
     private val notificationPermissionLauncher =
         registerForActivityResult(
@@ -175,9 +177,31 @@ class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
             }
         }
 
+        handleIntent(intent)
+
         setContent {
             SFATheme {
                 SFAApp()
+            }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent?) {
+        val uri = intent?.data ?: return
+        if (uri.scheme == "sing-box" && uri.host == "import-remote-profile") {
+            try {
+                val profile = Libbox.parseRemoteProfileImportLink(uri.toString())
+                pendingImportProfile = Triple(profile.name, profile.host, profile.url)
+                showImportProfileDialog = true
+            } catch (e: Exception) {
+                lifecycleScope.launch {
+                    GlobalEventBus.emit(UiEvent.ErrorMessage(e.message ?: "Failed to parse profile link"))
+                }
             }
         }
     }
@@ -283,6 +307,41 @@ class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
                     backgroundLocationPermissionLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
                 }
             }, onDismiss = { showBackgroundLocationDialog = false })
+        }
+
+        // Handle import remote profile dialog
+        if (showImportProfileDialog && pendingImportProfile != null) {
+            val (name, host, url) = pendingImportProfile!!
+            AlertDialog(
+                onDismissRequest = {
+                    showImportProfileDialog = false
+                    pendingImportProfile = null
+                },
+                title = { Text(stringResource(R.string.import_remote_profile)) },
+                text = { Text(stringResource(R.string.import_remote_profile_message, name, host)) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        startActivity(
+                            Intent(this@ComposeActivity, NewProfileComposeActivity::class.java).apply {
+                                putExtra(NewProfileComposeActivity.EXTRA_IMPORT_NAME, name)
+                                putExtra(NewProfileComposeActivity.EXTRA_IMPORT_URL, url)
+                            },
+                        )
+                        showImportProfileDialog = false
+                        pendingImportProfile = null
+                    }) {
+                        Text(stringResource(R.string.ok))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = {
+                        showImportProfileDialog = false
+                        pendingImportProfile = null
+                    }) {
+                        Text(stringResource(android.R.string.cancel))
+                    }
+                },
+            )
         }
 
         // Handle update check prompt dialog (shown only once on first launch)
