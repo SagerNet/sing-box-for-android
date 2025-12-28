@@ -55,6 +55,45 @@ data class Connection(
 ) {
     val isActive: Boolean get() = closedAt == null || closedAt == 0L
 
+    fun performSearch(content: String): Boolean {
+        if (content.isBlank()) return true
+        for (item in content.trim().split(" ").filter { it.isNotEmpty() }) {
+            val parts = item.split(":", limit = 2)
+            if (parts.size == 2) {
+                if (!performSearchType(parts[0], parts[1])) return false
+            } else {
+                if (!performSearchPlain(item)) return false
+            }
+        }
+        return true
+    }
+
+    private fun performSearchPlain(content: String): Boolean {
+        return destination.contains(content, ignoreCase = true) ||
+            domain.contains(content, ignoreCase = true) ||
+            outbound.contains(content, ignoreCase = true) ||
+            rule.contains(content, ignoreCase = true) ||
+            processInfo?.packageName?.contains(content, ignoreCase = true) == true
+    }
+
+    private fun performSearchType(type: String, value: String): Boolean {
+        return when (type) {
+            "network" -> network.equals(value, ignoreCase = true)
+            "inbound" -> inbound.contains(value, ignoreCase = true)
+            "inbound.type" -> inboundType.equals(value, ignoreCase = true)
+            "source" -> source.contains(value, ignoreCase = true)
+            "destination" -> destination.contains(value, ignoreCase = true)
+            "outbound" -> outbound.contains(value, ignoreCase = true)
+            "outbound.type" -> outboundType.equals(value, ignoreCase = true)
+            "rule" -> rule.contains(value, ignoreCase = true)
+            "protocol" -> protocolName.equals(value, ignoreCase = true)
+            "user" -> user.contains(value, ignoreCase = true)
+            "package" -> processInfo?.packageName?.contains(value, ignoreCase = true) == true
+            "chain" -> chain.any { it.contains(value, ignoreCase = true) }
+            else -> false
+        }
+    }
+
     companion object {
         fun from(connection: LibboxConnection): Connection {
             return Connection(

@@ -26,6 +26,8 @@ data class ConnectionsUiState(
     val isLoading: Boolean = false,
     val stateFilter: ConnectionStateFilter = ConnectionStateFilter.Active,
     val sort: ConnectionSort = ConnectionSort.ByDate,
+    val searchText: String = "",
+    val isSearchActive: Boolean = false,
 )
 
 sealed class ConnectionsEvent : ScreenEvent {
@@ -122,6 +124,24 @@ class ConnectionsViewModel(
         rawConnections?.let { processConnections(it) }
     }
 
+    fun setSearchText(text: String) {
+        updateState { copy(searchText = text) }
+        rawConnections?.let { processConnections(it) }
+    }
+
+    fun toggleSearch() {
+        val newSearchActive = !currentState.isSearchActive
+        updateState {
+            copy(
+                isSearchActive = newSearchActive,
+                searchText = if (newSearchActive) searchText else "",
+            )
+        }
+        if (!newSearchActive) {
+            rawConnections?.let { processConnections(it) }
+        }
+    }
+
     fun closeConnection(connectionId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -188,6 +208,7 @@ class ConnectionsViewModel(
             val connectionList = connections.iterator().toList()
                 .filter { it.outboundType != "dns" }
                 .map { Connection.from(it) }
+                .filter { it.performSearch(currentState.searchText) }
 
             withContext(Dispatchers.Main) {
                 updateState {

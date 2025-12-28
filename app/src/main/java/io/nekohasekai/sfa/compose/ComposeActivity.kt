@@ -22,12 +22,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material.icons.filled.UnfoldLess
 import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.foundation.layout.Column
@@ -40,6 +44,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FilterChip
 import dev.jeziellago.compose.markdowntext.MarkdownText
 import androidx.compose.material3.Badge
 import androidx.compose.ui.Alignment
@@ -101,6 +106,8 @@ import io.nekohasekai.sfa.compose.screen.connections.ConnectionDetailsScreen
 import io.nekohasekai.sfa.compose.screen.connections.ConnectionsScreen
 import io.nekohasekai.sfa.compose.screen.connections.ConnectionsViewModel
 import io.nekohasekai.sfa.ui.connections.Connection
+import io.nekohasekai.sfa.ui.connections.ConnectionSort
+import io.nekohasekai.sfa.ui.connections.ConnectionStateFilter
 import io.nekohasekai.sfa.compose.screen.dashboard.groups.GroupsViewModel
 import io.nekohasekai.sfa.compose.screen.log.LogViewModel
 import io.nekohasekai.sfa.compose.theme.SFATheme
@@ -856,22 +863,124 @@ class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
                             },
                         )
                     } else {
+                        var showStateMenu by remember { mutableStateOf(false) }
+                        var showSortMenu by remember { mutableStateOf(false) }
+
                         // Header
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 24.dp)
-                                .padding(bottom = 16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
+                                .padding(horizontal = 16.dp)
+                                .padding(bottom = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Text(
                                 text = stringResource(R.string.title_connections),
-                                style = MaterialTheme.typography.headlineSmall,
+                                style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Medium,
                                 color = MaterialTheme.colorScheme.onSurface,
                             )
 
+                            Spacer(modifier = Modifier.weight(1f))
+
+                            // State Filter
+                            Box {
+                                FilterChip(
+                                    selected = connectionsUiState.stateFilter != ConnectionStateFilter.Active,
+                                    onClick = { showStateMenu = true },
+                                    label = {
+                                        Text(
+                                            when (connectionsUiState.stateFilter) {
+                                                ConnectionStateFilter.All -> stringResource(R.string.connection_state_all)
+                                                ConnectionStateFilter.Active -> stringResource(R.string.connection_state_active)
+                                                ConnectionStateFilter.Closed -> stringResource(R.string.connection_state_closed)
+                                            }
+                                        )
+                                    },
+                                    leadingIcon = {
+                                        Icon(Icons.Default.FilterList, contentDescription = null)
+                                    },
+                                )
+
+                                DropdownMenu(
+                                    expanded = showStateMenu,
+                                    onDismissRequest = { showStateMenu = false },
+                                ) {
+                                    ConnectionStateFilter.entries.forEach { filter ->
+                                        DropdownMenuItem(
+                                            text = {
+                                                Text(
+                                                    when (filter) {
+                                                        ConnectionStateFilter.All -> stringResource(R.string.connection_state_all)
+                                                        ConnectionStateFilter.Active -> stringResource(R.string.connection_state_active)
+                                                        ConnectionStateFilter.Closed -> stringResource(R.string.connection_state_closed)
+                                                    }
+                                                )
+                                            },
+                                            onClick = {
+                                                connectionsViewModel.setStateFilter(filter)
+                                                showStateMenu = false
+                                            },
+                                            leadingIcon = {
+                                                if (connectionsUiState.stateFilter == filter) {
+                                                    Icon(Icons.Default.Check, contentDescription = null)
+                                                }
+                                            },
+                                        )
+                                    }
+                                }
+                            }
+
+                            // Sort
+                            Box {
+                                FilterChip(
+                                    selected = connectionsUiState.sort != ConnectionSort.ByDate,
+                                    onClick = { showSortMenu = true },
+                                    label = {
+                                        Text(
+                                            when (connectionsUiState.sort) {
+                                                ConnectionSort.ByDate -> stringResource(R.string.connection_sort_date)
+                                                ConnectionSort.ByTraffic -> stringResource(R.string.connection_sort_traffic)
+                                                ConnectionSort.ByTrafficTotal -> stringResource(R.string.connection_sort_traffic_total)
+                                            }
+                                        )
+                                    },
+                                    leadingIcon = {
+                                        Icon(Icons.Default.SwapVert, contentDescription = null)
+                                    },
+                                )
+
+                                DropdownMenu(
+                                    expanded = showSortMenu,
+                                    onDismissRequest = { showSortMenu = false },
+                                ) {
+                                    ConnectionSort.entries.forEach { sort ->
+                                        DropdownMenuItem(
+                                            text = {
+                                                Text(
+                                                    when (sort) {
+                                                        ConnectionSort.ByDate -> stringResource(R.string.connection_sort_date)
+                                                        ConnectionSort.ByTraffic -> stringResource(R.string.connection_sort_traffic)
+                                                        ConnectionSort.ByTrafficTotal -> stringResource(R.string.connection_sort_traffic_total)
+                                                    }
+                                                )
+                                            },
+                                            onClick = {
+                                                connectionsViewModel.setSort(sort)
+                                                showSortMenu = false
+                                            },
+                                            leadingIcon = {
+                                                if (connectionsUiState.sort == sort) {
+                                                    Icon(Icons.Default.Check, contentDescription = null)
+                                                }
+                                            },
+                                        )
+                                    }
+                                }
+                            }
+
+                            // Menu
                             Box {
                                 IconButton(onClick = { showConnectionsMenu = true }) {
                                     Icon(Icons.Default.MoreVert, contentDescription = null)
@@ -882,10 +991,34 @@ class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
                                     onDismissRequest = { showConnectionsMenu = false },
                                 ) {
                                     DropdownMenuItem(
+                                        text = {
+                                            Text(
+                                                if (connectionsUiState.isSearchActive) {
+                                                    stringResource(R.string.close_search)
+                                                } else {
+                                                    stringResource(R.string.search)
+                                                }
+                                            )
+                                        },
+                                        onClick = {
+                                            connectionsViewModel.toggleSearch()
+                                            showConnectionsMenu = false
+                                        },
+                                        leadingIcon = {
+                                            Icon(
+                                                imageVector = if (connectionsUiState.isSearchActive) Icons.Default.Close else Icons.Default.Search,
+                                                contentDescription = null,
+                                            )
+                                        },
+                                    )
+                                    DropdownMenuItem(
                                         text = { Text(stringResource(R.string.connection_close_all)) },
                                         onClick = {
                                             connectionsViewModel.closeAllConnections()
                                             showConnectionsMenu = false
+                                        },
+                                        leadingIcon = {
+                                            Icon(Icons.Default.Close, contentDescription = null)
                                         },
                                         enabled = connectionsUiState.connections.any { it.isActive },
                                     )

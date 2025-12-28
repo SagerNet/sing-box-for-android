@@ -24,6 +24,7 @@
     <string name="connection_sort_date">Date</string>
     <string name="connection_sort_traffic">Traffic</string>
     <string name="connection_sort_traffic_total">Total Traffic</string>
+    <string name="search_connections">Search connections…</string>
     <string name="connection_close">Close</string>
     <string name="connection_close_all">Close All</string>
     <string name="connection_state">State</string>
