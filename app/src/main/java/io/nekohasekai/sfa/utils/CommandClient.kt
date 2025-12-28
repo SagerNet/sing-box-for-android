@@ -62,6 +62,7 @@ open class CommandClient(
         Groups,
         Log,
         ClashMode,
+        Connections,
     }
 
     interface Handler {
@@ -85,6 +86,8 @@ open class CommandClient(
         ) {}
 
         fun updateClashMode(newMode: String) {}
+
+        fun updateConnections(connections: Connections) {}
     }
 
     private var commandClient: CommandClient? = null
@@ -100,6 +103,7 @@ open class CommandClient(
                     ConnectionType.Groups -> Libbox.CommandGroup
                     ConnectionType.Log -> Libbox.CommandLog
                     ConnectionType.ClashMode -> Libbox.CommandClashMode
+                    ConnectionType.Connections -> Libbox.CommandConnections
                 }
             options.addCommand(command)
         }
@@ -194,6 +198,8 @@ open class CommandClient(
         }
 
         override fun writeConnections(message: Connections?) {
+            if (message == null) return
+            getAllHandlers().forEach { it.updateConnections(message) }
         }
     }
 }

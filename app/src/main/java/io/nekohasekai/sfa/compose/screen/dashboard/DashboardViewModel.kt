@@ -132,6 +132,7 @@ class DashboardViewModel : BaseViewModel<DashboardUiState, UiEvent>(), CommandCl
                 CommandClient.ConnectionType.Status,
                 CommandClient.ConnectionType.ClashMode,
                 CommandClient.ConnectionType.Groups,
+                CommandClient.ConnectionType.Connections,
             ),
             this,
         )

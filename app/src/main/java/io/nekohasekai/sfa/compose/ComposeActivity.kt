@@ -38,6 +38,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import dev.jeziellago.compose.markdowntext.MarkdownText
 import androidx.compose.material3.Badge
 import androidx.compose.ui.Alignment
@@ -95,6 +97,10 @@ import io.nekohasekai.sfa.compose.navigation.bottomNavigationScreens
 import io.nekohasekai.sfa.compose.screen.dashboard.CardGroup
 import io.nekohasekai.sfa.compose.screen.dashboard.DashboardViewModel
 import io.nekohasekai.sfa.compose.screen.dashboard.GroupsCard
+import io.nekohasekai.sfa.compose.screen.connections.ConnectionDetailsScreen
+import io.nekohasekai.sfa.compose.screen.connections.ConnectionsScreen
+import io.nekohasekai.sfa.compose.screen.connections.ConnectionsViewModel
+import io.nekohasekai.sfa.ui.connections.Connection
 import io.nekohasekai.sfa.compose.screen.dashboard.groups.GroupsViewModel
 import io.nekohasekai.sfa.compose.screen.log.LogViewModel
 import io.nekohasekai.sfa.compose.theme.SFATheme
@@ -262,6 +268,9 @@ class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
 
         // Groups Sheet state
         var showGroupsSheet by remember { mutableStateOf(false) }
+
+        // Connections Sheet state
+        var showConnectionsSheet by remember { mutableStateOf(false) }
 
         // Error dialog state for UiEvent.ShowError
         var showErrorDialog by remember { mutableStateOf(false) }
@@ -713,6 +722,8 @@ class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
                     groupsCount = dashboardUiState.groupsCount,
                     hasGroups = dashboardUiState.hasGroups,
                     onGroupsClick = { showGroupsSheet = true },
+                    connectionsCount = dashboardUiState.connectionsOut.toIntOrNull() ?: 0,
+                    onConnectionsClick = { showConnectionsSheet = true },
                     onStopClick = { dashboardViewModel.toggleService() },
                     modifier = Modifier.align(Alignment.BottomCenter),
                 )
@@ -801,6 +812,95 @@ class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
                         viewModel = groupsViewModel,
                         modifier = Modifier.fillMaxSize(),
                     )
+                }
+            }
+        }
+
+        // Connections ModalBottomSheet
+        if (showConnectionsSheet) {
+            val connectionsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+            val connectionsViewModel: ConnectionsViewModel = viewModel(
+                factory = object : ViewModelProvider.Factory {
+                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                        @Suppress("UNCHECKED_CAST")
+                        return ConnectionsViewModel(dashboardViewModel.commandClient) as T
+                    }
+                }
+            )
+            val connectionsUiState by connectionsViewModel.uiState.collectAsState()
+            var selectedConnectionId by remember { mutableStateOf<String?>(null) }
+            val selectedConnection = connectionsUiState.allConnections.find { it.id == selectedConnectionId }
+            var showConnectionsMenu by remember { mutableStateOf(false) }
+
+            ModalBottomSheet(
+                onDismissRequest = {
+                    showConnectionsSheet = false
+                    selectedConnectionId = null
+                },
+                sheetState = connectionsSheetState,
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.9f),
+                ) {
+                    if (selectedConnection != null) {
+                        ConnectionDetailsScreen(
+                            connection = selectedConnection,
+                            onBack = { selectedConnectionId = null },
+                            onClose = {
+                                selectedConnectionId?.let { connectionsViewModel.closeConnection(it) }
+                                selectedConnectionId = null
+                            },
+                        )
+                    } else {
+                        // Header
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 24.dp)
+                                .padding(bottom = 16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                text = stringResource(R.string.title_connections),
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Medium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+
+                            Box {
+                                IconButton(onClick = { showConnectionsMenu = true }) {
+                                    Icon(Icons.Default.MoreVert, contentDescription = null)
+                                }
+
+                                DropdownMenu(
+                                    expanded = showConnectionsMenu,
+                                    onDismissRequest = { showConnectionsMenu = false },
+                                ) {
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(R.string.connection_close_all)) },
+                                        onClick = {
+                                            connectionsViewModel.closeAllConnections()
+                                            showConnectionsMenu = false
+                                        },
+                                        enabled = connectionsUiState.connections.any { it.isActive },
+                                    )
+                                }
+                            }
+                        }
+
+                        // Connections content
+                        ConnectionsScreen(
+                            serviceStatus = currentServiceStatus,
+                            viewModel = connectionsViewModel,
+                            onConnectionClick = { selectedConnectionId = it.id },
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                    }
                 }
             }
         }

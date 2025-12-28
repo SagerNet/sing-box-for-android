@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.outlined.Cable
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -46,6 +47,8 @@ fun ServiceStatusBar(
     groupsCount: Int,
     hasGroups: Boolean,
     onGroupsClick: () -> Unit,
+    connectionsCount: Int,
+    onConnectionsClick: () -> Unit,
     onStopClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -78,6 +81,32 @@ fun ServiceStatusBar(
                     },
                     modifier = Modifier.weight(1f),
                 )
+
+                // Connections button
+                Row(
+                    modifier =
+                        Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(MaterialTheme.colorScheme.secondaryContainer)
+                            .clickable(onClick = onConnectionsClick)
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+                    Text(
+                        text = connectionsCount.toString(),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Icon(
+                        imageVector = Icons.Outlined.Cable,
+                        contentDescription = stringResource(R.string.title_connections),
+                        modifier = Modifier.size(18.dp),
+                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                    )
+                }
 
                 // Groups button (only show if hasGroups)
                 if (hasGroups) {

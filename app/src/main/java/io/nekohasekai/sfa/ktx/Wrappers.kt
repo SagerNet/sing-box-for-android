@@ -3,11 +3,13 @@ package io.nekohasekai.sfa.ktx
 import android.net.IpPrefix
 import android.os.Build
 import androidx.annotation.RequiresApi
+import io.nekohasekai.libbox.ConnectionIterator
 import io.nekohasekai.libbox.LogEntry
 import io.nekohasekai.libbox.LogIterator
 import io.nekohasekai.libbox.RoutePrefix
 import io.nekohasekai.libbox.StringBox
 import io.nekohasekai.libbox.StringIterator
+import io.nekohasekai.libbox.Connection as LibboxConnection
 import java.net.InetAddress
 
 val StringBox?.unwrap: String
@@ -53,3 +55,11 @@ fun LogIterator.toList(): List<LogEntry> {
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 fun RoutePrefix.toIpPrefix() = IpPrefix(InetAddress.getByName(address()), prefix())
+
+fun ConnectionIterator.toList(): List<LibboxConnection> {
+    return mutableListOf<LibboxConnection>().apply {
+        while (hasNext()) {
+            add(next())
+        }
+    }
+}
