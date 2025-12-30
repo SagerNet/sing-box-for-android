@@ -15,6 +15,7 @@
     <string name="reset">重置</string>
     <string name="destroy">销毁</string>
     <string name="clear">清除</string>
+    <string name="browse">浏览</string>
     <string name="search">搜索</string>
     <string name="action">操作</string>
     <string name="action_start">启动</string>
@@ -78,7 +79,46 @@
     <string name="reset_order">重置顺序</string>
 
     <!-- Connections -->
+    <string name="empty_connections">无连接</string>
+    <string name="search_connections">搜索连接…</string>
     <string name="close_connections_confirm">关闭所有连接？</string>
+    <string name="connection_state_all">全部</string>
+    <string name="connection_state_active">活跃</string>
+    <string name="connection_state_closed">已关闭</string>
+    <string name="connection_sort_date">日期</string>
+    <string name="connection_sort_traffic">流量</string>
+    <string name="connection_sort_traffic_total">总流量</string>
+    <string name="connection_close">关闭</string>
+    <string name="connection_close_all">全部关闭</string>
+    <string name="connection_state">状态</string>
+    <string name="connection_details">连接详情</string>
+    <string name="connection_section_basic">基本信息</string>
+    <string name="connection_section_metadata">元数据</string>
+    <string name="connection_section_process">进程信息</string>
+    <string name="connection_created_at">创建时间</string>
+    <string name="connection_closed_at">关闭时间</string>
+    <string name="connection_duration">时长</string>
+    <string name="connection_uplink">上行</string>
+    <string name="connection_downlink">下行</string>
+    <string name="connection_inbound">入站</string>
+    <string name="connection_inbound_type">入站类型</string>
+    <string name="connection_outbound">出站</string>
+    <string name="connection_outbound_type">出站类型</string>
+    <string name="connection_ip_version">IP 版本</string>
+    <string name="connection_network">网络</string>
+    <string name="connection_source">来源</string>
+    <string name="connection_destination">目标</string>
+    <string name="connection_domain">域名</string>
+    <string name="connection_protocol">协议</string>
+    <string name="connection_user">用户</string>
+    <string name="connection_from_outbound">来自出站</string>
+    <string name="connection_match_rule">匹配规则</string>
+    <string name="connection_chain">链</string>
+    <string name="connection_process_id">进程 ID</string>
+    <string name="connection_user_id">用户 ID</string>
+    <string name="connection_user_name">用户名</string>
+    <string name="connection_process_path">进程路径</string>
+    <string name="connection_package_name">包名</string>
 
     <!-- Profiles -->
     <string name="no_profiles">没有配置的配置文件</string>
@@ -212,14 +252,35 @@
     <!-- Updates -->
     <string name="check_update">检查更新</string>
     <string name="check_update_automatic">自动检查更新</string>
+    <string name="check_update_prompt_play">是否启用从 **Play Store** 自动检查更新？</string>
+    <string name="check_update_prompt_github">是否启用从 **GitHub** 自动检查更新？</string>
     <string name="update_track">更新轨道</string>
     <string name="update_track_stable">稳定版</string>
     <string name="update_track_beta">测试版</string>
     <string name="update_track_not_supported">当前轨道尚不支持检查更新</string>
+    <string name="view_release">查看发布</string>
+    <string name="downloading">下载中…</string>
     <string name="no_updates_available">没有可用的更新</string>
     <string name="new_version_available">有新版本可用：%s</string>
+    <string name="auto_update">自动更新</string>
+    <string name="auto_update_description">在后台自动下载和安装更新</string>
+
+    <!-- Silent Install -->
+    <string name="silent_install">静默安装</string>
+    <string name="silent_install_title">静默安装</string>
+    <string name="silent_install_description">无需交互即可安装更新</string>
+    <string name="silent_install_method">安装方式</string>
+    <string name="silent_install_verify_failed">%s 不可用或权限被拒绝</string>
+    <string name="install_method_package_installer">PackageInstaller</string>
+    <string name="install_method_shizuku">Shizuku</string>
+    <string name="install_method_root">ROOT</string>
+    <string name="package_installer_not_available">未授予安装权限</string>
+    <string name="grant_install_permission">授予安装权限</string>
+    <string name="grant_install_permission_description">允许从此来源安装应用</string>
 
     <!-- Shizuku -->
+    <string name="shizuku_not_available">Shizuku 未安装或未运行</string>
+    <string name="shizuku_description">Shizuku 允许应用以更高权限直接使用系统 API</string>
     <string name="get_shizuku">获取 Shizuku</string>
     <string name="start_shizuku">启动 Shizuku</string>
     <string name="request_shizuku">授权 Shizuku</string>
@@ -262,6 +323,7 @@
     <string name="error_deprecated_warning">弃用警告</string>
     <string name="error_deprecated_documentation">文档</string>
     <string name="file_manager_missing">您的设备缺少 Android 标准文件选择器，请安装一个，例如 Material Files。</string>
+    <string name="no_file_manager">未找到文件管理器</string>
 
     <!-- Failed Operations -->
     <string name="failed_save_profile">保存配置文件失败：%s</string>
