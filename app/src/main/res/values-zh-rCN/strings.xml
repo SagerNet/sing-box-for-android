@@ -10,7 +10,6 @@
     <string name="title_new_profile">新建配置</string>
     <string name="title_edit_profile">编辑配置</string>
     <string name="title_edit_configuration">编辑配置</string>
-    <string name="title_overview">概述</string>
     <string name="title_groups">组</string>
     <string name="title_debug">调试</string>
     <string name="quick_toggle">切换</string>
@@ -19,13 +18,9 @@
     <string name="profile_source">源</string>
     <string name="profile_import_file">导入文件</string>
     <string name="profile_create">创建</string>
-    <string name="profile_edit_content">编辑内容</string>
-    <string name="profile_check">检查</string>
     <string name="profile_share">分享</string>
     <string name="profile_share_url">通过二维码分享 URL</string>
     <string name="profile_input_required">必须</string>
-    <string name="profile_empty">无配置</string>
-    <string name="profile_last_updated">最后更新</string>
     <string name="profile_update">更新</string>
     <string name="profile_auto_update">自动更新</string>
     <string name="profile_auto_update_interval">自动更新间隔 （分）</string>
@@ -51,7 +46,6 @@
     <string name="status_started">已启动</string>
     <string name="enabled">启用</string>
     <string name="disabled">禁用</string>
-    <string name="settings_clear_working_directory">清理工作目录</string>
     <string name="error_title">错误</string>
     <string name="file_manager_missing">您的设备缺少 Android 标准文件选择器，请安装一个，例如 Material Files。</string>
     <string name="loading">加载中...</string>
@@ -62,15 +56,9 @@
     <string name="service_error_title_start_service">启动服务</string>
     <string name="service_error_title_deprecated_warning">弃用警告</string>
     <string name="service_error_deprecated_warning_documentation">文档</string>
-    <string name="status_uplink">上传</string>
-    <string name="status_downlink">下载</string>
-    <string name="status_traffic_total">流量</string>
     <string name="group_selected_title">选中</string>
-    <string name="profile">配置</string>
-    <string name="core_version">版本</string>
     <string name="core_version_title">核心版本</string>
     <string name="core">核心</string>
-    <string name="dynamic_notification">在通知中显示实时速度</string>
     <string name="core_data_size">数据大小</string>
     <string name="calculating">计算中...</string>
     <string name="options">选项</string>
@@ -82,7 +70,6 @@
     <string name="auto_redirect">自动重定向</string>
     <string name="auto_redirect_description">需要 ROOT 权限</string>
     <string name="per_app_proxy">分应用代理</string>
-    <string name="unavailable">不可用</string>
     <string name="check_update_automatic">自动检查更新</string>
     <string name="check_update">检查更新</string>
     <string name="no_updates_available">没有可用的更新</string>
@@ -92,12 +79,9 @@
     <string name="update_track_stable">稳定版</string>
     <string name="update_track_beta">测试版</string>
     <string name="update_track_not_supported">当前轨道尚不支持检查更新</string>
-    <string name="app_version">版本 %s</string>
     <string name="app_version_title">应用版本</string>
     <string name="action">操作</string>
-    <string name="privacy_policy">隐私政策</string>
     <string name="title_app_settings">应用</string>
-    <string name="memory_limit">内存限制</string>
     <string name="background_permission">后台权限</string>
     <string name="background_permission_description">申请必要的权限以使 VPN 正常运行。  如果您使用的是中国公司生产的设备，则授予权限后该卡可能不会消失。</string>
     <string name="read_more">阅读更多</string>
@@ -105,9 +89,6 @@
     <string name="import_remote_profile">导入远程配置</string>
     <string name="import_remote_profile_message">您确定要导入远程配置文件 %1$s 吗？您将连接到 %2$s 来下载配置。</string>
     <string name="profile_override">配置覆盖</string>
-    <string name="profile_override_description">使用平台特定的值覆盖文件配置项。</string>
-    <string name="profile_override_configure">配置</string>
-    <string name="per_app_proxy_description">覆盖配置中的 include_package 和 exclude_package。</string>
     <string name="per_app_proxy_mode">代理模式</string>
     <string name="per_app_proxy_mode_include">白名单</string>
     <string name="per_app_proxy_mode_include_description">仅允许选定的应用程序通过 VPN</string>
@@ -147,8 +128,6 @@
     <string name="per_app_proxy_manage">管理</string>
     <string name="per_app_proxy_managed_mode">托管模式</string>
     <string name="per_app_proxy_managed_mode_description">自动排除中国应用</string>
-    <string name="import_profile">导入配置</string>
-    <string name="import_profile_message">您确定要导入配置文件 %s 吗？</string>
     <string name="icloud_profile_unsupported">当前平台不支持 iCloud 配置文件</string>
     <string name="search">搜索</string>
     <string name="expand">展开</string>
@@ -160,20 +139,8 @@
     <string name="icon_count_format">%d 个图标</string>
     <string name="no_icons_found">未找到图标</string>
     <string name="no_icons_match">没有匹配 \"%s\" 的图标</string>
-    <string name="http_proxy">HTTP 代理</string>
     <string name="system_http_proxy">系统 HTTP 代理</string>
-    <string name="title_scan_vpn">扫描 VPN 应用</string>
-    <string name="message_scan_vpn">检查设备上安装的 VPN 及其内容</string>
-    <string name="message_debug_tools">一些调试工具</string>
-    <string name="action_open">打开</string>
-    <string name="vpn_app_type">应用类型</string>
-    <string name="vpn_core_type">核心类型</string>
-    <string name="vpn_core_path">发现路径</string>
-    <string name="vpn_golang_version">Go 版本</string>
-    <string name="vpn_app_type_other">其他</string>
-    <string name="vpn_core_type_unknown">未知</string>
     <string name="sponsor">赞助</string>
-    <string name="sponsor_message">支持我的工作</string>
     <string name="action_start">启动</string>
     <string name="location_permission_title">位置权限</string>
     <string name="location_permission_description">您的个人资料包含 &lt;strong&gt;&lt;tt&gt;wifi_ssid&lt;/tt&gt; 或 &lt;tt&gt;wifi_bssid&lt;/tt&gt; 路由规则&lt;/strong&gt;。为了使它们正常工作，sing-box 在&lt;strong&gt;后台&lt;/strong&gt;使用 &lt;strong&gt;位置&lt;/strong&gt; 权限来获取有关所连接 Wi-Fi 网络的信息。该信息将&lt;strong&gt;仅用于路由目的&lt;/strong&gt;。</string>
@@ -183,7 +150,6 @@
     <string name="per_app_proxy_package_query_mode">模式</string>
     <string name="per_app_proxy_shizuku_required">通过 Play 商店安装时，分应用代理需要 Shizuku。Google Play 拒绝允许我们使用 QUERY_ALL_PACKAGES 权限（同时不禁止其他类似应用这样做），而这是列出应用程序所必需的。</string>
     <string name="per_app_proxy_root_required">通过 Play 商店安装时，分应用代理需要 ROOT。Google Play 拒绝允许我们使用 QUERY_ALL_PACKAGES 权限（同时不禁止其他类似应用这样做），而这是列出应用程序所必需的。</string>
-    <string name="per_app_proxy_shizuku_mode">分应用代理（Shizuku 模式）</string>
     <string name="start_shizuku">启动 Shizuku</string>
     <string name="request_shizuku">授权 Shizuku</string>
     <string name="get_shizuku">获取 Shizuku</string>
@@ -192,14 +158,9 @@
     <string name="privileged_access_required">需要 Root 或 Shizuku 权限来获取完整应用列表</string>
     <string name="title_connections">连接</string>
     <string name="title_others">其他</string>
-    <string name="title_experimental_features">实验性功能</string>
-    <string name="message_experimental_features">尝试仍在开发中的新功能</string>
-    <string name="use_compose_ui">使用新的 Material You UI（测试版）</string>
     <string name="no_profiles">没有配置的配置文件</string>
-    <string name="status">状态</string>
     <string name="memory">内存</string>
     <string name="goroutines">协程</string>
-    <string name="traffic">流量</string>
     <string name="upload">上传</string>
     <string name="download">下载</string>
     <string name="connections_in">入站</string>
@@ -239,17 +200,14 @@
     <string name="profile_saved_successfully">配置文件保存成功</string>
     <string name="profile_save_failed">保存配置文件失败：%s</string>
     <string name="profile_type_remote_updated">远程 • %s</string>
-    <string name="update_successful">更新成功</string>
     <string name="update_profile">更新配置文件</string>
     <string name="more_options">更多选项</string>
     <string name="edit">编辑</string>
-    <string name="done">完成</string>
     <string name="save_as_file">另存为文件</string>
     <string name="share_as_file">分享为文件</string>
     <string name="service">服务</string>
     <string name="about">关于</string>
     <string name="source_code">源代码</string>
-    <string name="switch_to_legacy_ui">切换到旧版 UI</string>
     <string name="unsaved_changes">未保存的更改</string>
     <string name="unsaved_changes_message">您有未保存的更改。要放弃它们吗？</string>
     <string name="discard">放弃</string>
@@ -283,7 +241,6 @@
     <!-- Profile Edit Screen -->
     <string name="basic_information">基本信息</string>
     <string name="icon">图标</string>
-    <string name="custom">自定义</string>
     <string name="default_text">默认</string>
     <string name="remote_configuration">远程配置</string>
     <string name="last_updated_format">最后更新：%s</string>
@@ -291,9 +248,6 @@
     <string name="json_viewer">JSON 查看器</string>
     <string name="json_editor">JSON 编辑器</string>
     <string name="success">成功</string>
-    <string name="configuration_file_not_found">配置文件未找到</string>
-    <string name="configuration_export_failed">导出失败：%s</string>
-    <string name="configuration_exported_successfully">配置导出成功</string>
     <string name="failed_to_read_configuration">读取配置失败：%s</string>
     <!-- Profile Content Editor -->
     <string name="view_configuration">查看配置</string>

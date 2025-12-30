@@ -11,7 +11,6 @@
     <string name="title_new_profile">New Profile</string>
     <string name="title_edit_profile">Edit Profile</string>
     <string name="title_edit_configuration">Edit Configuration</string>
-    <string name="title_overview">Overview</string>
     <string name="title_groups">Groups</string>
     <string name="title_debug">Debug</string>
     <string name="title_connections">Connections</string>
@@ -19,8 +18,6 @@
     <string name="connection_state_all">All</string>
     <string name="connection_state_active">Active</string>
     <string name="connection_state_closed">Closed</string>
-    <string name="connection_filter_state">State</string>
-    <string name="connection_filter_sort">Sort By</string>
     <string name="connection_sort_date">Date</string>
     <string name="connection_sort_traffic">Traffic</string>
     <string name="connection_sort_traffic_total">Total Traffic</string>
@@ -57,14 +54,9 @@
     <string name="connection_process_path">Process Path</string>
     <string name="connection_package_name">Package Name</string>
     <string name="title_others">Others</string>
-    <string name="title_experimental_features">Experimental Features</string>
-    <string name="message_experimental_features">Try out new features that are still in development</string>
-    <string name="use_compose_ui">Use New Material You UI (Beta)</string>
     <string name="no_profiles">No profiles configured</string>
-    <string name="status">Status</string>
     <string name="memory">Memory</string>
     <string name="goroutines">Goroutines</string>
-    <string name="traffic">Traffic</string>
     <string name="upload">Upload</string>
     <string name="download">Download</string>
     <string name="connections_in">Inbound</string>
@@ -80,13 +72,9 @@
     <string name="profile_url" translatable="false">URL</string>
     <string name="profile_import_file">Import File</string>
     <string name="profile_create">Create</string>
-    <string name="profile_edit_content">Edit Content</string>
-    <string name="profile_check">Check</string>
     <string name="profile_share">Share</string>
     <string name="profile_share_url">Share URL as QR Code</string>
     <string name="profile_input_required">Required</string>
-    <string name="profile_empty">Empty profiles</string>
-    <string name="profile_last_updated">Last Updated</string>
     <string name="time_just_now">Just now</string>
     <string name="time_yesterday">Yesterday</string>
     <string name="time_now">Now</string>
@@ -131,7 +119,6 @@
     <string name="status_started">Started</string>
     <string name="enabled">Enabled</string>
     <string name="disabled">Disabled</string>
-    <string name="settings_clear_working_directory">Clear Working Directory</string>
     <string name="error_title">Error</string>
     <string name="file_manager_missing">Your device lacks an Android standard file selector, please install one, such as Material Files.</string>
     <string name="loading">Loading…</string>
@@ -145,15 +132,9 @@
     <string name="service_error_title_start_service">Start service</string>
     <string name="service_error_title_deprecated_warning">Deprecated Warning</string>
     <string name="service_error_deprecated_warning_documentation">Documentation</string>
-    <string name="status_uplink">Uplink</string>
-    <string name="status_downlink">Downlink</string>
-    <string name="status_traffic_total">Traffic Total</string>
     <string name="group_selected_title">Selected</string>
-    <string name="profile">Profile</string>
-    <string name="core_version">Version</string>
     <string name="core_version_title">Core Version</string>
     <string name="core">Core</string>
-    <string name="dynamic_notification">Display realtime speed in notification</string>
     <string name="core_data_size">Data Size</string>
     <string name="calculating">Calculating...</string>
     <string name="options">Options</string>
@@ -165,7 +146,6 @@
     <string name="auto_redirect">Auto Redirect</string>
     <string name="auto_redirect_description">ROOT permission required</string>
     <string name="per_app_proxy">Per-App Proxy</string>
-    <string name="unavailable">Unavailable</string>
     <string name="check_update_automatic">Automatic Update Check</string>
     <string name="check_update_prompt_play">Would you like to enable automatic update checking from **Play Store**?</string>
     <string name="check_update_prompt_github">Would you like to enable automatic update checking from **GitHub**?</string>
@@ -177,15 +157,12 @@
     <string name="update_track_stable">Stable</string>
     <string name="update_track_beta">Beta</string>
     <string name="update_track_not_supported">Current track does not support update checking yet</string>
-    <string name="download_and_install">Download &amp; Install</string>
     <string name="view_release">View Release</string>
     <string name="downloading">Downloading…</string>
-    <string name="download_size">Download size: %s</string>
     <string name="silent_install">Silent Install</string>
     <string name="silent_install_title">Silent Install</string>
     <string name="silent_install_description">Install updates without interaction</string>
     <string name="silent_install_method">Install Method</string>
-    <string name="silent_install_method_description">Select an install method. The permission will be verified immediately after selection.</string>
     <string name="install_method_package_installer">PackageInstaller</string>
     <string name="install_method_shizuku">Shizuku</string>
     <string name="install_method_root">ROOT</string>
@@ -197,16 +174,12 @@
     <string name="get_shizuku">Get Shizuku</string>
     <string name="start_shizuku">Start Shizuku</string>
     <string name="request_shizuku">Request Shizuku</string>
-    <string name="silent_install_not_available">ROOT and Shizuku are not available</string>
     <string name="silent_install_verify_failed">%s is not available or permission denied</string>
     <string name="auto_update">Auto Update</string>
     <string name="auto_update_description">Automatically download and install updates in background</string>
-    <string name="app_version">Version %s</string>
     <string name="app_version_title">App version</string>
     <string name="action">Action</string>
-    <string name="privacy_policy">Privacy Policy</string>
     <string name="title_app_settings">App</string>
-    <string name="memory_limit">Memory Limit</string>
     <string name="background_permission">Background permission</string>
     <string name="background_permission_description">Apply for the necessary permissions in order for the VPN to function properly.\n\nIf you are using a device made by a Chinese company, the card may not disappear after the permission is granted.</string>
     <string name="read_more">Read More</string>
@@ -214,9 +187,6 @@
     <string name="import_remote_profile">Import remote profile</string>
     <string name="import_remote_profile_message">Are you sure to import remote profile %1$s? You will connect to %2$s to download the configuration.</string>
     <string name="profile_override">Profile Override</string>
-    <string name="profile_override_description">Overrides profile configuration items with platform-specific values.</string>
-    <string name="profile_override_configure">Configure</string>
-    <string name="per_app_proxy_description">Override include_package and exclude_package in the configuration.</string>
     <string name="per_app_proxy_mode">Proxy Mode</string>
     <string name="per_app_proxy_mode_include">Include</string>
     <string name="per_app_proxy_mode_include_description">Only selected apps are allowed through the VPN</string>
@@ -256,11 +226,8 @@
     <string name="per_app_proxy_manage">Manage</string>
     <string name="per_app_proxy_managed_mode">Managed Mode</string>
     <string name="per_app_proxy_managed_mode_description">Automatically Exclude China apps</string>
-    <string name="import_profile">Import profile</string>
-    <string name="import_profile_message">Are you sure to import profile %s?</string>
     <string name="icloud_profile_unsupported">iCloud profile is not support on current platform</string>
     <string name="search">Search</string>
-    <string name="urltest" translatable="false">URLTest</string>
     <string name="expand">Expand</string>
     <string name="collapse">Collapse</string>
     <string name="expand_all">Expand All</string>
@@ -270,20 +237,8 @@
     <string name="icon_count_format">%d icons</string>
     <string name="no_icons_found">No icons found</string>
     <string name="no_icons_match">No icons match \"%s\"</string>
-    <string name="http_proxy">HTTP Proxy</string>
     <string name="system_http_proxy">System HTTP Proxy</string>
-    <string name="title_scan_vpn">Scan VPN apps</string>
-    <string name="message_scan_vpn">Check the VPN installed on the device and its contents</string>
-    <string name="message_debug_tools">Some debug utilities</string>
-    <string name="action_open">Open</string>
-    <string name="vpn_app_type">App Type</string>
-    <string name="vpn_core_type">Core Type</string>
-    <string name="vpn_core_path">Detected Path</string>
-    <string name="vpn_golang_version">Go Version</string>
-    <string name="vpn_app_type_other">Other</string>
-    <string name="vpn_core_type_unknown">Unknown</string>
     <string name="sponsor">Sponsor</string>
-    <string name="sponsor_message">If I\'ve defended your modern life, please consider sponsoring me.</string>
     <string name="action_start">Start</string>
     <string name="location_permission_title">Location permission</string>
     <string name="location_permission_description">Your profile contains &lt;strong&gt;&lt;tt&gt;wifi_ssid&lt;/tt&gt; or &lt;tt&gt;wifi_bssid&lt;/tt&gt; routing rules&lt;/strong&gt;. To make them work, sing-box uses the &lt;strong&gt;location&lt;/strong&gt; permission &lt;strong&gt;in the background&lt;/strong&gt; to get information about the connected Wi-Fi network. The information will be used &lt;strong&gt;for routing purposes only&lt;/strong&gt;.</string>
@@ -293,7 +248,6 @@
     <string name="per_app_proxy_package_query_mode">Mode</string>
     <string name="per_app_proxy_shizuku_required">When installed from the Play Store, per-app proxy requires Shizuku. Google Play refuses to allow us to use the QUERY_ALL_PACKAGES permission (while not prohibiting other similar apps from doing so), which is required for listing apps.</string>
     <string name="per_app_proxy_root_required">When installed from the Play Store, per-app proxy requires ROOT. Google Play refuses to allow us to use the QUERY_ALL_PACKAGES permission (while not prohibiting other similar apps from doing so), which is required for listing apps.</string>
-    <string name="per_app_proxy_shizuku_mode">Per-App Proxy (Shizuku mode)</string>
     <string name="root_access_required">Root access required</string>
     <string name="root_access_denied">Root access denied</string>
     <string name="privileged_access_required">Root or Shizuku access required to get the complete app list</string>
@@ -309,17 +263,14 @@
     <string name="profile_saved_successfully">Profile saved successfully</string>
     <string name="profile_save_failed">Failed to save profile: %s</string>
     <string name="profile_type_remote_updated">Remote • %s</string>
-    <string name="update_successful">Update successful</string>
     <string name="update_profile">Update profile</string>
     <string name="more_options">More options</string>
     <string name="edit">Edit</string>
-    <string name="done">Done</string>
     <string name="save_as_file">Save As File</string>
     <string name="share_as_file">Share As File</string>
     <string name="service">Service</string>
     <string name="about">About</string>
     <string name="source_code">Source Code</string>
-    <string name="switch_to_legacy_ui">Switch to legacy UI</string>
     <string name="unsaved_changes">Unsaved Changes</string>
     <string name="unsaved_changes_message">You have unsaved changes. Do you want to discard them?</string>
     <string name="discard">Discard</string>
@@ -353,7 +304,6 @@
     <!-- Profile Edit Screen -->
     <string name="basic_information">Basic Information</string>
     <string name="icon">Icon</string>
-    <string name="custom">Custom</string>
     <string name="default_text">Default</string>
     <string name="remote_configuration">Remote Configuration</string>
     <string name="last_updated_format">Last updated: %s</string>
@@ -361,9 +311,6 @@
     <string name="json_viewer">JSON Viewer</string>
     <string name="json_editor">JSON Editor</string>
     <string name="success">Success</string>
-    <string name="configuration_file_not_found">Configuration file not found</string>
-    <string name="configuration_export_failed">Export failed: %s</string>
-    <string name="configuration_exported_successfully">Configuration exported successfully</string>
     <string name="failed_to_read_configuration">Failed to read configuration: %s</string>
     <!-- Profile Content Editor -->
     <string name="view_configuration">View Configuration</string>
