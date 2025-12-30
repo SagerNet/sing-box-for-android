@@ -319,64 +319,6 @@ fun SettingsScreen(navController: NavController) {
             }
         }
 
-        if (BuildConfig.DEBUG) {
-            // Debug
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = stringResource(R.string.title_debug),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(horizontal = 32.dp, vertical = 8.dp),
-            )
-            Card(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                colors =
-                    CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    ),
-            ) {
-                ListItem(
-                    headlineContent = {
-                        Text(
-                            stringResource(R.string.switch_to_legacy_ui),
-                            style = MaterialTheme.typography.bodyLarge,
-                        )
-                    },
-                    leadingContent = {
-                        Icon(
-                            imageVector = Icons.Outlined.SwapHoriz,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                        )
-                    },
-                    modifier =
-                        Modifier
-                            .clip(RoundedCornerShape(12.dp))
-                            .clickable {
-                                scope.launch(Dispatchers.IO) {
-                                    Settings.useComposeUI = false
-                                    val intent =
-                                        android.content.Intent(
-                                            context,
-                                            Class.forName("io.nekohasekai.sfa.ui.MainActivity"),
-                                        )
-                                    intent.flags =
-                                        android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                    context.startActivity(intent)
-                                }
-                            },
-                    colors =
-                        ListItemDefaults.colors(
-                            containerColor = Color.Transparent,
-                        ),
-                )
-            }
-        }
-
         Spacer(modifier = Modifier.height(16.dp))
     }
 }

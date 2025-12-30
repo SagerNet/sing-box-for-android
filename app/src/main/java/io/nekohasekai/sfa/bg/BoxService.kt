@@ -34,7 +34,7 @@ import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.database.ProfileManager
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.ktx.hasPermission
-import io.nekohasekai.sfa.ui.MainActivity
+import io.nekohasekai.sfa.compose.ComposeActivity
 import io.nekohasekai.sfa.vendor.Vendor
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -397,7 +397,7 @@ class BoxService(
                     0,
                     Intent(
                         service,
-                        MainActivity::class.java,
+                        ComposeActivity::class.java,
                     ).apply {
                         setAction(Action.OPEN_URL).setData(Uri.parse(notification.openURL))
                         setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)

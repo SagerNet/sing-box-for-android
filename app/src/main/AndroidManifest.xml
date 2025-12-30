@@ -96,21 +96,6 @@
         </activity>
 
         <activity
-            android:name=".ui.MainActivity"
-            android:exported="false"
-            android:icon="@mipmap/ic_launcher"
-            android:launchMode="singleTask">
-
-            <meta-data
-                android:name="android.app.shortcuts"
-                android:resource="@xml/shortcuts" />
-
-            <meta-data
-                android:name="firebase_crashlytics_collection_enabled"
-                android:value="false" />
-        </activity>
-
-        <activity
             android:name=".compose.ComposeActivity"
             android:exported="false"
             android:icon="@mipmap/ic_launcher"
@@ -122,21 +107,6 @@
                 android:resource="@xml/shortcuts" />
         </activity>
 
-        <activity
-            android:name=".ui.ShortcutActivity"
-            android:excludeFromRecents="true"
-            android:exported="true"
-            android:label="@string/quick_toggle"
-            android:launchMode="singleTask"
-            android:taskAffinity=""
-            android:theme="@style/AppTheme.Translucent">
-            <intent-filter>
-                <action android:name="android.intent.action.CREATE_SHORTCUT" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name="io.nekohasekai.sfa.ui.profile.NewProfileActivity"
-            android:exported="false" />
         <activity
             android:name="io.nekohasekai.sfa.compose.NewProfileComposeActivity"
             android:exported="false"
@@ -150,24 +120,8 @@
             android:exported="false"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="io.nekohasekai.sfa.ui.profile.EditProfileActivity"
-            android:exported="false" />
-        <activity
-            android:name="io.nekohasekai.sfa.ui.profile.EditProfileContentActivity"
-            android:exported="false" />
-        <activity
-            android:name="io.nekohasekai.sfa.ui.profileoverride.ProfileOverrideActivity"
-            android:exported="false" />
-        <activity
             android:name="io.nekohasekai.sfa.ui.profileoverride.PerAppProxyActivity"
             android:exported="false" />
-        <activity
-            android:name="io.nekohasekai.sfa.ui.debug.DebugActivity"
-            android:exported="false" />
-        <activity
-            android:name="io.nekohasekai.sfa.ui.debug.VPNScanActivity"
-            android:exported="false" />
-
         <activity
             android:name="io.nekohasekai.sfa.ui.profile.QRScanActivity"
             android:exported="false" />

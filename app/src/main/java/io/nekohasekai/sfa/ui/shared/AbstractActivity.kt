@@ -14,7 +14,6 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.color.DynamicColors
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.ktx.getAttrColor
-import io.nekohasekai.sfa.ui.MainActivity
 import io.nekohasekai.sfa.utils.MIUIUtils
 import java.lang.reflect.ParameterizedType
 
@@ -56,17 +55,15 @@ abstract class AbstractActivity<Binding : ViewBinding> : AppCompatActivity() {
             window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
         }
 
-        if (this !is MainActivity) {
-            supportActionBar?.setHomeAsUpIndicator(
-                AppCompatResources.getDrawable(
-                    this@AbstractActivity,
-                    R.drawable.ic_arrow_back_24,
-                )!!.apply {
-                    setTint(getAttrColor(com.google.android.material.R.attr.colorOnSurface))
-                },
-            )
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        }
+        supportActionBar?.setHomeAsUpIndicator(
+            AppCompatResources.getDrawable(
+                this@AbstractActivity,
+                R.drawable.ic_arrow_back_24,
+            )!!.apply {
+                setTint(getAttrColor(com.google.android.material.R.attr.colorOnSurface))
+            },
+        )
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

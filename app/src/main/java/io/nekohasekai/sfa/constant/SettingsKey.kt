@@ -11,7 +11,6 @@ object SettingsKey {
     const val AUTO_UPDATE_ENABLED = "auto_update_enabled"
     const val DISABLE_MEMORY_LIMIT = "disable_memory_limit"
     const val DYNAMIC_NOTIFICATION = "dynamic_notification"
-    const val USE_COMPOSE_UI = "use_compose_ui"
     const val DISABLE_DEPRECATED_WARNINGS = "disable_deprecated_warnings"
 
     const val AUTO_REDIRECT = "auto_redirect"
