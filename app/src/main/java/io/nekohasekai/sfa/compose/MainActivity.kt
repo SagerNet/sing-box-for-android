@@ -1098,17 +1098,17 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
         val title =
             when (alertType) {
                 Alert.RequestNotificationPermission -> stringResource(R.string.notification_permission_title)
-                Alert.StartCommandServer -> stringResource(R.string.service_error_title_start_command_server)
-                Alert.CreateService -> stringResource(R.string.service_error_title_create_service)
-                Alert.StartService -> stringResource(R.string.service_error_title_start_service)
+                Alert.StartCommandServer -> stringResource(R.string.error_start_command_server)
+                Alert.CreateService -> stringResource(R.string.error_create_service)
+                Alert.StartService -> stringResource(R.string.error_start_service)
                 else -> null
             }
 
         val dialogMessage =
             when (alertType) {
-                Alert.RequestVPNPermission -> stringResource(R.string.service_error_missing_permission)
+                Alert.RequestVPNPermission -> stringResource(R.string.error_missing_vpn_permission)
                 Alert.RequestNotificationPermission -> stringResource(R.string.notification_permission_required_description)
-                Alert.EmptyConfiguration -> stringResource(R.string.service_error_empty_configuration)
+                Alert.EmptyConfiguration -> stringResource(R.string.error_empty_configuration)
                 else -> message
             }
 

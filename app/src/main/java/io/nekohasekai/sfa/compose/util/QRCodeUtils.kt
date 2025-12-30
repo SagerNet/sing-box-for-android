@@ -81,7 +81,7 @@ suspend fun saveQRCodeToGallery(
         withContext(Dispatchers.Main) {
             Toast.makeText(
                 context,
-                context.getString(io.nekohasekai.sfa.R.string.failed_to_save_qr_code, e.message),
+                context.getString(io.nekohasekai.sfa.R.string.failed_save_qr_code, e.message),
                 Toast.LENGTH_LONG,
             ).show()
             e.printStackTrace()
@@ -137,7 +137,7 @@ suspend fun shareQRCodeImage(
         withContext(Dispatchers.Main) {
             Toast.makeText(
                 context,
-                context.getString(io.nekohasekai.sfa.R.string.failed_to_share_qr_code, e.message),
+                context.getString(io.nekohasekai.sfa.R.string.failed_share_qr_code, e.message),
                 Toast.LENGTH_LONG,
             ).show()
             e.printStackTrace()

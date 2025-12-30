@@ -215,7 +215,7 @@ fun ProfilesCard(
                         withContext(Dispatchers.Main) {
                             Toast.makeText(
                                 context,
-                                context.getString(R.string.profile_saved_successfully),
+                                context.getString(R.string.success_profile_saved),
                                 Toast.LENGTH_SHORT,
                             ).show()
                         }
@@ -223,7 +223,7 @@ fun ProfilesCard(
                         withContext(Dispatchers.Main) {
                             Toast.makeText(
                                 context,
-                                "${context.getString(R.string.profile_save_failed)}: ${e.message}",
+                                "${context.getString(R.string.failed_save_profile)}: ${e.message}",
                                 Toast.LENGTH_SHORT,
                             ).show()
                         }

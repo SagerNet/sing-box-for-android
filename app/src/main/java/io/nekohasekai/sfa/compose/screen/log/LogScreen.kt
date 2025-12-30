@@ -438,14 +438,14 @@ fun LogScreen(
                                     outputStream.flush()
                                     Toast.makeText(
                                         context,
-                                        context.getString(R.string.logs_saved_successfully),
+                                        context.getString(R.string.success_logs_saved),
                                         Toast.LENGTH_SHORT,
                                     ).show()
                                 }
                             } catch (e: Exception) {
                                 Toast.makeText(
                                     context,
-                                    context.getString(R.string.failed_to_save_logs, e.message),
+                                    context.getString(R.string.failed_save_logs, e.message),
                                     Toast.LENGTH_SHORT,
                                 ).show()
                             }
@@ -667,7 +667,7 @@ fun LogScreen(
                                 } catch (e: Exception) {
                                     Toast.makeText(
                                         context,
-                                        context.getString(R.string.failed_to_share_logs, e.message),
+                                        context.getString(R.string.failed_share_logs, e.message),
                                         Toast.LENGTH_SHORT,
                                     ).show()
                                 }

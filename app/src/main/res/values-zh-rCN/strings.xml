@@ -1,18 +1,96 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="stop">停止</string>
+    <!-- App -->
+    <string name="app_version_title">应用版本</string>
+
+    <!-- Common Actions -->
     <string name="ok">好</string>
+    <string name="cancel">取消</string>
+    <string name="save">保存</string>
+    <string name="discard">放弃</string>
+    <string name="edit">编辑</string>
+    <string name="close">关闭</string>
+    <string name="dismiss">关闭</string>
+    <string name="stop">停止</string>
+    <string name="reset">重置</string>
+    <string name="destroy">销毁</string>
+    <string name="clear">清除</string>
+    <string name="search">搜索</string>
+    <string name="action">操作</string>
+    <string name="action_start">启动</string>
+    <string name="action_deselect">取消选择</string>
+    <string name="expand">展开</string>
+    <string name="collapse">收起</string>
+    <string name="expand_all">全部展开</string>
+    <string name="collapse_all">全部收起</string>
+    <string name="previous">上一个</string>
+    <string name="next">下一个</string>
+    <string name="update">更新</string>
+    <string name="read_more">阅读更多</string>
     <string name="no_thanks">不，谢谢</string>
+    <string name="options">选项</string>
+    <string name="more_options">更多选项</string>
+
+    <!-- Common States -->
+    <string name="enabled">启用</string>
+    <string name="disabled">禁用</string>
+    <string name="loading">加载中...</string>
+    <string name="calculating">计算中...</string>
+    <string name="auto">自动</string>
+    <string name="success">成功</string>
+    <string name="default_text">默认</string>
+
+    <!-- Navigation Titles -->
     <string name="title_dashboard">仪表</string>
     <string name="title_configuration">配置</string>
     <string name="title_log">日志</string>
     <string name="title_settings">设置</string>
+    <string name="title_app_settings">应用</string>
     <string name="title_new_profile">新建配置</string>
     <string name="title_edit_profile">编辑配置</string>
     <string name="title_edit_configuration">编辑配置</string>
     <string name="title_groups">组</string>
     <string name="title_debug">调试</string>
-    <string name="quick_toggle">切换</string>
+    <string name="title_connections">连接</string>
+    <string name="title_others">其他</string>
+    <string name="title_scan_result">扫描结果</string>
+
+    <!-- Status -->
+    <string name="status_default">服务未启动</string>
+    <string name="status_starting">启动中</string>
+    <string name="status_stopping">停止中</string>
+    <string name="status_started">已启动</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_items">仪表项目</string>
+    <string name="memory">内存</string>
+    <string name="goroutines">协程</string>
+    <string name="upload">上传</string>
+    <string name="download">下载</string>
+    <string name="connections_in">入站</string>
+    <string name="connections_out">出站</string>
+    <string name="clash_mode">Clash 模式</string>
+    <string name="mode">模式</string>
+    <string name="system_proxy">系统代理</string>
+    <string name="url_test">测试</string>
+    <string name="drag_handle_to_reorder">拖动手柄重新排序项目</string>
+    <string name="drag_to_reorder">拖动重新排序</string>
+    <string name="reset_order">重置顺序</string>
+
+    <!-- Connections -->
+    <string name="close_connections_confirm">关闭所有连接？</string>
+
+    <!-- Profiles -->
+    <string name="no_profiles">没有配置的配置文件</string>
+    <string name="add_profile">添加配置文件</string>
+    <string name="update_profile">更新配置文件</string>
+    <string name="share_profile">分享配置文件</string>
+    <string name="import_remote_profile">导入远程配置</string>
+    <string name="import_remote_profile_message">您确定要导入远程配置文件 %1$s 吗？您将连接到 %2$s 来下载配置。</string>
+    <string name="import_from_file_description">从本地文件导入配置</string>
+    <string name="scan_qr_code_description">扫描配置二维码</string>
+    <string name="create_new_profile_description">从头创建新配置文件</string>
+    <string name="icloud_profile_unsupported">当前平台不支持 iCloud 配置文件</string>
     <string name="profile_name">名称</string>
     <string name="profile_type">类型</string>
     <string name="profile_source">源</string>
@@ -27,68 +105,62 @@
     <string name="profile_auto_update_interval_minimum_hint">最低值为 15</string>
     <string name="profile_type_local">本地</string>
     <string name="profile_type_remote">远程</string>
+    <string name="profile_type_remote_updated">远程 • %s</string>
     <string name="profile_source_create_new">创建</string>
     <string name="profile_source_import">导入</string>
     <string name="profile_add_import_file">从文件导入</string>
     <string name="profile_add_scan_qr_code">扫描二维码</string>
-    <string name="profile_add_scan_use_front_camera">前置摄像头</string>
-    <string name="profile_add_scan_use_vendor_analyzer">使用 MLKit 扫描</string>
-    <string name="profile_add_scan_enable_torch">灯光</string>
     <string name="profile_add_create_manually">手动创建</string>
-    <string name="menu_undo">撤销</string>
-    <string name="menu_redo">重做</string>
-    <string name="menu_format">格式化</string>
-    <string name="menu_delete">删除</string>
-    <string name="menu_share">分享</string>
-    <string name="status_default">服务未启动</string>
-    <string name="status_starting">启动中</string>
-    <string name="status_stopping">停止中</string>
-    <string name="status_started">已启动</string>
-    <string name="enabled">启用</string>
-    <string name="disabled">禁用</string>
-    <string name="error_title">错误</string>
-    <string name="file_manager_missing">您的设备缺少 Android 标准文件选择器，请安装一个，例如 Material Files。</string>
-    <string name="loading">加载中...</string>
-    <string name="service_error_missing_permission">缺少 VPN 权限</string>
-    <string name="service_error_empty_configuration">空配置</string>
-    <string name="service_error_title_start_command_server">启动命令服务器</string>
-    <string name="service_error_title_create_service">创建服务</string>
-    <string name="service_error_title_start_service">启动服务</string>
-    <string name="service_error_title_deprecated_warning">弃用警告</string>
-    <string name="service_error_deprecated_warning_documentation">文档</string>
+    <string name="profile_override">配置覆盖</string>
+    <string name="basic_information">基本信息</string>
+    <string name="remote_configuration">远程配置</string>
+    <string name="last_updated_format">最后更新：%s</string>
+    <string name="content">内容</string>
+    <string name="json_viewer">JSON 查看器</string>
+    <string name="json_editor">JSON 编辑器</string>
+    <string name="view_configuration">查看配置</string>
+    <string name="save_as_file">另存为文件</string>
+    <string name="share_as_file">分享为文件</string>
+    <string name="unsaved_changes">未保存的更改</string>
+    <string name="unsaved_changes_message">您有未保存的更改。要放弃它们吗？</string>
+    <string name="profile_qr_code_text">配置文件二维码：%s</string>
+
+    <!-- Groups -->
     <string name="group_selected_title">选中</string>
-    <string name="core_version_title">核心版本</string>
+
+    <!-- Log -->
+    <string name="log_level">日志级别</string>
+    <string name="filter_label">过滤器：%s</string>
+    <string name="clear_filter">清除</string>
+    <string name="clear_logs">清除日志</string>
+    <string name="search_logs_placeholder">搜索日志…</string>
+    <string name="logs_copied_to_clipboard">日志已复制到剪贴板</string>
+    <string name="no_logs_to_copy">没有日志可复制</string>
+    <string name="no_logs_to_share">没有日志可分享</string>
+    <string name="intent_share_logs">分享日志</string>
+    <string name="selected_count">已选择 %d 项</string>
+    <string name="not_selected">未选择</string>
+    <string name="save_to_clipboard">复制到剪贴板</string>
+    <string name="save_to_file">保存到文件</string>
+
+    <!-- Settings -->
+    <string name="service">服务</string>
     <string name="core">核心</string>
+    <string name="core_version_title">核心版本</string>
     <string name="core_data_size">数据大小</string>
-    <string name="calculating">计算中...</string>
-    <string name="options">选项</string>
-    <string name="disable_deprecated_warnings">禁用弃用警告</string>
+    <string name="about">关于</string>
+    <string name="source_code">源代码</string>
+    <string name="sponsor">赞助</string>
     <string name="working_directory">工作目录</string>
-    <string name="destroy">销毁</string>
+    <string name="disable_deprecated_warnings">禁用弃用警告</string>
     <string name="ignore_memory_limit">忽略内存限制</string>
     <string name="ignore_memory_limit_description">不对 sing-box 强制执行内存限制。</string>
     <string name="auto_redirect">自动重定向</string>
     <string name="auto_redirect_description">需要 ROOT 权限</string>
+    <string name="system_http_proxy">系统 HTTP 代理</string>
+
+    <!-- Per-App Proxy -->
     <string name="per_app_proxy">分应用代理</string>
-    <string name="check_update_automatic">自动检查更新</string>
-    <string name="check_update">检查更新</string>
-    <string name="no_updates_available">没有可用的更新</string>
-    <string name="new_version_available">有新版本可用：%s</string>
-    <string name="update">更新</string>
-    <string name="update_track">更新轨道</string>
-    <string name="update_track_stable">稳定版</string>
-    <string name="update_track_beta">测试版</string>
-    <string name="update_track_not_supported">当前轨道尚不支持检查更新</string>
-    <string name="app_version_title">应用版本</string>
-    <string name="action">操作</string>
-    <string name="title_app_settings">应用</string>
-    <string name="background_permission">后台权限</string>
-    <string name="background_permission_description">申请必要的权限以使 VPN 正常运行。  如果您使用的是中国公司生产的设备，则授予权限后该卡可能不会消失。</string>
-    <string name="read_more">阅读更多</string>
-    <string name="request_background_permission">忽略电池优化</string>
-    <string name="import_remote_profile">导入远程配置</string>
-    <string name="import_remote_profile_message">您确定要导入远程配置文件 %1$s 吗？您将连接到 %2$s 来下载配置。</string>
-    <string name="profile_override">配置覆盖</string>
     <string name="per_app_proxy_mode">代理模式</string>
     <string name="per_app_proxy_mode_include">白名单</string>
     <string name="per_app_proxy_mode_include_description">仅允许选定的应用程序通过 VPN</string>
@@ -116,59 +188,43 @@
     <string name="per_app_proxy_export">导出到剪切板</string>
     <string name="per_app_proxy_scan">扫描</string>
     <string name="per_app_proxy_scan_china_apps">中国应用</string>
-    <string name="content_description_app_icon">App 图标</string>
-    <string name="toast_clipboard_empty">剪切板为空</string>
-    <string name="toast_copied_to_clipboard">已导出到剪切板</string>
-    <string name="toast_imported_from_clipboard">已从剪贴板导入</string>
-    <string name="message_scanning">扫描中...</string>
-    <string name="message_scan_app_no_apps_found">未找到匹配的应用</string>
-    <string name="message_scan_app_found">找到以下应用程序，请选择您想要的操作。</string>
-    <string name="title_scan_result">扫描结果</string>
-    <string name="action_deselect">取消选择</string>
     <string name="per_app_proxy_manage">管理</string>
+    <string name="content_description_app_icon">App 图标</string>
     <string name="per_app_proxy_managed_mode">托管模式</string>
     <string name="per_app_proxy_managed_mode_description">自动排除中国应用</string>
-    <string name="icloud_profile_unsupported">当前平台不支持 iCloud 配置文件</string>
-    <string name="search">搜索</string>
-    <string name="expand">展开</string>
-    <string name="collapse">收起</string>
-    <string name="expand_all">全部展开</string>
-    <string name="collapse_all">全部收起</string>
-    <string name="close">关闭</string>
-    <string name="close_connections_confirm">关闭所有连接？</string>
-    <string name="icon_count_format">%d 个图标</string>
-    <string name="no_icons_found">未找到图标</string>
-    <string name="no_icons_match">没有匹配 \"%s\" 的图标</string>
-    <string name="system_http_proxy">系统 HTTP 代理</string>
-    <string name="sponsor">赞助</string>
-    <string name="action_start">启动</string>
+    <string name="per_app_proxy_package_query_mode">模式</string>
+    <string name="per_app_proxy_shizuku_required">通过 Play 商店安装时，分应用代理需要 Shizuku。Google Play 拒绝允许我们使用 QUERY_ALL_PACKAGES 权限（同时不禁止其他类似应用这样做），而这是列出应用程序所必需的。</string>
+    <string name="per_app_proxy_root_required">通过 Play 商店安装时，分应用代理需要 ROOT。Google Play 拒绝允许我们使用 QUERY_ALL_PACKAGES 权限（同时不禁止其他类似应用这样做），而这是列出应用程序所必需的。</string>
+    <string name="privileged_access_required">需要 Root 或 Shizuku 权限来获取完整应用列表</string>
+
+    <!-- Permissions -->
+    <string name="background_permission">后台权限</string>
+    <string name="background_permission_description">申请必要的权限以使 VPN 正常运行。  如果您使用的是中国公司生产的设备，则授予权限后该卡可能不会消失。</string>
+    <string name="request_background_permission">忽略电池优化</string>
     <string name="location_permission_title">位置权限</string>
     <string name="location_permission_description">您的个人资料包含 &lt;strong&gt;&lt;tt&gt;wifi_ssid&lt;/tt&gt; 或 &lt;tt&gt;wifi_bssid&lt;/tt&gt; 路由规则&lt;/strong&gt;。为了使它们正常工作，sing-box 在&lt;strong&gt;后台&lt;/strong&gt;使用 &lt;strong&gt;位置&lt;/strong&gt; 权限来获取有关所连接 Wi-Fi 网络的信息。该信息将&lt;strong&gt;仅用于路由目的&lt;/strong&gt;。</string>
     <string name="location_permission_background_description">在 Android 10 及更高版本中，需要&lt;strong&gt;后台位置&lt;/strong&gt;权限。选择&lt;strong&gt;始终允许&lt;/strong&gt;以授予权限。</string>
     <string name="notification_permission_title">通知权限</string>
     <string name="notification_permission_required_description">sing-box 无法在没有发送通知权限的情况下显示实时网速。请授予权限或禁用实时网速通知后再启动服务。</string>
-    <string name="per_app_proxy_package_query_mode">模式</string>
-    <string name="per_app_proxy_shizuku_required">通过 Play 商店安装时，分应用代理需要 Shizuku。Google Play 拒绝允许我们使用 QUERY_ALL_PACKAGES 权限（同时不禁止其他类似应用这样做），而这是列出应用程序所必需的。</string>
-    <string name="per_app_proxy_root_required">通过 Play 商店安装时，分应用代理需要 ROOT。Google Play 拒绝允许我们使用 QUERY_ALL_PACKAGES 权限（同时不禁止其他类似应用这样做），而这是列出应用程序所必需的。</string>
-    <string name="start_shizuku">启动 Shizuku</string>
-    <string name="request_shizuku">授权 Shizuku</string>
-    <string name="get_shizuku">获取 Shizuku</string>
     <string name="root_access_required">需要 Root 权限</string>
     <string name="root_access_denied">Root 权限被拒绝</string>
-    <string name="privileged_access_required">需要 Root 或 Shizuku 权限来获取完整应用列表</string>
-    <string name="title_connections">连接</string>
-    <string name="title_others">其他</string>
-    <string name="no_profiles">没有配置的配置文件</string>
-    <string name="memory">内存</string>
-    <string name="goroutines">协程</string>
-    <string name="upload">上传</string>
-    <string name="download">下载</string>
-    <string name="connections_in">入站</string>
-    <string name="connections_out">出站</string>
-    <string name="clash_mode">Clash 模式</string>
-    <string name="mode">模式</string>
-    <string name="system_proxy">系统代理</string>
-    <string name="url_test">测试</string>
+
+    <!-- Updates -->
+    <string name="check_update">检查更新</string>
+    <string name="check_update_automatic">自动检查更新</string>
+    <string name="update_track">更新轨道</string>
+    <string name="update_track_stable">稳定版</string>
+    <string name="update_track_beta">测试版</string>
+    <string name="update_track_not_supported">当前轨道尚不支持检查更新</string>
+    <string name="no_updates_available">没有可用的更新</string>
+    <string name="new_version_available">有新版本可用：%s</string>
+
+    <!-- Shizuku -->
+    <string name="get_shizuku">获取 Shizuku</string>
+    <string name="start_shizuku">启动 Shizuku</string>
+    <string name="request_shizuku">授权 Shizuku</string>
+
+    <!-- Time -->
     <string name="time_just_now">刚刚</string>
     <string name="time_yesterday">昨天</string>
     <string name="time_now">现在</string>
@@ -185,98 +241,87 @@
     <plurals name="time_days_ago">
         <item quantity="other">%d 天前</item>
     </plurals>
+
+    <!-- Menu -->
+    <string name="menu_undo">撤销</string>
+    <string name="menu_redo">重做</string>
+    <string name="menu_format">格式化</string>
+    <string name="menu_delete">删除</string>
+    <string name="menu_share">分享</string>
+
+    <!-- Errors -->
+    <string name="error_title">错误</string>
+    <string name="error_missing_vpn_permission">缺少 VPN 权限</string>
+    <string name="error_empty_configuration">空配置</string>
     <string name="error_empty_file">空文件</string>
     <string name="error_decode_profile">解码配置文件失败：%s</string>
     <string name="error_invalid_configuration">无效的 sing-box 配置：%s</string>
-    <string name="dashboard_items">仪表项目</string>
-    <string name="reset_order">重置顺序</string>
-    <string name="reset">重置</string>
-    <string name="drag_handle_to_reorder">拖动手柄重新排序项目</string>
-    <string name="drag_to_reorder">拖动重新排序</string>
-    <string name="add_profile">添加配置文件</string>
-    <string name="import_from_file_description">从本地文件导入配置</string>
-    <string name="scan_qr_code_description">扫描配置二维码</string>
-    <string name="create_new_profile_description">从头创建新配置文件</string>
-    <string name="profile_saved_successfully">配置文件保存成功</string>
-    <string name="profile_save_failed">保存配置文件失败：%s</string>
-    <string name="profile_type_remote_updated">远程 • %s</string>
-    <string name="update_profile">更新配置文件</string>
-    <string name="more_options">更多选项</string>
-    <string name="edit">编辑</string>
-    <string name="save_as_file">另存为文件</string>
-    <string name="share_as_file">分享为文件</string>
-    <string name="service">服务</string>
-    <string name="about">关于</string>
-    <string name="source_code">源代码</string>
-    <string name="unsaved_changes">未保存的更改</string>
-    <string name="unsaved_changes_message">您有未保存的更改。要放弃它们吗？</string>
-    <string name="discard">放弃</string>
-    <string name="save">保存</string>
-    <string name="share_profile">分享配置文件</string>
-    <string name="cancel">取消</string>
-    <string name="logs_copied_to_clipboard">日志已复制到剪贴板</string>
-    <string name="no_logs_to_copy">没有日志可复制</string>
-    <string name="logs_saved_successfully">日志保存成功</string>
-    <string name="failed_to_save_logs">保存日志失败：%s</string>
-    <string name="failed_to_share_logs">分享日志失败：%s</string>
-    <string name="no_logs_to_share">没有日志可分享</string>
+    <string name="error_start_command_server">启动命令服务器</string>
+    <string name="error_create_service">创建服务</string>
+    <string name="error_start_service">启动服务</string>
+    <string name="error_deprecated_warning">弃用警告</string>
+    <string name="error_deprecated_documentation">文档</string>
+    <string name="file_manager_missing">您的设备缺少 Android 标准文件选择器，请安装一个，例如 Material Files。</string>
+
+    <!-- Failed Operations -->
+    <string name="failed_save_profile">保存配置文件失败：%s</string>
+    <string name="failed_save_logs">保存日志失败：%s</string>
+    <string name="failed_share_logs">分享日志失败：%s</string>
+    <string name="failed_save_qr_code">保存二维码失败：%s</string>
+    <string name="failed_share_qr_code">分享二维码失败：%s</string>
+    <string name="failed_read_configuration">读取配置失败：%s</string>
+
+    <!-- Success Messages -->
+    <string name="success_profile_saved">配置文件保存成功</string>
+    <string name="success_logs_saved">日志保存成功</string>
+    <string name="success_configuration_saved">配置已保存</string>
     <string name="copied_to_clipboard">已复制到剪贴板</string>
     <string name="qr_code_saved_to_gallery">二维码已保存到相册</string>
-    <string name="failed_to_save_qr_code">保存二维码失败：%s</string>
-    <string name="failed_to_share_qr_code">分享二维码失败：%s</string>
+
+    <!-- Toast Messages -->
+    <string name="toast_clipboard_empty">剪切板为空</string>
+    <string name="toast_copied_to_clipboard">已导出到剪切板</string>
+    <string name="toast_imported_from_clipboard">已从剪贴板导入</string>
+
+    <!-- Scanning -->
+    <string name="profile_add_scan_use_front_camera">前置摄像头</string>
+    <string name="profile_add_scan_use_vendor_analyzer">使用 MLKit 扫描</string>
+    <string name="profile_add_scan_enable_torch">灯光</string>
+    <string name="message_scanning">扫描中...</string>
+    <string name="message_scan_app_no_apps_found">未找到匹配的应用</string>
+    <string name="message_scan_app_found">找到以下应用程序，请选择您想要的操作。</string>
+
+    <!-- Icon Selection -->
+    <string name="icon">图标</string>
+    <string name="icon_count_format">%d 个图标</string>
+    <string name="no_icons_found">未找到图标</string>
+    <string name="no_icons_match">没有匹配 \"%s\" 的图标</string>
+    <string name="profile_icon">配置文件图标</string>
+    <string name="select_icon">选择图标</string>
+    <string name="select_profile_icon">选择配置文件图标</string>
+    <string name="search_icons_placeholder">搜索图标...</string>
+    <string name="search_icons">搜索图标</string>
+    <string name="close_search">关闭搜索</string>
+    <string name="current_icon_format">当前：%s</string>
+    <string name="categories">分类</string>
+    <string name="all_icons">所有图标</string>
+    <string name="back_to_categories">返回分类</string>
+
+    <!-- QR Code -->
+    <string name="intent_share_qr_code">分享二维码</string>
+
+    <!-- Search -->
+    <string name="search_placeholder">在文档中查找</string>
+
+    <!-- Content Descriptions (Accessibility) -->
     <string name="content_description_back">返回</string>
     <string name="content_description_scroll_to_bottom">滚动到底部</string>
     <string name="content_description_exit_selection_mode">退出选择模式</string>
     <string name="content_description_copy_selected">复制选中</string>
     <string name="content_description_clear_search">清除搜索</string>
     <string name="content_description_qr_code">二维码</string>
-    <string name="search_logs_placeholder">搜索日志…</string>
-    <string name="intent_share_logs">分享日志</string>
-    <string name="intent_share_qr_code">分享二维码</string>
     <string name="content_description_resume_logs">恢复日志</string>
     <string name="content_description_pause_logs">暂停日志</string>
     <string name="content_description_collapse_search">折叠搜索</string>
     <string name="content_description_search_logs">搜索日志</string>
-    <string name="profile_qr_code_text">配置文件二维码：%s</string>
-    <!-- Profile Edit Screen -->
-    <string name="basic_information">基本信息</string>
-    <string name="icon">图标</string>
-    <string name="default_text">默认</string>
-    <string name="remote_configuration">远程配置</string>
-    <string name="last_updated_format">最后更新：%s</string>
-    <string name="content">内容</string>
-    <string name="json_viewer">JSON 查看器</string>
-    <string name="json_editor">JSON 编辑器</string>
-    <string name="success">成功</string>
-    <string name="failed_to_read_configuration">读取配置失败：%s</string>
-    <!-- Profile Content Editor -->
-    <string name="view_configuration">查看配置</string>
-    <string name="clear">清除</string>
-    <string name="previous">上一个</string>
-    <string name="next">下一个</string>
-    <string name="dismiss">关闭</string>
-    <string name="configuration_saved">配置已保存</string>
-    <string name="search_placeholder">在文档中查找</string>
-    <!-- Icon Selection -->
-    <string name="profile_icon">配置文件图标</string>
-    <string name="select_icon">选择图标</string>
-    <string name="search_icons_placeholder">搜索图标...</string>
-    <string name="close_search">关闭搜索</string>
-    <string name="search_icons">搜索图标</string>
-    <string name="current_icon_format">当前：%s</string>
-    <string name="categories">分类</string>
-    <string name="all_icons">所有图标</string>
-    <string name="back_to_categories">返回分类</string>
-    <string name="select_profile_icon">选择配置文件图标</string>
-    <string name="auto">自动</string>
-    <!-- New Profile Screen -->
-    <!-- Log Screen -->
-    <string name="filter_label">过滤器：%s</string>
-    <string name="clear_filter">清除</string>
-    <string name="log_level">日志级别</string>
-    <string name="save_to_clipboard">复制到剪贴板</string>
-    <string name="save_to_file">保存到文件</string>
-    <string name="clear_logs">清除日志</string>
-    <string name="selected_count">已选择 %d 项</string>
-    <string name="not_selected">未选择</string>
 </resources>

@@ -334,7 +334,7 @@ class EditProfileViewModel(application: Application) : AndroidViewModel(applicat
             Toast.makeText(
                 context,
                 context.getString(
-                    io.nekohasekai.sfa.R.string.failed_to_read_configuration,
+                    io.nekohasekai.sfa.R.string.failed_read_configuration,
                     e.message,
                 ),
                 Toast.LENGTH_SHORT,

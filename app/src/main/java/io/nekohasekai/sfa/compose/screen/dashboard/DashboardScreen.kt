@@ -59,7 +59,7 @@ fun DashboardScreen(
         val note = uiState.deprecatedNotes.first()
         AlertDialog(
             onDismissRequest = { },
-            title = { Text(stringResource(R.string.service_error_title_deprecated_warning)) },
+            title = { Text(stringResource(R.string.error_deprecated_warning)) },
             text = { Text(note.message) },
             confirmButton = {
                 TextButton(onClick = { viewModel.dismissDeprecatedNote() }) {
@@ -73,7 +73,7 @@ fun DashboardScreen(
                             viewModel.sendGlobalEvent(UiEvent.OpenUrl(note.migrationLink))
                             viewModel.dismissDeprecatedNote()
                         }) {
-                            Text(stringResource(R.string.service_error_deprecated_warning_documentation))
+                            Text(stringResource(R.string.error_deprecated_documentation))
                         }
                     }
                 } else {

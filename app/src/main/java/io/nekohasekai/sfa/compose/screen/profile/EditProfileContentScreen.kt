@@ -125,7 +125,7 @@ fun EditProfileContentScreen(
         if (uiState.showSaveSuccessMessage) {
             Toast.makeText(
                 context,
-                context.getString(R.string.configuration_saved),
+                context.getString(R.string.success_configuration_saved),
                 Toast.LENGTH_SHORT,
             ).show()
             viewModel.clearSaveSuccessMessage()

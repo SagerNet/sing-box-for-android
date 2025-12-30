@@ -40,10 +40,6 @@
         android:theme="@style/AppTheme"
         tools:targetApi="31">
 
-        <meta-data
-            android:name="android.app.shortcuts"
-            android:resource="@xml/shortcuts" />
-
         <activity
             android:name=".LauncherActivity"
             android:exported="true"
@@ -102,9 +98,6 @@
             android:launchMode="singleTask"
             android:theme="@style/AppTheme">
 
-            <meta-data
-                android:name="android.app.shortcuts"
-                android:resource="@xml/shortcuts" />
         </activity>
 
         <activity

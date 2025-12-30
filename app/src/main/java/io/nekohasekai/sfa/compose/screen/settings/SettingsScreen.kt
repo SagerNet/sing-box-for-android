@@ -215,7 +215,7 @@ fun SettingsScreen(navController: NavController) {
                 ListItem(
                     headlineContent = {
                         Text(
-                            stringResource(R.string.service_error_deprecated_warning_documentation),
+                            stringResource(R.string.error_deprecated_documentation),
                             style = MaterialTheme.typography.bodyLarge,
                         )
                     },
