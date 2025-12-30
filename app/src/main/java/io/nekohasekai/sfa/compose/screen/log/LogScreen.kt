@@ -372,9 +372,9 @@ fun LogScreen(
                 }
             } else {
                 // Log list
-                val extraBottomPadding = when {
-                    showStartFab -> 72.dp
-                    showStatusBar -> 58.dp
+                val bottomPadding = when {
+                    showStartFab -> 88.dp
+                    showStatusBar -> 74.dp
                     else -> 0.dp
                 }
                 LazyColumn(
@@ -385,7 +385,7 @@ fun LogScreen(
                             start = 8.dp,
                             end = 8.dp,
                             top = 8.dp,
-                            bottom = 88.dp + extraBottomPadding, // Space for FAB
+                            bottom = bottomPadding,
                         ),
                     verticalArrangement = Arrangement.spacedBy(2.dp),
                 ) {

@@ -41,6 +41,8 @@ data class CardRenderItem(
 @Composable
 fun DashboardScreen(
     serviceStatus: Status = Status.Stopped,
+    showStartFab: Boolean = false,
+    showStatusBar: Boolean = false,
     viewModel: DashboardViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -105,16 +107,18 @@ fun DashboardScreen(
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
+        val bottomPadding = when {
+            showStartFab -> 88.dp
+            showStatusBar -> 74.dp
+            else -> 0.dp
+        }
         LazyColumn(
             modifier =
                 Modifier
                     .fillMaxSize()
                     .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding =
-                PaddingValues(
-                    bottom = 88.dp, // Increased to accommodate FAB (56dp height + 32dp padding)
-                ),
+            contentPadding = PaddingValues(bottom = bottomPadding),
         ) {
             // Dynamic dashboard cards
             // Show cards when service is running OR if it's the Profiles card (always available)

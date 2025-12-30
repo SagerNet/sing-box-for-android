@@ -37,10 +37,16 @@ fun SFANavHost(
             if (dashboardViewModel != null) {
                 DashboardScreen(
                     serviceStatus = serviceStatus,
+                    showStartFab = showStartFab,
+                    showStatusBar = showStatusBar,
                     viewModel = dashboardViewModel,
                 )
             } else {
-                DashboardScreen(serviceStatus = serviceStatus)
+                DashboardScreen(
+                    serviceStatus = serviceStatus,
+                    showStartFab = showStartFab,
+                    showStatusBar = showStatusBar,
+                )
             }
         }
 
