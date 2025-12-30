@@ -60,7 +60,7 @@ import androidx.compose.ui.unit.dp
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.ProfileContent
 import io.nekohasekai.sfa.R
-import io.nekohasekai.sfa.compose.NewProfileComposeActivity
+import io.nekohasekai.sfa.compose.NewProfileActivity
 import io.nekohasekai.sfa.compose.screen.configuration.ProfileImportHandler
 import io.nekohasekai.sfa.compose.screen.configuration.QRCodeDialog
 import io.nekohasekai.sfa.compose.util.QRCodeGenerator
@@ -114,7 +114,7 @@ fun ProfilesCard(
             ActivityResultContracts.StartActivityForResult(),
         ) { result ->
             if (result.resultCode == android.app.Activity.RESULT_OK) {
-                val profileId = result.data?.getLongExtra(NewProfileComposeActivity.EXTRA_PROFILE_ID, -1L)
+                val profileId = result.data?.getLongExtra(NewProfileActivity.EXTRA_PROFILE_ID, -1L)
                 if (profileId != null && profileId != -1L) {
                     coroutineScope.launch {
                         val profile =
@@ -165,9 +165,9 @@ fun ProfilesCard(
                             is ProfileImportHandler.QRCodeParseResult.RemoteProfile -> {
                                 withContext(Dispatchers.Main) {
                                     val newProfileIntent =
-                                        Intent(context, NewProfileComposeActivity::class.java).apply {
-                                            putExtra(NewProfileComposeActivity.EXTRA_IMPORT_NAME, parseResult.name)
-                                            putExtra(NewProfileComposeActivity.EXTRA_IMPORT_URL, parseResult.url)
+                                        Intent(context, NewProfileActivity::class.java).apply {
+                                            putExtra(NewProfileActivity.EXTRA_IMPORT_NAME, parseResult.name)
+                                            putExtra(NewProfileActivity.EXTRA_IMPORT_URL, parseResult.url)
                                         }
                                     newProfileLauncher.launch(newProfileIntent)
                                 }
@@ -419,7 +419,7 @@ fun ProfilesCard(
                 ListItem(
                     modifier = Modifier.clickable {
                         onHideAddProfileSheet()
-                        val intent = Intent(context, NewProfileComposeActivity::class.java)
+                        val intent = Intent(context, NewProfileActivity::class.java)
                         newProfileLauncher.launch(intent)
                     },
                     leadingContent = {

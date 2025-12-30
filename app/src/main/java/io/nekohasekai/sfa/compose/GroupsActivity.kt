@@ -34,7 +34,7 @@ import io.nekohasekai.sfa.compose.theme.SFATheme
 import io.nekohasekai.sfa.constant.Alert
 import io.nekohasekai.sfa.constant.Status
 
-class GroupsComposeActivity : ComponentActivity(), ServiceConnection.Callback {
+class GroupsActivity : ComponentActivity(), ServiceConnection.Callback {
     private val connection = ServiceConnection(this, this)
     private var currentServiceStatus by mutableStateOf(Status.Stopped)
 

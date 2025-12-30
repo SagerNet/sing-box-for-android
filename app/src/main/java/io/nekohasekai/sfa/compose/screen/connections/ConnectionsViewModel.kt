@@ -7,9 +7,9 @@ import io.nekohasekai.sfa.compose.base.BaseViewModel
 import io.nekohasekai.sfa.compose.base.ScreenEvent
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.ktx.toList
-import io.nekohasekai.sfa.ui.connections.Connection
-import io.nekohasekai.sfa.ui.connections.ConnectionSort
-import io.nekohasekai.sfa.ui.connections.ConnectionStateFilter
+import io.nekohasekai.sfa.compose.model.Connection
+import io.nekohasekai.sfa.compose.model.ConnectionSort
+import io.nekohasekai.sfa.compose.model.ConnectionStateFilter
 import io.nekohasekai.sfa.utils.CommandClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

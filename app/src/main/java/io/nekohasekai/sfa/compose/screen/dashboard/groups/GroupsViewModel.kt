@@ -6,9 +6,9 @@ import io.nekohasekai.libbox.OutboundGroup
 import io.nekohasekai.sfa.compose.base.BaseViewModel
 import io.nekohasekai.sfa.compose.base.ScreenEvent
 import io.nekohasekai.sfa.constant.Status
-import io.nekohasekai.sfa.ui.dashboard.Group
-import io.nekohasekai.sfa.ui.dashboard.GroupItem
-import io.nekohasekai.sfa.ui.dashboard.toList
+import io.nekohasekai.sfa.compose.model.Group
+import io.nekohasekai.sfa.compose.model.GroupItem
+import io.nekohasekai.sfa.compose.model.toList
 import io.nekohasekai.sfa.utils.CommandClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

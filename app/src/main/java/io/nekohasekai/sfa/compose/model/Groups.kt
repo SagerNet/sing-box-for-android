@@ -1,4 +1,4 @@
-package io.nekohasekai.sfa.ui.dashboard
+package io.nekohasekai.sfa.compose.model
 
 import androidx.compose.runtime.Immutable
 import io.nekohasekai.libbox.OutboundGroup

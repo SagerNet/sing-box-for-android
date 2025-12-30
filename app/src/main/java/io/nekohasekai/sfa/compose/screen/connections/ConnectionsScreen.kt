@@ -44,7 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.constant.Status
-import io.nekohasekai.sfa.ui.connections.Connection
+import io.nekohasekai.sfa.compose.model.Connection
 
 @Composable
 fun ConnectionsScreen(

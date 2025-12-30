@@ -105,9 +105,9 @@ import io.nekohasekai.sfa.compose.screen.dashboard.GroupsCard
 import io.nekohasekai.sfa.compose.screen.connections.ConnectionDetailsScreen
 import io.nekohasekai.sfa.compose.screen.connections.ConnectionsScreen
 import io.nekohasekai.sfa.compose.screen.connections.ConnectionsViewModel
-import io.nekohasekai.sfa.ui.connections.Connection
-import io.nekohasekai.sfa.ui.connections.ConnectionSort
-import io.nekohasekai.sfa.ui.connections.ConnectionStateFilter
+import io.nekohasekai.sfa.compose.model.Connection
+import io.nekohasekai.sfa.compose.model.ConnectionSort
+import io.nekohasekai.sfa.compose.model.ConnectionStateFilter
 import io.nekohasekai.sfa.compose.screen.dashboard.groups.GroupsViewModel
 import io.nekohasekai.sfa.compose.screen.log.LogViewModel
 import io.nekohasekai.sfa.compose.theme.SFATheme
@@ -123,7 +123,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
+class MainActivity : ComponentActivity(), ServiceConnection.Callback {
     private val connection = ServiceConnection(this, this)
     private lateinit var dashboardViewModel: DashboardViewModel
     private var currentServiceStatus by mutableStateOf(Status.Stopped)
@@ -240,7 +240,7 @@ class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
             }
             val intent = Intent(Application.application, Settings.serviceClass())
             withContext(Dispatchers.Main) {
-                ContextCompat.startForegroundService(this@ComposeActivity, intent)
+                ContextCompat.startForegroundService(this@MainActivity, intent)
             }
             Settings.startedByUser = true
         }
@@ -249,7 +249,7 @@ class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
     private suspend fun prepare() =
         withContext(Dispatchers.Main) {
             try {
-                val intent = VpnService.prepare(this@ComposeActivity)
+                val intent = VpnService.prepare(this@MainActivity)
                 if (intent != null) {
                     prepareLauncher.launch(intent)
                     true
@@ -338,9 +338,9 @@ class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
                 confirmButton = {
                     TextButton(onClick = {
                         startActivity(
-                            Intent(this@ComposeActivity, NewProfileComposeActivity::class.java).apply {
-                                putExtra(NewProfileComposeActivity.EXTRA_IMPORT_NAME, name)
-                                putExtra(NewProfileComposeActivity.EXTRA_IMPORT_URL, url)
+                            Intent(this@MainActivity, NewProfileActivity::class.java).apply {
+                                putExtra(NewProfileActivity.EXTRA_IMPORT_NAME, name)
+                                putExtra(NewProfileActivity.EXTRA_IMPORT_URL, url)
                             },
                         )
                         showImportProfileDialog = false
@@ -430,7 +430,7 @@ class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
                         try {
                             val result = withContext(Dispatchers.IO) {
                                 Vendor.downloadAndInstall(
-                                    this@ComposeActivity,
+                                    this@MainActivity,
                                     updateInfo!!.downloadUrl,
                                 )
                             }
@@ -525,7 +525,7 @@ class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
                     }
 
                     is UiEvent.OpenUrl -> {
-                        this@ComposeActivity.launchCustomTab(event.url)
+                        this@MainActivity.launchCustomTab(event.url)
                     }
 
                     is UiEvent.RequestStartService -> {
@@ -538,7 +538,7 @@ class ComposeActivity : ComponentActivity(), ServiceConnection.Callback {
 
                     is UiEvent.EditProfile -> {
                         val intent =
-                            Intent(this@ComposeActivity, EditProfileComposeActivity::class.java)
+                            Intent(this@MainActivity, EditProfileActivity::class.java)
                         intent.putExtra("profile_id", event.profileId)
                         startActivity(intent)
                     }

@@ -96,7 +96,7 @@
         </activity>
 
         <activity
-            android:name=".compose.ComposeActivity"
+            android:name=".compose.MainActivity"
             android:exported="false"
             android:icon="@mipmap/ic_launcher"
             android:launchMode="singleTask"
@@ -108,15 +108,15 @@
         </activity>
 
         <activity
-            android:name="io.nekohasekai.sfa.compose.NewProfileComposeActivity"
+            android:name="io.nekohasekai.sfa.compose.NewProfileActivity"
             android:exported="false"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="io.nekohasekai.sfa.compose.EditProfileComposeActivity"
+            android:name="io.nekohasekai.sfa.compose.EditProfileActivity"
             android:exported="false"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="io.nekohasekai.sfa.compose.GroupsComposeActivity"
+            android:name="io.nekohasekai.sfa.compose.GroupsActivity"
             android:exported="false"
             android:theme="@style/AppTheme" />
         <activity

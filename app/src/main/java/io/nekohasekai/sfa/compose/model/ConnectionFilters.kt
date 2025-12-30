@@ -1,4 +1,4 @@
-package io.nekohasekai.sfa.ui.connections
+package io.nekohasekai.sfa.compose.model
 
 import io.nekohasekai.libbox.Libbox
 

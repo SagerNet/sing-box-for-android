@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import io.nekohasekai.sfa.compose.screen.configuration.NewProfileScreen
 import io.nekohasekai.sfa.compose.theme.SFATheme
 
-class NewProfileComposeActivity : ComponentActivity() {
+class NewProfileActivity : ComponentActivity() {
     companion object {
         const val EXTRA_PROFILE_ID = "profile_id"
         const val EXTRA_IMPORT_NAME = "import_name"

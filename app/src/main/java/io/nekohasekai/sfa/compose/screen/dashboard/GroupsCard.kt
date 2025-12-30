@@ -65,8 +65,8 @@ import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.screen.dashboard.groups.GroupsViewModel
 import io.nekohasekai.sfa.constant.Status
-import io.nekohasekai.sfa.ui.dashboard.Group
-import io.nekohasekai.sfa.ui.dashboard.GroupItem
+import io.nekohasekai.sfa.compose.model.Group
+import io.nekohasekai.sfa.compose.model.GroupItem
 import io.nekohasekai.sfa.utils.CommandClient
 
 @Composable

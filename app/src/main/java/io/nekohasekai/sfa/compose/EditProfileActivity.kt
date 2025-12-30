@@ -23,7 +23,7 @@ import io.nekohasekai.sfa.compose.screen.profile.EditProfileViewModel
 import io.nekohasekai.sfa.compose.screen.profile.IconSelectionScreen
 import io.nekohasekai.sfa.compose.theme.SFATheme
 
-class EditProfileComposeActivity : ComponentActivity() {
+class EditProfileActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

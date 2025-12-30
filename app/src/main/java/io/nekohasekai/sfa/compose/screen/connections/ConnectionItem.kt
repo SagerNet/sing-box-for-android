@@ -44,7 +44,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
-import io.nekohasekai.sfa.ui.connections.Connection
+import io.nekohasekai.sfa.compose.model.Connection
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
