@@ -91,8 +91,18 @@ object RootPackageManager {
         }
     }
 
+    private const val CHUNK_SIZE = 50
+
     suspend fun getInstalledPackages(flags: Int): List<PackageInfo> {
         val svc = bindService()
-        return svc.getInstalledPackages(flags)
+        val result = mutableListOf<PackageInfo>()
+        var offset = 0
+        while (true) {
+            val chunk = svc.getInstalledPackages(flags, offset, CHUNK_SIZE)
+            if (chunk.isEmpty()) break
+            result.addAll(chunk)
+            offset += chunk.size
+        }
+        return result
     }
 }
