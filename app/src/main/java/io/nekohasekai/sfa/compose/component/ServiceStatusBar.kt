@@ -136,11 +136,6 @@ fun ServiceStatusBar(
                     }
                 }
 
-                // Uptime
-                if (startTime != null) {
-                    UptimeDisplay(startTime = startTime)
-                }
-
                 // Stop button
                 Row(
                     modifier =
@@ -152,6 +147,10 @@ fun ServiceStatusBar(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center,
                 ) {
+                    if (startTime != null) {
+                        UptimeText(startTime = startTime)
+                        Spacer(modifier = Modifier.width(4.dp))
+                    }
                     Icon(
                         imageVector = Icons.Default.Stop,
                         contentDescription = stringResource(R.string.stop),
@@ -179,7 +178,7 @@ private fun StatusItem(
 }
 
 @Composable
-private fun UptimeDisplay(
+private fun UptimeText(
     startTime: Long,
     modifier: Modifier = Modifier,
 ) {
@@ -208,7 +207,7 @@ private fun UptimeDisplay(
         text = formattedTime,
         style = MaterialTheme.typography.labelLarge,
         fontWeight = FontWeight.Medium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        color = MaterialTheme.colorScheme.onPrimaryContainer,
         modifier = modifier,
     )
 }
