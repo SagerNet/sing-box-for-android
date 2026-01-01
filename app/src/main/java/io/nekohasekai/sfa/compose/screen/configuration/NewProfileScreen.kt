@@ -74,6 +74,7 @@ import io.nekohasekai.sfa.R
 fun NewProfileScreen(
     importName: String? = null,
     importUrl: String? = null,
+    qrsData: ByteArray? = null,
     onNavigateBack: () -> Unit,
     onProfileCreated: (profileId: Long) -> Unit,
     viewModel: NewProfileViewModel = viewModel(),
@@ -81,8 +82,12 @@ fun NewProfileScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    LaunchedEffect(importName, importUrl) {
-        viewModel.initializeFromQRImport(importName, importUrl)
+    LaunchedEffect(importName, importUrl, qrsData) {
+        if (qrsData != null) {
+            viewModel.initializeFromQRSImport(importName, qrsData)
+        } else {
+            viewModel.initializeFromQRImport(importName, importUrl)
+        }
     }
 
     // File picker launcher

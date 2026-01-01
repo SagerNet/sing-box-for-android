@@ -163,9 +163,14 @@
     <string name="view_configuration">View Configuration</string>
     <string name="save_as_file">Save As File</string>
     <string name="share_as_file">Share As File</string>
+    <string name="save_content_json">Save Content JSON File</string>
+    <string name="share_content_json">Share Content JSON File</string>
     <string name="unsaved_changes">Unsaved Changes</string>
     <string name="unsaved_changes_message">You have unsaved changes. Do you want to discard them?</string>
     <string name="profile_qr_code_text">Profile QR Code: %s</string>
+    <string name="import_profile_confirm_title">Import Profile</string>
+    <string name="import_profile_confirm_message">Import profile \"%s\"?</string>
+    <string name="import_action">Import</string>
 
     <!-- Groups -->
     <string name="group_selected_title">Selected</string>
@@ -376,6 +381,17 @@
 
     <!-- QR Code -->
     <string name="intent_share_qr_code">Share QR Code</string>
+
+    <!-- QR Stream (QRS) -->
+    <string name="share_as_qrs">Share as QR Stream</string>
+    <string name="qrs_progress">Receiving: %1$d / %2$d blocks</string>
+    <string name="qrs_speed">Speed</string>
+    <string name="qrs_interval_ms">Interval: %d ms</string>
+    <string name="qrs_scanning_mode">QR Stream Mode</string>
+    <string name="qrs_fps">FPS</string>
+    <string name="qrs_fps_interval">(%d ms)</string>
+    <string name="qrs_slice_size">Slice Size</string>
+    <string name="qrs_what_is_qrs">What is QRS</string>
 
     <!-- Search -->
     <string name="search_placeholder">Find in document</string>

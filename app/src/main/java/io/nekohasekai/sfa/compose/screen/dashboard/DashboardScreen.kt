@@ -27,8 +27,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.base.UiEvent
-import io.nekohasekai.sfa.compose.util.saveQRCodeToGallery
-import io.nekohasekai.sfa.compose.util.shareQRCodeImage
 import io.nekohasekai.sfa.constant.Status
 import kotlinx.coroutines.launch
 
@@ -176,16 +174,6 @@ fun DashboardScreen(
                                 onHideAddProfileSheet = viewModel::hideAddProfileSheet,
                                 onShowProfilePickerSheet = viewModel::showProfilePickerSheet,
                                 onHideProfilePickerSheet = viewModel::hideProfilePickerSheet,
-                                shareQRCodeImage = { bitmap, name ->
-                                    scope.launch {
-                                        shareQRCodeImage(context, bitmap, name)
-                                    }
-                                },
-                                saveQRCodeToGallery = { bitmap, name ->
-                                    scope.launch {
-                                        saveQRCodeToGallery(context, bitmap, name)
-                                    }
-                                },
                                 commandClient = viewModel.commandClient,
                                 modifier =
                                     Modifier
@@ -225,16 +213,6 @@ fun DashboardScreen(
                             onHideAddProfileSheet = viewModel::hideAddProfileSheet,
                             onShowProfilePickerSheet = viewModel::showProfilePickerSheet,
                             onHideProfilePickerSheet = viewModel::hideProfilePickerSheet,
-                            shareQRCodeImage = { bitmap, name ->
-                                scope.launch {
-                                    shareQRCodeImage(context, bitmap, name)
-                                }
-                            },
-                            saveQRCodeToGallery = { bitmap, name ->
-                                scope.launch {
-                                    saveQRCodeToGallery(context, bitmap, name)
-                                }
-                            },
                             commandClient = viewModel.commandClient,
                         )
                     }

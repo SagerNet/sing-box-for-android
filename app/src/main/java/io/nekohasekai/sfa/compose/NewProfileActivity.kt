@@ -17,6 +17,7 @@ class NewProfileActivity : ComponentActivity() {
         const val EXTRA_PROFILE_ID = "profile_id"
         const val EXTRA_IMPORT_NAME = "import_name"
         const val EXTRA_IMPORT_URL = "import_url"
+        const val EXTRA_QRS_DATA = "qrs_data"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,6 +26,7 @@ class NewProfileActivity : ComponentActivity() {
 
         val importName = intent.getStringExtra(EXTRA_IMPORT_NAME)
         val importUrl = intent.getStringExtra(EXTRA_IMPORT_URL)
+        val qrsData = intent.getByteArrayExtra(EXTRA_QRS_DATA)
 
         setContent {
             SFATheme {
@@ -35,6 +37,7 @@ class NewProfileActivity : ComponentActivity() {
                     NewProfileScreen(
                         importName = importName,
                         importUrl = importUrl,
+                        qrsData = qrsData,
                         onNavigateBack = { finish() },
                         onProfileCreated = { profileId ->
                             val resultIntent =

@@ -33,6 +33,8 @@ data class NewProfileUiState(
     // File import
     val importUri: Uri? = null,
     val importFileName: String? = null,
+    // QRS import
+    val qrsData: ByteArray? = null,
     // State
     val isLoading: Boolean = false,
     val isSaving: Boolean = false,
@@ -68,6 +70,17 @@ class NewProfileViewModel(application: Application) : AndroidViewModel(applicati
                     remoteUrl = url,
                 )
             }
+        }
+    }
+
+    fun initializeFromQRSImport(name: String?, qrsData: ByteArray) {
+        _uiState.update {
+            it.copy(
+                name = name ?: "",
+                profileType = ProfileType.Local,
+                profileSource = ProfileSource.Import,
+                qrsData = qrsData,
+            )
         }
     }
 
@@ -158,7 +171,7 @@ class NewProfileViewModel(application: Application) : AndroidViewModel(applicati
         // Validate based on profile type
         when (state.profileType) {
             ProfileType.Local -> {
-                if (state.profileSource == ProfileSource.Import && state.importUri == null) {
+                if (state.profileSource == ProfileSource.Import && state.importUri == null && state.qrsData == null) {
                     _uiState.update { it.copy(importError = context.getString(R.string.profile_input_required)) }
                     hasError = true
                 }
@@ -234,22 +247,27 @@ class NewProfileViewModel(application: Application) : AndroidViewModel(applicati
             when (state.profileSource) {
                 ProfileSource.CreateNew -> "{}"
                 ProfileSource.Import -> {
-                    state.importUri?.let { uri ->
-                        val sourceURL = uri.toString()
-                        when {
-                            sourceURL.startsWith("content://") -> {
-                                val inputStream = context.contentResolver.openInputStream(uri) as InputStream
-                                inputStream.use { it.bufferedReader().readText() }
+                    if (state.qrsData != null) {
+                        val content = Libbox.decodeProfileContent(state.qrsData)
+                        content.config
+                    } else {
+                        state.importUri?.let { uri ->
+                            val sourceURL = uri.toString()
+                            when {
+                                sourceURL.startsWith("content://") -> {
+                                    val inputStream = context.contentResolver.openInputStream(uri) as InputStream
+                                    inputStream.use { it.bufferedReader().readText() }
+                                }
+                                sourceURL.startsWith("file://") -> {
+                                    File(Uri.parse(sourceURL).path!!).readText()
+                                }
+                                sourceURL.startsWith("http://") || sourceURL.startsWith("https://") -> {
+                                    HTTPClient().use { it.getString(sourceURL) }
+                                }
+                                else -> throw Exception("Unsupported source: $sourceURL")
                             }
-                            sourceURL.startsWith("file://") -> {
-                                File(Uri.parse(sourceURL).path!!).readText()
-                            }
-                            sourceURL.startsWith("http://") || sourceURL.startsWith("https://") -> {
-                                HTTPClient().use { it.getString(sourceURL) }
-                            }
-                            else -> throw Exception("Unsupported source: $sourceURL")
-                        }
-                    } ?: "{}"
+                        } ?: "{}"
+                    }
                 }
             }
 

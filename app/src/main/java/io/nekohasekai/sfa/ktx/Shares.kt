@@ -44,3 +44,20 @@ suspend fun Context.shareProfile(profile: Profile) {
         )
     }
 }
+
+suspend fun Context.shareProfileAsJson(profile: Profile) {
+    val configDirectory = File(cacheDir, "share").also { it.mkdirs() }
+    val jsonFile = File(configDirectory, "${profile.name}.json")
+    jsonFile.writeText(File(profile.typed.path).readText())
+    val uri = FileProvider.getUriForFile(this, "$packageName.cache", jsonFile)
+    withContext(Dispatchers.Main) {
+        startActivity(
+            Intent.createChooser(
+                Intent(Intent.ACTION_SEND).setType("application/json")
+                    .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    .putExtra(Intent.EXTRA_STREAM, uri),
+                getString(AppCompatR.string.abc_shareactionprovider_share_with),
+            ),
+        )
+    }
+}

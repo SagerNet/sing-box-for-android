@@ -115,9 +115,6 @@
         <activity
             android:name="io.nekohasekai.sfa.ui.profileoverride.PerAppProxyActivity"
             android:exported="false" />
-        <activity
-            android:name="io.nekohasekai.sfa.ui.profile.QRScanActivity"
-            android:exported="false" />
 
         <service
             android:name=".bg.TileService"

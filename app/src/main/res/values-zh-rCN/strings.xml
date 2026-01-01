@@ -159,11 +159,16 @@
     <string name="json_viewer">JSON 查看器</string>
     <string name="json_editor">JSON 编辑器</string>
     <string name="view_configuration">查看配置</string>
-    <string name="save_as_file">另存为文件</string>
+    <string name="save_as_file">保存为文件</string>
     <string name="share_as_file">分享为文件</string>
+    <string name="save_content_json">保存配置 JSON 文件</string>
+    <string name="share_content_json">分享配置 JSON 文件</string>
     <string name="unsaved_changes">未保存的更改</string>
     <string name="unsaved_changes_message">您有未保存的更改。要放弃它们吗？</string>
     <string name="profile_qr_code_text">配置文件二维码：%s</string>
+    <string name="import_profile_confirm_title">导入配置</string>
+    <string name="import_profile_confirm_message">导入配置「%s」？</string>
+    <string name="import_action">导入</string>
 
     <!-- Groups -->
     <string name="group_selected_title">选中</string>
@@ -371,6 +376,17 @@
 
     <!-- QR Code -->
     <string name="intent_share_qr_code">分享二维码</string>
+
+    <!-- QR Stream (QRS) -->
+    <string name="share_as_qrs">分享为 QRS</string>
+    <string name="qrs_progress">接收中：%1$d / %2$d 块</string>
+    <string name="qrs_speed">速度</string>
+    <string name="qrs_interval_ms">间隔：%d 毫秒</string>
+    <string name="qrs_scanning_mode">QRS 模式</string>
+    <string name="qrs_fps">帧率</string>
+    <string name="qrs_fps_interval">（%d 毫秒）</string>
+    <string name="qrs_slice_size">分块大小</string>
+    <string name="qrs_what_is_qrs">什么是 QRS</string>
 
     <!-- Search -->
     <string name="search_placeholder">在文档中查找</string>

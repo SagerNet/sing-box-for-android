@@ -31,6 +31,18 @@ class ProfileImportHandler(private val context: Context) {
         data class Error(val message: String) : QRCodeParseResult()
     }
 
+    sealed class QRSParseResult {
+        data class Success(val name: String) : QRSParseResult()
+
+        data class Error(val message: String) : QRSParseResult()
+    }
+
+    sealed class UriParseResult {
+        data class Success(val name: String) : UriParseResult()
+
+        data class Error(val message: String) : UriParseResult()
+    }
+
     suspend fun importFromUri(uri: Uri): ImportResult =
         withContext(Dispatchers.IO) {
             try {
@@ -65,6 +77,38 @@ class ProfileImportHandler(private val context: Context) {
                 importProfile(content)
             } catch (e: Exception) {
                 ImportResult.Error(e.message ?: "Unknown error")
+            }
+        }
+
+    suspend fun parseUri(uri: Uri): UriParseResult =
+        withContext(Dispatchers.IO) {
+            try {
+                val data =
+                    context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                        ?: return@withContext UriParseResult.Error(context.getString(R.string.error_empty_file))
+
+                val filename = getFileNameFromUri(uri)
+                val dataString = String(data)
+
+                if (isJsonConfiguration(dataString)) {
+                    return@withContext UriParseResult.Success(name = filename)
+                }
+
+                val content =
+                    try {
+                        Libbox.decodeProfileContent(data)
+                    } catch (e: Exception) {
+                        if (dataString.trimStart().startsWith("{") || dataString.trimStart().startsWith("[")) {
+                            return@withContext UriParseResult.Success(name = filename)
+                        }
+                        return@withContext UriParseResult.Error(
+                            context.getString(R.string.error_decode_profile, e.message),
+                        )
+                    }
+
+                UriParseResult.Success(name = content.name)
+            } catch (e: Exception) {
+                UriParseResult.Error(e.message ?: "Unknown error")
             }
         }
 
@@ -145,6 +189,38 @@ class ProfileImportHandler(private val context: Context) {
                         }
                     importProfile(content)
                 }
+            } catch (e: Exception) {
+                ImportResult.Error(e.message ?: "Unknown error")
+            }
+        }
+
+    suspend fun parseQRSData(data: ByteArray): QRSParseResult =
+        withContext(Dispatchers.IO) {
+            try {
+                val content = try {
+                    Libbox.decodeProfileContent(data)
+                } catch (e: Exception) {
+                    return@withContext QRSParseResult.Error(
+                        context.getString(R.string.error_decode_profile, e.message),
+                    )
+                }
+                QRSParseResult.Success(name = content.name)
+            } catch (e: Exception) {
+                QRSParseResult.Error(e.message ?: "Unknown error")
+            }
+        }
+
+    suspend fun importFromQRSData(data: ByteArray): ImportResult =
+        withContext(Dispatchers.IO) {
+            try {
+                val content = try {
+                    Libbox.decodeProfileContent(data)
+                } catch (e: Exception) {
+                    return@withContext ImportResult.Error(
+                        context.getString(R.string.error_decode_profile, e.message),
+                    )
+                }
+                importProfile(content)
             } catch (e: Exception) {
                 ImportResult.Error(e.message ?: "Unknown error")
             }

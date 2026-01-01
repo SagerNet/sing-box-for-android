@@ -1,6 +1,5 @@
 package io.nekohasekai.sfa.compose.screen.dashboard
 
-import android.graphics.Bitmap
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import io.nekohasekai.sfa.constant.Status
@@ -34,8 +33,6 @@ fun DashboardCardRenderer(
     onHideAddProfileSheet: () -> Unit = {},
     onShowProfilePickerSheet: () -> Unit = {},
     onHideProfilePickerSheet: () -> Unit = {},
-    shareQRCodeImage: (Bitmap, String) -> Unit = { _, _ -> },
-    saveQRCodeToGallery: (Bitmap, String) -> Unit = { _, _ -> },
     commandClient: CommandClient? = null,
     modifier: Modifier = Modifier,
 ) {
@@ -127,8 +124,6 @@ fun DashboardCardRenderer(
                 onImportFromFile = { /* Handled in ProfilesCard */ },
                 onScanQrCode = { /* Handled in ProfilesCard */ },
                 onCreateManually = { /* Handled in ProfilesCard */ },
-                shareQRCodeImage = shareQRCodeImage,
-                saveQRCodeToGallery = saveQRCodeToGallery,
             )
         }
     }

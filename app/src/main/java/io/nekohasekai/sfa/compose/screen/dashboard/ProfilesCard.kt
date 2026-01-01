@@ -1,7 +1,7 @@
 package io.nekohasekai.sfa.compose.screen.dashboard
 
 import android.content.Intent
-import android.graphics.Bitmap
+import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.IosShare
 import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.DataObject
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.outlined.CreateNewFolder
 import androidx.compose.material.icons.outlined.Description
@@ -37,13 +38,16 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -61,18 +65,22 @@ import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.ProfileContent
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.NewProfileActivity
+import io.nekohasekai.sfa.compose.component.qr.QRCodeDialog
+import io.nekohasekai.sfa.compose.component.qr.QRScanSheet
+import io.nekohasekai.sfa.compose.component.qr.QRSDialog
+import io.nekohasekai.sfa.compose.screen.qrscan.QRScanResult
 import io.nekohasekai.sfa.compose.screen.configuration.ProfileImportHandler
-import io.nekohasekai.sfa.compose.screen.configuration.QRCodeDialog
 import io.nekohasekai.sfa.compose.util.QRCodeGenerator
 import io.nekohasekai.sfa.compose.util.RelativeTimeFormatter
 import io.nekohasekai.sfa.database.Profile
 import io.nekohasekai.sfa.database.TypedProfile
 import io.nekohasekai.sfa.ktx.errorDialogBuilder
 import io.nekohasekai.sfa.ktx.shareProfile
-import io.nekohasekai.sfa.ui.profile.QRScanActivity
+import io.nekohasekai.sfa.ktx.shareProfileAsJson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,8 +106,6 @@ fun ProfilesCard(
     onImportFromFile: () -> Unit,
     onScanQrCode: () -> Unit,
     onCreateManually: () -> Unit,
-    shareQRCodeImage: suspend (Bitmap, String) -> Unit,
-    saveQRCodeToGallery: suspend (Bitmap, String) -> Unit,
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -108,6 +114,17 @@ fun ProfilesCard(
 
     var showQRCodeDialog by remember { mutableStateOf(false) }
     var qrCodeProfile by remember { mutableStateOf<Profile?>(null) }
+
+    var showQRSDialog by remember { mutableStateOf(false) }
+    var qrsProfile by remember { mutableStateOf<Profile?>(null) }
+    var qrsProfileData by remember { mutableStateOf<ByteArray?>(null) }
+
+    var showImportConfirmDialog by remember { mutableStateOf(false) }
+    var pendingImportName by remember { mutableStateOf<String?>(null) }
+    var pendingQrsData by remember { mutableStateOf<ByteArray?>(null) }
+    var pendingImportUri by remember { mutableStateOf<Uri?>(null) }
+
+    var showQRScanSheet by remember { mutableStateOf(false) }
 
     val newProfileLauncher =
         rememberLauncherForActivityResult(
@@ -137,62 +154,17 @@ fun ProfilesCard(
         ) { uri ->
             uri?.let {
                 coroutineScope.launch {
-                    when (val result = importHandler.importFromUri(uri)) {
-                        is ProfileImportHandler.ImportResult.Success -> {
+                    when (val parseResult = importHandler.parseUri(uri)) {
+                        is ProfileImportHandler.UriParseResult.Success -> {
                             withContext(Dispatchers.Main) {
-                                onProfileEdit(result.profile)
+                                pendingImportName = parseResult.name
+                                pendingImportUri = uri
+                                showImportConfirmDialog = true
                             }
                         }
-                        is ProfileImportHandler.ImportResult.Error -> {
+                        is ProfileImportHandler.UriParseResult.Error -> {
                             withContext(Dispatchers.Main) {
-                                context.errorDialogBuilder(Exception(result.message)).show()
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-    val scanQrCodeLauncher =
-        rememberLauncherForActivityResult(
-            QRScanActivity.Contract(),
-        ) { result ->
-            result?.let { intent ->
-                val data = intent.dataString
-                if (data != null) {
-                    coroutineScope.launch {
-                        when (val parseResult = importHandler.parseQRCode(data)) {
-                            is ProfileImportHandler.QRCodeParseResult.RemoteProfile -> {
-                                withContext(Dispatchers.Main) {
-                                    val newProfileIntent =
-                                        Intent(context, NewProfileActivity::class.java).apply {
-                                            putExtra(NewProfileActivity.EXTRA_IMPORT_NAME, parseResult.name)
-                                            putExtra(NewProfileActivity.EXTRA_IMPORT_URL, parseResult.url)
-                                        }
-                                    newProfileLauncher.launch(newProfileIntent)
-                                }
-                            }
-
-                            is ProfileImportHandler.QRCodeParseResult.LocalProfile -> {
-                                when (val importResult = importHandler.importFromQRCode(data)) {
-                                    is ProfileImportHandler.ImportResult.Success -> {
-                                        withContext(Dispatchers.Main) {
-                                            onProfileEdit(importResult.profile)
-                                        }
-                                    }
-
-                                    is ProfileImportHandler.ImportResult.Error -> {
-                                        withContext(Dispatchers.Main) {
-                                            context.errorDialogBuilder(Exception(importResult.message)).show()
-                                        }
-                                    }
-                                }
-                            }
-
-                            is ProfileImportHandler.QRCodeParseResult.Error -> {
-                                withContext(Dispatchers.Main) {
-                                    context.errorDialogBuilder(Exception(parseResult.message)).show()
-                                }
+                                context.errorDialogBuilder(Exception(parseResult.message)).show()
                             }
                         }
                     }
@@ -211,6 +183,39 @@ fun ProfilesCard(
                         val profileData = createProfileContent(selectedProfile)
                         context.contentResolver.openOutputStream(uri)?.use { outputStream ->
                             outputStream.write(profileData)
+                        }
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.success_profile_saved),
+                                Toast.LENGTH_SHORT,
+                            ).show()
+                        }
+                    } catch (e: Exception) {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(
+                                context,
+                                "${context.getString(R.string.failed_save_profile)}: ${e.message}",
+                                Toast.LENGTH_SHORT,
+                            ).show()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    val saveJsonFileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/json"),
+    ) { uri ->
+        if (uri != null) {
+            val selectedProfile = profiles.find { it.id == selectedProfileId }
+            if (selectedProfile != null) {
+                coroutineScope.launch(Dispatchers.IO) {
+                    try {
+                        val jsonContent = File(selectedProfile.typed.path).readText()
+                        context.contentResolver.openOutputStream(uri)?.use { outputStream ->
+                            outputStream.write(jsonContent.toByteArray())
                         }
                         withContext(Dispatchers.Main) {
                             Toast.makeText(
@@ -334,10 +339,46 @@ fun ProfilesCard(
                             saveFileLauncher.launch("${it.name}.bpf")
                         }
                     },
+                    onSaveJson = {
+                        selectedProfile?.let {
+                            saveJsonFileLauncher.launch("${it.name}.json")
+                        }
+                    },
+                    onShareJson = {
+                        selectedProfile?.let {
+                            coroutineScope.launch(Dispatchers.IO) {
+                                try {
+                                    context.shareProfileAsJson(it)
+                                } catch (e: Exception) {
+                                    withContext(Dispatchers.Main) {
+                                        context.errorDialogBuilder(e).show()
+                                    }
+                                }
+                            }
+                        }
+                    },
                     onShareURL = {
                         selectedProfile?.let {
                             qrCodeProfile = it
                             showQRCodeDialog = true
+                        }
+                    },
+                    onShareQRS = {
+                        selectedProfile?.let { profile ->
+                            coroutineScope.launch(Dispatchers.IO) {
+                                try {
+                                    val data = createProfileContent(profile)
+                                    withContext(Dispatchers.Main) {
+                                        qrsProfile = profile
+                                        qrsProfileData = data
+                                        showQRSDialog = true
+                                    }
+                                } catch (e: Exception) {
+                                    withContext(Dispatchers.Main) {
+                                        context.errorDialogBuilder(e).show()
+                                    }
+                                }
+                            }
                         }
                     },
                 )
@@ -354,8 +395,6 @@ fun ProfilesCard(
             onProfileDelete = onProfileDelete,
             onProfileMove = onProfileMove,
             onDismiss = onHideProfilePickerSheet,
-            shareQRCodeImage = shareQRCodeImage,
-            saveQRCodeToGallery = saveQRCodeToGallery,
         )
     }
 
@@ -399,7 +438,7 @@ fun ProfilesCard(
                 ListItem(
                     modifier = Modifier.clickable {
                         onHideAddProfileSheet()
-                        scanQrCodeLauncher.launch(null)
+                        showQRScanSheet = true
                     },
                     leadingContent = {
                         Icon(
@@ -448,9 +487,8 @@ fun ProfilesCard(
                 profile.typed.remoteURL,
             )
         }
-        val qrBitmap = remember(link) {
-            QRCodeGenerator.generate(link)
-        }
+        val surfaceColor = MaterialTheme.colorScheme.surface.toArgb()
+        val qrBitmap = QRCodeGenerator.rememberPrimaryBitmap(link, backgroundColor = surfaceColor)
 
         QRCodeDialog(
             bitmap = qrBitmap,
@@ -458,18 +496,148 @@ fun ProfilesCard(
                 showQRCodeDialog = false
                 qrCodeProfile = null
             },
-            onShare = {
-                coroutineScope.launch {
-                    shareQRCodeImage(qrBitmap, profile.name)
-                }
-                showQRCodeDialog = false
-                qrCodeProfile = null
+        )
+    }
+
+    if (showQRSDialog && qrsProfile != null && qrsProfileData != null) {
+        QRSDialog(
+            profileData = qrsProfileData!!,
+            profileName = qrsProfile!!.name,
+            onDismiss = {
+                showQRSDialog = false
+                qrsProfile = null
+                qrsProfileData = null
             },
-            onSave = {
-                coroutineScope.launch {
-                    saveQRCodeToGallery(qrBitmap, profile.name)
-                    showQRCodeDialog = false
-                    qrCodeProfile = null
+        )
+    }
+
+    if (showImportConfirmDialog && pendingImportName != null) {
+        AlertDialog(
+            onDismissRequest = {
+                showImportConfirmDialog = false
+                pendingImportName = null
+                pendingQrsData = null
+                pendingImportUri = null
+            },
+            title = { Text(stringResource(R.string.import_profile_confirm_title)) },
+            text = { Text(stringResource(R.string.import_profile_confirm_message, pendingImportName!!)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showImportConfirmDialog = false
+                        val qrsData = pendingQrsData
+                        val importUri = pendingImportUri
+                        pendingImportName = null
+                        pendingQrsData = null
+                        pendingImportUri = null
+                        coroutineScope.launch {
+                            if (qrsData != null) {
+                                when (val result = importHandler.importFromQRSData(qrsData)) {
+                                    is ProfileImportHandler.ImportResult.Success -> {
+                                        withContext(Dispatchers.Main) {
+                                            onProfileEdit(result.profile)
+                                        }
+                                    }
+                                    is ProfileImportHandler.ImportResult.Error -> {
+                                        withContext(Dispatchers.Main) {
+                                            context.errorDialogBuilder(Exception(result.message)).show()
+                                        }
+                                    }
+                                }
+                            } else if (importUri != null) {
+                                when (val result = importHandler.importFromUri(importUri)) {
+                                    is ProfileImportHandler.ImportResult.Success -> {
+                                        withContext(Dispatchers.Main) {
+                                            onProfileEdit(result.profile)
+                                        }
+                                    }
+                                    is ProfileImportHandler.ImportResult.Error -> {
+                                        withContext(Dispatchers.Main) {
+                                            context.errorDialogBuilder(Exception(result.message)).show()
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                ) {
+                    Text(stringResource(R.string.import_action))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showImportConfirmDialog = false
+                        pendingImportName = null
+                        pendingQrsData = null
+                        pendingImportUri = null
+                    },
+                ) {
+                    Text(stringResource(R.string.cancel))
+                }
+            },
+        )
+    }
+
+    if (showQRScanSheet) {
+        QRScanSheet(
+            onDismiss = { showQRScanSheet = false },
+            onScanResult = { result ->
+                showQRScanSheet = false
+                when (result) {
+                    is QRScanResult.QRSData -> {
+                        coroutineScope.launch {
+                            when (val parseResult = importHandler.parseQRSData(result.data)) {
+                                is ProfileImportHandler.QRSParseResult.Success -> {
+                                    withContext(Dispatchers.Main) {
+                                        pendingImportName = parseResult.name
+                                        pendingQrsData = result.data
+                                        showImportConfirmDialog = true
+                                    }
+                                }
+                                is ProfileImportHandler.QRSParseResult.Error -> {
+                                    withContext(Dispatchers.Main) {
+                                        context.errorDialogBuilder(Exception(parseResult.message)).show()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    is QRScanResult.RemoteProfile -> {
+                        coroutineScope.launch {
+                            when (val parseResult = importHandler.parseQRCode(result.uri.toString())) {
+                                is ProfileImportHandler.QRCodeParseResult.RemoteProfile -> {
+                                    withContext(Dispatchers.Main) {
+                                        val newProfileIntent =
+                                            Intent(context, NewProfileActivity::class.java).apply {
+                                                putExtra(NewProfileActivity.EXTRA_IMPORT_NAME, parseResult.name)
+                                                putExtra(NewProfileActivity.EXTRA_IMPORT_URL, parseResult.url)
+                                            }
+                                        newProfileLauncher.launch(newProfileIntent)
+                                    }
+                                }
+                                is ProfileImportHandler.QRCodeParseResult.LocalProfile -> {
+                                    when (val importResult = importHandler.importFromQRCode(result.uri.toString())) {
+                                        is ProfileImportHandler.ImportResult.Success -> {
+                                            withContext(Dispatchers.Main) {
+                                                onProfileEdit(importResult.profile)
+                                            }
+                                        }
+                                        is ProfileImportHandler.ImportResult.Error -> {
+                                            withContext(Dispatchers.Main) {
+                                                context.errorDialogBuilder(Exception(importResult.message)).show()
+                                            }
+                                        }
+                                    }
+                                }
+                                is ProfileImportHandler.QRCodeParseResult.Error -> {
+                                    withContext(Dispatchers.Main) {
+                                        context.errorDialogBuilder(Exception(parseResult.message)).show()
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             },
         )
@@ -560,7 +728,10 @@ private fun ProfileActionRow(
     onUpdate: () -> Unit,
     onShareFile: () -> Unit,
     onSaveFile: () -> Unit,
+    onSaveJson: () -> Unit,
+    onShareJson: () -> Unit,
     onShareURL: () -> Unit,
+    onShareQRS: () -> Unit,
 ) {
     if (profile == null) return
 
@@ -591,7 +762,10 @@ private fun ProfileActionRow(
             profile = profile,
             onShareFile = onShareFile,
             onSaveFile = onSaveFile,
+            onSaveJson = onSaveJson,
+            onShareJson = onShareJson,
             onShareURL = onShareURL,
+            onShareQRS = onShareQRS,
         )
     }
 }
@@ -643,7 +817,10 @@ private fun ShareButton(
     profile: Profile,
     onShareFile: () -> Unit,
     onSaveFile: () -> Unit,
+    onSaveJson: () -> Unit,
+    onShareJson: () -> Unit,
     onShareURL: () -> Unit,
+    onShareQRS: () -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -686,6 +863,34 @@ private fun ShareButton(
                     )
                 },
             )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.save_content_json)) },
+                onClick = {
+                    expanded = false
+                    onSaveJson()
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.DataObject,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.share_content_json)) },
+                onClick = {
+                    expanded = false
+                    onShareJson()
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.DataObject,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                },
+            )
             if (profile.typed.type == TypedProfile.Type.Remote) {
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.profile_share_url)) },
@@ -702,6 +907,20 @@ private fun ShareButton(
                     },
                 )
             }
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.share_as_qrs)) },
+                onClick = {
+                    expanded = false
+                    onShareQRS()
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.QrCode2,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                },
+            )
         }
     }
 }

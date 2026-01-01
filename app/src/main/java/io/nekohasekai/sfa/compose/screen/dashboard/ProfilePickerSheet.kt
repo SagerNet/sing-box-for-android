@@ -1,6 +1,5 @@
 package io.nekohasekai.sfa.compose.screen.dashboard
 
-import android.graphics.Bitmap
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -45,6 +44,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,7 +60,7 @@ import androidx.compose.ui.unit.dp
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.ProfileContent
 import io.nekohasekai.sfa.R
-import io.nekohasekai.sfa.compose.screen.configuration.QRCodeDialog
+import io.nekohasekai.sfa.compose.component.qr.QRCodeDialog
 import io.nekohasekai.sfa.compose.util.ProfileIcons
 import io.nekohasekai.sfa.compose.util.QRCodeGenerator
 import io.nekohasekai.sfa.compose.util.RelativeTimeFormatter
@@ -83,8 +83,6 @@ fun ProfilePickerSheet(
     onProfileDelete: (Profile) -> Unit,
     onProfileMove: (Int, Int) -> Unit,
     onDismiss: () -> Unit,
-    shareQRCodeImage: suspend (Bitmap, String) -> Unit,
-    saveQRCodeToGallery: suspend (Bitmap, String) -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val context = LocalContext.current
@@ -173,29 +171,14 @@ fun ProfilePickerSheet(
                 profile.typed.remoteURL,
             )
         }
-        val qrBitmap = remember(link) {
-            QRCodeGenerator.generate(link)
-        }
+        val surfaceColor = MaterialTheme.colorScheme.surface.toArgb()
+        val qrBitmap = QRCodeGenerator.rememberPrimaryBitmap(link, backgroundColor = surfaceColor)
 
         QRCodeDialog(
             bitmap = qrBitmap,
             onDismiss = {
                 showQRCodeDialog = false
                 qrCodeProfile = null
-            },
-            onShare = {
-                coroutineScope.launch {
-                    shareQRCodeImage(qrBitmap, profile.name)
-                }
-                showQRCodeDialog = false
-                qrCodeProfile = null
-            },
-            onSave = {
-                coroutineScope.launch {
-                    saveQRCodeToGallery(qrBitmap, profile.name)
-                    showQRCodeDialog = false
-                    qrCodeProfile = null
-                }
             },
         )
     }

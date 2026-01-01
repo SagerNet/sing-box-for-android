@@ -1,5 +1,6 @@
 <resources>
     <color name="seed">#d81b60</color>
+    <color name="surface_80">#CC1C1B1F</color>
 
     <color name="blue_grey_600">#546e7a</color>
 
