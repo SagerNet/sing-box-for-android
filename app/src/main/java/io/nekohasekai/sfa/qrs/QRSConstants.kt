@@ -13,7 +13,7 @@ object QRSConstants {
     const val MAX_FPS = 60
 
     // Slice Size settings
-    const val DEFAULT_SLICE_SIZE = 512
+    const val DEFAULT_SLICE_SIZE = 500
     const val MIN_SLICE_SIZE = 100
     const val MAX_SLICE_SIZE = 1500
 

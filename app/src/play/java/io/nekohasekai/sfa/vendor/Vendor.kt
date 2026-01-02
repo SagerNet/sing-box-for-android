@@ -12,6 +12,7 @@ import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.mlkit.common.MlKitException
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.ui.profile.QRCodeCropArea
 import io.nekohasekai.sfa.update.UpdateInfo
 import io.nekohasekai.sfa.update.UpdateState
 
@@ -82,9 +83,10 @@ object Vendor : VendorInterface {
     override fun createQRCodeAnalyzer(
         onSuccess: (String) -> Unit,
         onFailure: (Exception) -> Unit,
+        onCropArea: ((QRCodeCropArea?) -> Unit)?,
     ): ImageAnalysis.Analyzer? {
         try {
-            return MLKitQRCodeAnalyzer(onSuccess, onFailure)
+            return MLKitQRCodeAnalyzer(onSuccess, onFailure, onCropArea)
         } catch (exception: Exception) {
             if (exception !is MlKitException || exception.errorCode != MlKitException.UNAVAILABLE) {
                 Log.e(TAG, "failed to create MLKitQRCodeAnalyzer", exception)

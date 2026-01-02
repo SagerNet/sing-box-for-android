@@ -16,6 +16,7 @@ import androidx.lifecycle.LifecycleOwner
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.qrs.QRSDecoder
 import io.nekohasekai.sfa.qrs.readIntLE
+import io.nekohasekai.sfa.ui.profile.QRCodeCropArea
 import io.nekohasekai.sfa.ui.profile.ZxingQRCodeAnalyzer
 import io.nekohasekai.sfa.vendor.Vendor
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,6 +49,7 @@ data class QRScanUiState(
     val vendorAnalyzerAvailable: Boolean = false,
     val qrsMode: Boolean = false,
     val qrsProgress: Pair<Int, Int>? = null,
+    val cropArea: QRCodeCropArea? = null,
     val errorMessage: String? = null,
     val result: QRScanResult? = null,
     val zoomRatio: Float = 1f,
@@ -75,7 +77,8 @@ class QRScanViewModel(application: Application) : AndroidViewModel(application) 
 
     private val vendorAnalyzer: ImageAnalysis.Analyzer? = Vendor.createQRCodeAnalyzer(
         onSuccess = { rawValue -> handleScanSuccess(rawValue) },
-        onFailure = { exception -> handleScanFailure(exception) }
+        onFailure = { exception -> handleScanFailure(exception) },
+        onCropArea = ::updateCropArea,
     )
 
     init {
@@ -95,6 +98,16 @@ class QRScanViewModel(application: Application) : AndroidViewModel(application) 
         handleScanFailure(exception)
     }
 
+    private fun updateCropArea(area: QRCodeCropArea?) {
+        _uiState.update { state ->
+            if (state.cropArea == area) {
+                state
+            } else {
+                state.copy(cropArea = area)
+            }
+        }
+    }
+
     private fun handleScanSuccess(rawValue: String) {
         Log.d(TAG, "Scanned: ${rawValue.take(100)}...")
         val qrsPayload = extractQRSPayload(rawValue)
@@ -102,6 +115,7 @@ class QRScanViewModel(application: Application) : AndroidViewModel(application) 
         if (qrsPayload != null) {
             handleQRSFrame(qrsPayload)
         } else {
+            updateCropArea(null)
             if (_uiState.value.qrsMode) {
                 resetQRSState()
             }
@@ -114,6 +128,7 @@ class QRScanViewModel(application: Application) : AndroidViewModel(application) 
         if (_uiState.value.qrsMode) {
             return
         }
+        updateCropArea(null)
         imageAnalysis?.clearAnalyzer()
         if (showingError.compareAndSet(false, true)) {
             resetAnalyzer()
@@ -125,7 +140,7 @@ class QRScanViewModel(application: Application) : AndroidViewModel(application) 
         if (_uiState.value.useVendorAnalyzer && vendorAnalyzer != null) {
             _uiState.update { it.copy(useVendorAnalyzer = false) }
             imageAnalysis?.clearAnalyzer()
-            imageAnalyzer = ZxingQRCodeAnalyzer(onSuccess, onFailure)
+            imageAnalyzer = ZxingQRCodeAnalyzer(onSuccess, onFailure, onCropArea = ::updateCropArea)
             imageAnalysis?.setAnalyzer(analysisExecutor, imageAnalyzer!!)
         }
     }
@@ -154,7 +169,7 @@ class QRScanViewModel(application: Application) : AndroidViewModel(application) 
                 imageAnalyzer = if (_uiState.value.useVendorAnalyzer && vendorAnalyzer != null) {
                     vendorAnalyzer
                 } else {
-                    ZxingQRCodeAnalyzer(onSuccess, onFailure)
+                    ZxingQRCodeAnalyzer(onSuccess, onFailure, onCropArea = ::updateCropArea)
                 }
                 imageAnalysis?.setAnalyzer(analysisExecutor, imageAnalyzer!!)
 
@@ -220,12 +235,13 @@ class QRScanViewModel(application: Application) : AndroidViewModel(application) 
 
         val newState = !_uiState.value.useVendorAnalyzer
         _uiState.update { it.copy(useVendorAnalyzer = newState) }
+        updateCropArea(null)
 
         imageAnalysis?.clearAnalyzer()
         imageAnalyzer = if (newState) {
             vendorAnalyzer
         } else {
-            ZxingQRCodeAnalyzer(onSuccess, onFailure)
+            ZxingQRCodeAnalyzer(onSuccess, onFailure, onCropArea = ::updateCropArea)
         }
         imageAnalysis?.setAnalyzer(analysisExecutor, imageAnalyzer!!)
     }
@@ -238,7 +254,7 @@ class QRScanViewModel(application: Application) : AndroidViewModel(application) 
 
     fun clearResult() {
         resetQRSState()
-        _uiState.update { it.copy(result = null) }
+        _uiState.update { it.copy(result = null, cropArea = null) }
     }
 
     private fun extractQRSPayload(content: String): ByteArray? {

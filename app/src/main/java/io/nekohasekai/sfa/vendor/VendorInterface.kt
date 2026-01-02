@@ -2,6 +2,7 @@ package io.nekohasekai.sfa.vendor
 
 import android.app.Activity
 import androidx.camera.core.ImageAnalysis
+import io.nekohasekai.sfa.ui.profile.QRCodeCropArea
 import io.nekohasekai.sfa.update.UpdateInfo
 
 interface VendorInterface {
@@ -13,6 +14,7 @@ interface VendorInterface {
     fun createQRCodeAnalyzer(
         onSuccess: (String) -> Unit,
         onFailure: (Exception) -> Unit,
+        onCropArea: ((QRCodeCropArea?) -> Unit)? = null,
     ): ImageAnalysis.Analyzer?
 
     /**

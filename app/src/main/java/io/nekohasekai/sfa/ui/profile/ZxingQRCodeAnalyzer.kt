@@ -15,6 +15,7 @@ import com.google.zxing.qrcode.QRCodeReader
 class ZxingQRCodeAnalyzer(
     private val onSuccess: ((String) -> Unit),
     private val onFailure: ((Exception) -> Unit),
+    private val onCropArea: ((QRCodeCropArea?) -> Unit)? = null,
 ) : ImageAnalysis.Analyzer {
     private val qrCodeReader = QRCodeReader()
     private var yDataBuffer: ByteArray? = null
@@ -23,12 +24,37 @@ class ZxingQRCodeAnalyzer(
 
     override fun analyze(image: ImageProxy) {
         try {
-            val source = image.toYUVSource()
+            val yData = image.toYUVData()
+            val width = image.width
+            val height = image.height
+            val rotationDegrees = image.imageInfo.rotationDegrees
+            val source = PlanarYUVLuminanceSource(yData, width, height, 0, 0, width, height, false)
 
             // Fast path: HybridBinarizer
             tryDecode(BinaryBitmap(HybridBinarizer(source)))?.let {
                 onSuccess(it.text)
                 return
+            }
+
+            val cropArea = QRCodeSmartCrop.findCropArea(yData, width, height, rotationDegrees)
+            onCropArea?.invoke(cropArea)
+            if (cropArea != null) {
+                val cropWidth = cropArea.right - cropArea.left
+                val cropHeight = cropArea.bottom - cropArea.top
+                val smartSource = PlanarYUVLuminanceSource(
+                    yData,
+                    width,
+                    height,
+                    cropArea.left,
+                    cropArea.top,
+                    cropWidth,
+                    cropHeight,
+                    false,
+                )
+                tryDecode(BinaryBitmap(HybridBinarizer(smartSource)))?.let {
+                    onSuccess(it.text)
+                    return
+                }
             }
 
             // In QRS mode, skip additional binarizer attempts for performance
@@ -65,7 +91,7 @@ class ZxingQRCodeAnalyzer(
         }
     }
 
-    private fun ImageProxy.toYUVSource(): PlanarYUVLuminanceSource {
+    private fun ImageProxy.toYUVData(): ByteArray {
         val yPlane = planes[0]
         val yBuffer = yPlane.buffer
         val rowStride = yPlane.rowStride
@@ -80,7 +106,7 @@ class ZxingQRCodeAnalyzer(
                 yBuffer.get(yData, row * width, width)
             }
         }
-        return PlanarYUVLuminanceSource(yData, width, height, 0, 0, width, height, false)
+        return yData
     }
 
     private fun tryDecode(bitmap: BinaryBitmap): Result? {

@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,8 +40,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
@@ -53,6 +56,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.screen.qrscan.QRScanResult
 import io.nekohasekai.sfa.compose.screen.qrscan.QRScanViewModel
+import io.nekohasekai.sfa.ui.profile.QRCodeCropArea
+import kotlin.math.max
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -186,7 +191,8 @@ fun QRScanSheet(
                     CameraPreview(
                         modifier = Modifier.fillMaxSize(),
                         viewModel = viewModel,
-                        lifecycleOwner = lifecycleOwner
+                        lifecycleOwner = lifecycleOwner,
+                        cropArea = uiState.cropArea,
                     )
                 }
 
@@ -261,6 +267,7 @@ private fun CameraPreview(
     modifier: Modifier = Modifier,
     viewModel: QRScanViewModel,
     lifecycleOwner: LifecycleOwner,
+    cropArea: QRCodeCropArea?,
 ) {
     var previewView by remember { mutableStateOf<PreviewView?>(null) }
 
@@ -272,20 +279,92 @@ private fun CameraPreview(
         onDispose { }
     }
 
-    AndroidView(
-        modifier = modifier,
-        factory = { ctx ->
-            PreviewView(ctx).apply {
-                implementationMode = PreviewView.ImplementationMode.COMPATIBLE
-                previewView = this
+    Box(modifier = modifier) {
+        AndroidView(
+            modifier = Modifier.fillMaxSize(),
+            factory = { ctx ->
+                PreviewView(ctx).apply {
+                    implementationMode = PreviewView.ImplementationMode.COMPATIBLE
+                    previewView = this
 
-                previewStreamState.observe(lifecycleOwner) { state ->
-                    if (state == PreviewView.StreamState.STREAMING) {
-                        viewModel.onPreviewStreamStateChanged(true)
-                        implementationMode = PreviewView.ImplementationMode.PERFORMANCE
+                    previewStreamState.observe(lifecycleOwner) { state ->
+                        if (state == PreviewView.StreamState.STREAMING) {
+                            viewModel.onPreviewStreamStateChanged(true)
+                            implementationMode = PreviewView.ImplementationMode.PERFORMANCE
+                        }
                     }
                 }
             }
+        )
+
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val rect = cropArea?.let { mapCropAreaToPreview(it, size.width, size.height) } ?: return@Canvas
+            drawRect(
+                color = Color.White.copy(alpha = 0.85f),
+                topLeft = rect.topLeft,
+                size = rect.size,
+                style = Stroke(width = 2.dp.toPx()),
+            )
         }
-    )
+    }
+}
+
+private fun mapCropAreaToPreview(
+    area: QRCodeCropArea,
+    viewWidth: Float,
+    viewHeight: Float,
+): Rect? {
+    if (viewWidth <= 0f || viewHeight <= 0f) return null
+
+    val rotation = ((area.rotationDegrees % 360) + 360) % 360
+    var rotLeft = area.left.toFloat()
+    var rotTop = area.top.toFloat()
+    var rotRight = area.right.toFloat()
+    var rotBottom = area.bottom.toFloat()
+    var imageWidth = area.imageWidth.toFloat()
+    var imageHeight = area.imageHeight.toFloat()
+    when (rotation) {
+        90 -> {
+            rotLeft = (area.imageHeight - area.bottom).toFloat()
+            rotTop = area.left.toFloat()
+            rotRight = (area.imageHeight - area.top).toFloat()
+            rotBottom = area.right.toFloat()
+            imageWidth = area.imageHeight.toFloat()
+            imageHeight = area.imageWidth.toFloat()
+        }
+        180 -> {
+            rotLeft = (area.imageWidth - area.right).toFloat()
+            rotTop = (area.imageHeight - area.bottom).toFloat()
+            rotRight = (area.imageWidth - area.left).toFloat()
+            rotBottom = (area.imageHeight - area.top).toFloat()
+        }
+        270 -> {
+            rotLeft = area.top.toFloat()
+            rotTop = (area.imageWidth - area.right).toFloat()
+            rotRight = area.bottom.toFloat()
+            rotBottom = (area.imageWidth - area.left).toFloat()
+            imageWidth = area.imageHeight.toFloat()
+            imageHeight = area.imageWidth.toFloat()
+        }
+    }
+
+    if (imageWidth <= 0f || imageHeight <= 0f) return null
+
+    val scale = max(viewWidth / imageWidth, viewHeight / imageHeight)
+    val dx = (viewWidth - imageWidth * scale) / 2f
+    val dy = (viewHeight - imageHeight * scale) / 2f
+
+    val left = rotLeft * scale + dx
+    val top = rotTop * scale + dy
+    val right = rotRight * scale + dx
+    val bottom = rotBottom * scale + dy
+
+    val clampedLeft = left.coerceIn(0f, viewWidth)
+    val clampedTop = top.coerceIn(0f, viewHeight)
+    val clampedRight = right.coerceIn(0f, viewWidth)
+    val clampedBottom = bottom.coerceIn(0f, viewHeight)
+
+    if (clampedRight - clampedLeft < 4f || clampedBottom - clampedTop < 4f) return null
+
+    return Rect(clampedLeft, clampedTop, clampedRight, clampedBottom)
 }

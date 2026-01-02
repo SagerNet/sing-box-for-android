@@ -9,6 +9,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.database.Settings
+import io.nekohasekai.sfa.ui.profile.QRCodeCropArea
 import io.nekohasekai.sfa.update.UpdateCheckException
 import io.nekohasekai.sfa.update.UpdateInfo
 import io.nekohasekai.sfa.update.UpdateState
@@ -91,6 +92,7 @@ object Vendor : VendorInterface {
     override fun createQRCodeAnalyzer(
         onSuccess: (String) -> Unit,
         onFailure: (Exception) -> Unit,
+        onCropArea: ((QRCodeCropArea?) -> Unit)?,
     ): ImageAnalysis.Analyzer? {
         return null
     }
