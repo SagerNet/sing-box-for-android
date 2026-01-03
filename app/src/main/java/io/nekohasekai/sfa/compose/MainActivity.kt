@@ -735,9 +735,9 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
                     modifier = Modifier.align(Alignment.BottomCenter),
                 )
 
-                // Start FAB (shown when service is not running and a profile is selected)
+                // Start FAB (shown when service is stopped and a profile is selected)
                 AnimatedVisibility(
-                    visible = !serviceRunning && dashboardUiState.selectedProfileId != -1L && !isSettingsSubScreen,
+                    visible = currentServiceStatus == Status.Stopped && dashboardUiState.selectedProfileId != -1L && !isSettingsSubScreen,
                     enter = scaleIn(),
                     exit = scaleOut(),
                     modifier = Modifier
