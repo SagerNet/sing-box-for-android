@@ -178,7 +178,7 @@ private fun StatusItem(
 }
 
 @Composable
-private fun UptimeText(
+fun UptimeText(
     startTime: Long,
     modifier: Modifier = Modifier,
 ) {

@@ -3,6 +3,7 @@ package io.nekohasekai.sfa.compose
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
@@ -15,6 +16,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,35 +24,31 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.SwapVert
+import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.UnfoldLess
 import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.FilterChip
 import dev.jeziellago.compose.markdowntext.MarkdownText
 import androidx.compose.material3.Badge
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Job
 import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -58,8 +56,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SheetState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -76,6 +76,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
@@ -95,6 +96,7 @@ import io.nekohasekai.sfa.bg.ServiceNotification
 import io.nekohasekai.sfa.compose.base.GlobalEventBus
 import io.nekohasekai.sfa.compose.base.UiEvent
 import io.nekohasekai.sfa.compose.component.ServiceStatusBar
+import io.nekohasekai.sfa.compose.component.UptimeText
 import io.nekohasekai.sfa.compose.component.UpdateAvailableDialog
 import io.nekohasekai.sfa.compose.navigation.SFANavHost
 import io.nekohasekai.sfa.compose.navigation.Screen
@@ -103,11 +105,8 @@ import io.nekohasekai.sfa.compose.screen.dashboard.CardGroup
 import io.nekohasekai.sfa.compose.screen.dashboard.DashboardViewModel
 import io.nekohasekai.sfa.compose.screen.dashboard.GroupsCard
 import io.nekohasekai.sfa.compose.screen.connections.ConnectionDetailsScreen
-import io.nekohasekai.sfa.compose.screen.connections.ConnectionsScreen
+import io.nekohasekai.sfa.compose.screen.connections.ConnectionsPage
 import io.nekohasekai.sfa.compose.screen.connections.ConnectionsViewModel
-import io.nekohasekai.sfa.compose.model.Connection
-import io.nekohasekai.sfa.compose.model.ConnectionSort
-import io.nekohasekai.sfa.compose.model.ConnectionStateFilter
 import io.nekohasekai.sfa.compose.screen.dashboard.groups.GroupsViewModel
 import io.nekohasekai.sfa.compose.screen.log.LogViewModel
 import io.nekohasekai.sfa.compose.theme.SFATheme
@@ -268,7 +267,12 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
         val navController = rememberNavController()
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination
+        val currentRoute = currentDestination?.route
         val scope = rememberCoroutineScope()
+
+        val configuration = LocalConfiguration.current
+        val useNavigationRail =
+            configuration.isLayoutSizeAtLeast(Configuration.SCREENLAYOUT_SIZE_LARGE)
 
         // Snackbar state
         val snackbarHostState = remember { SnackbarHostState() }
@@ -490,16 +494,32 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
         }
         val dashboardUiState by dashboardViewModel.uiState.collectAsState()
 
+        val isSettingsSubScreen = currentRoute?.startsWith("settings/") == true
+        val isConnectionsDetail = currentRoute?.startsWith("connections/detail") == true
+        val currentRootRoute =
+            when {
+                isSettingsSubScreen -> Screen.Settings.route
+                currentRoute?.startsWith(Screen.Connections.route) == true -> Screen.Connections.route
+                currentRoute?.startsWith(Screen.Log.route) == true -> Screen.Log.route
+                else -> currentRoute
+            }
+        val isConnectionsRoute = currentRootRoute == Screen.Connections.route
+        val isGroupsRoute = currentRootRoute == Screen.Groups.route
+
         // Determine current screen title
         val currentScreen =
-            bottomNavigationScreens.find { screen ->
-                currentDestination?.route == screen.route
-            } ?: bottomNavigationScreens[0]
+            when (currentRootRoute) {
+                Screen.Dashboard.route -> Screen.Dashboard
+                Screen.Groups.route -> Screen.Groups
+                Screen.Connections.route -> Screen.Connections
+                Screen.Log.route -> Screen.Log
+                Screen.Settings.route -> Screen.Settings
+                else -> Screen.Dashboard
+            }
 
-        // Check if we're in a settings sub-screen
-        val isSettingsSubScreen = currentDestination?.route?.startsWith("settings/") == true
+        val isSubScreen = isSettingsSubScreen || isConnectionsDetail
         val settingsScreenTitle =
-            when (currentDestination?.route) {
+            when (currentRoute) {
                 "settings/app" -> stringResource(R.string.title_app_settings)
                 "settings/core" -> stringResource(R.string.core)
                 "settings/service" -> stringResource(R.string.service)
@@ -514,6 +534,76 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
             } else {
                 null
             }
+
+        val groupsViewModel: GroupsViewModel? =
+            if (isGroupsRoute) {
+                viewModel(
+                    factory = object : ViewModelProvider.Factory {
+                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                            @Suppress("UNCHECKED_CAST")
+                            return GroupsViewModel(dashboardViewModel.commandClient) as T
+                        }
+                    }
+                )
+            } else {
+                null
+            }
+
+        val connectionsViewModel: ConnectionsViewModel? =
+            if (isConnectionsRoute) {
+                viewModel(
+                    factory = object : ViewModelProvider.Factory {
+                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                            @Suppress("UNCHECKED_CAST")
+                            return ConnectionsViewModel(dashboardViewModel.commandClient) as T
+                        }
+                    }
+                )
+            } else {
+                null
+            }
+
+        val showGroupsInNav = dashboardUiState.hasGroups
+        val showConnectionsInNav =
+            currentServiceStatus == Status.Started || currentServiceStatus == Status.Starting
+
+        val railScreens =
+            buildList {
+                add(Screen.Dashboard)
+                if (showGroupsInNav) {
+                    add(Screen.Groups)
+                }
+                if (showConnectionsInNav) {
+                    add(Screen.Connections)
+                }
+                add(Screen.Log)
+                add(Screen.Settings)
+            }
+
+        val allowedRoutes =
+            buildSet {
+                add(Screen.Dashboard.route)
+                add(Screen.Log.route)
+                add(Screen.Settings.route)
+                if (useNavigationRail && showGroupsInNav) {
+                    add(Screen.Groups.route)
+                }
+                if (useNavigationRail && showConnectionsInNav) {
+                    add(Screen.Connections.route)
+                }
+            }
+
+        LaunchedEffect(allowedRoutes, currentRootRoute, useNavigationRail) {
+            if (currentRootRoute != null && !allowedRoutes.contains(currentRootRoute)) {
+                navController.navigate(Screen.Dashboard.route) {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            }
+        }
 
         // Collect all UI events from GlobalEventBus
         LaunchedEffect(Unit) {
@@ -565,143 +655,137 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
             }
         }
 
-        Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-            topBar = {
-                TopAppBar(
-                    title = {
-                        Text(
-                            if (isSettingsSubScreen && settingsScreenTitle != null) {
-                                settingsScreenTitle
-                            } else {
-                                stringResource(currentScreen.titleRes)
-                            },
-                        )
-                    },
-                    navigationIcon = {
-                        if (isSettingsSubScreen) {
-                            IconButton(onClick = { navController.navigateUp() }) {
+        val topBarContent: @Composable () -> Unit = {
+            TopAppBar(
+                title = {
+                    Text(
+                        when {
+                            isSettingsSubScreen && settingsScreenTitle != null -> settingsScreenTitle
+                            isConnectionsDetail -> stringResource(R.string.connection_details)
+                            else -> stringResource(currentScreen.titleRes)
+                        },
+                    )
+                },
+                navigationIcon = {
+                    if (isSubScreen) {
+                        IconButton(onClick = { navController.navigateUp() }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                                contentDescription = stringResource(R.string.content_description_back),
+                            )
+                        }
+                    }
+                },
+                actions = {
+                    // Show Others menu for Dashboard screen (but not in settings sub-screens)
+                    if (currentScreen == Screen.Dashboard && !isSettingsSubScreen) {
+                        // More options button
+                        IconButton(onClick = { dashboardViewModel.toggleCardSettingsDialog() }) {
+                            Icon(
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = stringResource(R.string.title_others),
+                                tint = MaterialTheme.colorScheme.onSurface,
+                            )
+                        }
+                    }
+
+                    if (currentScreen == Screen.Groups && groupsViewModel != null) {
+                        val groupsUiState by groupsViewModel.uiState.collectAsState()
+                        val allCollapsed = groupsUiState.expandedGroups.isEmpty()
+                        if (groupsUiState.groups.isNotEmpty()) {
+                            IconButton(onClick = { groupsViewModel.toggleAllGroups() }) {
                                 Icon(
-                                    imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                                    contentDescription = stringResource(R.string.content_description_back),
+                                    imageVector = if (allCollapsed) Icons.Default.UnfoldMore else Icons.Default.UnfoldLess,
+                                    contentDescription =
+                                        if (allCollapsed) {
+                                            stringResource(R.string.expand_all)
+                                        } else {
+                                            stringResource(R.string.collapse_all)
+                                        },
                                 )
                             }
                         }
-                    },
-                    actions = {
-                        // Show Others menu for Dashboard screen (but not in settings sub-screens)
-                        if (currentScreen == Screen.Dashboard && !isSettingsSubScreen) {
-                            // More options button
-                            IconButton(onClick = { dashboardViewModel.toggleCardSettingsDialog() }) {
+                    }
+
+                    if (isConnectionsDetail && connectionsViewModel != null) {
+                        val connectionsUiState by connectionsViewModel.uiState.collectAsState()
+                        val connectionId = navBackStackEntry?.arguments?.getString("connectionId")
+                        val detailConnection =
+                            connectionsUiState.allConnections.find { it.id == connectionId }
+                                ?: connectionsUiState.connections.find { it.id == connectionId }
+                        if (detailConnection?.isActive == true) {
+                            IconButton(onClick = { connectionsViewModel.closeConnection(detailConnection.id) }) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = stringResource(R.string.connection_close),
+                                )
+                            }
+                        }
+                    }
+
+                    if (currentScreen == Screen.Log && logViewModel != null) {
+                        val logUiState by logViewModel.uiState.collectAsState()
+
+                        if (!logUiState.isSelectionMode) {
+                            IconButton(onClick = { logViewModel.togglePause() }) {
+                                Icon(
+                                    imageVector =
+                                        if (logUiState.isPaused) {
+                                            Icons.Default.PlayArrow
+                                        } else {
+                                            Icons.Default.Pause
+                                        },
+                                    contentDescription =
+                                        if (logUiState.isPaused) {
+                                            stringResource(
+                                                R.string.content_description_resume_logs,
+                                            )
+                                        } else {
+                                            stringResource(R.string.content_description_pause_logs)
+                                        },
+                                )
+                            }
+
+                            IconButton(onClick = { logViewModel.toggleSearch() }) {
+                                Icon(
+                                    imageVector =
+                                        if (logUiState.isSearchActive) {
+                                            Icons.Default.ExpandLess
+                                        } else {
+                                            Icons.Default.Search
+                                        },
+                                    contentDescription =
+                                        if (logUiState.isSearchActive) {
+                                            stringResource(
+                                                R.string.content_description_collapse_search,
+                                            )
+                                        } else {
+                                            stringResource(R.string.content_description_search_logs)
+                                        },
+                                    tint =
+                                        if (logUiState.isSearchActive) {
+                                            MaterialTheme.colorScheme.primary
+                                        } else {
+                                            MaterialTheme.colorScheme.onSurface
+                                        },
+                                )
+                            }
+
+                            IconButton(onClick = { logViewModel.toggleOptionsMenu() }) {
                                 Icon(
                                     imageVector = Icons.Default.MoreVert,
-                                    contentDescription = stringResource(R.string.title_others),
+                                    contentDescription = stringResource(R.string.more_options),
                                     tint = MaterialTheme.colorScheme.onSurface,
                                 )
                             }
                         }
-
-                        if (currentScreen == Screen.Log && logViewModel != null) {
-                            val logUiState by logViewModel.uiState.collectAsState()
-
-                            if (!logUiState.isSelectionMode) {
-                                IconButton(onClick = { logViewModel.togglePause() }) {
-                                    Icon(
-                                        imageVector =
-                                            if (logUiState.isPaused) {
-                                                Icons.Default.PlayArrow
-                                            } else {
-                                                Icons.Default.Pause
-                                            },
-                                        contentDescription =
-                                            if (logUiState.isPaused) {
-                                                stringResource(
-                                                    R.string.content_description_resume_logs,
-                                                )
-                                            } else {
-                                                stringResource(R.string.content_description_pause_logs)
-                                            },
-                                    )
-                                }
-
-                                IconButton(onClick = { logViewModel.toggleSearch() }) {
-                                    Icon(
-                                        imageVector =
-                                            if (logUiState.isSearchActive) {
-                                                Icons.Default.ExpandLess
-                                            } else {
-                                                Icons.Default.Search
-                                            },
-                                        contentDescription =
-                                            if (logUiState.isSearchActive) {
-                                                stringResource(
-                                                    R.string.content_description_collapse_search,
-                                                )
-                                            } else {
-                                                stringResource(R.string.content_description_search_logs)
-                                            },
-                                        tint =
-                                            if (logUiState.isSearchActive) {
-                                                MaterialTheme.colorScheme.primary
-                                            } else {
-                                                MaterialTheme.colorScheme.onSurface
-                                            },
-                                    )
-                                }
-
-                                IconButton(onClick = { logViewModel.toggleOptionsMenu() }) {
-                                    Icon(
-                                        imageVector = Icons.Default.MoreVert,
-                                        contentDescription = stringResource(R.string.more_options),
-                                        tint = MaterialTheme.colorScheme.onSurface,
-                                    )
-                                }
-                            }
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(),
-                )
-            },
-            bottomBar = {
-                // Only show bottom bar when not in settings sub-screens
-                if (!isSettingsSubScreen) {
-                    val hasUpdate by UpdateState.hasUpdate
-                    NavigationBar {
-                        bottomNavigationScreens.forEach { screen ->
-                            NavigationBarItem(
-                                icon = {
-                                    if (screen == Screen.Settings && hasUpdate) {
-                                        BadgedBox(badge = { Badge(containerColor = MaterialTheme.colorScheme.primary) }) {
-                                            Icon(screen.icon, contentDescription = null)
-                                        }
-                                    } else {
-                                        Icon(screen.icon, contentDescription = null)
-                                    }
-                                },
-                                selected =
-                                    currentDestination?.hierarchy?.any {
-                                        it.route == screen.route
-                                    } == true,
-                                onClick = {
-                                    navController.navigate(screen.route) {
-                                        // Pop up to the start destination of the graph to
-                                        // avoid building up a large stack of destinations
-                                        popUpTo(navController.graph.findStartDestination().id) {
-                                            saveState = true
-                                        }
-                                        // Avoid multiple copies of the same destination
-                                        launchSingleTop = true
-                                        // Restore state when reselecting a previously selected item
-                                        restoreState = true
-                                    }
-                                },
-                            )
-                        }
                     }
-                }
-            },
-        ) { paddingValues ->
+                },
+                colors = TopAppBarDefaults.topAppBarColors(),
+            )
+        }
+
+        val scaffoldContent: @Composable (PaddingValues) -> Unit = { paddingValues ->
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -720,46 +804,231 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
                     showStatusBar = showStatusBar,
                     dashboardViewModel = dashboardViewModel,
                     logViewModel = logViewModel,
+                    groupsViewModel = groupsViewModel,
+                    connectionsViewModel = connectionsViewModel,
                     modifier = Modifier.fillMaxSize(),
                 )
-                ServiceStatusBar(
-                    visible = showStatusBar && !isSettingsSubScreen,
-                    serviceStatus = currentServiceStatus,
-                    startTime = dashboardUiState.serviceStartTime,
-                    groupsCount = dashboardUiState.groupsCount,
-                    hasGroups = dashboardUiState.hasGroups,
-                    onGroupsClick = { showGroupsSheet = true },
-                    connectionsCount = dashboardUiState.connectionsOut.toIntOrNull() ?: 0,
-                    onConnectionsClick = { showConnectionsSheet = true },
-                    onStopClick = { dashboardViewModel.toggleService() },
-                    modifier = Modifier.align(Alignment.BottomCenter),
-                )
+                if (!useNavigationRail) {
+                    ServiceStatusBar(
+                        visible = showStatusBar && !isSubScreen,
+                        serviceStatus = currentServiceStatus,
+                        startTime = dashboardUiState.serviceStartTime,
+                        groupsCount = dashboardUiState.groupsCount,
+                        hasGroups = dashboardUiState.hasGroups,
+                        onGroupsClick = { showGroupsSheet = true },
+                        connectionsCount = dashboardUiState.connectionsOut.toIntOrNull() ?: 0,
+                        onConnectionsClick = { showConnectionsSheet = true },
+                        onStopClick = { dashboardViewModel.toggleService() },
+                        modifier = Modifier.align(Alignment.BottomCenter),
+                    )
+                }
 
-                // Start FAB (shown when service is stopped and a profile is selected)
-                AnimatedVisibility(
-                    visible = currentServiceStatus == Status.Stopped && dashboardUiState.selectedProfileId != -1L && !isSettingsSubScreen,
-                    enter = scaleIn(),
-                    exit = scaleOut(),
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(16.dp),
-                ) {
-                    FloatingActionButton(
-                        onClick = { startService() },
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                val showPadFab = useNavigationRail && !isSubScreen && (showStartFab || showStatusBar)
+                if (useNavigationRail) {
+                    androidx.compose.animation.AnimatedVisibility(
+                        visible = showPadFab,
+                        enter = scaleIn(),
+                        exit = scaleOut(),
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(20.dp),
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.PlayArrow,
-                            contentDescription = stringResource(R.string.action_start),
-                        )
+                        val isRunning =
+                            currentServiceStatus == Status.Started || currentServiceStatus == Status.Starting
+                        val isStopping = currentServiceStatus == Status.Stopping
+                        if (currentServiceStatus == Status.Stopped) {
+                            FloatingActionButton(
+                                onClick = { startService() },
+                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.PlayArrow,
+                                    contentDescription = stringResource(R.string.action_start),
+                                )
+                            }
+                        } else {
+                            ExtendedFloatingActionButton(
+                                onClick = {
+                                    if (isRunning || isStopping) {
+                                        dashboardViewModel.toggleService()
+                                    } else {
+                                        startService()
+                                    }
+                                },
+                                icon = {
+                                    Icon(
+                                        imageVector =
+                                            if (isRunning || isStopping) {
+                                                Icons.Default.Stop
+                                            } else {
+                                                Icons.Default.PlayArrow
+                                            },
+                                        contentDescription =
+                                            if (isRunning || isStopping) {
+                                                stringResource(R.string.stop)
+                                            } else {
+                                                stringResource(R.string.action_start)
+                                            },
+                                    )
+                                },
+                                text = {
+                                    when {
+                                        isRunning && dashboardUiState.serviceStartTime != null -> {
+                                            UptimeText(startTime = dashboardUiState.serviceStartTime!!)
+                                        }
+                                        currentServiceStatus == Status.Started -> {
+                                            Text(
+                                                text = stringResource(R.string.status_started),
+                                                style = MaterialTheme.typography.labelLarge,
+                                            )
+                                        }
+                                        currentServiceStatus == Status.Starting -> {
+                                            Text(
+                                                text = stringResource(R.string.status_starting),
+                                                style = MaterialTheme.typography.labelLarge,
+                                            )
+                                        }
+                                        currentServiceStatus == Status.Stopping -> {
+                                            Text(
+                                                text = stringResource(R.string.status_stopping),
+                                                style = MaterialTheme.typography.labelLarge,
+                                            )
+                                        }
+                                        else -> {
+                                            Text(
+                                                text = stringResource(R.string.action_start),
+                                                style = MaterialTheme.typography.labelLarge,
+                                            )
+                                        }
+                                    }
+                                },
+                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                modifier = Modifier.height(64.dp),
+                            )
+                        }
+                    }
+                } else {
+                    // Start FAB (shown when service is stopped and a profile is selected)
+                    androidx.compose.animation.AnimatedVisibility(
+                        visible = currentServiceStatus == Status.Stopped &&
+                            dashboardUiState.selectedProfileId != -1L &&
+                            !isSubScreen,
+                        enter = scaleIn(),
+                        exit = scaleOut(),
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(16.dp),
+                    ) {
+                        FloatingActionButton(
+                            onClick = { startService() },
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.PlayArrow,
+                                contentDescription = stringResource(R.string.action_start),
+                            )
+                        }
                     }
                 }
             }
         }
 
+        if (useNavigationRail) {
+            Row(modifier = Modifier.fillMaxSize()) {
+                Surface(tonalElevation = 1.dp) {
+                    NavigationRail(
+                        modifier = Modifier.fillMaxHeight(),
+                    ) {
+                        val hasUpdate by UpdateState.hasUpdate
+                        railScreens.forEach { screen ->
+                            val selected = currentRootRoute == screen.route
+
+                            NavigationRailItem(
+                                icon = {
+                                    if (screen == Screen.Settings && hasUpdate) {
+                                        BadgedBox(badge = { Badge(containerColor = MaterialTheme.colorScheme.primary) }) {
+                                            Icon(screen.icon, contentDescription = null)
+                                        }
+                                    } else {
+                                        Icon(screen.icon, contentDescription = null)
+                                    }
+                                },
+                                label = { Text(stringResource(screen.titleRes)) },
+                                selected = selected,
+                                onClick = {
+                                    navController.navigate(screen.route) {
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
+                                },
+                            )
+                        }
+                    }
+                }
+
+                Scaffold(
+                    modifier = Modifier.weight(1f),
+                    snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+                    topBar = topBarContent,
+                ) { paddingValues ->
+                    scaffoldContent(paddingValues)
+                }
+            }
+        } else {
+            Scaffold(
+                modifier = Modifier.fillMaxSize(),
+                snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+                topBar = topBarContent,
+                bottomBar = {
+                    if (!isSubScreen) {
+                        val hasUpdate by UpdateState.hasUpdate
+                        NavigationBar {
+                            bottomNavigationScreens.forEach { screen ->
+                                NavigationBarItem(
+                                    icon = {
+                                        if (screen == Screen.Settings && hasUpdate) {
+                                            BadgedBox(badge = { Badge(containerColor = MaterialTheme.colorScheme.primary) }) {
+                                                Icon(screen.icon, contentDescription = null)
+                                            }
+                                        } else {
+                                            Icon(screen.icon, contentDescription = null)
+                                        }
+                                    },
+                                    selected =
+                                        currentDestination?.hierarchy?.any {
+                                            it.route == screen.route
+                                        } == true,
+                                    onClick = {
+                                        navController.navigate(screen.route) {
+                                            // Pop up to the start destination of the graph to
+                                            // avoid building up a large stack of destinations
+                                            popUpTo(navController.graph.findStartDestination().id) {
+                                                saveState = true
+                                            }
+                                            // Avoid multiple copies of the same destination
+                                            launchSingleTop = true
+                                            // Restore state when reselecting a previously selected item
+                                            restoreState = true
+                                        }
+                                    },
+                                )
+                            }
+                        }
+                    }
+                },
+            ) { paddingValues ->
+                scaffoldContent(paddingValues)
+            }
+        }
+
         // Groups ModalBottomSheet
-        if (showGroupsSheet) {
+        if (showGroupsSheet && !useNavigationRail) {
             val groupsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
             val groupsViewModel: GroupsViewModel = viewModel(
                 factory = object : ViewModelProvider.Factory {
@@ -824,7 +1093,7 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
         }
 
         // Connections ModalBottomSheet
-        if (showConnectionsSheet) {
+        if (showConnectionsSheet && !useNavigationRail) {
             val connectionsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
             val connectionsViewModel: ConnectionsViewModel = viewModel(
                 factory = object : ViewModelProvider.Factory {
@@ -837,7 +1106,6 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
             val connectionsUiState by connectionsViewModel.uiState.collectAsState()
             var selectedConnectionId by remember { mutableStateOf<String?>(null) }
             val selectedConnection = connectionsUiState.allConnections.find { it.id == selectedConnectionId }
-            var showConnectionsMenu by remember { mutableStateOf(false) }
 
             ModalBottomSheet(
                 onDismissRequest = {
@@ -863,174 +1131,11 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
                             },
                         )
                     } else {
-                        var showStateMenu by remember { mutableStateOf(false) }
-                        var showSortMenu by remember { mutableStateOf(false) }
-
-                        // Header
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp)
-                                .padding(bottom = 16.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Text(
-                                text = stringResource(R.string.title_connections),
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Medium,
-                                color = MaterialTheme.colorScheme.onSurface,
-                            )
-
-                            Spacer(modifier = Modifier.weight(1f))
-
-                            // State Filter
-                            Box {
-                                FilterChip(
-                                    selected = connectionsUiState.stateFilter != ConnectionStateFilter.Active,
-                                    onClick = { showStateMenu = true },
-                                    label = {
-                                        Text(
-                                            when (connectionsUiState.stateFilter) {
-                                                ConnectionStateFilter.All -> stringResource(R.string.connection_state_all)
-                                                ConnectionStateFilter.Active -> stringResource(R.string.connection_state_active)
-                                                ConnectionStateFilter.Closed -> stringResource(R.string.connection_state_closed)
-                                            }
-                                        )
-                                    },
-                                    leadingIcon = {
-                                        Icon(Icons.Default.FilterList, contentDescription = null)
-                                    },
-                                )
-
-                                DropdownMenu(
-                                    expanded = showStateMenu,
-                                    onDismissRequest = { showStateMenu = false },
-                                ) {
-                                    ConnectionStateFilter.entries.forEach { filter ->
-                                        DropdownMenuItem(
-                                            text = {
-                                                Text(
-                                                    when (filter) {
-                                                        ConnectionStateFilter.All -> stringResource(R.string.connection_state_all)
-                                                        ConnectionStateFilter.Active -> stringResource(R.string.connection_state_active)
-                                                        ConnectionStateFilter.Closed -> stringResource(R.string.connection_state_closed)
-                                                    }
-                                                )
-                                            },
-                                            onClick = {
-                                                connectionsViewModel.setStateFilter(filter)
-                                                showStateMenu = false
-                                            },
-                                            leadingIcon = {
-                                                if (connectionsUiState.stateFilter == filter) {
-                                                    Icon(Icons.Default.Check, contentDescription = null)
-                                                }
-                                            },
-                                        )
-                                    }
-                                }
-                            }
-
-                            // Sort
-                            Box {
-                                FilterChip(
-                                    selected = connectionsUiState.sort != ConnectionSort.ByDate,
-                                    onClick = { showSortMenu = true },
-                                    label = {
-                                        Text(
-                                            when (connectionsUiState.sort) {
-                                                ConnectionSort.ByDate -> stringResource(R.string.connection_sort_date)
-                                                ConnectionSort.ByTraffic -> stringResource(R.string.connection_sort_traffic)
-                                                ConnectionSort.ByTrafficTotal -> stringResource(R.string.connection_sort_traffic_total)
-                                            }
-                                        )
-                                    },
-                                    leadingIcon = {
-                                        Icon(Icons.Default.SwapVert, contentDescription = null)
-                                    },
-                                )
-
-                                DropdownMenu(
-                                    expanded = showSortMenu,
-                                    onDismissRequest = { showSortMenu = false },
-                                ) {
-                                    ConnectionSort.entries.forEach { sort ->
-                                        DropdownMenuItem(
-                                            text = {
-                                                Text(
-                                                    when (sort) {
-                                                        ConnectionSort.ByDate -> stringResource(R.string.connection_sort_date)
-                                                        ConnectionSort.ByTraffic -> stringResource(R.string.connection_sort_traffic)
-                                                        ConnectionSort.ByTrafficTotal -> stringResource(R.string.connection_sort_traffic_total)
-                                                    }
-                                                )
-                                            },
-                                            onClick = {
-                                                connectionsViewModel.setSort(sort)
-                                                showSortMenu = false
-                                            },
-                                            leadingIcon = {
-                                                if (connectionsUiState.sort == sort) {
-                                                    Icon(Icons.Default.Check, contentDescription = null)
-                                                }
-                                            },
-                                        )
-                                    }
-                                }
-                            }
-
-                            // Menu
-                            Box {
-                                IconButton(onClick = { showConnectionsMenu = true }) {
-                                    Icon(Icons.Default.MoreVert, contentDescription = null)
-                                }
-
-                                DropdownMenu(
-                                    expanded = showConnectionsMenu,
-                                    onDismissRequest = { showConnectionsMenu = false },
-                                ) {
-                                    DropdownMenuItem(
-                                        text = {
-                                            Text(
-                                                if (connectionsUiState.isSearchActive) {
-                                                    stringResource(R.string.close_search)
-                                                } else {
-                                                    stringResource(R.string.search)
-                                                }
-                                            )
-                                        },
-                                        onClick = {
-                                            connectionsViewModel.toggleSearch()
-                                            showConnectionsMenu = false
-                                        },
-                                        leadingIcon = {
-                                            Icon(
-                                                imageVector = if (connectionsUiState.isSearchActive) Icons.Default.Close else Icons.Default.Search,
-                                                contentDescription = null,
-                                            )
-                                        },
-                                    )
-                                    DropdownMenuItem(
-                                        text = { Text(stringResource(R.string.connection_close_all)) },
-                                        onClick = {
-                                            connectionsViewModel.closeAllConnections()
-                                            showConnectionsMenu = false
-                                        },
-                                        leadingIcon = {
-                                            Icon(Icons.Default.Close, contentDescription = null)
-                                        },
-                                        enabled = connectionsUiState.connections.any { it.isActive },
-                                    )
-                                }
-                            }
-                        }
-
-                        // Connections content
-                        ConnectionsScreen(
+                        ConnectionsPage(
                             serviceStatus = currentServiceStatus,
                             viewModel = connectionsViewModel,
-                            onConnectionClick = { selectedConnectionId = it.id },
+                            showTitle = true,
+                            onConnectionClick = { selectedConnectionId = it },
                             modifier = Modifier.fillMaxSize(),
                         )
                     }

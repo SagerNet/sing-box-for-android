@@ -203,6 +203,7 @@
     <string name="auto_redirect">自动重定向</string>
     <string name="auto_redirect_description">需要 ROOT 权限</string>
     <string name="system_http_proxy">系统 HTTP 代理</string>
+    <string name="update_settings">更新设置</string>
 
     <!-- Per-App Proxy -->
     <string name="per_app_proxy">分应用代理</string>

@@ -279,12 +279,71 @@ fun AppSettingsScreen(navController: NavController) {
                     },
                     modifier =
                         Modifier
-                            .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)),
+                            .clip(RoundedCornerShape(12.dp)),
                     colors =
                         ListItemDefaults.colors(
                             containerColor = Color.Transparent,
                         ),
                 )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = stringResource(R.string.update_settings),
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(horizontal = 32.dp, vertical = 8.dp),
+        )
+
+        Card(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                ),
+        ) {
+            Column {
+                val updateItemCount =
+                    run {
+                        var count = 0
+                        if (Vendor.supportsTrackSelection()) {
+                            count += 1
+                        }
+                        count += 1
+                        if (Vendor.supportsSilentInstall()) {
+                            count += 1
+                            if (silentInstallEnabled) {
+                                count += 1
+                                if (silentInstallMethod == "SHIZUKU" && !isMethodAvailable) {
+                                    count += 1
+                                }
+                                if (silentInstallMethod == "PACKAGE_INSTALLER" && !isMethodAvailable) {
+                                    count += 1
+                                }
+                            }
+                        }
+                        if (Vendor.supportsAutoUpdate()) {
+                            count += 1
+                        }
+                        count
+                    }
+
+                var updateItemIndex = 0
+                fun updateItemModifier(): Modifier {
+                    val index = updateItemIndex++
+                    return when {
+                        updateItemCount == 1 -> Modifier.clip(RoundedCornerShape(12.dp))
+                        index == 0 -> Modifier.clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+                        index == updateItemCount - 1 ->
+                            Modifier.clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
+                        else -> Modifier
+                    }
+                }
 
                 if (Vendor.supportsTrackSelection()) {
                     ListItem(
@@ -309,7 +368,7 @@ fun AppSettingsScreen(navController: NavController) {
                             )
                         },
                         modifier =
-                            Modifier
+                            updateItemModifier()
                                 .clickable { showTrackDialog = true },
                         colors =
                             ListItemDefaults.colors(
@@ -343,40 +402,14 @@ fun AppSettingsScreen(navController: NavController) {
                             },
                         )
                     },
-                    modifier =
-                        Modifier
-                            .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)),
+                    modifier = updateItemModifier(),
                     colors =
                         ListItemDefaults.colors(
                             containerColor = Color.Transparent,
                         ),
                 )
-            }
-        }
 
-        // Silent Install Section (Other flavor only)
-        if (Vendor.supportsSilentInstall()) {
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = stringResource(R.string.silent_install_title),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(horizontal = 32.dp, vertical = 8.dp),
-            )
-
-            Card(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                colors =
-                    CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    ),
-            ) {
-                Column {
-                    // Silent Install toggle
+                if (Vendor.supportsSilentInstall()) {
                     ListItem(
                         headlineContent = {
                             Text(
@@ -433,16 +466,13 @@ fun AppSettingsScreen(navController: NavController) {
                                 )
                             }
                         },
-                        modifier =
-                            Modifier
-                                .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)),
+                        modifier = updateItemModifier(),
                         colors =
                             ListItemDefaults.colors(
                                 containerColor = Color.Transparent,
                             ),
                     )
 
-                    // Install Method row (when enabled)
                     if (silentInstallEnabled) {
                         ListItem(
                             headlineContent = {
@@ -470,7 +500,7 @@ fun AppSettingsScreen(navController: NavController) {
                                 )
                             },
                             modifier =
-                                Modifier
+                                updateItemModifier()
                                     .clickable { showInstallMethodMenu = true },
                             colors =
                                 ListItemDefaults.colors(
@@ -478,7 +508,6 @@ fun AppSettingsScreen(navController: NavController) {
                                 ),
                         )
 
-                        // Get Shizuku row (when Shizuku is selected but not available)
                         if (silentInstallMethod == "SHIZUKU" && !isMethodAvailable) {
                             ListItem(
                                 headlineContent = {
@@ -502,7 +531,7 @@ fun AppSettingsScreen(navController: NavController) {
                                     )
                                 },
                                 modifier =
-                                    Modifier
+                                    updateItemModifier()
                                         .clickable {
                                             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://shizuku.rikka.app/"))
                                             context.startActivity(intent)
@@ -514,7 +543,6 @@ fun AppSettingsScreen(navController: NavController) {
                             )
                         }
 
-                        // Grant Install Permission row (when PackageInstaller is selected but permission not granted)
                         if (silentInstallMethod == "PACKAGE_INSTALLER" && !isMethodAvailable) {
                             ListItem(
                                 headlineContent = {
@@ -538,7 +566,7 @@ fun AppSettingsScreen(navController: NavController) {
                                     )
                                 },
                                 modifier =
-                                    Modifier
+                                    updateItemModifier()
                                         .clickable {
                                             val intent = Intent(
                                                 AndroidSettings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
@@ -553,51 +581,48 @@ fun AppSettingsScreen(navController: NavController) {
                             )
                         }
                     }
+                }
 
-                    // Auto Update toggle
-                    if (Vendor.supportsAutoUpdate()) {
-                        ListItem(
-                            headlineContent = {
-                                Text(
-                                    stringResource(R.string.auto_update),
-                                    style = MaterialTheme.typography.bodyLarge,
-                                )
-                            },
-                            supportingContent = {
-                                Text(
-                                    stringResource(R.string.auto_update_description),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            },
-                            leadingContent = {
-                                Icon(
-                                    imageVector = Icons.Outlined.SystemUpdateAlt,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                )
-                            },
-                            trailingContent = {
-                                Switch(
-                                    checked = autoUpdateEnabled,
-                                    onCheckedChange = { checked ->
-                                        autoUpdateEnabled = checked
-                                        scope.launch(Dispatchers.IO) {
-                                            Settings.autoUpdateEnabled = checked
-                                            Vendor.scheduleAutoUpdate()
-                                        }
-                                    },
-                                )
-                            },
-                            modifier =
-                                Modifier
-                                    .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)),
-                            colors =
-                                ListItemDefaults.colors(
-                                    containerColor = Color.Transparent,
-                                ),
-                        )
-                    }
+                if (Vendor.supportsAutoUpdate()) {
+                    ListItem(
+                        headlineContent = {
+                            Text(
+                                stringResource(R.string.auto_update),
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                        },
+                        supportingContent = {
+                            Text(
+                                stringResource(R.string.auto_update_description),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        },
+                        leadingContent = {
+                            Icon(
+                                imageVector = Icons.Outlined.SystemUpdateAlt,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                        },
+                        trailingContent = {
+                            Switch(
+                                checked = autoUpdateEnabled,
+                                onCheckedChange = { checked ->
+                                    autoUpdateEnabled = checked
+                                    scope.launch(Dispatchers.IO) {
+                                        Settings.autoUpdateEnabled = checked
+                                        Vendor.scheduleAutoUpdate()
+                                    }
+                                },
+                            )
+                        },
+                        modifier = updateItemModifier(),
+                        colors =
+                            ListItemDefaults.colors(
+                                containerColor = Color.Transparent,
+                            ),
+                    )
                 }
             }
         }

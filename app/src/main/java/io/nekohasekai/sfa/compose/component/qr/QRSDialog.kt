@@ -3,6 +3,7 @@ package io.nekohasekai.sfa.compose.component.qr
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,6 +45,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -60,6 +64,8 @@ fun QRSDialog(
     onDismiss: () -> Unit,
 ) {
     val context = LocalContext.current
+    val configuration = LocalConfiguration.current
+    val isTablet = configuration.isLayoutSizeAtLeast(Configuration.SCREENLAYOUT_SIZE_LARGE)
     val coroutineScope = rememberCoroutineScope()
     var fps by remember { mutableIntStateOf(QRSConstants.DEFAULT_FPS) }
     var sliceSize by remember { mutableIntStateOf(QRSConstants.DEFAULT_SLICE_SIZE) }
@@ -119,20 +125,26 @@ fun QRSDialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
         Card(
-            modifier = Modifier
-                .fillMaxWidth(0.9f)
-                .wrapContentHeight(),
+            modifier =
+                if (isTablet) {
+                    Modifier
+                        .fillMaxWidth(0.85f)
+                        .sizeIn(maxWidth = 960.dp)
+                        .wrapContentHeight()
+                } else {
+                    Modifier
+                        .fillMaxWidth(0.9f)
+                        .wrapContentHeight()
+                },
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surface,
             ),
         ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
+            val qrSurface: @Composable () -> Unit = {
                 Surface(
                     modifier = Modifier
+                        .sizeIn(maxWidth = if (isTablet) 420.dp else 360.dp, maxHeight = if (isTablet) 420.dp else 360.dp)
                         .fillMaxWidth()
                         .aspectRatio(1f),
                     shape = RoundedCornerShape(0.dp),
@@ -149,17 +161,16 @@ fun QRSDialog(
                                 bitmap = bitmap.asImageBitmap(),
                                 contentDescription = stringResource(R.string.content_description_qr_code),
                                 modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Fit,
                             )
                         }
                     }
                 }
+            }
 
-                Spacer(modifier = Modifier.height(16.dp))
-
+            val controlsContent: @Composable () -> Unit = {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -213,10 +224,7 @@ fun QRSDialog(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .padding(bottom = 16.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     OutlinedButton(
@@ -247,6 +255,42 @@ fun QRSDialog(
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(stringResource(R.string.close))
                     }
+                }
+            }
+
+            if (isTablet) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    horizontalArrangement = Arrangement.spacedBy(24.dp),
+                    verticalAlignment = Alignment.Top,
+                ) {
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        qrSurface()
+                    }
+
+                    Column(
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        controlsContent()
+                    }
+                }
+            } else {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    qrSurface()
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    controlsContent()
                 }
             }
         }
