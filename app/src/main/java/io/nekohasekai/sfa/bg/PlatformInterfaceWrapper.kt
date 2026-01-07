@@ -1,13 +1,13 @@
 package io.nekohasekai.sfa.bg
 
 import android.annotation.SuppressLint
-import android.content.pm.PackageManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Process
 import android.system.OsConstants
 import android.util.Log
 import androidx.annotation.RequiresApi
+import io.nekohasekai.libbox.ConnectionOwner
 import io.nekohasekai.libbox.InterfaceUpdateListener
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.LocalDNSTransport
@@ -49,7 +49,7 @@ interface PlatformInterfaceWrapper : PlatformInterface {
         sourcePort: Int,
         destinationAddress: String,
         destinationPort: Int,
-    ): Int {
+    ): ConnectionOwner {
         try {
             val uid =
                 Application.connectivity.getConnectionOwnerUid(
@@ -58,35 +58,15 @@ interface PlatformInterfaceWrapper : PlatformInterface {
                     InetSocketAddress(destinationAddress, destinationPort),
                 )
             if (uid == Process.INVALID_UID) error("android: connection owner not found")
-            return uid
+            val packages = Application.packageManager.getPackagesForUid(uid)
+            val owner = ConnectionOwner()
+            owner.userId = uid
+            owner.userName = packages?.firstOrNull() ?: ""
+            return owner
         } catch (e: Exception) {
             Log.e("PlatformInterface", "getConnectionOwnerUid", e)
             e.printStackTrace(System.err)
             throw e
-        }
-    }
-
-    override fun packageNameByUid(uid: Int): String {
-        val packages = Application.packageManager.getPackagesForUid(uid)
-        if (packages.isNullOrEmpty()) error("android: package not found")
-        return packages[0]
-    }
-
-    @Suppress("DEPRECATION")
-    override fun uidByPackageName(packageName: String): Int {
-        return try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                Application.packageManager.getPackageUid(
-                    packageName,
-                    PackageManager.PackageInfoFlags.of(0),
-                )
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                Application.packageManager.getPackageUid(packageName, 0)
-            } else {
-                Application.packageManager.getApplicationInfo(packageName, 0).uid
-            }
-        } catch (e: PackageManager.NameNotFoundException) {
-            error("android: package not found")
         }
     }
 
