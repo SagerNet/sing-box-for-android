@@ -1,3 +1,5 @@
+import org.gradle.api.file.DuplicatesStrategy
+import org.gradle.api.tasks.Sync
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
@@ -125,6 +127,7 @@ android {
         }
         getByName("otherLegacy") {
             java.srcDirs("src/minApi21/java", "src/github/java")
+            aidl.srcDirs("src/minApi23/aidl")
         }
     }
 
@@ -138,8 +141,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     buildFeatures {
@@ -246,10 +249,8 @@ dependencies {
     val shizukuVersion = "12.2.0"
     "playImplementation"("dev.rikka.shizuku:api:$shizukuVersion")
     "playImplementation"("dev.rikka.shizuku:provider:$shizukuVersion")
-    "playImplementation"("org.lsposed.hiddenapibypass:hiddenapibypass:4.3")
     "otherImplementation"("dev.rikka.shizuku:api:$shizukuVersion")
     "otherImplementation"("dev.rikka.shizuku:provider:$shizukuVersion")
-    "otherImplementation"("org.lsposed.hiddenapibypass:hiddenapibypass:4.3")
 
     // libsu for ROOT package query (all flavors)
     val libsuVersion = "6.0.0"
@@ -309,6 +310,10 @@ dependencies {
     implementation("sh.calvin.reorderable:reorderable:3.0.0")
     implementation("com.github.jeziellago:compose-markdown:0.5.4")
     implementation("org.kodein.emoji:emoji-kt:2.3.0")
+
+    // Xposed API for self-hooking VPN hide module
+    compileOnly("de.robv.android.xposed:api:82")
+    compileOnly(project(":libxposed-api"))
 }
 
 val playCredentialsJSON = rootProject.file("service-account-credentials.json")
@@ -329,7 +334,7 @@ if (playCredentialsJSON.exists()) {
 
 tasks.withType<KotlinCompile>().configureEach {
     compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_1_8)
+        jvmTarget.set(JvmTarget.JVM_17)
     }
 }
 

@@ -9,7 +9,7 @@ import android.util.Log
 import android.widget.Toast
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.database.Settings
-import io.nekohasekai.sfa.ui.profileoverride.PerAppProxyActivity
+import io.nekohasekai.sfa.compose.screen.profileoverride.PerAppProxyScanner
 import io.nekohasekai.sfa.vendor.PackageQueryManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -64,7 +64,7 @@ class AppChangeReceiver : BroadcastReceiver() {
         val installedPackages = PackageQueryManager.getInstalledPackages(packageManagerFlags)
         val chinaApps = mutableSetOf<String>()
         for (packageInfo in installedPackages) {
-            if (PerAppProxyActivity.scanChinaPackage(packageInfo)) {
+            if (PerAppProxyScanner.scanChinaPackage(packageInfo)) {
                 chinaApps.add(packageInfo.packageName)
             }
         }

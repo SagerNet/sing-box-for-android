@@ -8,8 +8,8 @@ import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
-import io.nekohasekai.sfa.ui.profile.QRCodeCropArea
-import io.nekohasekai.sfa.ui.profile.QRCodeSmartCrop
+import io.nekohasekai.sfa.compose.screen.qrscan.QRCodeCropArea
+import io.nekohasekai.sfa.compose.screen.qrscan.QRCodeSmartCrop
 
 // kanged from: https://github.com/G00fY2/quickie/blob/main/quickie/src/main/kotlin/io/github/g00fy2/quickie/QRCodeAnalyzer.kt
 

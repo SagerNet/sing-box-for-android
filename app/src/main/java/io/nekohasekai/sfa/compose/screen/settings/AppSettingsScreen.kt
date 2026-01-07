@@ -20,6 +20,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.AdminPanelSettings
 import androidx.compose.material.icons.outlined.Autorenew
 import androidx.compose.material.icons.outlined.Download
@@ -36,14 +37,17 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -62,11 +66,14 @@ import androidx.navigation.NavController
 import io.nekohasekai.sfa.BuildConfig
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.database.Settings
+import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.compose.component.UpdateAvailableDialog
 import io.nekohasekai.sfa.update.UpdateCheckException
 import io.nekohasekai.sfa.update.UpdateState
 import io.nekohasekai.sfa.update.UpdateTrack
 import io.nekohasekai.sfa.vendor.Vendor
+import io.nekohasekai.sfa.utils.HookStatusClient
+import io.nekohasekai.sfa.xposed.XposedActivation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -75,6 +82,20 @@ import kotlinx.coroutines.withContext
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppSettingsScreen(navController: NavController) {
+    OverrideTopBar {
+        TopAppBar(
+            title = { Text(stringResource(R.string.title_app_settings)) },
+            navigationIcon = {
+                IconButton(onClick = { navController.navigateUp() }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.content_description_back),
+                    )
+                }
+            },
+        )
+    }
+
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val hasUpdate by UpdateState.hasUpdate
@@ -87,6 +108,8 @@ fun AppSettingsScreen(navController: NavController) {
 
     var silentInstallEnabled by remember { mutableStateOf(Settings.silentInstallEnabled) }
     var silentInstallMethod by remember { mutableStateOf(Settings.silentInstallMethod) }
+    val systemHookStatus by HookStatusClient.status.collectAsState()
+    val xposedActivated = systemHookStatus?.active == true || XposedActivation.isActivated(context)
     var isMethodAvailable by remember { mutableStateOf(true) }
     var autoUpdateEnabled by remember { mutableStateOf(Settings.autoUpdateEnabled) }
     var showInstallMethodMenu by remember { mutableStateOf(false) }
@@ -98,8 +121,13 @@ fun AppSettingsScreen(navController: NavController) {
     var downloadError by remember { mutableStateOf<String?>(null) }
     var showUpdateAvailableDialog by remember { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) {
+        HookStatusClient.refresh()
+    }
+
     // Re-check method availability when returning from background (e.g., after granting permission)
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        HookStatusClient.refresh()
         if (silentInstallEnabled) {
             scope.launch {
                 val success = withContext(Dispatchers.IO) {
@@ -216,14 +244,10 @@ fun AppSettingsScreen(navController: NavController) {
                 downloadError = null
                 downloadJob = scope.launch {
                     try {
-                        val result = withContext(Dispatchers.IO) {
+                        withContext(Dispatchers.IO) {
                             Vendor.downloadAndInstall(context, updateInfo!!.downloadUrl)
                         }
-                        if (result.isFailure) {
-                            downloadError = result.exceptionOrNull()?.message
-                        } else {
-                            showDownloadDialog = false
-                        }
+                        showDownloadDialog = false
                     } catch (e: Exception) {
                         downloadError = e.message
                     }
@@ -473,7 +497,7 @@ fun AppSettingsScreen(navController: NavController) {
                             ),
                     )
 
-                    if (silentInstallEnabled) {
+                    if (silentInstallEnabled && !xposedActivated) {
                         ListItem(
                             headlineContent = {
                                 Text(
@@ -706,6 +730,76 @@ fun AppSettingsScreen(navController: NavController) {
                             containerColor = Color.Transparent,
                         ),
                 )
+
+                if (BuildConfig.DEBUG && Vendor.supportsTrackSelection()) {
+                    var isForceDownloading by remember { mutableStateOf(false) }
+                    ListItem(
+                        headlineContent = {
+                            Text(
+                                stringResource(R.string.force_download_install),
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                        },
+                        leadingContent = {
+                            Icon(
+                                imageVector = Icons.Outlined.SystemUpdateAlt,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.error,
+                            )
+                        },
+                        trailingContent = {
+                            if (isForceDownloading) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(24.dp),
+                                    strokeWidth = 2.dp,
+                                )
+                            }
+                        },
+                        modifier =
+                            Modifier
+                                .clip(
+                                    if (hasUpdate) {
+                                        RoundedCornerShape(0.dp)
+                                    } else {
+                                        RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)
+                                    },
+                                )
+                                .clickable(enabled = !isForceDownloading) {
+                                    isForceDownloading = true
+                                    scope.launch {
+                                        try {
+                                            val latestUpdate = withContext(Dispatchers.IO) {
+                                                Vendor.forceGetLatestUpdate()
+                                            }
+                                            if (latestUpdate != null) {
+                                                showDownloadDialog = true
+                                                downloadError = null
+                                                downloadJob = scope.launch {
+                                                    try {
+                                                        withContext(Dispatchers.IO) {
+                                                            Vendor.downloadAndInstall(context, latestUpdate.downloadUrl)
+                                                        }
+                                                        showDownloadDialog = false
+                                                    } catch (e: Exception) {
+                                                        downloadError = e.message
+                                                    }
+                                                }
+                                            } else {
+                                                showErrorDialog = R.string.no_updates_available
+                                            }
+                                        } catch (_: UpdateCheckException.TrackNotSupported) {
+                                            showErrorDialog = R.string.update_track_not_supported
+                                        } catch (_: Exception) {
+                                        }
+                                        isForceDownloading = false
+                                    }
+                                },
+                        colors =
+                            ListItemDefaults.colors(
+                                containerColor = Color.Transparent,
+                            ),
+                    )
+                }
 
                 if (hasUpdate && updateInfo != null) {
                     ListItem(

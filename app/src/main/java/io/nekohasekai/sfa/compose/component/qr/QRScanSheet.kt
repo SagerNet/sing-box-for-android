@@ -56,7 +56,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.screen.qrscan.QRScanResult
 import io.nekohasekai.sfa.compose.screen.qrscan.QRScanViewModel
-import io.nekohasekai.sfa.ui.profile.QRCodeCropArea
+import io.nekohasekai.sfa.compose.screen.qrscan.QRCodeCropArea
 import kotlin.math.max
 
 @OptIn(ExperimentalMaterial3Api::class)

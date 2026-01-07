@@ -1,6 +1,5 @@
 package io.nekohasekai.sfa.compose.screen.dashboard
 
-import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -64,10 +63,10 @@ import androidx.compose.ui.unit.dp
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.ProfileContent
 import io.nekohasekai.sfa.R
-import io.nekohasekai.sfa.compose.NewProfileActivity
 import io.nekohasekai.sfa.compose.component.qr.QRCodeDialog
 import io.nekohasekai.sfa.compose.component.qr.QRScanSheet
 import io.nekohasekai.sfa.compose.component.qr.QRSDialog
+import io.nekohasekai.sfa.compose.navigation.NewProfileArgs
 import io.nekohasekai.sfa.compose.screen.qrscan.QRScanResult
 import io.nekohasekai.sfa.compose.screen.configuration.ProfileImportHandler
 import io.nekohasekai.sfa.compose.util.QRCodeGenerator
@@ -103,9 +102,7 @@ fun ProfilesCard(
     onHideAddProfileSheet: () -> Unit,
     onShowProfilePickerSheet: () -> Unit,
     onHideProfilePickerSheet: () -> Unit,
-    onImportFromFile: () -> Unit,
-    onScanQrCode: () -> Unit,
-    onCreateManually: () -> Unit,
+    onOpenNewProfile: (NewProfileArgs) -> Unit,
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -125,28 +122,6 @@ fun ProfilesCard(
     var pendingImportUri by remember { mutableStateOf<Uri?>(null) }
 
     var showQRScanSheet by remember { mutableStateOf(false) }
-
-    val newProfileLauncher =
-        rememberLauncherForActivityResult(
-            ActivityResultContracts.StartActivityForResult(),
-        ) { result ->
-            if (result.resultCode == android.app.Activity.RESULT_OK) {
-                val profileId = result.data?.getLongExtra(NewProfileActivity.EXTRA_PROFILE_ID, -1L)
-                if (profileId != null && profileId != -1L) {
-                    coroutineScope.launch {
-                        val profile =
-                            withContext(Dispatchers.IO) {
-                                io.nekohasekai.sfa.database.ProfileManager.get(profileId)
-                            }
-                        profile?.let {
-                            withContext(Dispatchers.Main) {
-                                onProfileEdit(it)
-                            }
-                        }
-                    }
-                }
-            }
-        }
 
     val importFromFileLauncher =
         rememberLauncherForActivityResult(
@@ -236,9 +211,6 @@ fun ProfilesCard(
                 }
             }
         }
-    }
-
-    LaunchedEffect(onImportFromFile, onScanQrCode) {
     }
 
     val selectedProfile = profiles.find { it.id == selectedProfileId }
@@ -458,8 +430,7 @@ fun ProfilesCard(
                 ListItem(
                     modifier = Modifier.clickable {
                         onHideAddProfileSheet()
-                        val intent = Intent(context, NewProfileActivity::class.java)
-                        newProfileLauncher.launch(intent)
+                        onOpenNewProfile(NewProfileArgs())
                     },
                     leadingContent = {
                         Icon(
@@ -608,12 +579,12 @@ fun ProfilesCard(
                             when (val parseResult = importHandler.parseQRCode(result.uri.toString())) {
                                 is ProfileImportHandler.QRCodeParseResult.RemoteProfile -> {
                                     withContext(Dispatchers.Main) {
-                                        val newProfileIntent =
-                                            Intent(context, NewProfileActivity::class.java).apply {
-                                                putExtra(NewProfileActivity.EXTRA_IMPORT_NAME, parseResult.name)
-                                                putExtra(NewProfileActivity.EXTRA_IMPORT_URL, parseResult.url)
-                                            }
-                                        newProfileLauncher.launch(newProfileIntent)
+                                        onOpenNewProfile(
+                                            NewProfileArgs(
+                                                importName = parseResult.name,
+                                                importUrl = parseResult.url,
+                                            ),
+                                        )
                                     }
                                 }
                                 is ProfileImportHandler.QRCodeParseResult.LocalProfile -> {

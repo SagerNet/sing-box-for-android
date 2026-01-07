@@ -4,8 +4,9 @@
 
     <application>
         <service
-            android:name=".vendor.RootPackageManagerService"
-            tools:node="remove" />
+            android:name=".bg.RootServer"
+            android:exported="false"
+            tools:ignore="Instantiatable" />
     </application>
 
 </manifest>

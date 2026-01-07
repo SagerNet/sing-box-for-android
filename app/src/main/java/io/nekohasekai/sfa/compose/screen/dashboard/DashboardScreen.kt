@@ -9,10 +9,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,6 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.base.UiEvent
+import io.nekohasekai.sfa.compose.navigation.NewProfileArgs
+import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.constant.Status
 import kotlinx.coroutines.launch
 
@@ -41,9 +48,24 @@ fun DashboardScreen(
     serviceStatus: Status = Status.Stopped,
     showStartFab: Boolean = false,
     showStatusBar: Boolean = false,
+    onOpenNewProfile: (NewProfileArgs) -> Unit = {},
     viewModel: DashboardViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    OverrideTopBar {
+        TopAppBar(
+            title = { Text(stringResource(R.string.title_dashboard)) },
+            actions = {
+                IconButton(onClick = { viewModel.toggleCardSettingsDialog() }) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = stringResource(R.string.title_others),
+                    )
+                }
+            },
+        )
+    }
 
     // Update service status in ViewModel
     LaunchedEffect(serviceStatus) {
@@ -174,6 +196,7 @@ fun DashboardScreen(
                                 onHideAddProfileSheet = viewModel::hideAddProfileSheet,
                                 onShowProfilePickerSheet = viewModel::showProfilePickerSheet,
                                 onHideProfilePickerSheet = viewModel::hideProfilePickerSheet,
+                                onOpenNewProfile = onOpenNewProfile,
                                 commandClient = viewModel.commandClient,
                                 modifier =
                                     Modifier
@@ -213,6 +236,7 @@ fun DashboardScreen(
                             onHideAddProfileSheet = viewModel::hideAddProfileSheet,
                             onShowProfilePickerSheet = viewModel::showProfilePickerSheet,
                             onHideProfilePickerSheet = viewModel::hideProfilePickerSheet,
+                            onOpenNewProfile = onOpenNewProfile,
                             commandClient = viewModel.commandClient,
                         )
                     }

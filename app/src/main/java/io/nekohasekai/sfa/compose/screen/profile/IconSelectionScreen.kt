@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -44,7 +45,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -67,6 +67,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.compose.util.ProfileIcon
 import io.nekohasekai.sfa.compose.util.icons.IconCategory
 import io.nekohasekai.sfa.compose.util.icons.MaterialIconsLibrary
@@ -99,113 +100,76 @@ fun IconSelectionScreen(
             }
         }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.select_icon)) },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.content_description_back),
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(
-                        onClick = {
-                            isSearchActive = !isSearchActive
-                            if (!isSearchActive) {
-                                searchQuery = ""
-                                viewMode = IconViewMode.CATEGORIES
-                                selectedCategory = null
-                                focusManager.clearFocus()
-                            }
-                        },
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription =
-                                if (isSearchActive) {
-                                    stringResource(R.string.close_search)
-                                } else {
-                                    stringResource(
-                                        R.string.search_icons,
-                                    )
-                                },
-                            tint =
-                                if (isSearchActive) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.onSurface
-                                },
-                        )
-                    }
-                },
-                colors =
-                    TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                    ),
-            )
-        },
-        bottomBar = {
-            // Footer with current selection info
-            currentIconId?.let { id ->
-                MaterialIconsLibrary.getIconById(id)?.let { icon ->
-                    Card(
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .windowInsetsPadding(WindowInsets.navigationBars)
-                                .padding(horizontal = 16.dp, vertical = 8.dp),
-                        colors =
-                            CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
-                            ),
-                    ) {
-                        Row(
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .padding(12.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Icon(
-                                imageVector = icon,
-                                contentDescription = null,
-                                modifier = Modifier.size(24.dp),
-                                tint = MaterialTheme.colorScheme.primary,
-                            )
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Column {
-                                val iconInfo = MaterialIconsLibrary.getAllIcons().find { it.id == id }
-                                Text(
-                                    text =
-                                        stringResource(
-                                            R.string.current_icon_format,
-                                            iconInfo?.label ?: id,
-                                        ),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                )
-                                MaterialIconsLibrary.getCategoryForIcon(id)?.let { category ->
-                                    Text(
-                                        text = category,
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                }
-                            }
-                        }
-                    }
+    OverrideTopBar {
+        TopAppBar(
+            title = { Text(stringResource(R.string.select_icon)) },
+            navigationIcon = {
+                IconButton(onClick = onNavigateBack) {
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.content_description_back),
+                    )
                 }
-            }
-        },
-    ) { paddingValues ->
+            },
+            actions = {
+                IconButton(
+                    onClick = {
+                        isSearchActive = !isSearchActive
+                        if (!isSearchActive) {
+                            searchQuery = ""
+                            viewMode = IconViewMode.CATEGORIES
+                            selectedCategory = null
+                            focusManager.clearFocus()
+                        }
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription =
+                            if (isSearchActive) {
+                                stringResource(R.string.close_search)
+                            } else {
+                                stringResource(
+                                    R.string.search_icons,
+                                )
+                            },
+                        tint =
+                            if (isSearchActive) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurface
+                            },
+                    )
+                }
+            },
+            colors =
+                TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                ),
+        )
+    }
+
+    val currentIcon =
+        currentIconId?.let { id ->
+            MaterialIconsLibrary.getIconById(id)?.let { icon -> id to icon }
+        }
+    val bottomInset =
+        with(LocalDensity.current) {
+            WindowInsets.navigationBars.getBottom(this).toDp()
+        }
+    val bottomBarPadding =
+        if (currentIcon != null) {
+            88.dp + bottomInset
+        } else {
+            0.dp
+        }
+
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .padding(paddingValues),
+                    .padding(bottom = bottomBarPadding),
         ) {
             // Show search bar with animation
             AnimatedVisibility(
@@ -414,6 +378,55 @@ fun IconSelectionScreen(
                                     },
                                 )
                             }
+                        }
+                    }
+                }
+            }
+        }
+
+        currentIcon?.let { (id, icon) ->
+            Card(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                        .windowInsetsPadding(WindowInsets.navigationBars)
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                colors =
+                    CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
+                    ),
+            ) {
+                Row(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column {
+                        val iconInfo = MaterialIconsLibrary.getAllIcons().find { it.id == id }
+                        Text(
+                            text =
+                                stringResource(
+                                    R.string.current_icon_format,
+                                    iconInfo?.label ?: id,
+                                ),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        MaterialIconsLibrary.getCategoryForIcon(id)?.let { category ->
+                            Text(
+                                text = category,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
                         }
                     }
                 }

@@ -1,9 +1,11 @@
 package io.nekohasekai.sfa.compose.screen.dashboard
 
 import androidx.lifecycle.viewModelScope
+import io.nekohasekai.libbox.Connections
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.OutboundGroup
 import io.nekohasekai.libbox.StatusMessage
+import io.nekohasekai.sfa.ktx.toList
 import io.nekohasekai.sfa.bg.BoxService
 import io.nekohasekai.sfa.compose.base.BaseViewModel
 import io.nekohasekai.sfa.compose.base.UiEvent
@@ -50,6 +52,7 @@ data class DashboardUiState(
     val isLoading: Boolean = false,
     val hasGroups: Boolean = false,
     val groupsCount: Int = 0,
+    val connectionsCount: Int = 0,
     val serviceStartTime: Long? = null,
     val deprecatedNotes: List<DeprecatedNote> = emptyList(),
     val showDeprecatedDialog: Boolean = false,
@@ -627,6 +630,13 @@ class DashboardViewModel : BaseViewModel<DashboardUiState, UiEvent>(), CommandCl
             updateState {
                 copy(hasGroups = hasGroups, groupsCount = newGroups.size)
             }
+        }
+    }
+
+    override fun updateConnections(connections: Connections) {
+        viewModelScope.launch(Dispatchers.Main) {
+            val count = connections.iterator().toList().count { it.outboundType != "dns" }
+            updateState { copy(connectionsCount = count) }
         }
     }
 

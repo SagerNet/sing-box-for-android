@@ -24,6 +24,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Close
@@ -33,12 +34,14 @@ import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -54,16 +57,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.compose.model.ConnectionSort
 import io.nekohasekai.sfa.compose.model.ConnectionStateFilter
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.compose.model.Connection
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConnectionsPage(
     serviceStatus: Status,
     viewModel: ConnectionsViewModel = viewModel(),
     showTitle: Boolean = true,
+    showTopBar: Boolean = false,
     onConnectionClick: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
@@ -71,6 +77,14 @@ fun ConnectionsPage(
     var showStateMenu by remember { mutableStateOf(false) }
     var showSortMenu by remember { mutableStateOf(false) }
     var showConnectionsMenu by remember { mutableStateOf(false) }
+
+    if (showTopBar) {
+        OverrideTopBar {
+            TopAppBar(
+                title = { Text(stringResource(R.string.title_connections)) },
+            )
+        }
+    }
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -253,6 +267,7 @@ fun ConnectionsPage(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConnectionDetailsRoute(
     connectionId: String,
@@ -265,6 +280,30 @@ fun ConnectionDetailsRoute(
     val connection =
         uiState.allConnections.find { it.id == connectionId }
             ?: uiState.connections.find { it.id == connectionId }
+
+    OverrideTopBar {
+        TopAppBar(
+            title = { Text(stringResource(R.string.connection_details)) },
+            navigationIcon = {
+                IconButton(onClick = onBack) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.content_description_back),
+                    )
+                }
+            },
+            actions = {
+                if (connection?.isActive == true) {
+                    IconButton(onClick = { viewModel.closeConnection(connectionId) }) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = stringResource(R.string.connection_close),
+                        )
+                    }
+                }
+            },
+        )
+    }
 
     LaunchedEffect(serviceStatus) {
         viewModel.updateServiceStatus(serviceStatus)

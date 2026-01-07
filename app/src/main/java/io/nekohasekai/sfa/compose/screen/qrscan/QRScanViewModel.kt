@@ -16,8 +16,6 @@ import androidx.lifecycle.LifecycleOwner
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.qrs.QRSDecoder
 import io.nekohasekai.sfa.qrs.readIntLE
-import io.nekohasekai.sfa.ui.profile.QRCodeCropArea
-import io.nekohasekai.sfa.ui.profile.ZxingQRCodeAnalyzer
 import io.nekohasekai.sfa.vendor.Vendor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

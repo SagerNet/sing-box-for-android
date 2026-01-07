@@ -259,6 +259,7 @@
 
     <!-- Updates -->
     <string name="check_update">Check Update</string>
+    <string name="force_download_install">Force Download and Install</string>
     <string name="check_update_automatic">Automatic Update Check</string>
     <string name="check_update_prompt_play">Would you like to enable automatic update checking from **Play Store**?</string>
     <string name="check_update_prompt_github">Would you like to enable automatic update checking from **GitHub**?</string>
@@ -268,6 +269,7 @@
     <string name="update_track_not_supported">Current track does not support update checking yet</string>
     <string name="view_release">View Release</string>
     <string name="downloading">Downloading…</string>
+    <string name="exporting">Exporting…</string>
     <string name="no_updates_available">No updates available</string>
     <string name="new_version_available">New version available: %s</string>
     <string name="auto_update">Auto Update</string>
@@ -408,4 +410,48 @@
     <string name="content_description_pause_logs">Pause logs</string>
     <string name="content_description_collapse_search">Collapse search</string>
     <string name="content_description_search_logs">Search logs</string>
+
+    <!-- Xposed Module -->
+    <string name="xposed_description">Privileged Enhancement for sing-box</string>
+
+    <!-- Privileged Enhancement -->
+    <string name="privilege_module_title">Privilege modules</string>
+    <string name="lsposed_module">LSPosed Module</string>
+    <string name="lsposed_module_activated">LSPosed activated</string>
+    <string name="lsposed_module_pending_update">LSPosed update pending</string>
+    <string name="lsposed_module_pending_downgrade">LSPosed downgrade pending</string>
+    <string name="lsposed_module_not_activated">LSPosed not activated</string>
+    <string name="lsposed_module_description">System Framework only.</string>
+    <string name="privilege_settings">Privileged Enhancement</string>
+    <string name="privilege_settings_hide_title">Hide Settings</string>
+    <string name="privilege_settings_hide_description">Resist VPN detection for selected apps</string>
+    <string name="privilege_settings_hide_manage">Manage</string>
+    <string name="privilege_settings_hide_test">Run Test</string>
+    <string name="privilege_settings_hide_test_result">Test Result</string>
+    <string name="privilege_settings_hide_test_running">Running detection tests…</string>
+    <string name="privilege_settings_hide_test_not_detected">Not detected</string>
+    <string name="privilege_settings_test_interfaces">Interfaces:</string>
+    <string name="privilege_settings_test_http_proxy">HTTP proxy:</string>
+    <string name="privilege_settings_interface_rename_title">Interface Rename</string>
+    <string name="privilege_settings_interface_prefix">Interface prefix</string>
+    <string name="privilege_settings_vpn_detection_title">VPN Detection</string>
+    <string name="privilege_settings_view_logs">View logs</string>
+    <string name="privilege_settings_export_debug">Export debug info</string>
+    <string name="privilege_settings_hook_logs_empty">No logs</string>
+    <string name="privilege_settings_export_debug_complete">Export complete</string>
+    <string name="privilege_settings_export_debug_message">This file contains private information and should not be shared publicly. Size: %s</string>
+    <string name="privilege_settings_export_debug_failed">Failed to export debug info: %s</string>
+    <string name="privilege_settings_risky_app_title">Warning</string>
+    <string name="privilege_settings_risky_vpn_message_single">This app is a VPN app. Resisting VPN detection may cause issues: %1$s</string>
+    <string name="privilege_settings_risky_vpn_message_multi">These apps are VPN apps. Resisting VPN detection may cause issues: %1$s</string>
+    <string name="privilege_settings_risky_management_message_single">This app has network management permissions. Resisting VPN detection may cause issues: %1$s</string>
+    <string name="privilege_settings_risky_management_message_multi">These apps have network management permissions. Resisting VPN detection may cause issues: %1$s</string>
+    <string name="privilege_module_restart_title">Reboot required</string>
+    <string name="privilege_module_restart_message">LSPosed module updated. Reboot to apply changes.</string>
+    <string name="privilege_module_restart_action">Restart</string>
+    <string name="privilege_module_restart_failed">Failed to request reboot: %1$s</string>
+    <string name="privilege_module_restart_notification_title">Reboot required</string>
+    <string name="privilege_module_restart_notification_message">LSPosed module updated. Reboot to apply changes.</string>
+    <string name="privilege_module_restart_channel">LSPosed Module</string>
+    <string name="reboot_required">Reboot required</string>
 </resources>

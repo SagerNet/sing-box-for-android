@@ -44,7 +44,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -62,6 +61,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.Key
@@ -82,6 +82,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.blacksquircle.ui.language.json.JsonLanguage
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -137,7 +138,91 @@ fun EditProfileContentScreen(
         showUnsavedChangesDialog = true
     }
 
-    Scaffold(
+    OverrideTopBar {
+        TopAppBar(
+            title = {
+                Column {
+                    Text(
+                        if (uiState.isReadOnly) {
+                            stringResource(R.string.view_configuration)
+                        } else {
+                            stringResource(R.string.title_edit_configuration)
+                        },
+                    )
+                    if (uiState.profileName.isNotEmpty()) {
+                        Text(
+                            text = uiState.profileName,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+            },
+            navigationIcon = {
+                IconButton(
+                    onClick = {
+                        if (uiState.hasUnsavedChanges && !uiState.isReadOnly) {
+                            showUnsavedChangesDialog = true
+                        } else {
+                            onNavigateBack()
+                        }
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.content_description_back),
+                    )
+                }
+            },
+            actions = {
+                // Search/Collapse button (Ctrl/Cmd+F)
+                IconButton(
+                    onClick = { viewModel.toggleSearchBar() },
+                ) {
+                    Icon(
+                        imageVector = if (uiState.showSearchBar) Icons.Default.ExpandLess else Icons.Default.Search,
+                        contentDescription =
+                            if (uiState.showSearchBar) {
+                                stringResource(R.string.content_description_collapse_search)
+                            } else {
+                                stringResource(R.string.search)
+                            },
+                        tint =
+                            if (uiState.showSearchBar) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurface
+                            },
+                    )
+                }
+
+                // Save button (only show if not read-only) (Ctrl/Cmd+S)
+                if (!uiState.isReadOnly) {
+                    IconButton(
+                        onClick = { viewModel.saveConfiguration() },
+                        enabled = uiState.hasUnsavedChanges && !uiState.isLoading,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Save,
+                            contentDescription = stringResource(R.string.save),
+                            tint =
+                                if (uiState.hasUnsavedChanges) {
+                                    MaterialTheme.colorScheme.primary
+                                } else {
+                                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                                },
+                        )
+                    }
+                }
+            },
+            colors =
+                TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                ),
+        )
+    }
+
+    Column(
         modifier =
             modifier
                 .fillMaxSize()
@@ -221,106 +306,17 @@ fun EditProfileContentScreen(
                         false
                     }
                 },
-        topBar = {
-            TopAppBar(
-                title = {
-                    Column {
-                        Text(
-                            if (uiState.isReadOnly) {
-                                stringResource(R.string.view_configuration)
-                            } else {
-                                stringResource(R.string.title_edit_configuration)
-                            },
-                        )
-                        if (uiState.profileName.isNotEmpty()) {
-                            Text(
-                                text = uiState.profileName,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            if (uiState.hasUnsavedChanges && !uiState.isReadOnly) {
-                                showUnsavedChangesDialog = true
-                            } else {
-                                onNavigateBack()
-                            }
-                        },
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.content_description_back),
-                        )
-                    }
-                },
-                actions = {
-                    // Search/Collapse button (Ctrl/Cmd+F)
-                    IconButton(
-                        onClick = { viewModel.toggleSearchBar() },
-                    ) {
-                        Icon(
-                            imageVector = if (uiState.showSearchBar) Icons.Default.ExpandLess else Icons.Default.Search,
-                            contentDescription =
-                                if (uiState.showSearchBar) {
-                                    stringResource(R.string.content_description_collapse_search)
-                                } else {
-                                    stringResource(R.string.search)
-                                },
-                            tint =
-                                if (uiState.showSearchBar) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.onSurface
-                                },
-                        )
-                    }
-
-                    // Save button (only show if not read-only) (Ctrl/Cmd+S)
-                    if (!uiState.isReadOnly) {
-                        IconButton(
-                            onClick = { viewModel.saveConfiguration() },
-                            enabled = uiState.hasUnsavedChanges && !uiState.isLoading,
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Save,
-                                contentDescription = stringResource(R.string.save),
-                                tint =
-                                    if (uiState.hasUnsavedChanges) {
-                                        MaterialTheme.colorScheme.primary
-                                    } else {
-                                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                                    },
-                            )
-                        }
-                    }
-                },
-                colors =
-                    TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    ),
-            )
-        },
-    ) { paddingValues ->
-        Column(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-        ) {
+    ) {
             // Search bar (appears at top when activated)
             AnimatedVisibility(
                 visible = uiState.showSearchBar,
-                enter = slideInVertically(initialOffsetY = { -it }) + fadeIn() + expandVertically(),
-                exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut() + shrinkVertically(),
+                enter = expandVertically(expandFrom = Alignment.Top) + fadeIn(),
+                exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut(),
             ) {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     color = MaterialTheme.colorScheme.surfaceContainer,
-                    shadowElevation = 4.dp,
+                    tonalElevation = 2.dp,
                 ) {
                     Row(
                         modifier =
@@ -435,7 +431,8 @@ fun EditProfileContentScreen(
             Box(
                 modifier =
                     Modifier
-                        .fillMaxSize()
+                .fillMaxSize()
+                .clipToBounds()
                         .weight(1f),
             ) {
                 // Editor
@@ -829,8 +826,6 @@ fun EditProfileContentScreen(
                 }
             }
         }
-    }
-
     // Unsaved changes dialog
     if (showUnsavedChangesDialog) {
         AlertDialog(

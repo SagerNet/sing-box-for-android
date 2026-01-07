@@ -16,7 +16,7 @@ import androidx.lifecycle.MutableLiveData
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.StatusMessage
 import io.nekohasekai.sfa.Application
-import io.nekohasekai.sfa.LauncherActivity
+import io.nekohasekai.sfa.compose.MainActivity
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.constant.Action
 import io.nekohasekai.sfa.constant.Status
@@ -61,7 +61,7 @@ class ServiceNotification(
                     0,
                     Intent(
                         service,
-                        LauncherActivity::class.java,
+                        MainActivity::class.java,
                     ).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT),
                     flags,
                 ),

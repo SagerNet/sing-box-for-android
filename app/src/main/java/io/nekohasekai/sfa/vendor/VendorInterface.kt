@@ -2,7 +2,7 @@ package io.nekohasekai.sfa.vendor
 
 import android.app.Activity
 import androidx.camera.core.ImageAnalysis
-import io.nekohasekai.sfa.ui.profile.QRCodeCropArea
+import io.nekohasekai.sfa.compose.screen.qrscan.QRCodeCropArea
 import io.nekohasekai.sfa.update.UpdateInfo
 
 interface VendorInterface {
@@ -36,6 +36,12 @@ interface VendorInterface {
     fun checkUpdateAsync(): UpdateInfo? = null
 
     /**
+     * Force get latest update (ignores version check)
+     * @return UpdateInfo of the latest release, null if unavailable
+     */
+    fun forceGetLatestUpdate(): UpdateInfo? = null
+
+    /**
      * Check if silent install feature is available
      * @return true if silent install is supported (Other flavor only)
      */
@@ -63,8 +69,8 @@ interface VendorInterface {
      * Download and install an APK update
      * @param context The context
      * @param downloadUrl The URL to download the APK from
-     * @return Result indicating success or failure
+     * @throws Exception if download or install fails
      */
-    suspend fun downloadAndInstall(context: android.content.Context, downloadUrl: String): Result<Unit> =
-        Result.failure(UnsupportedOperationException("Not supported in this flavor"))
+    suspend fun downloadAndInstall(context: android.content.Context, downloadUrl: String): Unit =
+        throw UnsupportedOperationException("Not supported in this flavor")
 }

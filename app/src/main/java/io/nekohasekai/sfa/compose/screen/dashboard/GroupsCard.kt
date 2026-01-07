@@ -26,6 +26,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.UnfoldLess
+import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material3.Card
@@ -40,6 +42,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -63,17 +66,20 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.compose.screen.dashboard.groups.GroupsViewModel
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.compose.model.Group
 import io.nekohasekai.sfa.compose.model.GroupItem
 import io.nekohasekai.sfa.utils.CommandClient
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GroupsCard(
     serviceStatus: Status,
     commandClient: CommandClient? = null,
     viewModel: GroupsViewModel? = null,
+    showTopBar: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     val actualViewModel: GroupsViewModel = viewModel ?: viewModel(
@@ -87,6 +93,35 @@ fun GroupsCard(
     )
     val snackbarHostState = remember { SnackbarHostState() }
     val uiState by actualViewModel.uiState.collectAsState()
+
+    if (showTopBar) {
+        val allCollapsed = uiState.expandedGroups.isEmpty()
+        OverrideTopBar {
+            TopAppBar(
+                title = { Text(stringResource(R.string.title_groups)) },
+                actions = {
+                    if (uiState.groups.isNotEmpty()) {
+                        IconButton(onClick = { actualViewModel.toggleAllGroups() }) {
+                            Icon(
+                                imageVector =
+                                    if (allCollapsed) {
+                                        Icons.Default.UnfoldMore
+                                    } else {
+                                        Icons.Default.UnfoldLess
+                                    },
+                                contentDescription =
+                                    if (allCollapsed) {
+                                        stringResource(R.string.expand_all)
+                                    } else {
+                                        stringResource(R.string.collapse_all)
+                                    },
+                            )
+                        }
+                    }
+                },
+            )
+        }
+    }
 
     // Stable callbacks to prevent recomposition - use remember with viewModel as key
     val onToggleExpanded =

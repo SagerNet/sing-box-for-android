@@ -9,7 +9,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.database.Settings
-import io.nekohasekai.sfa.ui.profile.QRCodeCropArea
+import io.nekohasekai.sfa.compose.screen.qrscan.QRCodeCropArea
 import io.nekohasekai.sfa.update.UpdateCheckException
 import io.nekohasekai.sfa.update.UpdateInfo
 import io.nekohasekai.sfa.update.UpdateState
@@ -123,25 +123,20 @@ object Vendor : VendorInterface {
     override suspend fun verifySilentInstallMethod(method: String): Boolean {
         return when (method) {
             "PACKAGE_INSTALLER" -> {
-                ApkInstaller.canSystemSilentInstall() &&
-                    Application.application.packageManager.canRequestPackageInstalls()
+                ApkInstaller.canSystemSilentInstall()
             }
             "ROOT" -> RootInstaller.checkAccess()
             else -> false
         }
     }
 
-    override suspend fun downloadAndInstall(context: android.content.Context, downloadUrl: String): Result<Unit> {
-        return try {
-            val cachedApk = UpdateState.cachedApkFile.value
-            val apkFile = if (cachedApk != null && cachedApk.exists() && cachedApk.length() > 0) {
-                cachedApk
-            } else {
-                ApkDownloader().use { it.download(downloadUrl) }
-            }
-            ApkInstaller.install(context, apkFile)
-        } catch (e: Exception) {
-            Result.failure(e)
+    override suspend fun downloadAndInstall(context: android.content.Context, downloadUrl: String) {
+        val cachedApk = UpdateState.cachedApkFile.value
+        val apkFile = if (cachedApk != null && cachedApk.exists() && cachedApk.length() > 0) {
+            cachedApk
+        } else {
+            ApkDownloader().use { it.download(downloadUrl) }
         }
+        ApkInstaller.install(context, apkFile)
     }
 }

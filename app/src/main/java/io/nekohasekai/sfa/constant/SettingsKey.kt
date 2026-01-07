@@ -23,6 +23,11 @@ object SettingsKey {
 
     const val SYSTEM_PROXY_ENABLED = "system_proxy_enabled"
 
+    const val PRIVILEGE_SETTINGS_ENABLED = "hide_settings_enabled"
+    const val PRIVILEGE_SETTINGS_LIST = "hide_settings_list"
+    const val PRIVILEGE_SETTINGS_INTERFACE_RENAME_ENABLED = "hide_settings_interface_rename_enabled"
+    const val PRIVILEGE_SETTINGS_INTERFACE_PREFIX = "hide_settings_interface_prefix"
+
     // dashboard
     const val DASHBOARD_ITEM_ORDER = "dashboard_item_order"
     const val DASHBOARD_DISABLED_ITEMS = "dashboard_disabled_items"

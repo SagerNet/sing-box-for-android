@@ -23,13 +23,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.UnfoldLess
 import androidx.compose.material.icons.filled.UnfoldMore
@@ -64,10 +58,9 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -94,13 +87,19 @@ import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.bg.ServiceConnection
 import io.nekohasekai.sfa.bg.ServiceNotification
 import io.nekohasekai.sfa.compose.base.GlobalEventBus
+import io.nekohasekai.sfa.compose.base.SelectableMessageDialog
 import io.nekohasekai.sfa.compose.base.UiEvent
 import io.nekohasekai.sfa.compose.component.ServiceStatusBar
 import io.nekohasekai.sfa.compose.component.UptimeText
 import io.nekohasekai.sfa.compose.component.UpdateAvailableDialog
+import io.nekohasekai.sfa.compose.navigation.NewProfileArgs
+import io.nekohasekai.sfa.compose.navigation.ProfileRoutes
 import io.nekohasekai.sfa.compose.navigation.SFANavHost
 import io.nekohasekai.sfa.compose.navigation.Screen
 import io.nekohasekai.sfa.compose.navigation.bottomNavigationScreens
+import io.nekohasekai.sfa.compose.topbar.LocalTopBarController
+import io.nekohasekai.sfa.compose.topbar.TopBarEntry
+import io.nekohasekai.sfa.compose.topbar.TopBarController
 import io.nekohasekai.sfa.compose.screen.dashboard.CardGroup
 import io.nekohasekai.sfa.compose.screen.dashboard.DashboardViewModel
 import io.nekohasekai.sfa.compose.screen.dashboard.GroupsCard
@@ -131,6 +130,7 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
     private var showBackgroundLocationDialog by mutableStateOf(false)
     private var showImportProfileDialog by mutableStateOf(false)
     private var pendingImportProfile by mutableStateOf<Triple<String, String, String>?>(null)
+    private var newProfileArgs by mutableStateOf(NewProfileArgs())
 
     private val notificationPermissionLauncher =
         registerForActivityResult(
@@ -171,6 +171,7 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
                 onServiceAlert(Alert.RequestVPNPermission, null)
             }
         }
+    private val pendingNavigationRoute = mutableStateOf<String?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -204,7 +205,13 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
     }
 
     private fun handleIntent(intent: Intent?) {
-        val uri = intent?.data ?: return
+        if (intent == null) {
+            return
+        }
+        if (intent.categories?.contains("de.robv.android.xposed.category.MODULE_SETTINGS") == true) {
+            pendingNavigationRoute.value = "settings/privilege"
+        }
+        val uri = intent.data ?: return
         if (uri.scheme == "sing-box" && uri.host == "import-remote-profile") {
             try {
                 val profile = Libbox.parseRemoteProfileImportLink(uri.toString())
@@ -286,6 +293,15 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
         // Error dialog state for UiEvent.ShowError
         var showErrorDialog by remember { mutableStateOf(false) }
         var errorMessage by remember { mutableStateOf("") }
+        val topBarState = remember { mutableStateOf(emptyList<TopBarEntry>()) }
+        val topBarController = remember { TopBarController(topBarState) }
+        val topBarOverride = topBarState.value.lastOrNull()?.content
+        val openNewProfile: (NewProfileArgs) -> Unit = { args ->
+            newProfileArgs = args
+            navController.navigate(ProfileRoutes.NewProfile) {
+                launchSingleTop = true
+            }
+        }
 
         // Handle service alerts
         currentAlert?.let { (alertType, message) ->
@@ -298,15 +314,10 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
 
         // Handle UiEvent.ShowError dialog
         if (showErrorDialog) {
-            AlertDialog(
-                onDismissRequest = { showErrorDialog = false },
-                title = { Text(stringResource(R.string.error_title)) },
-                text = { Text(errorMessage) },
-                confirmButton = {
-                    TextButton(onClick = { showErrorDialog = false }) {
-                        Text(stringResource(R.string.ok))
-                    }
-                },
+            SelectableMessageDialog(
+                title = stringResource(R.string.error_title),
+                message = errorMessage,
+                onDismiss = { showErrorDialog = false },
             )
         }
 
@@ -341,11 +352,11 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
                 text = { Text(stringResource(R.string.import_remote_profile_message, name, host)) },
                 confirmButton = {
                     TextButton(onClick = {
-                        startActivity(
-                            Intent(this@MainActivity, NewProfileActivity::class.java).apply {
-                                putExtra(NewProfileActivity.EXTRA_IMPORT_NAME, name)
-                                putExtra(NewProfileActivity.EXTRA_IMPORT_URL, url)
-                            },
+                        openNewProfile(
+                            NewProfileArgs(
+                                importName = name,
+                                importUrl = url,
+                            ),
                         )
                         showImportProfileDialog = false
                         pendingImportProfile = null
@@ -432,17 +443,13 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
                     downloadError = null
                     downloadJob = scope.launch {
                         try {
-                            val result = withContext(Dispatchers.IO) {
+                            withContext(Dispatchers.IO) {
                                 Vendor.downloadAndInstall(
                                     this@MainActivity,
                                     updateInfo!!.downloadUrl,
                                 )
                             }
-                            if (result.isFailure) {
-                                downloadError = result.exceptionOrNull()?.message
-                            } else {
-                                showDownloadDialog = false
-                            }
+                            showDownloadDialog = false
                         } catch (e: Exception) {
                             downloadError = e.message
                         }
@@ -496,40 +503,23 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
 
         val isSettingsSubScreen = currentRoute?.startsWith("settings/") == true
         val isConnectionsDetail = currentRoute?.startsWith("connections/detail") == true
+        val isProfileRoute = currentRoute?.startsWith("profile/") == true
         val currentRootRoute =
             when {
                 isSettingsSubScreen -> Screen.Settings.route
                 currentRoute?.startsWith(Screen.Connections.route) == true -> Screen.Connections.route
                 currentRoute?.startsWith(Screen.Log.route) == true -> Screen.Log.route
+                isProfileRoute -> Screen.Dashboard.route
                 else -> currentRoute
             }
         val isConnectionsRoute = currentRootRoute == Screen.Connections.route
         val isGroupsRoute = currentRootRoute == Screen.Groups.route
+        val isLogRoute = currentRootRoute == Screen.Log.route
 
-        // Determine current screen title
-        val currentScreen =
-            when (currentRootRoute) {
-                Screen.Dashboard.route -> Screen.Dashboard
-                Screen.Groups.route -> Screen.Groups
-                Screen.Connections.route -> Screen.Connections
-                Screen.Log.route -> Screen.Log
-                Screen.Settings.route -> Screen.Settings
-                else -> Screen.Dashboard
-            }
-
-        val isSubScreen = isSettingsSubScreen || isConnectionsDetail
-        val settingsScreenTitle =
-            when (currentRoute) {
-                "settings/app" -> stringResource(R.string.title_app_settings)
-                "settings/core" -> stringResource(R.string.core)
-                "settings/service" -> stringResource(R.string.service)
-                "settings/profile_override" -> stringResource(R.string.profile_override)
-                else -> null
-            }
-
+        val isSubScreen = isSettingsSubScreen || isConnectionsDetail || isProfileRoute
         // Get LogViewModel instance if we're on the Log screen
         val logViewModel: LogViewModel? =
-            if (currentScreen == Screen.Log) {
+            if (isLogRoute) {
                 viewModel()
             } else {
                 null
@@ -593,6 +583,16 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
                 }
             }
 
+        val pendingRoute = pendingNavigationRoute.value
+        LaunchedEffect(pendingRoute) {
+            if (pendingRoute != null) {
+                navController.navigate(pendingRoute) {
+                    launchSingleTop = true
+                }
+                pendingNavigationRoute.value = null
+            }
+        }
+
         LaunchedEffect(allowedRoutes, currentRootRoute, useNavigationRail) {
             if (currentRootRoute != null && !allowedRoutes.contains(currentRootRoute)) {
                 navController.navigate(Screen.Dashboard.route) {
@@ -627,10 +627,9 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
                     }
 
                     is UiEvent.EditProfile -> {
-                        val intent =
-                            Intent(this@MainActivity, EditProfileActivity::class.java)
-                        intent.putExtra("profile_id", event.profileId)
-                        startActivity(intent)
+                        navController.navigate(ProfileRoutes.editProfile(event.profileId)) {
+                            launchSingleTop = true
+                        }
                     }
 
                     is UiEvent.RestartToTakeEffect -> {
@@ -656,133 +655,7 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
         }
 
         val topBarContent: @Composable () -> Unit = {
-            TopAppBar(
-                title = {
-                    Text(
-                        when {
-                            isSettingsSubScreen && settingsScreenTitle != null -> settingsScreenTitle
-                            isConnectionsDetail -> stringResource(R.string.connection_details)
-                            else -> stringResource(currentScreen.titleRes)
-                        },
-                    )
-                },
-                navigationIcon = {
-                    if (isSubScreen) {
-                        IconButton(onClick = { navController.navigateUp() }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                                contentDescription = stringResource(R.string.content_description_back),
-                            )
-                        }
-                    }
-                },
-                actions = {
-                    // Show Others menu for Dashboard screen (but not in settings sub-screens)
-                    if (currentScreen == Screen.Dashboard && !isSettingsSubScreen) {
-                        // More options button
-                        IconButton(onClick = { dashboardViewModel.toggleCardSettingsDialog() }) {
-                            Icon(
-                                imageVector = Icons.Default.MoreVert,
-                                contentDescription = stringResource(R.string.title_others),
-                                tint = MaterialTheme.colorScheme.onSurface,
-                            )
-                        }
-                    }
-
-                    if (currentScreen == Screen.Groups && groupsViewModel != null) {
-                        val groupsUiState by groupsViewModel.uiState.collectAsState()
-                        val allCollapsed = groupsUiState.expandedGroups.isEmpty()
-                        if (groupsUiState.groups.isNotEmpty()) {
-                            IconButton(onClick = { groupsViewModel.toggleAllGroups() }) {
-                                Icon(
-                                    imageVector = if (allCollapsed) Icons.Default.UnfoldMore else Icons.Default.UnfoldLess,
-                                    contentDescription =
-                                        if (allCollapsed) {
-                                            stringResource(R.string.expand_all)
-                                        } else {
-                                            stringResource(R.string.collapse_all)
-                                        },
-                                )
-                            }
-                        }
-                    }
-
-                    if (isConnectionsDetail && connectionsViewModel != null) {
-                        val connectionsUiState by connectionsViewModel.uiState.collectAsState()
-                        val connectionId = navBackStackEntry?.arguments?.getString("connectionId")
-                        val detailConnection =
-                            connectionsUiState.allConnections.find { it.id == connectionId }
-                                ?: connectionsUiState.connections.find { it.id == connectionId }
-                        if (detailConnection?.isActive == true) {
-                            IconButton(onClick = { connectionsViewModel.closeConnection(detailConnection.id) }) {
-                                Icon(
-                                    imageVector = Icons.Default.Close,
-                                    contentDescription = stringResource(R.string.connection_close),
-                                )
-                            }
-                        }
-                    }
-
-                    if (currentScreen == Screen.Log && logViewModel != null) {
-                        val logUiState by logViewModel.uiState.collectAsState()
-
-                        if (!logUiState.isSelectionMode) {
-                            IconButton(onClick = { logViewModel.togglePause() }) {
-                                Icon(
-                                    imageVector =
-                                        if (logUiState.isPaused) {
-                                            Icons.Default.PlayArrow
-                                        } else {
-                                            Icons.Default.Pause
-                                        },
-                                    contentDescription =
-                                        if (logUiState.isPaused) {
-                                            stringResource(
-                                                R.string.content_description_resume_logs,
-                                            )
-                                        } else {
-                                            stringResource(R.string.content_description_pause_logs)
-                                        },
-                                )
-                            }
-
-                            IconButton(onClick = { logViewModel.toggleSearch() }) {
-                                Icon(
-                                    imageVector =
-                                        if (logUiState.isSearchActive) {
-                                            Icons.Default.ExpandLess
-                                        } else {
-                                            Icons.Default.Search
-                                        },
-                                    contentDescription =
-                                        if (logUiState.isSearchActive) {
-                                            stringResource(
-                                                R.string.content_description_collapse_search,
-                                            )
-                                        } else {
-                                            stringResource(R.string.content_description_search_logs)
-                                        },
-                                    tint =
-                                        if (logUiState.isSearchActive) {
-                                            MaterialTheme.colorScheme.primary
-                                        } else {
-                                            MaterialTheme.colorScheme.onSurface
-                                        },
-                                )
-                            }
-
-                            IconButton(onClick = { logViewModel.toggleOptionsMenu() }) {
-                                Icon(
-                                    imageVector = Icons.Default.MoreVert,
-                                    contentDescription = stringResource(R.string.more_options),
-                                    tint = MaterialTheme.colorScheme.onSurface,
-                                )
-                            }
-                        }
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(),
-            )
+            topBarOverride?.invoke()
         }
 
         val scaffoldContent: @Composable (PaddingValues) -> Unit = { paddingValues ->
@@ -802,6 +675,9 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
                     serviceStatus = currentServiceStatus,
                     showStartFab = showStartFab,
                     showStatusBar = showStatusBar,
+                    newProfileArgs = newProfileArgs,
+                    onClearNewProfileArgs = { newProfileArgs = NewProfileArgs() },
+                    onOpenNewProfile = openNewProfile,
                     dashboardViewModel = dashboardViewModel,
                     logViewModel = logViewModel,
                     groupsViewModel = groupsViewModel,
@@ -816,7 +692,7 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
                         groupsCount = dashboardUiState.groupsCount,
                         hasGroups = dashboardUiState.hasGroups,
                         onGroupsClick = { showGroupsSheet = true },
-                        connectionsCount = dashboardUiState.connectionsOut.toIntOrNull() ?: 0,
+                        connectionsCount = dashboardUiState.connectionsCount,
                         onConnectionsClick = { showConnectionsSheet = true },
                         onStopClick = { dashboardViewModel.toggleService() },
                         modifier = Modifier.align(Alignment.BottomCenter),
@@ -936,61 +812,18 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
             }
         }
 
-        if (useNavigationRail) {
-            Row(modifier = Modifier.fillMaxSize()) {
-                Surface(tonalElevation = 1.dp) {
-                    NavigationRail(
-                        modifier = Modifier.fillMaxHeight(),
-                    ) {
-                        val hasUpdate by UpdateState.hasUpdate
-                        railScreens.forEach { screen ->
-                            val selected = currentRootRoute == screen.route
+        CompositionLocalProvider(LocalTopBarController provides topBarController) {
+            if (useNavigationRail) {
+                Row(modifier = Modifier.fillMaxSize()) {
+                    Surface(tonalElevation = 1.dp) {
+                        NavigationRail(
+                            modifier = Modifier.fillMaxHeight(),
+                        ) {
+                            val hasUpdate by UpdateState.hasUpdate
+                            railScreens.forEach { screen ->
+                                val selected = currentRootRoute == screen.route
 
-                            NavigationRailItem(
-                                icon = {
-                                    if (screen == Screen.Settings && hasUpdate) {
-                                        BadgedBox(badge = { Badge(containerColor = MaterialTheme.colorScheme.primary) }) {
-                                            Icon(screen.icon, contentDescription = null)
-                                        }
-                                    } else {
-                                        Icon(screen.icon, contentDescription = null)
-                                    }
-                                },
-                                label = { Text(stringResource(screen.titleRes)) },
-                                selected = selected,
-                                onClick = {
-                                    navController.navigate(screen.route) {
-                                        popUpTo(navController.graph.findStartDestination().id) {
-                                            saveState = true
-                                        }
-                                        launchSingleTop = true
-                                        restoreState = true
-                                    }
-                                },
-                            )
-                        }
-                    }
-                }
-
-                Scaffold(
-                    modifier = Modifier.weight(1f),
-                    snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-                    topBar = topBarContent,
-                ) { paddingValues ->
-                    scaffoldContent(paddingValues)
-                }
-            }
-        } else {
-            Scaffold(
-                modifier = Modifier.fillMaxSize(),
-                snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-                topBar = topBarContent,
-                bottomBar = {
-                    if (!isSubScreen) {
-                        val hasUpdate by UpdateState.hasUpdate
-                        NavigationBar {
-                            bottomNavigationScreens.forEach { screen ->
-                                NavigationBarItem(
+                                NavigationRailItem(
                                     icon = {
                                         if (screen == Screen.Settings && hasUpdate) {
                                             BadgedBox(badge = { Badge(containerColor = MaterialTheme.colorScheme.primary) }) {
@@ -1000,20 +833,14 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
                                             Icon(screen.icon, contentDescription = null)
                                         }
                                     },
-                                    selected =
-                                        currentDestination?.hierarchy?.any {
-                                            it.route == screen.route
-                                        } == true,
+                                    label = { Text(stringResource(screen.titleRes)) },
+                                    selected = selected,
                                     onClick = {
                                         navController.navigate(screen.route) {
-                                            // Pop up to the start destination of the graph to
-                                            // avoid building up a large stack of destinations
                                             popUpTo(navController.graph.findStartDestination().id) {
                                                 saveState = true
                                             }
-                                            // Avoid multiple copies of the same destination
                                             launchSingleTop = true
-                                            // Restore state when reselecting a previously selected item
                                             restoreState = true
                                         }
                                     },
@@ -1021,9 +848,60 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
                             }
                         }
                     }
-                },
-            ) { paddingValues ->
-                scaffoldContent(paddingValues)
+
+                    Scaffold(
+                        modifier = Modifier.weight(1f),
+                        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+                        topBar = topBarContent,
+                    ) { paddingValues ->
+                        scaffoldContent(paddingValues)
+                    }
+                }
+            } else {
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+                    topBar = topBarContent,
+                    bottomBar = {
+                        if (!isSubScreen) {
+                            val hasUpdate by UpdateState.hasUpdate
+                            NavigationBar {
+                                bottomNavigationScreens.forEach { screen ->
+                                    NavigationBarItem(
+                                        icon = {
+                                            if (screen == Screen.Settings && hasUpdate) {
+                                                BadgedBox(badge = { Badge(containerColor = MaterialTheme.colorScheme.primary) }) {
+                                                    Icon(screen.icon, contentDescription = null)
+                                                }
+                                            } else {
+                                                Icon(screen.icon, contentDescription = null)
+                                            }
+                                        },
+                                        selected =
+                                            currentDestination?.hierarchy?.any {
+                                                it.route == screen.route
+                                            } == true,
+                                        onClick = {
+                                            navController.navigate(screen.route) {
+                                                // Pop up to the start destination of the graph to
+                                                // avoid building up a large stack of destinations
+                                                popUpTo(navController.graph.findStartDestination().id) {
+                                                    saveState = true
+                                                }
+                                                // Avoid multiple copies of the same destination
+                                                launchSingleTop = true
+                                                // Restore state when reselecting a previously selected item
+                                                restoreState = true
+                                            }
+                                        },
+                                    )
+                                }
+                            }
+                        }
+                    },
+                ) { paddingValues ->
+                    scaffoldContent(paddingValues)
+                }
             }
         }
 

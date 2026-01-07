@@ -2,15 +2,13 @@ package io.nekohasekai.sfa.vendor
 
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.os.Build
-import android.os.IBinder
+import android.os.Process
 import io.nekohasekai.sfa.Application
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import org.lsposed.hiddenapibypass.HiddenApiBypass
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import rikka.shizuku.Shizuku
-import rikka.shizuku.ShizukuBinderWrapper
-import rikka.shizuku.SystemServiceHelper
 
 object ShizukuPackageManager {
 
@@ -33,19 +31,19 @@ object ShizukuPackageManager {
     private val binderDeadListener = Shizuku.OnBinderDeadListener {
         _binderReady.value = false
         _permissionGranted.value = false
+        ShizukuPrivilegedServiceClient.reset()
     }
 
     private val permissionResultListener = Shizuku.OnRequestPermissionResultListener { _, grantResult ->
         _permissionGranted.value = grantResult == PackageManager.PERMISSION_GRANTED
+        _binderReady.value = isAvailable()
     }
 
     fun registerListeners() {
         Shizuku.addBinderReceivedListenerSticky(binderReceivedListener)
         Shizuku.addBinderDeadListener(binderDeadListener)
         Shizuku.addRequestPermissionResultListener(permissionResultListener)
-        _shizukuInstalled.value = isShizukuInstalled()
-        _binderReady.value = isAvailable()
-        _permissionGranted.value = checkPermission()
+        refresh()
     }
 
     fun isShizukuInstalled(): Boolean {
@@ -69,46 +67,17 @@ object ShizukuPackageManager {
 
     fun requestPermission() = ShizukuInstaller.requestPermission()
 
-    fun getInstalledPackages(flags: Int): List<PackageInfo> {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            HiddenApiBypass.addHiddenApiExemptions("")
-        }
-
-        val packageManagerBinder = SystemServiceHelper.getSystemService("package")
-        val wrappedBinder = ShizukuBinderWrapper(packageManagerBinder)
-
-        val iPackageManagerClass = Class.forName("android.content.pm.IPackageManager")
-        val stubClass = Class.forName("android.content.pm.IPackageManager\$Stub")
-        val asInterfaceMethod = stubClass.getMethod("asInterface", IBinder::class.java)
-        val iPackageManager = asInterfaceMethod.invoke(null, wrappedBinder)
-
-        val userId = android.os.Process.myUserHandle().hashCode()
-
-        val result = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val method = iPackageManagerClass.getMethod(
-                "getInstalledPackages",
-                Long::class.javaPrimitiveType,
-                Int::class.javaPrimitiveType
-            )
-            method.invoke(iPackageManager, flags.toLong(), userId)
-        } else {
-            val method = iPackageManagerClass.getMethod(
-                "getInstalledPackages",
-                Int::class.javaPrimitiveType,
-                Int::class.javaPrimitiveType
-            )
-            method.invoke(iPackageManager, flags, userId)
-        }
-
-        return extractPackageList(result)
+    fun refresh() {
+        _shizukuInstalled.value = isShizukuInstalled()
+        _binderReady.value = isAvailable()
+        _permissionGranted.value = checkPermission()
     }
 
-    @Suppress("UNCHECKED_CAST")
-    private fun extractPackageList(parceledListSlice: Any?): List<PackageInfo> {
-        if (parceledListSlice == null) return emptyList()
-
-        val getListMethod = parceledListSlice.javaClass.getMethod("getList")
-        val list = getListMethod.invoke(parceledListSlice) as? List<*>
-        return list?.filterIsInstance<PackageInfo>() ?: emptyList()
+    suspend fun getInstalledPackages(flags: Int): List<PackageInfo> = withContext(Dispatchers.IO) {
+        val service = ShizukuPrivilegedServiceClient.getService()
+        val userId = Process.myUserHandle().hashCode()
+        val slice = service.getInstalledPackages(flags, userId)
+        @Suppress("UNCHECKED_CAST")
+        slice.list as List<PackageInfo>
     }
 }

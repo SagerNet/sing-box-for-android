@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
@@ -44,7 +45,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -66,6 +66,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.compose.base.SelectableMessageDialog
+import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.compose.util.ProfileIcons
 import io.nekohasekai.sfa.compose.util.RelativeTimeFormatter
 import io.nekohasekai.sfa.compose.util.icons.MaterialIconsLibrary
@@ -112,22 +114,12 @@ fun EditProfileScreen(
 
     // Error dialog
     if (showErrorDialog) {
-        AlertDialog(
-            onDismissRequest = {
+        SelectableMessageDialog(
+            title = stringResource(R.string.error_title),
+            message = uiState.errorMessage ?: "",
+            onDismiss = {
                 showErrorDialog = false
                 viewModel.clearError()
-            },
-            title = { Text(stringResource(R.string.error_title)) },
-            text = { Text(uiState.errorMessage ?: "") },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        showErrorDialog = false
-                        viewModel.clearError()
-                    },
-                ) {
-                    Text(stringResource(R.string.ok))
-                }
             },
         )
     }
@@ -175,74 +167,38 @@ fun EditProfileScreen(
         showUnsavedChangesDialog = true
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.title_edit_profile)) },
-                navigationIcon = {
-                    IconButton(onClick = handleBack) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.content_description_back),
-                        )
-                    }
-                },
-                colors =
-                    TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                    ),
-            )
-        },
-        bottomBar = {
-            AnimatedVisibility(
-                visible = uiState.hasChanges,
-                enter = fadeIn() + expandVertically(),
-                exit = fadeOut() + shrinkVertically(),
-            ) {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colorScheme.surface,
-                    tonalElevation = 3.dp,
-                ) {
-                    Box(
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .windowInsetsPadding(WindowInsets.navigationBars)
-                                .padding(16.dp),
-                    ) {
-                        Button(
-                            onClick = { viewModel.saveChanges() },
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = !uiState.isSaving && uiState.autoUpdateIntervalError == null,
-                        ) {
-                            if (uiState.isSaving) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(18.dp),
-                                    strokeWidth = 2.dp,
-                                    color = MaterialTheme.colorScheme.onPrimary,
-                                )
-                            } else {
-                                Icon(
-                                    Icons.Default.Save,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(18.dp),
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(stringResource(R.string.save))
-                            }
-                        }
-                    }
+    OverrideTopBar {
+        TopAppBar(
+            title = { Text(stringResource(R.string.title_edit_profile)) },
+            navigationIcon = {
+                IconButton(onClick = handleBack) {
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.content_description_back),
+                    )
                 }
-            }
-        },
-    ) { paddingValues ->
-        Box(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-        ) {
+            },
+            colors =
+                TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                ),
+        )
+    }
+
+    val bottomInset =
+        with(LocalDensity.current) {
+            WindowInsets.navigationBars.getBottom(this).toDp()
+        }
+    val bottomBarPadding =
+        if (uiState.hasChanges) {
+            88.dp + bottomInset
+        } else {
+            0.dp
+        }
+
+    Box(
+        modifier = Modifier.fillMaxSize(),
+    ) {
             // Progress indicator at top (only for initial loading)
             if (uiState.isLoading) {
                 LinearProgressIndicator(
@@ -256,7 +212,8 @@ fun EditProfileScreen(
                         Modifier
                             .fillMaxSize()
                             .verticalScroll(rememberScrollState())
-                            .padding(16.dp),
+                            .padding(16.dp)
+                            .padding(bottom = bottomBarPadding),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     // Basic Information Card
@@ -556,6 +513,47 @@ fun EditProfileScreen(
                                     )
                                 }
                             }
+                        }
+                    }
+                }
+            }
+        AnimatedVisibility(
+            visible = uiState.hasChanges,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically(),
+            modifier = Modifier.align(Alignment.BottomCenter),
+        ) {
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colorScheme.surface,
+                tonalElevation = 3.dp,
+            ) {
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .windowInsetsPadding(WindowInsets.navigationBars)
+                            .padding(16.dp),
+                ) {
+                    Button(
+                        onClick = { viewModel.saveChanges() },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !uiState.isSaving && uiState.autoUpdateIntervalError == null,
+                    ) {
+                        if (uiState.isSaving) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(18.dp),
+                                strokeWidth = 2.dp,
+                                color = MaterialTheme.colorScheme.onPrimary,
+                            )
+                        } else {
+                            Icon(
+                                Icons.Default.Save,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp),
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(stringResource(R.string.save))
                         }
                     }
                 }

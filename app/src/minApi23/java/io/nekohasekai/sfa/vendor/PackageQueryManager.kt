@@ -1,34 +1,27 @@
 package io.nekohasekai.sfa.vendor
 
-import android.Manifest
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
-import android.util.Log
 import io.nekohasekai.sfa.Application
+import io.nekohasekai.sfa.BuildConfig
+import io.nekohasekai.sfa.bg.RootClient
 import io.nekohasekai.sfa.database.Settings
+import io.nekohasekai.sfa.utils.HookStatusClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 object PackageQueryManager {
 
-    private const val TAG = "PackageQueryManager"
-
-    val needsPrivilegedQuery: Boolean by lazy {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            // Check if QUERY_ALL_PACKAGES is declared in manifest
-            val packageInfo = Application.packageManager.getPackageInfo(
-                Application.application.packageName,
-                PackageManager.GET_PERMISSIONS
-            )
-            val hasPermission = packageInfo.requestedPermissions?.contains(
-                Manifest.permission.QUERY_ALL_PACKAGES
-            ) == true
-            !hasPermission
-        } else {
-            false
+    val strategy: PackageQueryStrategy
+        get() = when {
+            HookStatusClient.status.value?.active == true -> PackageQueryStrategy.ForcedRoot
+            BuildConfig.FLAVOR == "play" -> PackageQueryStrategy.UserSelected(queryMode.value)
+            else -> PackageQueryStrategy.Direct
         }
-    }
+
+    val showModeSelector: Boolean
+        get() = strategy is PackageQueryStrategy.UserSelected
 
     private val _queryMode = MutableStateFlow(Settings.perAppProxyPackageQueryMode)
     val queryMode: StateFlow<String> = _queryMode
@@ -36,8 +29,8 @@ object PackageQueryManager {
     val shizukuInstalled: StateFlow<Boolean> get() = ShizukuPackageManager.shizukuInstalled
     val shizukuBinderReady: StateFlow<Boolean> get() = ShizukuPackageManager.binderReady
     val shizukuPermissionGranted: StateFlow<Boolean> get() = ShizukuPackageManager.permissionGranted
-    val rootAvailable: StateFlow<Boolean?> get() = RootPackageManager.rootAvailable
-    val rootServiceConnected: StateFlow<Boolean> get() = RootPackageManager.serviceConnected
+    val rootAvailable: StateFlow<Boolean?> get() = RootClient.rootAvailable
+    val rootServiceConnected: StateFlow<Boolean> get() = RootClient.serviceConnected
 
     fun isShizukuAvailable(): Boolean =
         ShizukuPackageManager.isAvailable() && ShizukuPackageManager.checkPermission()
@@ -55,8 +48,12 @@ object PackageQueryManager {
         ShizukuPackageManager.requestPermission()
     }
 
+    fun refreshShizukuState() {
+        ShizukuPackageManager.refresh()
+    }
+
     suspend fun checkRootAvailable(): Boolean {
-        return RootPackageManager.checkRootAvailable()
+        return RootClient.checkRootAvailable()
     }
 
     fun setQueryMode(mode: String) {
@@ -64,26 +61,14 @@ object PackageQueryManager {
     }
 
     suspend fun getInstalledPackages(flags: Int): List<PackageInfo> {
-        if (!needsPrivilegedQuery) {
-            return getPackagesViaPackageManager(flags)
-        }
-
-        val mode = _queryMode.value
-
-        if (mode == Settings.PACKAGE_QUERY_MODE_ROOT) {
-            if (rootAvailable.value != true) {
-                val isAvailable = RootPackageManager.checkRootAvailable()
-                if (!isAvailable) {
-                    throw PrivilegedAccessRequiredException("ROOT access required")
-                }
+        return when (val s = strategy) {
+            is PackageQueryStrategy.ForcedRoot -> RootClient.getInstalledPackages(flags)
+            is PackageQueryStrategy.UserSelected -> when (s.mode) {
+                Settings.PACKAGE_QUERY_MODE_ROOT -> RootClient.getInstalledPackages(flags)
+                else -> ShizukuPackageManager.getInstalledPackages(flags)
             }
-            return RootPackageManager.getInstalledPackages(flags)
+            is PackageQueryStrategy.Direct -> getPackagesViaPackageManager(flags)
         }
-
-        if (!isShizukuAvailable()) {
-            throw PrivilegedAccessRequiredException("Shizuku access required")
-        }
-        return ShizukuPackageManager.getInstalledPackages(flags)
     }
 
     private fun getPackagesViaPackageManager(flags: Int): List<PackageInfo> {

@@ -64,7 +64,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import io.nekohasekai.sfa.BuildConfig
 import io.nekohasekai.sfa.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,17 +77,13 @@ fun DashboardSettingsBottomSheet(
     onResetOrder: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    val filteredCardOrder =
-        if (BuildConfig.DEBUG) cardOrder else cardOrder.filter { it != CardGroup.Debug }
-    val filteredVisibleCards =
-        if (BuildConfig.DEBUG) visibleCards else visibleCards.filter { it != CardGroup.Debug }.toSet()
-    var reorderedList by remember(filteredCardOrder) { mutableStateOf(filteredCardOrder) }
-    var currentVisibleCards by remember(filteredVisibleCards) { mutableStateOf(filteredVisibleCards) }
+    var reorderedList by remember(cardOrder) { mutableStateOf(cardOrder) }
+    var currentVisibleCards by remember(visibleCards) { mutableStateOf(visibleCards) }
 
     // Update local state when props change (e.g., after reset)
-    LaunchedEffect(filteredCardOrder, filteredVisibleCards) {
-        reorderedList = filteredCardOrder
-        currentVisibleCards = filteredVisibleCards
+    LaunchedEffect(cardOrder, visibleCards) {
+        reorderedList = cardOrder
+        currentVisibleCards = visibleCards
     }
 
     val hapticFeedback = LocalHapticFeedback.current
@@ -166,7 +161,7 @@ fun DashboardSettingsBottomSheet(
                             listOfNotNull(
                                 CardGroup.UploadTraffic,
                                 CardGroup.DownloadTraffic,
-                                if (BuildConfig.DEBUG) CardGroup.Debug else null,
+                                CardGroup.Debug,
                                 CardGroup.Connections,
                                 CardGroup.SystemProxy,
                                 CardGroup.ClashMode,
@@ -177,7 +172,7 @@ fun DashboardSettingsBottomSheet(
                                 CardGroup.ClashMode,
                                 CardGroup.UploadTraffic,
                                 CardGroup.DownloadTraffic,
-                                if (BuildConfig.DEBUG) CardGroup.Debug else null,
+                                CardGroup.Debug,
                                 CardGroup.Connections,
                                 CardGroup.SystemProxy,
                                 CardGroup.Profiles,

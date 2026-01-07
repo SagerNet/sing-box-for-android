@@ -16,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.AppShortcut
 import androidx.compose.material.icons.outlined.FilterList
@@ -26,7 +27,9 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +37,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -47,12 +51,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.database.Settings
-import io.nekohasekai.sfa.ui.profileoverride.PerAppProxyActivity
+import io.nekohasekai.sfa.compose.screen.profileoverride.PerAppProxyScanner
 import io.nekohasekai.sfa.vendor.PackageQueryManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -60,8 +68,23 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileOverrideScreen(navController: NavController) {
+    OverrideTopBar {
+        TopAppBar(
+            title = { Text(stringResource(R.string.profile_override)) },
+            navigationIcon = {
+                IconButton(onClick = { navController.navigateUp() }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.content_description_back),
+                    )
+                }
+            },
+        )
+    }
+
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
@@ -73,7 +96,7 @@ fun ProfileOverrideScreen(navController: NavController) {
     var showRootDialog by remember { mutableStateOf(false) }
     var showModeDialog by remember { mutableStateOf(false) }
 
-    val needsPrivilegedQuery = PackageQueryManager.needsPrivilegedQuery
+    val showModeSelector = PackageQueryManager.showModeSelector
     var packageQueryMode by remember { mutableStateOf(Settings.perAppProxyPackageQueryMode) }
     val useRootMode = packageQueryMode == Settings.PACKAGE_QUERY_MODE_ROOT
 
@@ -82,20 +105,34 @@ fun ProfileOverrideScreen(navController: NavController) {
     val isShizukuPermissionGranted by PackageQueryManager.shizukuPermissionGranted.collectAsState()
     val isShizukuAvailable = isShizukuBinderReady && isShizukuPermissionGranted
 
-    DisposableEffect(needsPrivilegedQuery) {
-        if (needsPrivilegedQuery) {
+    DisposableEffect(showModeSelector) {
+        if (showModeSelector) {
             PackageQueryManager.registerListeners()
         }
         onDispose {
-            if (needsPrivilegedQuery) {
+            if (showModeSelector) {
                 PackageQueryManager.unregisterListeners()
             }
         }
     }
 
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner, showModeSelector) {
+        if (!showModeSelector) return@DisposableEffect onDispose { }
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                PackageQueryManager.refreshShizukuState()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
     // Auto-disable per-app proxy if Shizuku authorization is revoked (only when using Shizuku mode)
     LaunchedEffect(isShizukuAvailable, useRootMode) {
-        if (needsPrivilegedQuery && !useRootMode && !isShizukuAvailable && perAppProxyEnabled) {
+        if (showModeSelector && !useRootMode && !isShizukuAvailable && perAppProxyEnabled) {
             perAppProxyEnabled = false
             withContext(Dispatchers.IO) {
                 Settings.perAppProxyEnabled = false
@@ -105,7 +142,7 @@ fun ProfileOverrideScreen(navController: NavController) {
 
     // Auto-close dialog and enable feature when Shizuku becomes available
     LaunchedEffect(isShizukuAvailable) {
-        if (needsPrivilegedQuery && isShizukuAvailable && showShizukuDialog) {
+        if (showModeSelector && isShizukuAvailable && showShizukuDialog) {
             showShizukuDialog = false
             perAppProxyEnabled = true
             withContext(Dispatchers.IO) {
@@ -212,7 +249,7 @@ fun ProfileOverrideScreen(navController: NavController) {
         }
 
         // Section: Per-App Proxy
-        val canUsePerAppProxy = if (needsPrivilegedQuery) {
+        val canUsePerAppProxy = if (showModeSelector) {
             if (useRootMode) true else isShizukuAvailable
         } else {
             true
@@ -237,7 +274,7 @@ fun ProfileOverrideScreen(navController: NavController) {
         ) {
             Column {
                 // Mode selector (only when privileged query is needed)
-                if (needsPrivilegedQuery) {
+                if (showModeSelector) {
                     val modeEnabled = !perAppProxyEnabled
                     val disabledAlpha = 0.38f
                     ListItem(
@@ -301,7 +338,7 @@ fun ProfileOverrideScreen(navController: NavController) {
                         Switch(
                             checked = perAppProxyEnabled,
                             onCheckedChange = { checked ->
-                                if (checked && needsPrivilegedQuery) {
+                                if (checked && showModeSelector) {
                                     if (useRootMode) {
                                         showRootDialog = true
                                     } else {
@@ -329,7 +366,7 @@ fun ProfileOverrideScreen(navController: NavController) {
                     },
                     modifier =
                         Modifier.clip(
-                            if (needsPrivilegedQuery) {
+                            if (showModeSelector) {
                                 RoundedCornerShape(0.dp)
                             } else if (perAppProxyEnabled && canUsePerAppProxy) {
                                 RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
@@ -383,8 +420,7 @@ fun ProfileOverrideScreen(navController: NavController) {
                         },
                         modifier =
                             Modifier.clickable(enabled = manageEnabled) {
-                                val intent = Intent(context, PerAppProxyActivity::class.java)
-                                context.startActivity(intent)
+                                navController.navigate("settings/profile_override/manage")
                             },
                         colors =
                             ListItemDefaults.colors(
@@ -674,7 +710,7 @@ private suspend fun scanAllChinaApps(): Set<String> = withContext(Dispatchers.De
     val chinaApps = mutableSetOf<String>()
     installedPackages.map { packageInfo ->
         async {
-            if (PerAppProxyActivity.scanChinaPackage(packageInfo)) {
+        if (PerAppProxyScanner.scanChinaPackage(packageInfo)) {
                 synchronized(chinaApps) {
                     chinaApps.add(packageInfo.packageName)
                 }

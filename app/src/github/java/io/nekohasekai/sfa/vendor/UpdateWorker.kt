@@ -77,13 +77,8 @@ class UpdateWorker(
                 val apkFile = ApkDownloader().use { it.download(updateInfo.downloadUrl) }
 
                 Log.d(TAG, "Installing update...")
-                val result = ApkInstaller.install(appContext, apkFile)
-
-                if (result.isSuccess) {
-                    Log.d(TAG, "Update installed successfully")
-                } else {
-                    Log.e(TAG, "Update installation failed", result.exceptionOrNull())
-                }
+                ApkInstaller.install(appContext, apkFile)
+                Log.d(TAG, "Update installed successfully")
             } else {
                 Log.d(TAG, "Silent install not available, update will be shown on next app launch")
             }

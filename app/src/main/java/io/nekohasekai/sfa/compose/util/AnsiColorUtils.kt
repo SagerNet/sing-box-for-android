@@ -20,7 +20,7 @@ object AnsiColorUtils {
     private val logWhite = Color(0xFFECF0F1)
 
     fun ansiToAnnotatedString(text: String): AnnotatedString {
-        val cleanText = text.replace(ansiRegex, "")
+        val cleanText = stripAnsi(text)
         val matches = ansiRegex.findAll(text).toList()
 
         if (matches.isEmpty()) {
@@ -64,6 +64,8 @@ object AnsiColorUtils {
             }
         }
     }
+
+    fun stripAnsi(text: String): String = text.replace(ansiRegex, "")
 
     private fun parseAnsiCode(code: String): SpanStyle? {
         val colorCodes = code.substringAfter('[').substringBefore('m').split(';')
