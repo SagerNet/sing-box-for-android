@@ -91,11 +91,13 @@ class HookNetworkCapabilitiesWriteToParcel : XHook {
     }
 
     private fun clearUnderlyingNetworks(caps: NetworkCapabilities) {
-        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.S) {
-            return
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            val field = XposedHelpers.findField(NetworkCapabilities::class.java, "mUnderlyingNetworks")
+            field.set(caps, null)
+        } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            val field = XposedHelpers.findFieldIfExists(NetworkCapabilities::class.java, "mUnderlyingNetworks")
+            field?.set(caps, null)
         }
-        val field = XposedHelpers.findField(NetworkCapabilities::class.java, "mUnderlyingNetworks")
-        field.set(caps, null)
     }
 
     private fun clearOwnerUid(caps: NetworkCapabilities) {

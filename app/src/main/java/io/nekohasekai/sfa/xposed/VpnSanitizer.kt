@@ -3,6 +3,7 @@ package io.nekohasekai.sfa.xposed
 import android.net.LinkProperties
 import android.net.NetworkCapabilities
 import android.net.NetworkInfo
+import android.os.Build
 import android.os.Parcel
 import android.os.Process
 import de.robv.android.xposed.XposedHelpers
@@ -81,14 +82,26 @@ object VpnSanitizer {
     }
 
     private fun clearUnderlyingNetworks(caps: NetworkCapabilities) {
-        XposedHelpers.callMethod(caps, "setUnderlyingNetworks", null)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val field = XposedHelpers.findField(NetworkCapabilities::class.java, "mUnderlyingNetworks")
+            field.set(caps, null)
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val field = XposedHelpers.findFieldIfExists(NetworkCapabilities::class.java, "mUnderlyingNetworks")
+            field?.set(caps, null)
+        }
     }
 
     private fun clearOwnerUid(caps: NetworkCapabilities) {
-        XposedHelpers.callMethod(caps, "setOwnerUid", Process.INVALID_UID)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val field = XposedHelpers.findField(NetworkCapabilities::class.java, "mOwnerUid")
+            field.setInt(caps, Process.INVALID_UID)
+        }
     }
 
     private fun clearVpnTransportInfo(caps: NetworkCapabilities) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            return
+        }
         val field = XposedHelpers.findField(NetworkCapabilities::class.java, "mTransportInfo")
         val info = field.get(caps) ?: return
         if (info.javaClass.name.contains("VpnTransportInfo")) {
