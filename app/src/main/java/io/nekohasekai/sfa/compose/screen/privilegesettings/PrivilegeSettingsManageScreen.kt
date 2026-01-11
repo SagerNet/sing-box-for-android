@@ -20,10 +20,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentPaste
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material.icons.filled.ManageSearch
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SelectAll
@@ -63,7 +60,6 @@ import io.nekohasekai.sfa.compose.shared.AppSelectionCard
 import io.nekohasekai.sfa.compose.shared.PackageCache
 import io.nekohasekai.sfa.compose.shared.SortMode
 import io.nekohasekai.sfa.compose.shared.buildDisplayPackages
-import io.nekohasekai.sfa.compose.screen.profileoverride.PerAppProxyScanner
 import io.nekohasekai.sfa.utils.PrivilegeSettingsClient
 import io.nekohasekai.sfa.vendor.PackageQueryManager
 import io.nekohasekai.sfa.vendor.PrivilegedAccessRequiredException
@@ -263,49 +259,19 @@ fun PrivilegeSettingsManageScreen(onBack: () -> Unit) {
         postSaveSelectedApplications(newSelected)
     }
 
-    fun startScanChinaApps() {
-        val scanPackages = currentPackages.toList()
-        if (scanPackages.isEmpty() || isLoading) return
-        isLoading = true
-        coroutineScope.launch {
-            val foundUids =
-                withContext(Dispatchers.Default) {
-                    scanPackages.mapNotNull { packageCache ->
-                        if (PerAppProxyScanner.scanChinaPackage(packageCache.info)) {
-                            if (getRiskCategory(packageCache) != RiskCategory.NONE) {
-                                null
-                            } else {
-                                packageCache.uid
-                            }
-                        } else {
-                            null
-                        }
-                    }.toSet()
-                }
-            if (foundUids.isNotEmpty()) {
-                postSaveSelectedApplications(selectedUids + foundUids)
-            }
-            isLoading = false
-        }
-    }
-
     LaunchedEffect(Unit) {
         isLoading = true
         val packageManagerFlags =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                PackageManager.GET_PERMISSIONS or PackageManager.MATCH_UNINSTALLED_PACKAGES or
-                    PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES or
-                    PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS
+                PackageManager.GET_PERMISSIONS or PackageManager.MATCH_UNINSTALLED_PACKAGES
             } else {
                 @Suppress("DEPRECATION")
-                PackageManager.GET_PERMISSIONS or PackageManager.GET_UNINSTALLED_PACKAGES or
-                    PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES or
-                    PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS
+                PackageManager.GET_PERMISSIONS or PackageManager.GET_UNINSTALLED_PACKAGES
             }
         val loadResult =
             withContext(Dispatchers.IO) {
                 try {
-                    val installedPackages = PackageQueryManager.getInstalledPackages(packageManagerFlags)
+                    val installedPackages = PackageQueryManager.getInstalledPackages(packageManagerFlags, packageManagerFlags)
                     val packageManager = context.packageManager
                     val packageCaches =
                         installedPackages.mapNotNull { packageInfo ->
@@ -423,9 +389,6 @@ fun PrivilegeSettingsManageScreen(onBack: () -> Unit) {
                     onHideDisabledAppsToggle = {
                         hideDisabledApps = !hideDisabledApps
                         applyFilter()
-                    },
-                    onScanChinaApps = {
-                        startScanChinaApps()
                     },
                     onSelectAll = {
                         val newSelected = currentPackages.map { it.uid }.toSet()
@@ -594,7 +557,6 @@ private fun PrivilegeSettingsMenus(
     onHideSystemAppsToggle: () -> Unit,
     onHideOfflineAppsToggle: () -> Unit,
     onHideDisabledAppsToggle: () -> Unit,
-    onScanChinaApps: () -> Unit,
     onSelectAll: () -> Unit,
     onDeselectAll: () -> Unit,
     onImport: () -> Unit,
@@ -603,7 +565,6 @@ private fun PrivilegeSettingsMenus(
     var showMainMenu by remember { mutableStateOf(false) }
     var showSortMenu by remember { mutableStateOf(false) }
     var showFilterMenu by remember { mutableStateOf(false) }
-    var showScanMenu by remember { mutableStateOf(false) }
     var showSelectMenu by remember { mutableStateOf(false) }
     var showBackupMenu by remember { mutableStateOf(false) }
 
@@ -617,7 +578,6 @@ private fun PrivilegeSettingsMenus(
             showMainMenu = false
             showSortMenu = false
             showFilterMenu = false
-            showScanMenu = false
             showSelectMenu = false
             showBackupMenu = false
         },
@@ -731,48 +691,6 @@ private fun PrivilegeSettingsMenus(
                     )
                 },
             )
-        }
-
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.per_app_proxy_scan)) },
-            onClick = { showScanMenu = !showScanMenu },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.ManageSearch,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                )
-            },
-            trailingIcon = {
-                Icon(
-                    imageVector =
-                        if (showScanMenu) {
-                            Icons.Default.ExpandLess
-                        } else {
-                            Icons.Default.ExpandMore
-                        },
-                    contentDescription = null,
-                )
-            },
-        )
-        if (showScanMenu) {
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.per_app_proxy_scan_china_apps)) },
-                onClick = {
-                    onScanChinaApps()
-                    showMainMenu = false
-                    showScanMenu = false
-                },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.ManageSearch,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(start = 24.dp),
-                    )
-                },
-            )
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
         }
 
         DropdownMenuItem(

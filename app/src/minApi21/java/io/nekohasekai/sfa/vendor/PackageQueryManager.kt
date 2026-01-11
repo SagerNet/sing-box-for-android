@@ -52,22 +52,33 @@ object PackageQueryManager {
         _queryMode.value = mode
     }
 
-    suspend fun getInstalledPackages(flags: Int): List<PackageInfo> {
+    suspend fun getInstalledPackages(flags: Int, retryFlags: Int): List<PackageInfo> {
         return when (val s = strategy) {
             is PackageQueryStrategy.ForcedRoot -> RootClient.getInstalledPackages(flags)
             is PackageQueryStrategy.UserSelected -> RootClient.getInstalledPackages(flags)
-            is PackageQueryStrategy.Direct -> getPackagesViaPackageManager(flags)
+            is PackageQueryStrategy.Direct -> getPackagesViaPackageManager(flags, retryFlags)
         }
     }
 
-    private fun getPackagesViaPackageManager(flags: Int): List<PackageInfo> {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            Application.packageManager.getInstalledPackages(
-                PackageManager.PackageInfoFlags.of(flags.toLong())
-            )
-        } else {
-            @Suppress("DEPRECATION")
-            Application.packageManager.getInstalledPackages(flags)
+    private fun getPackagesViaPackageManager(flags: Int, retryFlags: Int): List<PackageInfo> {
+        return try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                Application.packageManager.getInstalledPackages(
+                    PackageManager.PackageInfoFlags.of(flags.toLong())
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                Application.packageManager.getInstalledPackages(flags)
+            }
+        } catch (_: RuntimeException) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                Application.packageManager.getInstalledPackages(
+                    PackageManager.PackageInfoFlags.of(retryFlags.toLong())
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                Application.packageManager.getInstalledPackages(retryFlags)
+            }
         }
     }
 }

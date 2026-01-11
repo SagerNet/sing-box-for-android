@@ -242,6 +242,13 @@ fun PerAppProxyScreen(onBack: () -> Unit) {
                     PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES or
                     PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS
             }
+        val retryFlags =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                PackageManager.MATCH_UNINSTALLED_PACKAGES
+            } else {
+                @Suppress("DEPRECATION")
+                PackageManager.GET_UNINSTALLED_PACKAGES
+            }
         val loadResult =
             withContext(Dispatchers.IO) {
                 try {
@@ -251,7 +258,7 @@ fun PerAppProxyScreen(onBack: () -> Unit) {
                         } else {
                             Settings.PER_APP_PROXY_EXCLUDE
                         }
-                    val installedPackages = PackageQueryManager.getInstalledPackages(packageManagerFlags)
+                    val installedPackages = PackageQueryManager.getInstalledPackages(packageManagerFlags, retryFlags)
                     val packageManager = context.packageManager
                     val packageCaches =
                         installedPackages.mapNotNull { packageInfo ->

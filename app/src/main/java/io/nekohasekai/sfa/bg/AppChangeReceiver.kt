@@ -61,7 +61,13 @@ class AppChangeReceiver : BroadcastReceiver() {
                 PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES or
                 PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS
         }
-        val installedPackages = PackageQueryManager.getInstalledPackages(packageManagerFlags)
+        val retryFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            PackageManager.MATCH_UNINSTALLED_PACKAGES
+        } else {
+            @Suppress("DEPRECATION")
+            PackageManager.GET_UNINSTALLED_PACKAGES
+        }
+        val installedPackages = PackageQueryManager.getInstalledPackages(packageManagerFlags, retryFlags)
         val chinaApps = mutableSetOf<String>()
         for (packageInfo in installedPackages) {
             if (PerAppProxyScanner.scanChinaPackage(packageInfo)) {
