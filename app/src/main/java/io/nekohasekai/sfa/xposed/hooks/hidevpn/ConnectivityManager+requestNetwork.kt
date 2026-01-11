@@ -57,171 +57,73 @@ class HookConnectivityManagerRequestNetwork(private val helper: ConnectivityServ
     }
 
     private fun hookRequestNetwork() {
-        when {
-            helper.sdkInt >= 36 -> {
-                try {
-                    hookRequestNetworkV16()
-                } catch (e: Throwable) {
-                    HookErrorStore.w(SOURCE, "hookRequestNetworkV16 failed: ${e.message}", e)
-                    try {
-                        hookRequestNetworkV12()
-                    } catch (e2: Throwable) {
-                        HookErrorStore.e(SOURCE, "hookRequestNetworkV12 failed: ${e2.message}", e2)
-                    }
-                }
-            }
-            helper.sdkInt >= 31 -> {
-                try {
-                    hookRequestNetworkV12()
-                } catch (e: Throwable) {
-                    HookErrorStore.w(SOURCE, "hookRequestNetworkV12 failed: ${e.message}", e)
-                    try {
-                        hookRequestNetworkV11()
-                    } catch (e2: Throwable) {
-                        HookErrorStore.e(SOURCE, "hookRequestNetworkV11 failed: ${e2.message}", e2)
-                    }
-                }
-            }
-            helper.sdkInt >= 30 -> {
-                try {
-                    hookRequestNetworkV11()
-                } catch (e: Throwable) {
-                    HookErrorStore.w(SOURCE, "hookRequestNetworkV11 failed: ${e.message}", e)
-                    try {
-                        hookRequestNetworkV8()
-                    } catch (e2: Throwable) {
-                        HookErrorStore.e(SOURCE, "hookRequestNetworkV8 failed: ${e2.message}", e2)
-                    }
-                }
-            }
-            else -> {
-                try {
-                    hookRequestNetworkV8()
-                } catch (e: Throwable) {
-                    HookErrorStore.e(SOURCE, "hookRequestNetworkV8 failed: ${e.message}", e)
-                }
+        val methods = listOf(
+            "V16" to { hookRequestNetworkV16() },
+            "V12" to { hookRequestNetworkV12() },
+            "V11" to { hookRequestNetworkV11() },
+            "V8" to { hookRequestNetworkV8() },
+        )
+        for ((version, hook) in methods) {
+            try {
+                hook()
+                return
+            } catch (e: Throwable) {
+                HookErrorStore.w(SOURCE, "hookRequestNetwork$version failed: ${e.message}", e)
             }
         }
+        HookErrorStore.e(SOURCE, "All hookRequestNetwork variants failed")
     }
 
     private fun hookListenForNetwork() {
-        when {
-            helper.sdkInt >= 36 -> {
-                try {
-                    hookListenForNetworkV16()
-                } catch (e: Throwable) {
-                    HookErrorStore.w(SOURCE, "hookListenForNetworkV16 failed: ${e.message}", e)
-                    try {
-                        hookListenForNetworkV12()
-                    } catch (e2: Throwable) {
-                        HookErrorStore.e(SOURCE, "hookListenForNetworkV12 failed: ${e2.message}", e2)
-                    }
-                }
-            }
-            helper.sdkInt >= 31 -> {
-                try {
-                    hookListenForNetworkV12()
-                } catch (e: Throwable) {
-                    HookErrorStore.w(SOURCE, "hookListenForNetworkV12 failed: ${e.message}", e)
-                    try {
-                        hookListenForNetworkV11()
-                    } catch (e2: Throwable) {
-                        HookErrorStore.e(SOURCE, "hookListenForNetworkV11 failed: ${e2.message}", e2)
-                    }
-                }
-            }
-            helper.sdkInt >= 30 -> {
-                try {
-                    hookListenForNetworkV11()
-                } catch (e: Throwable) {
-                    HookErrorStore.w(SOURCE, "hookListenForNetworkV11 failed: ${e.message}", e)
-                    try {
-                        hookListenForNetworkV8()
-                    } catch (e2: Throwable) {
-                        HookErrorStore.e(SOURCE, "hookListenForNetworkV8 failed: ${e2.message}", e2)
-                    }
-                }
-            }
-            else -> {
-                try {
-                    hookListenForNetworkV8()
-                } catch (e: Throwable) {
-                    HookErrorStore.e(SOURCE, "hookListenForNetworkV8 failed: ${e.message}", e)
-                }
+        val methods = listOf(
+            "V16" to { hookListenForNetworkV16() },
+            "V12" to { hookListenForNetworkV12() },
+            "V11" to { hookListenForNetworkV11() },
+            "V8" to { hookListenForNetworkV8() },
+        )
+        for ((version, hook) in methods) {
+            try {
+                hook()
+                return
+            } catch (e: Throwable) {
+                HookErrorStore.w(SOURCE, "hookListenForNetwork$version failed: ${e.message}", e)
             }
         }
+        HookErrorStore.e(SOURCE, "All hookListenForNetwork variants failed")
     }
 
     private fun hookPendingRequestForNetwork() {
-        when {
-            helper.sdkInt >= 31 -> {
-                try {
-                    hookPendingRequestForNetworkV12()
-                } catch (e: Throwable) {
-                    HookErrorStore.w(SOURCE, "hookPendingRequestForNetworkV12 failed: ${e.message}", e)
-                    try {
-                        hookPendingRequestForNetworkV11()
-                    } catch (e2: Throwable) {
-                        HookErrorStore.e(SOURCE, "hookPendingRequestForNetworkV11 failed: ${e2.message}", e2)
-                    }
-                }
-            }
-            helper.sdkInt >= 30 -> {
-                try {
-                    hookPendingRequestForNetworkV11()
-                } catch (e: Throwable) {
-                    HookErrorStore.w(SOURCE, "hookPendingRequestForNetworkV11 failed: ${e.message}", e)
-                    try {
-                        hookPendingRequestForNetworkV8()
-                    } catch (e2: Throwable) {
-                        HookErrorStore.e(SOURCE, "hookPendingRequestForNetworkV8 failed: ${e2.message}", e2)
-                    }
-                }
-            }
-            else -> {
-                try {
-                    hookPendingRequestForNetworkV8()
-                } catch (e: Throwable) {
-                    HookErrorStore.e(SOURCE, "hookPendingRequestForNetworkV8 failed: ${e.message}", e)
-                }
+        val methods = listOf(
+            "V12" to { hookPendingRequestForNetworkV12() },
+            "V11" to { hookPendingRequestForNetworkV11() },
+            "V8" to { hookPendingRequestForNetworkV8() },
+        )
+        for ((version, hook) in methods) {
+            try {
+                hook()
+                return
+            } catch (e: Throwable) {
+                HookErrorStore.w(SOURCE, "hookPendingRequestForNetwork$version failed: ${e.message}", e)
             }
         }
+        HookErrorStore.e(SOURCE, "All hookPendingRequestForNetwork variants failed")
     }
 
     private fun hookPendingListenForNetwork() {
-        when {
-            helper.sdkInt >= 31 -> {
-                try {
-                    hookPendingListenForNetworkV12()
-                } catch (e: Throwable) {
-                    HookErrorStore.w(SOURCE, "hookPendingListenForNetworkV12 failed: ${e.message}", e)
-                    try {
-                        hookPendingListenForNetworkV11()
-                    } catch (e2: Throwable) {
-                        HookErrorStore.e(SOURCE, "hookPendingListenForNetworkV11 failed: ${e2.message}", e2)
-                    }
-                }
-            }
-            helper.sdkInt >= 30 -> {
-                try {
-                    hookPendingListenForNetworkV11()
-                } catch (e: Throwable) {
-                    HookErrorStore.w(SOURCE, "hookPendingListenForNetworkV11 failed: ${e.message}", e)
-                    try {
-                        hookPendingListenForNetworkV8()
-                    } catch (e2: Throwable) {
-                        HookErrorStore.e(SOURCE, "hookPendingListenForNetworkV8 failed: ${e2.message}", e2)
-                    }
-                }
-            }
-            else -> {
-                try {
-                    hookPendingListenForNetworkV8()
-                } catch (e: Throwable) {
-                    HookErrorStore.e(SOURCE, "hookPendingListenForNetworkV8 failed: ${e.message}", e)
-                }
+        val methods = listOf(
+            "V12" to { hookPendingListenForNetworkV12() },
+            "V11" to { hookPendingListenForNetworkV11() },
+            "V8" to { hookPendingListenForNetworkV8() },
+        )
+        for ((version, hook) in methods) {
+            try {
+                hook()
+                return
+            } catch (e: Throwable) {
+                HookErrorStore.w(SOURCE, "hookPendingListenForNetwork$version failed: ${e.message}", e)
             }
         }
+        HookErrorStore.e(SOURCE, "All hookPendingListenForNetwork variants failed")
     }
 
     // region requestNetwork versions
