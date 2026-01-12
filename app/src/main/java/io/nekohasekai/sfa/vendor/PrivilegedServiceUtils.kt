@@ -19,15 +19,11 @@ import java.io.IOException
 
 object PrivilegedServiceUtils {
 
-    const val SYSTEM_SERVICE_NAME = "sfa_privileged"
-
     private fun getPackageManager(): Any {
-        val binder = SystemServiceHelperCompat.getSystemService("package")
-            ?: throw IllegalStateException("package service not available")
+        val binder = SystemServiceHelperCompat.getSystemService("package") ?: throw IllegalStateException("package service not available")
         val stubClass = Class.forName("android.content.pm.IPackageManager\$Stub")
         val asInterface = stubClass.getMethod("asInterface", IBinder::class.java)
-        return asInterface.invoke(null, binder)
-            ?: throw IllegalStateException("IPackageManager is null")
+        return asInterface.invoke(null, binder) ?: throw IllegalStateException("IPackageManager is null")
     }
 
     fun getInstalledPackages(flags: Int, userId: Int): List<PackageInfo> {
@@ -37,14 +33,14 @@ object PrivilegedServiceUtils {
             val method = iPackageManagerClass.getMethod(
                 "getInstalledPackages",
                 Long::class.javaPrimitiveType,
-                Int::class.javaPrimitiveType
+                Int::class.javaPrimitiveType,
             )
             method.invoke(iPackageManager, flags.toLong(), userId)
         } else {
             val method = iPackageManagerClass.getMethod(
                 "getInstalledPackages",
                 Int::class.javaPrimitiveType,
-                Int::class.javaPrimitiveType
+                Int::class.javaPrimitiveType,
             )
             method.invoke(iPackageManager, flags, userId)
         }
@@ -61,14 +57,19 @@ object PrivilegedServiceUtils {
             iPackageInstaller,
             installerPackageName,
             null,
-            targetUserId
+            targetUserId,
         )
 
         val params = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL)
+        params.setAppPackageName(BuildConfig.APPLICATION_ID)
+        // Set INSTALL_REPLACE_EXISTING flag (value = 2)
+        val installFlagsField = PackageInstaller.SessionParams::class.java.getDeclaredField("installFlags")
+        installFlagsField.isAccessible = true
+        installFlagsField.setInt(params, installFlagsField.getInt(params) or 2)
         val sessionId = packageInstaller.createSession(params)
 
         val iSession = IPackageInstallerSession.Stub.asInterface(
-            iPackageInstaller.openSession(sessionId).asBinder()
+            iPackageInstaller.openSession(sessionId).asBinder(),
         )
         val session = createSession(iSession)
 
@@ -91,8 +92,7 @@ object PrivilegedServiceUtils {
             session.commit(intentSender)
             latch.await(60, TimeUnit.SECONDS)
 
-            val intent = resultIntent[0]
-                ?: throw IOException("Installation timed out")
+            val intent = resultIntent[0] ?: throw IOException("Installation timed out")
 
             val status = intent.getIntExtra(PackageInstaller.EXTRA_STATUS, PackageInstaller.STATUS_FAILURE)
             if (status != PackageInstaller.STATUS_SUCCESS) {
@@ -116,32 +116,26 @@ object PrivilegedServiceUtils {
         installer: IPackageInstaller,
         installerPackageName: String,
         installerAttributionTag: String?,
-        userId: Int
+        userId: Int,
     ): PackageInstaller {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            PackageInstaller::class.java
-                .getConstructor(
+            PackageInstaller::class.java.getConstructor(
                     IPackageInstaller::class.java,
                     String::class.java,
                     String::class.java,
-                    Int::class.javaPrimitiveType
-                )
-                .newInstance(installer, installerPackageName, installerAttributionTag, userId)
+                    Int::class.javaPrimitiveType,
+                ).newInstance(installer, installerPackageName, installerAttributionTag, userId)
         } else {
-            PackageInstaller::class.java
-                .getConstructor(
+            PackageInstaller::class.java.getConstructor(
                     IPackageInstaller::class.java,
                     String::class.java,
-                    Int::class.javaPrimitiveType
-                )
-                .newInstance(installer, installerPackageName, userId)
+                    Int::class.javaPrimitiveType,
+                ).newInstance(installer, installerPackageName, userId)
         }
     }
 
     private fun createSession(session: IPackageInstallerSession): PackageInstaller.Session {
-        return PackageInstaller.Session::class.java
-            .getConstructor(IPackageInstallerSession::class.java)
-            .newInstance(session)
+        return PackageInstaller.Session::class.java.getConstructor(IPackageInstallerSession::class.java).newInstance(session)
     }
 
     private fun createIntentSender(onResult: (Intent) -> Unit): IntentSender {
@@ -153,14 +147,12 @@ object PrivilegedServiceUtils {
                 whitelistToken: android.os.IBinder?,
                 finishedReceiver: android.content.IIntentReceiver?,
                 requiredPermission: String?,
-                options: Bundle?
+                options: Bundle?,
             ) {
                 onResult(intent)
             }
         }
-        return IntentSender::class.java
-            .getConstructor(IIntentSender::class.java)
-            .newInstance(sender)
+        return IntentSender::class.java.getConstructor(IIntentSender::class.java).newInstance(sender)
     }
 
     @Suppress("UNCHECKED_CAST")

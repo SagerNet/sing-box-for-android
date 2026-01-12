@@ -259,7 +259,6 @@
 
     <!-- Updates -->
     <string name="check_update">Check Update</string>
-    <string name="force_download_install">Force Download and Install</string>
     <string name="check_update_automatic">Automatic Update Check</string>
     <string name="check_update_prompt_play">Would you like to enable automatic update checking from **Play Store**?</string>
     <string name="check_update_prompt_github">Would you like to enable automatic update checking from **GitHub**?</string>

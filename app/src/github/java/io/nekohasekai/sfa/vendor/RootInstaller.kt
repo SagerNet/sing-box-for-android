@@ -2,7 +2,9 @@ package io.nekohasekai.sfa.vendor
 
 import android.content.Intent
 import android.content.ServiceConnection
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.os.ParcelFileDescriptor
 import com.topjohnwu.superuser.ipc.RootService
 import io.nekohasekai.sfa.Application
@@ -77,12 +79,14 @@ object RootInstaller {
         }
     }
 
-    private data class RootServiceHandle(
+    private class RootServiceHandle(
         val connection: ServiceConnection,
         val service: IRootService
     ) : java.io.Closeable {
         override fun close() {
-            RootService.unbind(connection)
+            Handler(Looper.getMainLooper()).post {
+                RootService.unbind(connection)
+            }
         }
     }
 }

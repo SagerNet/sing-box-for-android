@@ -3,8 +3,8 @@ package io.nekohasekai.sfa.compose.screen.settings
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import android.provider.Settings as AndroidSettings
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -249,6 +249,7 @@ fun AppSettingsScreen(navController: NavController) {
                         }
                         showDownloadDialog = false
                     } catch (e: Exception) {
+                        Log.e("AppSettingsScreen", "Error downloading update", e)
                         downloadError = e.message
                     }
                 }
@@ -497,7 +498,7 @@ fun AppSettingsScreen(navController: NavController) {
                             ),
                     )
 
-                    if (silentInstallEnabled && !xposedActivated) {
+                    if (silentInstallEnabled) {
                         ListItem(
                             headlineContent = {
                                 Text(
@@ -507,7 +508,9 @@ fun AppSettingsScreen(navController: NavController) {
                             },
                             supportingContent = {
                                 Text(
-                                    when (silentInstallMethod) {
+                                    if (xposedActivated) {
+                                        stringResource(R.string.install_method_root)
+                                    } else when (silentInstallMethod) {
                                         "PACKAGE_INSTALLER" -> stringResource(R.string.install_method_package_installer)
                                         "SHIZUKU" -> stringResource(R.string.install_method_shizuku)
                                         "ROOT" -> stringResource(R.string.install_method_root)
@@ -525,7 +528,7 @@ fun AppSettingsScreen(navController: NavController) {
                             },
                             modifier =
                                 updateItemModifier()
-                                    .clickable { showInstallMethodMenu = true },
+                                    .let { if (!xposedActivated) it.clickable { showInstallMethodMenu = true } else it },
                             colors =
                                 ListItemDefaults.colors(
                                     containerColor = Color.Transparent,
@@ -730,76 +733,6 @@ fun AppSettingsScreen(navController: NavController) {
                             containerColor = Color.Transparent,
                         ),
                 )
-
-                if (BuildConfig.DEBUG && Vendor.supportsTrackSelection()) {
-                    var isForceDownloading by remember { mutableStateOf(false) }
-                    ListItem(
-                        headlineContent = {
-                            Text(
-                                stringResource(R.string.force_download_install),
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-                        },
-                        leadingContent = {
-                            Icon(
-                                imageVector = Icons.Outlined.SystemUpdateAlt,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.error,
-                            )
-                        },
-                        trailingContent = {
-                            if (isForceDownloading) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(24.dp),
-                                    strokeWidth = 2.dp,
-                                )
-                            }
-                        },
-                        modifier =
-                            Modifier
-                                .clip(
-                                    if (hasUpdate) {
-                                        RoundedCornerShape(0.dp)
-                                    } else {
-                                        RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)
-                                    },
-                                )
-                                .clickable(enabled = !isForceDownloading) {
-                                    isForceDownloading = true
-                                    scope.launch {
-                                        try {
-                                            val latestUpdate = withContext(Dispatchers.IO) {
-                                                Vendor.forceGetLatestUpdate()
-                                            }
-                                            if (latestUpdate != null) {
-                                                showDownloadDialog = true
-                                                downloadError = null
-                                                downloadJob = scope.launch {
-                                                    try {
-                                                        withContext(Dispatchers.IO) {
-                                                            Vendor.downloadAndInstall(context, latestUpdate.downloadUrl)
-                                                        }
-                                                        showDownloadDialog = false
-                                                    } catch (e: Exception) {
-                                                        downloadError = e.message
-                                                    }
-                                                }
-                                            } else {
-                                                showErrorDialog = R.string.no_updates_available
-                                            }
-                                        } catch (_: UpdateCheckException.TrackNotSupported) {
-                                            showErrorDialog = R.string.update_track_not_supported
-                                        } catch (_: Exception) {
-                                        }
-                                        isForceDownloading = false
-                                    }
-                                },
-                        colors =
-                            ListItemDefaults.colors(
-                                containerColor = Color.Transparent,
-                            ),
-                    )
-                }
 
                 if (hasUpdate && updateInfo != null) {
                     ListItem(

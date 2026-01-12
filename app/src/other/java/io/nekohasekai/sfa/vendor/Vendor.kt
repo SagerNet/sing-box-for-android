@@ -108,13 +108,6 @@ object Vendor : VendorInterface {
         }
     }
 
-    override fun forceGetLatestUpdate(): UpdateInfo? {
-        val track = UpdateTrack.fromString(Settings.updateTrack)
-        return GitHubUpdateChecker().use { checker ->
-            checker.forceGetLatestUpdate(track)
-        }
-    }
-
     override fun supportsSilentInstall(): Boolean {
         return true
     }

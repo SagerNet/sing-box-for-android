@@ -36,12 +36,6 @@ interface VendorInterface {
     fun checkUpdateAsync(): UpdateInfo? = null
 
     /**
-     * Force get latest update (ignores version check)
-     * @return UpdateInfo of the latest release, null if unavailable
-     */
-    fun forceGetLatestUpdate(): UpdateInfo? = null
-
-    /**
      * Check if silent install feature is available
      * @return true if silent install is supported (Other flavor only)
      */

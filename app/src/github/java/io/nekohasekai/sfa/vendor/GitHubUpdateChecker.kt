@@ -27,14 +27,6 @@ class GitHubUpdateChecker : Closeable {
     private val json = Json { ignoreUnknownKeys = true }
 
     fun checkUpdate(track: UpdateTrack): UpdateInfo? {
-        return getLatestUpdate(track, checkVersion = true)
-    }
-
-    fun forceGetLatestUpdate(track: UpdateTrack): UpdateInfo? {
-        return getLatestUpdate(track, checkVersion = false)
-    }
-
-    private fun getLatestUpdate(track: UpdateTrack, checkVersion: Boolean): UpdateInfo? {
         val includePrerelease = track == UpdateTrack.BETA
         val release = getLatestRelease(includePrerelease) ?: return null
 
@@ -44,7 +36,7 @@ class GitHubUpdateChecker : Closeable {
 
         val metadata = downloadMetadata(release)!!
 
-        if (checkVersion && metadata.versionCode <= BuildConfig.VERSION_CODE) {
+        if (metadata.versionCode <= BuildConfig.VERSION_CODE) {
             return null
         }
 
