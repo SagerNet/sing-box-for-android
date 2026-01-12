@@ -437,8 +437,8 @@
     <string name="privilege_module_restart_notification_message">LSPosed 模块已更新，请重启以应用改动。</string>
     <string name="privilege_module_restart_channel">LSPosed 模块</string>
     <string name="lsposed_module">LSPosed 模块</string>
-    <string name="lsposed_module_activated">LSPosed 已激活</string>
-    <string name="lsposed_module_pending_update">LSPosed 待更新</string>
-    <string name="lsposed_module_pending_downgrade">LSPosed 待降级</string>
-    <string name="lsposed_module_not_activated">LSPosed 未激活</string>
+    <string name="lsposed_module_activated">LSPosed 模块已激活</string>
+    <string name="lsposed_module_pending_update">LSPosed 模块待更新</string>
+    <string name="lsposed_module_pending_downgrade">LSPosed 模块待降级</string>
+    <string name="lsposed_module_not_activated">LSPosed 模块未激活</string>
 </resources>

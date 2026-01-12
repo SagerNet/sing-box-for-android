@@ -417,10 +417,10 @@
     <!-- Privileged Enhancement -->
     <string name="privilege_module_title">Privilege modules</string>
     <string name="lsposed_module">LSPosed Module</string>
-    <string name="lsposed_module_activated">LSPosed activated</string>
-    <string name="lsposed_module_pending_update">LSPosed update pending</string>
-    <string name="lsposed_module_pending_downgrade">LSPosed downgrade pending</string>
-    <string name="lsposed_module_not_activated">LSPosed not activated</string>
+    <string name="lsposed_module_activated">LSPosed module activated</string>
+    <string name="lsposed_module_pending_update">LSPosed module update pending</string>
+    <string name="lsposed_module_pending_downgrade">LSPosed module downgrade pending</string>
+    <string name="lsposed_module_not_activated">LSPosed module not activated</string>
     <string name="lsposed_module_description">System Framework only.</string>
     <string name="privilege_settings">Privileged Enhancement</string>
     <string name="privilege_settings_hide_title">Hide Settings</string>
