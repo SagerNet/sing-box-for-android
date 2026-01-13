@@ -2,9 +2,11 @@ package io.nekohasekai.sfa.vendor
 
 import android.content.Context
 import io.nekohasekai.sfa.Application
+import io.nekohasekai.sfa.bg.BoxService
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.utils.HookStatusClient
 import io.nekohasekai.sfa.xposed.XposedActivation
+import kotlinx.coroutines.delay
 import java.io.File
 
 enum class InstallMethod {
@@ -14,6 +16,20 @@ enum class InstallMethod {
 }
 
 object ApkInstaller {
+
+    private suspend fun stopServiceIfRunning() {
+        val commandSocket = File(Application.application.filesDir, "command.sock")
+        if (!commandSocket.exists()) {
+            return
+        }
+        BoxService.stop()
+        repeat(20) {
+            delay(100)
+            if (!commandSocket.exists()) {
+                return
+            }
+        }
+    }
 
     fun getConfiguredMethod(): InstallMethod {
         if (HookStatusClient.status.value?.active == true ||
@@ -29,6 +45,7 @@ object ApkInstaller {
     }
 
     suspend fun install(context: Context, apkFile: File, method: InstallMethod = getConfiguredMethod()) {
+        stopServiceIfRunning()
         when (method) {
             InstallMethod.SHIZUKU -> ShizukuInstaller.install(apkFile)
             InstallMethod.ROOT -> RootInstaller.install(apkFile)
