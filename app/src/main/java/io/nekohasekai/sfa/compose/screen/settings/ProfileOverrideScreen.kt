@@ -58,6 +58,7 @@ import androidx.navigation.NavController
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.bg.RootClient
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.compose.screen.profileoverride.PerAppProxyScanner
@@ -206,18 +207,7 @@ fun ProfileOverrideScreen(navController: NavController) {
                         onCheckedChange = { checked ->
                             if (checked && !autoRedirect) {
                                 scope.launch {
-                                    val hasRoot =
-                                        withContext(Dispatchers.IO) {
-                                            try {
-                                                val process = Runtime.getRuntime().exec("su -c id")
-                                                process.inputStream.close()
-                                                process.outputStream.close()
-                                                process.errorStream.close()
-                                                process.waitFor() == 0
-                                            } catch (e: Exception) {
-                                                false
-                                            }
-                                        }
+                                    val hasRoot = RootClient.checkRootAvailable()
                                     if (hasRoot) {
                                         autoRedirect = true
                                         withContext(Dispatchers.IO) {

@@ -18,16 +18,6 @@ import kotlin.coroutines.resumeWithException
 
 object RootInstaller {
 
-    suspend fun checkAccess(): Boolean = withContext(Dispatchers.IO) {
-        try {
-            val process = Runtime.getRuntime().exec("su -c echo test")
-            val exitCode = process.waitFor()
-            exitCode == 0
-        } catch (e: Exception) {
-            false
-        }
-    }
-
     suspend fun install(apkFile: File) {
         withContext(Dispatchers.IO) {
             bindRootService().use { handle ->

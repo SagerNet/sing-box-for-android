@@ -2,6 +2,7 @@ package io.nekohasekai.sfa.vendor
 
 import android.content.Context
 import io.nekohasekai.sfa.Application
+import io.nekohasekai.sfa.bg.RootClient
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.utils.HookStatusClient
 import io.nekohasekai.sfa.xposed.XposedActivation
@@ -43,7 +44,7 @@ object ApkInstaller {
         val method = getConfiguredMethod()
         return when (method) {
             InstallMethod.PACKAGE_INSTALLER -> canSystemSilentInstall()
-            InstallMethod.ROOT -> RootInstaller.checkAccess()
+            InstallMethod.ROOT -> RootClient.checkRootAvailable()
         }
     }
 }

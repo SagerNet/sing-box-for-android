@@ -3,6 +3,7 @@ package io.nekohasekai.sfa.vendor
 import android.content.Context
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.bg.BoxService
+import io.nekohasekai.sfa.bg.RootClient
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.utils.HookStatusClient
 import io.nekohasekai.sfa.xposed.XposedActivation
@@ -62,7 +63,7 @@ object ApkInstaller {
         return when (method) {
             InstallMethod.PACKAGE_INSTALLER -> canSystemSilentInstall()
             InstallMethod.SHIZUKU -> ShizukuInstaller.isAvailable() && ShizukuInstaller.checkPermission()
-            InstallMethod.ROOT -> RootInstaller.checkAccess()
+            InstallMethod.ROOT -> RootClient.checkRootAvailable()
         }
     }
 }
