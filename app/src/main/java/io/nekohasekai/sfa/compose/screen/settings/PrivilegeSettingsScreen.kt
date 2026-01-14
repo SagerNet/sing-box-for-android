@@ -590,16 +590,24 @@ fun PrivilegeSettingsScreen(navController: NavController, serviceStatus: Status 
                             checked = privilegeSettingsEnabled,
                             onCheckedChange = { checked ->
                                 privilegeSettingsEnabled = checked
+                                if (checked && !interfaceRenameEnabled) {
+                                    interfaceRenameEnabled = true
+                                }
                                 scope.launch {
                                     val failure =
                                         withContext(Dispatchers.IO) {
                                             Settings.privilegeSettingsEnabled = checked
+                                            if (checked) {
+                                                Settings.privilegeSettingsInterfaceRenameEnabled = true
+                                            }
                                             PrivilegeSettingsClient.sync()
                                         }
                                     if (failure != null) {
                                         messageDialogTitle = context.getString(R.string.error_title)
                                         messageDialogMessage = failure.message ?: failure.toString()
                                         showMessageDialog = true
+                                    } else if (checked && serviceStatus == Status.Started) {
+                                        GlobalEventBus.tryEmit(UiEvent.RestartToTakeEffect)
                                     }
                                 }
                             },
