@@ -5,7 +5,7 @@ import go.Seq
 import io.nekohasekai.libbox.CommandClient
 import io.nekohasekai.libbox.CommandClientHandler
 import io.nekohasekai.libbox.CommandClientOptions
-import io.nekohasekai.libbox.Connections
+import io.nekohasekai.libbox.ConnectionEvents
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.LogEntry
 import io.nekohasekai.libbox.LogIterator
@@ -15,10 +15,6 @@ import io.nekohasekai.libbox.StatusMessage
 import io.nekohasekai.libbox.StringIterator
 import io.nekohasekai.sfa.ktx.toList
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 
 open class CommandClient(
     private val scope: CoroutineScope,
@@ -87,7 +83,7 @@ open class CommandClient(
 
         fun updateClashMode(newMode: String) {}
 
-        fun updateConnections(connections: Connections) {}
+        fun writeConnectionEvents(events: ConnectionEvents) {}
     }
 
     private var commandClient: CommandClient? = null
@@ -109,27 +105,8 @@ open class CommandClient(
         }
         options.statusInterval = 1 * 1000 * 1000 * 1000
         val commandClient = CommandClient(clientHandler, options)
-        scope.launch(Dispatchers.IO) {
-            for (i in 1..10) {
-                delay(100 + i.toLong() * 50)
-                try {
-                    commandClient.connect()
-                } catch (ignored: Exception) {
-                    continue
-                }
-                if (!isActive) {
-                    runCatching {
-                        commandClient.disconnect()
-                    }
-                    return@launch
-                }
-                this@CommandClient.commandClient = commandClient
-                return@launch
-            }
-            runCatching {
-                commandClient.disconnect()
-            }
-        }
+        commandClient.connect()
+        this.commandClient = commandClient
     }
 
     fun disconnect() {
@@ -197,9 +174,9 @@ open class CommandClient(
             getAllHandlers().forEach { it.updateClashMode(newMode) }
         }
 
-        override fun writeConnections(message: Connections?) {
-            if (message == null) return
-            getAllHandlers().forEach { it.updateConnections(message) }
+        override fun writeConnectionEvents(events: ConnectionEvents?) {
+            if (events == null) return
+            getAllHandlers().forEach { it.writeConnectionEvents(events) }
         }
     }
 }

@@ -1,11 +1,9 @@
 package io.nekohasekai.sfa.compose.screen.dashboard
 
 import androidx.lifecycle.viewModelScope
-import io.nekohasekai.libbox.Connections
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.OutboundGroup
 import io.nekohasekai.libbox.StatusMessage
-import io.nekohasekai.sfa.ktx.toList
 import io.nekohasekai.sfa.bg.BoxService
 import io.nekohasekai.sfa.compose.base.BaseViewModel
 import io.nekohasekai.sfa.compose.base.UiEvent
@@ -14,6 +12,7 @@ import io.nekohasekai.sfa.database.Profile
 import io.nekohasekai.sfa.database.ProfileManager
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.database.TypedProfile
+import io.nekohasekai.sfa.utils.AppLifecycleObserver
 import io.nekohasekai.sfa.utils.CommandClient
 import io.nekohasekai.sfa.utils.HTTPClient
 import kotlinx.coroutines.Dispatchers
@@ -135,7 +134,6 @@ class DashboardViewModel : BaseViewModel<DashboardUiState, UiEvent>(), CommandCl
                 CommandClient.ConnectionType.Status,
                 CommandClient.ConnectionType.ClashMode,
                 CommandClient.ConnectionType.Groups,
-                CommandClient.ConnectionType.Connections,
             ),
             this,
         )
@@ -157,6 +155,17 @@ class DashboardViewModel : BaseViewModel<DashboardUiState, UiEvent>(), CommandCl
     init {
         loadProfiles()
         ProfileManager.registerCallback(::onProfilesChanged)
+
+        viewModelScope.launch {
+            AppLifecycleObserver.isForeground.collect { foreground ->
+                if (_serviceStatus.value != Status.Started) return@collect
+                if (foreground) {
+                    commandClient.connect()
+                } else {
+                    commandClient.disconnect()
+                }
+            }
+        }
     }
 
     override fun onCleared() {
@@ -447,7 +456,9 @@ class DashboardViewModel : BaseViewModel<DashboardUiState, UiEvent>(), CommandCl
         when (status) {
             Status.Started -> {
                 checkDeprecatedNotes()
-                commandClient.connect()
+                if (AppLifecycleObserver.isForeground.value) {
+                    commandClient.connect()
+                }
                 reloadSystemProxyStatus()
                 reloadStartedAt()
             }
@@ -458,6 +469,7 @@ class DashboardViewModel : BaseViewModel<DashboardUiState, UiEvent>(), CommandCl
                     copy(
                         hasGroups = false,
                         groupsCount = 0,
+                        connectionsCount = 0,
                         serviceStartTime = null,
                         clashModeVisible = false,
                         systemProxyVisible = false,
@@ -587,6 +599,7 @@ class DashboardViewModel : BaseViewModel<DashboardUiState, UiEvent>(), CommandCl
                     goroutines = status.goroutines.toString(),
                     // Only set trafficVisible to true, never back to false from status updates
                     trafficVisible = if (status.trafficAvailable) true else trafficVisible,
+                    connectionsCount = status.connectionsIn,
                     connectionsIn = status.connectionsIn.toString(),
                     connectionsOut = status.connectionsOut.toString(),
                     uplink = "${Libbox.formatBytes(status.uplink)}/s",
@@ -630,13 +643,6 @@ class DashboardViewModel : BaseViewModel<DashboardUiState, UiEvent>(), CommandCl
             updateState {
                 copy(hasGroups = hasGroups, groupsCount = newGroups.size)
             }
-        }
-    }
-
-    override fun updateConnections(connections: Connections) {
-        viewModelScope.launch(Dispatchers.Main) {
-            val count = connections.iterator().toList().count { it.outboundType != "dns" }
-            updateState { copy(connectionsCount = count) }
         }
     }
 

@@ -211,6 +211,7 @@ dependencies {
     // API 23+ dependencies (play/other)
     "playImplementation"("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion23")
     "playImplementation"("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion23")
+    "playImplementation"("androidx.lifecycle:lifecycle-process:$lifecycleVersion23")
     "playImplementation"("androidx.room:room-runtime:$roomVersion23")
     "playImplementation"("androidx.work:work-runtime-ktx:$workVersion23")
     "playImplementation"("androidx.camera:camera-view:$cameraVersion23")
@@ -222,6 +223,7 @@ dependencies {
 
     "otherImplementation"("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion23")
     "otherImplementation"("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion23")
+    "otherImplementation"("androidx.lifecycle:lifecycle-process:$lifecycleVersion23")
     "otherImplementation"("androidx.room:room-runtime:$roomVersion23")
     "otherImplementation"("androidx.work:work-runtime-ktx:$workVersion23")
     "otherImplementation"("androidx.camera:camera-view:$cameraVersion23")
@@ -233,6 +235,7 @@ dependencies {
     // API 21 dependencies (otherLegacy)
     "otherLegacyImplementation"("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion21")
     "otherLegacyImplementation"("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion21")
+    "otherLegacyImplementation"("androidx.lifecycle:lifecycle-process:$lifecycleVersion21")
     "otherLegacyImplementation"("androidx.room:room-runtime:$roomVersion21")
     "otherLegacyImplementation"("androidx.work:work-runtime-ktx:$workVersion21")
     "otherLegacyImplementation"("androidx.camera:camera-view:$cameraVersion21")

@@ -61,6 +61,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -541,14 +542,7 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
 
         val connectionsViewModel: ConnectionsViewModel? =
             if (isConnectionsRoute) {
-                viewModel(
-                    factory = object : ViewModelProvider.Factory {
-                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                            @Suppress("UNCHECKED_CAST")
-                            return ConnectionsViewModel(dashboardViewModel.commandClient) as T
-                        }
-                    }
-                )
+                viewModel()
             } else {
                 null
             }
@@ -973,17 +967,20 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
         // Connections ModalBottomSheet
         if (showConnectionsSheet && !useNavigationRail) {
             val connectionsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-            val connectionsViewModel: ConnectionsViewModel = viewModel(
-                factory = object : ViewModelProvider.Factory {
-                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                        @Suppress("UNCHECKED_CAST")
-                        return ConnectionsViewModel(dashboardViewModel.commandClient) as T
-                    }
-                }
-            )
+            val connectionsViewModel: ConnectionsViewModel = viewModel()
             val connectionsUiState by connectionsViewModel.uiState.collectAsState()
             var selectedConnectionId by remember { mutableStateOf<String?>(null) }
             val selectedConnection = connectionsUiState.allConnections.find { it.id == selectedConnectionId }
+
+            LaunchedEffect(Unit) {
+                connectionsViewModel.setVisible(true)
+            }
+
+            DisposableEffect(Unit) {
+                onDispose {
+                    connectionsViewModel.setVisible(false)
+                }
+            }
 
             ModalBottomSheet(
                 onDismissRequest = {

@@ -5,6 +5,7 @@ import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.LogEntry
 import io.nekohasekai.sfa.compose.util.AnsiColorUtils
 import io.nekohasekai.sfa.constant.Status
+import io.nekohasekai.sfa.utils.AppLifecycleObserver
 import io.nekohasekai.sfa.utils.CommandClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.update
@@ -24,6 +25,20 @@ class LogViewModel : BaseLogViewModel(), CommandClient.Handler {
             connectionType = CommandClient.ConnectionType.Log,
             handler = this,
         )
+    private var lastServiceStatus: Status = Status.Stopped
+
+    init {
+        viewModelScope.launch {
+            AppLifecycleObserver.isForeground.collect { foreground ->
+                if (lastServiceStatus != Status.Started) return@collect
+                if (foreground) {
+                    commandClient.connect()
+                } else {
+                    commandClient.disconnect()
+                }
+            }
+        }
+    }
 
     private fun processLogEntry(entry: LogEntry): ProcessedLogEntry {
         val level = LogLevel.entries.find { it.priority == entry.level } ?: LogLevel.Default
@@ -35,11 +50,14 @@ class LogViewModel : BaseLogViewModel(), CommandClient.Handler {
     }
 
     override fun updateServiceStatus(status: Status) {
+        lastServiceStatus = status
         _uiState.update { it.copy(serviceStatus = status) }
 
         when (status) {
             Status.Started -> {
-                commandClient.connect()
+                if (AppLifecycleObserver.isForeground.value) {
+                    commandClient.connect()
+                }
             }
 
             Status.Stopped, Status.Stopping -> {

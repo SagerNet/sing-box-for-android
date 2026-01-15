@@ -9,13 +9,11 @@ import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.compose.model.Group
 import io.nekohasekai.sfa.compose.model.GroupItem
 import io.nekohasekai.sfa.compose.model.toList
+import io.nekohasekai.sfa.utils.AppLifecycleObserver
 import io.nekohasekai.sfa.utils.CommandClient
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -39,7 +37,6 @@ class GroupsViewModel(
     private val _serviceStatus = MutableStateFlow(Status.Stopped)
     val serviceStatus = _serviceStatus.asStateFlow()
     private var lastServiceStatus: Status = Status.Stopped
-    private var connectionJob: Job? = null
 
     init {
         if (sharedCommandClient != null) {
@@ -55,14 +52,32 @@ class GroupsViewModel(
                 )
             isUsingSharedClient = false
         }
+
+        viewModelScope.launch {
+            AppLifecycleObserver.isForeground.collect { foreground ->
+                if (lastServiceStatus != Status.Started) return@collect
+                if (foreground) {
+                    if (isUsingSharedClient) {
+                        commandClient.addHandler(this@GroupsViewModel)
+                    } else {
+                        updateState { copy(isLoading = true) }
+                        commandClient.connect()
+                    }
+                } else {
+                    if (isUsingSharedClient) {
+                        commandClient.removeHandler(this@GroupsViewModel)
+                    } else {
+                        commandClient.disconnect()
+                    }
+                }
+            }
+        }
     }
 
     override fun createInitialState() = GroupsUiState()
 
     override fun onCleared() {
         super.onCleared()
-        connectionJob?.cancel()
-        connectionJob = null
         if (isUsingSharedClient) {
             commandClient.removeHandler(this)
         } else {
@@ -72,25 +87,11 @@ class GroupsViewModel(
 
     private fun handleServiceStatusChange(status: Status) {
         if (status == Status.Started) {
-            if (!isUsingSharedClient) {
-                updateState {
-                    copy(isLoading = true)
-                }
-                connectionJob?.cancel()
-                connectionJob = viewModelScope.launch(Dispatchers.IO) {
-                    while (isActive) {
-                        try {
-                            commandClient.connect()
-                            break
-                        } catch (e: Exception) {
-                            delay(100)
-                        }
-                    }
-                }
+            if (!isUsingSharedClient && AppLifecycleObserver.isForeground.value) {
+                updateState { copy(isLoading = true) }
+                commandClient.connect()
             }
         } else {
-            connectionJob?.cancel()
-            connectionJob = null
             if (!isUsingSharedClient) {
                 commandClient.disconnect()
             }
@@ -243,8 +244,6 @@ class GroupsViewModel(
     }
 
     override fun updateGroups(newGroups: MutableList<OutboundGroup>) {
-        connectionJob?.cancel()
-        connectionJob = null
         viewModelScope.launch(Dispatchers.Default) {
             val currentGroups = uiState.value.groups
             val newGroupsMap = newGroups.associateBy { it.tag }

@@ -1,6 +1,7 @@
 package io.nekohasekai.sfa.compose.screen.connections
 
 import androidx.lifecycle.viewModelScope
+import io.nekohasekai.libbox.ConnectionEvents
 import io.nekohasekai.libbox.Connections
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.compose.base.BaseViewModel
@@ -10,14 +11,16 @@ import io.nekohasekai.sfa.ktx.toList
 import io.nekohasekai.sfa.compose.model.Connection
 import io.nekohasekai.sfa.compose.model.ConnectionSort
 import io.nekohasekai.sfa.compose.model.ConnectionStateFilter
+import io.nekohasekai.sfa.utils.AppLifecycleObserver
 import io.nekohasekai.sfa.utils.CommandClient
+import java.util.concurrent.atomic.AtomicLong
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.isActive
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 data class ConnectionsUiState(
@@ -35,70 +38,62 @@ sealed class ConnectionsEvent : ScreenEvent {
     data object AllConnectionsClosed : ConnectionsEvent()
 }
 
-class ConnectionsViewModel(
-    private val sharedCommandClient: CommandClient? = null,
-) : BaseViewModel<ConnectionsUiState, ConnectionsEvent>(), CommandClient.Handler {
-    private val commandClient: CommandClient
-    private val isUsingSharedClient: Boolean
+class ConnectionsViewModel : BaseViewModel<ConnectionsUiState, ConnectionsEvent>(), CommandClient.Handler {
+    private val commandClient = CommandClient(
+        viewModelScope,
+        CommandClient.ConnectionType.Connections,
+        this,
+    )
 
     private val _serviceStatus = MutableStateFlow(Status.Stopped)
     val serviceStatus = _serviceStatus.asStateFlow()
     private var lastServiceStatus: Status = Status.Stopped
-    private var connectionJob: Job? = null
 
-    private var rawConnections: Connections? = null
+    private val _isVisible = MutableStateFlow(false)
 
-    init {
-        if (sharedCommandClient != null) {
-            commandClient = sharedCommandClient
-            isUsingSharedClient = true
-            commandClient.addHandler(this)
-        } else {
-            commandClient = CommandClient(
-                viewModelScope,
-                CommandClient.ConnectionType.Connections,
-                this,
-            )
-            isUsingSharedClient = false
-        }
-    }
+    private var connectionsStore: Connections? = null
+    private val connectionsMutex = Mutex()
+    private val connectionsGeneration = AtomicLong(0)
 
     override fun createInitialState() = ConnectionsUiState()
 
-    override fun onCleared() {
-        super.onCleared()
-        connectionJob?.cancel()
-        connectionJob = null
-        if (isUsingSharedClient) {
-            commandClient.removeHandler(this)
-        } else {
-            commandClient.disconnect()
+    init {
+        viewModelScope.launch {
+            combine(
+                AppLifecycleObserver.isForeground,
+                _isVisible,
+                _serviceStatus
+            ) { foreground, visible, status ->
+                Triple(foreground, visible, status)
+            }.collect { (foreground, visible, status) ->
+                val shouldConnect = foreground && visible && status == Status.Started
+                if (shouldConnect) {
+                    updateState { copy(isLoading = true) }
+                    commandClient.connect()
+                } else {
+                    commandClient.disconnect()
+                }
+            }
         }
     }
 
-    private fun handleServiceStatusChange(status: Status) {
-        if (status == Status.Started) {
-            if (!isUsingSharedClient) {
-                updateState { copy(isLoading = true) }
-                connectionJob?.cancel()
-                connectionJob = viewModelScope.launch(Dispatchers.IO) {
-                    while (isActive) {
-                        try {
-                            commandClient.connect()
-                            break
-                        } catch (e: Exception) {
-                            delay(100)
-                        }
-                    }
+    fun setVisible(visible: Boolean) {
+        _isVisible.value = visible
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        commandClient.disconnect()
+    }
+
+    private suspend fun handleServiceStatusChange(status: Status) {
+        if (status != Status.Started) {
+            withContext(Dispatchers.Default) {
+                connectionsMutex.withLock {
+                    connectionsStore = null
                 }
+                connectionsGeneration.incrementAndGet()
             }
-        } else {
-            connectionJob?.cancel()
-            connectionJob = null
-            if (!isUsingSharedClient) {
-                commandClient.disconnect()
-            }
-            rawConnections = null
             updateState {
                 copy(connections = emptyList(), allConnections = emptyList(), isLoading = false)
             }
@@ -116,17 +111,17 @@ class ConnectionsViewModel(
 
     fun setStateFilter(filter: ConnectionStateFilter) {
         updateState { copy(stateFilter = filter) }
-        rawConnections?.let { processConnections(it) }
+        requestConnectionsRefresh()
     }
 
     fun setSort(sort: ConnectionSort) {
         updateState { copy(sort = sort) }
-        rawConnections?.let { processConnections(it) }
+        requestConnectionsRefresh()
     }
 
     fun setSearchText(text: String) {
         updateState { copy(searchText = text) }
-        rawConnections?.let { processConnections(it) }
+        requestConnectionsRefresh()
     }
 
     fun toggleSearch() {
@@ -138,7 +133,7 @@ class ConnectionsViewModel(
             )
         }
         if (!newSearchActive) {
-            rawConnections?.let { processConnections(it) }
+            requestConnectionsRefresh()
         }
     }
 
@@ -175,50 +170,102 @@ class ConnectionsViewModel(
     }
 
     override fun onDisconnected() {
-        viewModelScope.launch(Dispatchers.Main) {
-            rawConnections = null
-            updateState {
-                copy(connections = emptyList(), allConnections = emptyList(), isLoading = false)
+        viewModelScope.launch(Dispatchers.Default) {
+            connectionsMutex.withLock {
+                connectionsStore = null
+            }
+            connectionsGeneration.incrementAndGet()
+            withContext(Dispatchers.Main) {
+                updateState {
+                    copy(connections = emptyList(), allConnections = emptyList(), isLoading = false)
+                }
             }
         }
     }
 
-    override fun updateConnections(connections: Connections) {
-        rawConnections = connections
-        processConnections(connections)
-    }
-
-    private fun processConnections(connections: Connections) {
-        connectionJob?.cancel()
-        connectionJob = viewModelScope.launch(Dispatchers.Default) {
-            val currentState = uiState.value
-
-            val allConnectionList = connections.iterator().toList()
-                .filter { it.outboundType != "dns" }
-                .map { Connection.from(it) }
-
-            connections.filterState(currentState.stateFilter.libboxValue)
-
-            when (currentState.sort) {
-                ConnectionSort.ByDate -> connections.sortByDate()
-                ConnectionSort.ByTraffic -> connections.sortByTraffic()
-                ConnectionSort.ByTrafficTotal -> connections.sortByTrafficTotal()
+    override fun writeConnectionEvents(events: ConnectionEvents) {
+        viewModelScope.launch(Dispatchers.Default) {
+            val generation = connectionsGeneration.get()
+            val snapshot = connectionsMutex.withLock {
+                if (connectionsStore == null) {
+                    connectionsStore = Libbox.newConnections()
+                }
+                val store = connectionsStore ?: return@withLock null
+                store.applyEvents(events)
+                buildConnectionLists(store, uiState.value)
+            } ?: return@launch
+            if (connectionsGeneration.get() != generation) {
+                return@launch
             }
-
-            val connectionList = connections.iterator().toList()
-                .filter { it.outboundType != "dns" }
-                .map { Connection.from(it) }
-                .filter { it.performSearch(currentState.searchText) }
-
             withContext(Dispatchers.Main) {
+                if (connectionsGeneration.get() != generation) {
+                    return@withContext
+                }
                 updateState {
                     copy(
-                        connections = connectionList,
-                        allConnections = allConnectionList,
+                        connections = snapshot.connections,
+                        allConnections = snapshot.allConnections,
                         isLoading = false,
                     )
                 }
             }
         }
     }
+
+    private fun requestConnectionsRefresh() {
+        viewModelScope.launch(Dispatchers.Default) {
+            val generation = connectionsGeneration.get()
+            val snapshot = connectionsMutex.withLock {
+                val store = connectionsStore ?: return@withLock null
+                buildConnectionLists(store, uiState.value)
+            } ?: return@launch
+            if (connectionsGeneration.get() != generation) {
+                return@launch
+            }
+            withContext(Dispatchers.Main) {
+                if (connectionsGeneration.get() != generation) {
+                    return@withContext
+                }
+                updateState {
+                    copy(
+                        connections = snapshot.connections,
+                        allConnections = snapshot.allConnections,
+                        isLoading = false,
+                    )
+                }
+            }
+        }
+    }
+
+    private fun buildConnectionLists(
+        connections: Connections,
+        currentState: ConnectionsUiState,
+    ): ConnectionLists {
+        val allConnectionList = connections.iterator().toList()
+            .filter { it.outboundType != "dns" }
+            .map { Connection.from(it) }
+
+        connections.filterState(currentState.stateFilter.libboxValue)
+
+        when (currentState.sort) {
+            ConnectionSort.ByDate -> connections.sortByDate()
+            ConnectionSort.ByTraffic -> connections.sortByTraffic()
+            ConnectionSort.ByTrafficTotal -> connections.sortByTrafficTotal()
+        }
+
+        val connectionList = connections.iterator().toList()
+            .filter { it.outboundType != "dns" }
+            .map { Connection.from(it) }
+            .filter { it.performSearch(currentState.searchText) }
+
+        return ConnectionLists(
+            connections = connectionList,
+            allConnections = allConnectionList,
+        )
+    }
+
+    private data class ConnectionLists(
+        val connections: List<Connection>,
+        val allConnections: List<Connection>,
+    )
 }

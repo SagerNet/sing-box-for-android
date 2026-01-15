@@ -43,6 +43,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -333,6 +334,16 @@ fun ConnectionsScreen(
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.setVisible(true)
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.setVisible(false)
+        }
+    }
 
     LaunchedEffect(serviceStatus) {
         viewModel.updateServiceStatus(serviceStatus)
