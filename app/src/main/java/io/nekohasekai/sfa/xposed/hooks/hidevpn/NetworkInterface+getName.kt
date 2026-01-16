@@ -31,6 +31,11 @@ class HookNetworkInterfaceGetName(private val classLoader: ClassLoader) : XHook 
         private const val IFF_UP = 0x1
     }
 
+    private val netlinkSocketAddressClass by lazy { Class.forName("android.system.NetlinkSocketAddress") }
+    private val netlinkSocketAddressCtor by lazy {
+        netlinkSocketAddressClass.getConstructor(Int::class.javaPrimitiveType, Int::class.javaPrimitiveType)
+    }
+
     private val seq = AtomicInteger(1)
 
     override fun injectHook() {
@@ -223,9 +228,7 @@ class HookNetworkInterfaceGetName(private val classLoader: ClassLoader) : XHook 
     }
 
     private fun buildNetlinkAddress(): SocketAddress {
-        val cls = Class.forName("android.system.NetlinkSocketAddress")
-        val ctor = cls.getConstructor(Int::class.javaPrimitiveType, Int::class.javaPrimitiveType)
-        return ctor.newInstance(0, 0) as SocketAddress
+        return netlinkSocketAddressCtor.newInstance(0, 0) as SocketAddress
     }
 
     private fun buildLinkMessage(

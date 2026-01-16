@@ -17,6 +17,25 @@ class HookNetworkCapabilitiesWriteToParcel : XHook {
         private const val SOURCE = "HookNCWriteToParcel"
     }
 
+    private val copyCtor by lazy {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            NetworkCapabilities::class.java.getDeclaredConstructor(
+                NetworkCapabilities::class.java,
+                Long::class.javaPrimitiveType
+            ).apply { isAccessible = true }
+        } else {
+            NetworkCapabilities::class.java.getDeclaredConstructor(
+                NetworkCapabilities::class.java
+            ).apply { isAccessible = true }
+        }
+    }
+    private val removeTransportTypeMethod by lazy {
+        NetworkCapabilities::class.java.getMethod("removeTransportType", Int::class.javaPrimitiveType)
+    }
+    private val addCapabilityMethod by lazy {
+        NetworkCapabilities::class.java.getMethod("addCapability", Int::class.javaPrimitiveType)
+    }
+
     private val inWrite = ThreadLocal.withInitial { false }
 
     override fun injectHook() {
@@ -58,22 +77,15 @@ class HookNetworkCapabilitiesWriteToParcel : XHook {
 
     private fun copyNetworkCapabilities(caps: NetworkCapabilities): NetworkCapabilities {
         return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-            val ctor = NetworkCapabilities::class.java.getDeclaredConstructor(
-                NetworkCapabilities::class.java,
-                Long::class.javaPrimitiveType!!
-            )
-            ctor.isAccessible = true
-            ctor.newInstance(caps, 0L)
+            copyCtor.newInstance(caps, 0L) as NetworkCapabilities
         } else {
-            val ctor = NetworkCapabilities::class.java.getDeclaredConstructor(NetworkCapabilities::class.java)
-            ctor.isAccessible = true
-            ctor.newInstance(caps)
+            copyCtor.newInstance(caps) as NetworkCapabilities
         }
     }
 
     private fun sanitizeNetworkCapabilities(caps: NetworkCapabilities) {
-        XposedHelpers.callMethod(caps, "removeTransportType", NetworkCapabilities.TRANSPORT_VPN)
-        XposedHelpers.callMethod(caps, "addCapability", NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
+        removeTransportTypeMethod.invoke(caps, NetworkCapabilities.TRANSPORT_VPN)
+        addCapabilityMethod.invoke(caps, NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
         clearVpnTransportInfo(caps)
         clearUnderlyingNetworks(caps)
         clearOwnerUid(caps)

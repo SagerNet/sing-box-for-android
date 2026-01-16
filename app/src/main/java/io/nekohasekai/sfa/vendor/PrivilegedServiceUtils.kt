@@ -19,30 +19,67 @@ import java.io.IOException
 
 object PrivilegedServiceUtils {
 
+    private val iPackageManagerStubClass by lazy { Class.forName("android.content.pm.IPackageManager\$Stub") }
+    private val asInterfaceMethod by lazy { iPackageManagerStubClass.getMethod("asInterface", IBinder::class.java) }
+    private val iPackageManagerClass by lazy { Class.forName("android.content.pm.IPackageManager") }
+
+    private val getInstalledPackagesMethodLong by lazy {
+        iPackageManagerClass.getMethod(
+            "getInstalledPackages",
+            Long::class.javaPrimitiveType,
+            Int::class.javaPrimitiveType
+        )
+    }
+    private val getInstalledPackagesMethodInt by lazy {
+        iPackageManagerClass.getMethod(
+            "getInstalledPackages",
+            Int::class.javaPrimitiveType,
+            Int::class.javaPrimitiveType
+        )
+    }
+    private val getPackageInstallerMethod by lazy { iPackageManagerClass.getMethod("getPackageInstaller") }
+
+    private val packageInstallerCtorS by lazy {
+        PackageInstaller::class.java.getConstructor(
+            IPackageInstaller::class.java,
+            String::class.java,
+            String::class.java,
+            Int::class.javaPrimitiveType
+        )
+    }
+    private val packageInstallerCtorPre by lazy {
+        PackageInstaller::class.java.getConstructor(
+            IPackageInstaller::class.java,
+            String::class.java,
+            Int::class.javaPrimitiveType
+        )
+    }
+    private val sessionCtor by lazy {
+        PackageInstaller.Session::class.java.getConstructor(IPackageInstallerSession::class.java)
+    }
+    private val intentSenderCtor by lazy {
+        IntentSender::class.java.getConstructor(IIntentSender::class.java)
+    }
+    private val installFlagsField by lazy {
+        PackageInstaller.SessionParams::class.java.getDeclaredField("installFlags").apply { isAccessible = true }
+    }
+    private val getListMethod by lazy {
+        Class.forName("android.content.pm.ParceledListSlice").getMethod("getList")
+    }
+
     private fun getPackageManager(): Any {
-        val binder = SystemServiceHelperCompat.getSystemService("package") ?: throw IllegalStateException("package service not available")
-        val stubClass = Class.forName("android.content.pm.IPackageManager\$Stub")
-        val asInterface = stubClass.getMethod("asInterface", IBinder::class.java)
-        return asInterface.invoke(null, binder) ?: throw IllegalStateException("IPackageManager is null")
+        val binder = SystemServiceHelperCompat.getSystemService("package")
+            ?: throw IllegalStateException("package service not available")
+        return asInterfaceMethod.invoke(null, binder)
+            ?: throw IllegalStateException("IPackageManager is null")
     }
 
     fun getInstalledPackages(flags: Int, userId: Int): List<PackageInfo> {
         val iPackageManager = getPackageManager()
-        val iPackageManagerClass = Class.forName("android.content.pm.IPackageManager")
         val result = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val method = iPackageManagerClass.getMethod(
-                "getInstalledPackages",
-                Long::class.javaPrimitiveType,
-                Int::class.javaPrimitiveType,
-            )
-            method.invoke(iPackageManager, flags.toLong(), userId)
+            getInstalledPackagesMethodLong.invoke(iPackageManager, flags.toLong(), userId)
         } else {
-            val method = iPackageManagerClass.getMethod(
-                "getInstalledPackages",
-                Int::class.javaPrimitiveType,
-                Int::class.javaPrimitiveType,
-            )
-            method.invoke(iPackageManager, flags, userId)
+            getInstalledPackagesMethodInt.invoke(iPackageManager, flags, userId)
         }
         return extractPackageList(result)
     }
@@ -62,9 +99,6 @@ object PrivilegedServiceUtils {
 
         val params = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL)
         params.setAppPackageName(BuildConfig.APPLICATION_ID)
-        // Set INSTALL_REPLACE_EXISTING flag (value = 2)
-        val installFlagsField = PackageInstaller.SessionParams::class.java.getDeclaredField("installFlags")
-        installFlagsField.isAccessible = true
         installFlagsField.setInt(params, installFlagsField.getInt(params) or 2)
         val sessionId = packageInstaller.createSession(params)
 
@@ -106,9 +140,7 @@ object PrivilegedServiceUtils {
 
     private fun getPackageInstaller(): IPackageInstaller {
         val iPackageManager = getPackageManager()
-        val iPackageManagerClass = Class.forName("android.content.pm.IPackageManager")
-        val method = iPackageManagerClass.getMethod("getPackageInstaller")
-        val installer = method.invoke(iPackageManager) as IPackageInstaller
+        val installer = getPackageInstallerMethod.invoke(iPackageManager) as IPackageInstaller
         return IPackageInstaller.Stub.asInterface(installer.asBinder())
     }
 
@@ -119,23 +151,14 @@ object PrivilegedServiceUtils {
         userId: Int,
     ): PackageInstaller {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            PackageInstaller::class.java.getConstructor(
-                    IPackageInstaller::class.java,
-                    String::class.java,
-                    String::class.java,
-                    Int::class.javaPrimitiveType,
-                ).newInstance(installer, installerPackageName, installerAttributionTag, userId)
+            packageInstallerCtorS.newInstance(installer, installerPackageName, installerAttributionTag, userId)
         } else {
-            PackageInstaller::class.java.getConstructor(
-                    IPackageInstaller::class.java,
-                    String::class.java,
-                    Int::class.javaPrimitiveType,
-                ).newInstance(installer, installerPackageName, userId)
+            packageInstallerCtorPre.newInstance(installer, installerPackageName, userId)
         }
     }
 
     private fun createSession(session: IPackageInstallerSession): PackageInstaller.Session {
-        return PackageInstaller.Session::class.java.getConstructor(IPackageInstallerSession::class.java).newInstance(session)
+        return sessionCtor.newInstance(session)
     }
 
     private fun createIntentSender(onResult: (Intent) -> Unit): IntentSender {
@@ -152,13 +175,12 @@ object PrivilegedServiceUtils {
                 onResult(intent)
             }
         }
-        return IntentSender::class.java.getConstructor(IIntentSender::class.java).newInstance(sender)
+        return intentSenderCtor.newInstance(sender)
     }
 
     @Suppress("UNCHECKED_CAST")
     private fun extractPackageList(parceledListSlice: Any?): List<PackageInfo> {
         if (parceledListSlice == null) return emptyList()
-        val getListMethod = parceledListSlice.javaClass.getMethod("getList")
         val list = getListMethod.invoke(parceledListSlice) as? List<*>
         return list?.filterIsInstance<PackageInfo>() ?: emptyList()
     }

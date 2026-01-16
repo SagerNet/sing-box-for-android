@@ -3,6 +3,7 @@ package io.nekohasekai.sfa.xposed
 import android.net.LinkProperties
 import android.net.NetworkCapabilities
 import android.net.NetworkInfo
+import android.net.ProxyInfo
 import android.os.Build
 import android.os.Parcel
 import android.os.Process
@@ -13,6 +14,22 @@ object VpnSanitizer {
     private val vpnInterfacePrefixes = arrayOf(
         "tun",
     )
+
+    private val getStackedLinksMethod by lazy {
+        LinkProperties::class.java.getMethod("getStackedLinks")
+    }
+    private val removeStackedLinkMethod by lazy {
+        LinkProperties::class.java.getMethod("removeStackedLink", String::class.java)
+    }
+    private val setHttpProxyMethod by lazy {
+        LinkProperties::class.java.getMethod("setHttpProxy", ProxyInfo::class.java)
+    }
+    private val removeTransportTypeMethod by lazy {
+        NetworkCapabilities::class.java.getMethod("removeTransportType", Int::class.javaPrimitiveType)
+    }
+    private val addCapabilityMethod by lazy {
+        NetworkCapabilities::class.java.getMethod("addCapability", Int::class.javaPrimitiveType)
+    }
 
     fun shouldHide(uid: Int): Boolean {
         if (!PrivilegeSettingsStore.shouldHideUid(uid)) {
@@ -47,13 +64,13 @@ object VpnSanitizer {
             lp.setInterfaceName(null)
         }
         @Suppress("UNCHECKED_CAST")
-        val stacked = XposedHelpers.callMethod(lp, "getStackedLinks") as? List<LinkProperties>
+        val stacked = getStackedLinksMethod.invoke(lp) as? List<LinkProperties>
         if (!stacked.isNullOrEmpty()) {
             for (link in stacked) {
                 clearHttpProxy(link)
-                val name = link.interfaceName
-                if (isVpnInterface(name)) {
-                    XposedHelpers.callMethod(lp, "removeStackedLink", name)
+                val iface = link.interfaceName
+                if (iface != null && isVpnInterface(iface)) {
+                    removeStackedLinkMethod.invoke(lp, iface)
                 }
             }
         }
@@ -65,8 +82,7 @@ object VpnSanitizer {
             return true
         }
         @Suppress("UNCHECKED_CAST")
-        val stacked = XposedHelpers.callMethod(lp, "getStackedLinks") as? List<LinkProperties>
-            ?: return false
+        val stacked = getStackedLinksMethod.invoke(lp) as? List<LinkProperties> ?: return false
         return stacked.any { isVpnInterface(it.interfaceName) }
     }
 
@@ -77,8 +93,8 @@ object VpnSanitizer {
     }
 
     private fun sanitizeTransport(caps: NetworkCapabilities) {
-        XposedHelpers.callMethod(caps, "removeTransportType", NetworkCapabilities.TRANSPORT_VPN)
-        XposedHelpers.callMethod(caps, "addCapability", NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
+        removeTransportTypeMethod.invoke(caps, NetworkCapabilities.TRANSPORT_VPN)
+        addCapabilityMethod.invoke(caps, NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
     }
 
     private fun clearUnderlyingNetworks(caps: NetworkCapabilities) {
@@ -110,7 +126,7 @@ object VpnSanitizer {
     }
 
     private fun clearHttpProxy(lp: LinkProperties) {
-        XposedHelpers.callMethod(lp, "setHttpProxy", null)
+        setHttpProxyMethod.invoke(lp, null as ProxyInfo?)
     }
 
     fun cloneLinkProperties(source: LinkProperties): LinkProperties {

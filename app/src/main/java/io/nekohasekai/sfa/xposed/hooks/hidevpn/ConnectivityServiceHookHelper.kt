@@ -14,6 +14,7 @@ import io.nekohasekai.sfa.xposed.VpnAppStore
 import io.nekohasekai.sfa.xposed.VpnSanitizer
 import io.nekohasekai.sfa.xposed.hooks.SafeMethodHook
 import io.nekohasekai.sfa.xposed.hooks.XHook
+import java.lang.reflect.Method
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -33,6 +34,17 @@ class ConnectivityServiceHookHelper(private val classLoader: ClassLoader) : XHoo
     lateinit var cls: Class<*>
         private set
 
+    private val serviceManagerClass by lazy { Class.forName("android.os.ServiceManager") }
+    private val checkServiceMethod by lazy { serviceManagerClass.getMethod("checkService", String::class.java) }
+
+    private var getVpnForUidMethod: Method? = null
+    private lateinit var getVpnUnderlyingNetworksMethod: Method
+    private lateinit var getNetworkAgentInfoForNetworkMethod: Method
+    private var getFilteredNetworkInfoMethod: Method? = null
+    private lateinit var getDefaultNetworkMethod: Method
+    private lateinit var isVPNMethod: Method
+    private var networkMethod: Method? = null
+
     override fun injectHook() {
         val foundClass = findConnectivityServiceClass()
         if (foundClass != null) {
@@ -50,6 +62,7 @@ class ConnectivityServiceHookHelper(private val classLoader: ClassLoader) : XHoo
         }
         this.cls = cls
         connectivityClassLoader = cls.classLoader ?: classLoader
+        initMethodCache()
         HookErrorStore.i(
             SOURCE,
             "Installing ConnectivityService hooks ($source) cls=${cls.name} loader=${connectivityClassLoader.javaClass.name}",
@@ -70,6 +83,38 @@ class ConnectivityServiceHookHelper(private val classLoader: ClassLoader) : XHoo
         HookConnectivityManagerProxyChangeAction(this).install()
 
         HookErrorStore.i(SOURCE, "Hooked ConnectivityService ($source) cls=${cls.name}")
+    }
+
+    private fun initMethodCache() {
+        val intType = Int::class.javaPrimitiveType!!
+        val booleanType = Boolean::class.javaPrimitiveType!!
+        val naiClass = resolveConnectivityModuleClass("NetworkAgentInfo", "connectivity")
+        if (sdkInt >= 31) {
+            getVpnForUidMethod = findDeclaredMethod(cls, "getVpnForUid", intType)
+            if (getVpnForUidMethod == null) {
+                HookErrorStore.w(SOURCE, "getVpnForUid not found; falling back to underlying networks")
+            }
+        }
+        getVpnUnderlyingNetworksMethod = requireDeclaredMethod(cls, "getVpnUnderlyingNetworks", intType)
+        getNetworkAgentInfoForNetworkMethod = requireDeclaredMethod(cls, "getNetworkAgentInfoForNetwork", Network::class.java)
+        if (sdkInt >= 31) {
+            getFilteredNetworkInfoMethod = findDeclaredMethod(
+                cls,
+                "getFilteredNetworkInfo",
+                naiClass,
+                intType,
+                booleanType
+            )
+            if (getFilteredNetworkInfoMethod == null) {
+                HookErrorStore.w(SOURCE, "getFilteredNetworkInfo not found; network info sanitization disabled")
+            }
+        }
+        getDefaultNetworkMethod = requireDeclaredMethod(cls, "getDefaultNetwork")
+        isVPNMethod = requireDeclaredMethod(naiClass, "isVPN")
+        networkMethod = findDeclaredMethod(naiClass, "network")
+        if (networkMethod == null) {
+            HookErrorStore.w(SOURCE, "NetworkAgentInfo.network() not found; falling back to field access")
+        }
     }
 
     // region Service Discovery
@@ -229,9 +274,7 @@ class ConnectivityServiceHookHelper(private val classLoader: ClassLoader) : XHoo
     private fun tryHookFromServiceManager() {
         if (hooked.get()) return
         val binder = try {
-            val serviceManager = Class.forName("android.os.ServiceManager")
-            val checkService = serviceManager.getMethod("checkService", String::class.java)
-            checkService.invoke(null, Context.CONNECTIVITY_SERVICE) as? IBinder
+            checkServiceMethod.invoke(null, Context.CONNECTIVITY_SERVICE) as? IBinder
         } catch (_: Throwable) {
             null
         }
@@ -365,54 +408,86 @@ class ConnectivityServiceHookHelper(private val classLoader: ClassLoader) : XHoo
 
     fun hasVpnForUid(connectivityService: Any, uid: Int): Boolean {
         if (sdkInt >= 31) {
-            return XposedHelpers.callMethod(connectivityService, "getVpnForUid", uid) != null
+            val vpnForUidMethod = getVpnForUidMethod
+            if (vpnForUidMethod != null) {
+                return vpnForUidMethod.invoke(connectivityService, uid) != null
+            }
         }
         @Suppress("UNCHECKED_CAST")
-        val networks = XposedHelpers.callMethod(connectivityService, "getVpnUnderlyingNetworks", uid)
-            as? Array<Network>
+        val networks = getVpnUnderlyingNetworksMethod.invoke(connectivityService, uid) as? Array<Network>
         return networks != null && networks.isNotEmpty()
     }
 
     fun isVpnNetwork(connectivityService: Any, network: Network): Boolean {
-        val nai = XposedHelpers.callMethod(connectivityService, "getNetworkAgentInfoForNetwork", network)
-            ?: return false
+        val nai = getNetworkAgentInfoForNetworkMethod.invoke(connectivityService, network) ?: return false
         return isVpnNai(nai)
     }
 
     fun isVpnNai(nai: Any): Boolean {
-        return XposedHelpers.callMethod(nai, "isVPN") as Boolean
+        return isVPNMethod.invoke(nai) as Boolean
     }
 
     fun getUnderlyingNetwork(connectivityService: Any, uid: Int): Network? {
         val nai = getUnderlyingNai(connectivityService, uid) ?: return null
-        return XposedHelpers.callMethod(nai, "network") as Network?
+        val method = networkMethod
+        return if (method != null) {
+            method.invoke(nai) as Network?
+        } else {
+            XposedHelpers.getObjectField(nai, "network") as? Network
+        }
     }
 
     fun getUnderlyingLinkProperties(connectivityService: Any, uid: Int): LinkProperties? {
         val nai = getUnderlyingNai(connectivityService, uid) ?: return null
-        val lp = XposedHelpers.getObjectField(nai, "linkProperties") as LinkProperties?
-            ?: return null
+        val lp = XposedHelpers.getObjectField(nai, "linkProperties") as LinkProperties? ?: return null
         return VpnSanitizer.cloneLinkProperties(lp)
     }
 
     fun getUnderlyingNetworkInfo(connectivityService: Any, uid: Int): NetworkInfo? {
         val nai = getUnderlyingNai(connectivityService, uid) ?: return null
-        return XposedHelpers.callMethod(connectivityService, "getFilteredNetworkInfo", nai, uid, false)
-            as NetworkInfo?
+        val method = getFilteredNetworkInfoMethod
+        if (method != null) {
+            return method.invoke(connectivityService, nai, uid, false) as NetworkInfo?
+        }
+        return XposedHelpers.getObjectField(nai, "networkInfo") as? NetworkInfo
     }
 
     fun getUnderlyingNai(connectivityService: Any, uid: Int): Any? {
         @Suppress("UNCHECKED_CAST")
-        val networks = XposedHelpers.callMethod(connectivityService, "getVpnUnderlyingNetworks", uid)
-            as? Array<Network>
+        val networks = getVpnUnderlyingNetworksMethod.invoke(connectivityService, uid) as? Array<Network>
         if (networks != null && networks.isNotEmpty()) {
-            return XposedHelpers.callMethod(connectivityService, "getNetworkAgentInfoForNetwork", networks[0])
+            return getNetworkAgentInfoForNetworkMethod.invoke(connectivityService, networks[0])
         }
-        val defaultNai = XposedHelpers.callMethod(connectivityService, "getDefaultNetwork")
+        val defaultNai = getDefaultNetworkMethod.invoke(connectivityService)
         if (defaultNai != null && !isVpnNai(defaultNai)) {
             return defaultNai
         }
         return null
+    }
+
+    private fun findDeclaredMethod(
+        target: Class<*>,
+        name: String,
+        vararg parameterTypes: Class<*>,
+    ): Method? {
+        var current: Class<*>? = target
+        while (current != null) {
+            try {
+                return current.getDeclaredMethod(name, *parameterTypes).apply { isAccessible = true }
+            } catch (_: NoSuchMethodException) {
+                current = current.superclass
+            }
+        }
+        return null
+    }
+
+    private fun requireDeclaredMethod(
+        target: Class<*>,
+        name: String,
+        vararg parameterTypes: Class<*>,
+    ): Method {
+        return findDeclaredMethod(target, name, *parameterTypes)
+            ?: throw NoSuchMethodException("${target.name}#$name")
     }
 
     /**

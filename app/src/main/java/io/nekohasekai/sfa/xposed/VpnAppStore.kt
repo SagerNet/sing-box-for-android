@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.os.Binder
 import android.os.SystemClock
 import io.nekohasekai.sfa.BuildConfig
+import java.lang.reflect.Method
 import java.util.concurrent.ConcurrentHashMap
 
 object VpnAppStore {
@@ -19,6 +20,16 @@ object VpnAppStore {
     private val vpnPackagesByUser = ConcurrentHashMap<Int, CacheEntry<Set<String>>>()
     private val uidVpnCache = ConcurrentHashMap<Int, CacheEntry<Boolean>>()
     private val uidPackagesCache = ConcurrentHashMap<Int, CacheEntry<List<String>>>()
+
+    private val appGlobalsClass by lazy { Class.forName("android.app.AppGlobals") }
+    private val getPackageManagerMethod by lazy { appGlobalsClass.getMethod("getPackageManager") }
+
+    @Volatile
+    private var pmClass: Class<*>? = null
+    private var getPackagesForUidMethod: Method? = null
+    private var getInstalledPackagesMethodLong: Method? = null
+    private var getInstalledPackagesMethodInt: Method? = null
+    private var getListMethod: Method? = null
 
     fun isVpnUid(uid: Int): Boolean {
         val now = SystemClock.uptimeMillis()
@@ -57,7 +68,11 @@ object VpnAppStore {
         val result = binderLocalScope {
             val pm = getPackageManager() ?: return@binderLocalScope emptyList<String>()
             try {
-                val method = pm.javaClass.getMethod("getPackagesForUid", Int::class.javaPrimitiveType)
+                val method = getPackagesForUidMethod ?: run {
+                    pm.javaClass.getMethod("getPackagesForUid", Int::class.javaPrimitiveType).also {
+                        getPackagesForUidMethod = it
+                    }
+                }
                 when (val raw = method.invoke(pm, uid)) {
                     is Array<*> -> raw.filterIsInstance<String>()
                     is List<*> -> raw.filterIsInstance<String>()
@@ -108,19 +123,23 @@ object VpnAppStore {
 
     private fun getInstalledPackagesCompat(pm: Any, flags: Long, userId: Int): List<PackageInfo> {
         val result = try {
-            val method = pm.javaClass.getMethod(
-                "getInstalledPackages",
-                Long::class.javaPrimitiveType,
-                Int::class.javaPrimitiveType,
-            )
+            val method = getInstalledPackagesMethodLong ?: run {
+                pm.javaClass.getMethod(
+                    "getInstalledPackages",
+                    Long::class.javaPrimitiveType,
+                    Int::class.javaPrimitiveType,
+                ).also { getInstalledPackagesMethodLong = it }
+            }
             method.invoke(pm, flags, userId)
         } catch (_: Throwable) {
             try {
-                val method = pm.javaClass.getMethod(
-                    "getInstalledPackages",
-                    Int::class.javaPrimitiveType,
-                    Int::class.javaPrimitiveType,
-                )
+                val method = getInstalledPackagesMethodInt ?: run {
+                    pm.javaClass.getMethod(
+                        "getInstalledPackages",
+                        Int::class.javaPrimitiveType,
+                        Int::class.javaPrimitiveType,
+                    ).also { getInstalledPackagesMethodInt = it }
+                }
                 method.invoke(pm, flags.toInt(), userId)
             } catch (e: Throwable) {
                 HookErrorStore.e("VpnAppStore", "getInstalledPackages failed", e)
@@ -137,9 +156,7 @@ object VpnAppStore {
 
     private fun getPackageManager(): Any? {
         return try {
-            val appGlobals = Class.forName("android.app.AppGlobals")
-            val method = appGlobals.getMethod("getPackageManager")
-            method.invoke(null)
+            getPackageManagerMethod.invoke(null)
         } catch (e: Throwable) {
             HookErrorStore.e("VpnAppStore", "getPackageManager failed", e)
             null
@@ -161,7 +178,9 @@ object VpnAppStore {
             return raw.filterIsInstance<PackageInfo>()
         }
         return try {
-            val method = raw.javaClass.getMethod("getList")
+            val method = getListMethod ?: run {
+                raw.javaClass.getMethod("getList").also { getListMethod = it }
+            }
             val list = method.invoke(raw)
             if (list is List<*>) {
                 list.filterIsInstance<PackageInfo>()

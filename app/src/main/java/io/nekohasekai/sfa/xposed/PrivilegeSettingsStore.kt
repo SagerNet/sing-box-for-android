@@ -1,8 +1,8 @@
 package io.nekohasekai.sfa.xposed
 
 import java.io.File
+import java.lang.reflect.Method
 import java.util.concurrent.ConcurrentHashMap
-import io.nekohasekai.sfa.xposed.HookErrorStore
 
 object PrivilegeSettingsStore {
     private const val SETTINGS_DIR = "/data/system/sing-box"
@@ -16,6 +16,10 @@ object PrivilegeSettingsStore {
     @Volatile
     private var interfacePrefix = "en"
     private val uidCache = ConcurrentHashMap<Int, Boolean>()
+
+    private val appGlobalsClass by lazy { Class.forName("android.app.AppGlobals") }
+    private val getPackageManagerMethod by lazy { appGlobalsClass.getMethod("getPackageManager") }
+    private var getPackagesForUidMethod: Method? = null
 
     fun update(
         enabled: Boolean,
@@ -110,7 +114,11 @@ object PrivilegeSettingsStore {
     private fun getPackagesForUid(uid: Int): List<String> {
         val pm = getPackageManager() ?: return emptyList()
         return try {
-            val method = pm.javaClass.getMethod("getPackagesForUid", Int::class.javaPrimitiveType)
+            val method = getPackagesForUidMethod ?: run {
+                pm.javaClass.getMethod("getPackagesForUid", Int::class.javaPrimitiveType).also {
+                    getPackagesForUidMethod = it
+                }
+            }
             val result = method.invoke(pm, uid)
             when (result) {
                 is Array<*> -> result.filterIsInstance<String>()
@@ -125,9 +133,7 @@ object PrivilegeSettingsStore {
 
     private fun getPackageManager(): Any? {
         return try {
-            val appGlobals = Class.forName("android.app.AppGlobals")
-            val method = appGlobals.getMethod("getPackageManager")
-            method.invoke(null)
+            getPackageManagerMethod.invoke(null)
         } catch (e: Throwable) {
             HookErrorStore.e("PrivilegeSettingsStore", "getPackageManager failed", e)
             null

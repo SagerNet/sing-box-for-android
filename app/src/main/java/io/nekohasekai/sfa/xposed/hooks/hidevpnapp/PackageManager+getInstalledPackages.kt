@@ -13,12 +13,17 @@ import io.nekohasekai.sfa.xposed.PrivilegeSettingsStore
 import io.nekohasekai.sfa.xposed.VpnAppStore
 import io.nekohasekai.sfa.xposed.hooks.SafeMethodHook
 import io.nekohasekai.sfa.xposed.hooks.XHook
+import java.lang.reflect.Method
 
 class HookPackageManagerGetInstalledPackages(private val classLoader: ClassLoader) : XHook {
     private companion object {
         private const val SOURCE = "HookPMGetInstalledPackages"
         private const val PER_USER_RANGE = 100000
     }
+
+    @Volatile
+    private var lastPackageNameClass: Class<*>? = null
+    private var getPackageNameMethod: Method? = null
 
     override fun injectHook() {
         val hooked = ArrayList<String>()
@@ -238,7 +243,15 @@ class HookPackageManagerGetInstalledPackages(private val classLoader: ClassLoade
     private fun extractPackageName(arg: Any?): String? {
         if (arg == null) return null
         try {
-            val method = arg.javaClass.getMethod("getPackageName")
+            val argClass = arg.javaClass
+            val method = if (lastPackageNameClass == argClass && getPackageNameMethod != null) {
+                getPackageNameMethod!!
+            } else {
+                argClass.getMethod("getPackageName").also {
+                    lastPackageNameClass = argClass
+                    getPackageNameMethod = it
+                }
+            }
             val result = method.invoke(arg) as String?
             if (!result.isNullOrEmpty()) {
                 return result

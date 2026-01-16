@@ -15,6 +15,10 @@ class XposedInit(
     param: XposedModuleInterface.ModuleLoadedParam,
 ) : XposedModule(base, param) {
 
+    private val activityThreadClass by lazy { Class.forName("android.app.ActivityThread") }
+    private val currentActivityThreadMethod by lazy { activityThreadClass.getMethod("currentActivityThread") }
+    private val getSystemContextMethod by lazy { activityThreadClass.getMethod("getSystemContext") }
+
     override fun onSystemServerLoaded(param: XposedModuleInterface.SystemServerLoadedParam) {
         val systemContext = resolveSystemContext()
         HookErrorStore.i("XposedInit", "handleSystemServerLoaded")
@@ -45,9 +49,8 @@ class XposedInit(
 
     private fun resolveSystemContext(): Context? {
         return try {
-            val activityThread = Class.forName("android.app.ActivityThread")
-            val currentThread = activityThread.getMethod("currentActivityThread").invoke(null)
-            activityThread.getMethod("getSystemContext").invoke(currentThread) as? Context
+            val currentThread = currentActivityThreadMethod.invoke(null)
+            getSystemContextMethod.invoke(currentThread) as? Context
         } catch (e: Throwable) {
             HookErrorStore.e("XposedInit", "resolveSystemContext failed", e)
             null

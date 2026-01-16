@@ -3,8 +3,7 @@ package io.nekohasekai.sfa.xposed
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Process
-import de.robv.android.xposed.XposedHelpers
-import io.nekohasekai.sfa.BuildConfig
+import java.lang.reflect.Method
 import java.util.concurrent.ConcurrentHashMap
 
 object PrivilegeChecker {
@@ -20,6 +19,13 @@ object PrivilegeChecker {
     private val exemptPackages = emptySet<String>()
     private val exemptCache = ConcurrentHashMap<Int, Boolean>()
     private val privilegedCache = ConcurrentHashMap<Int, Boolean>()
+
+    private val appGlobalsClass by lazy { Class.forName("android.app.AppGlobals") }
+    private val getPackageManagerMethod by lazy { appGlobalsClass.getMethod("getPackageManager") }
+    private var getPackagesForUidMethod: Method? = null
+    private var checkUidPermissionMethod: Method? = null
+    private var getApplicationInfoMethodLong: Method? = null
+    private var getApplicationInfoMethodInt: Method? = null
 
     fun isPrivilegedUid(uid: Int): Boolean {
         if (uid < Process.FIRST_APPLICATION_UID) {
@@ -44,9 +50,16 @@ object PrivilegeChecker {
                     return true
                 }
             }
+            val checkMethod = checkUidPermissionMethod ?: run {
+                pm.javaClass.getMethod(
+                    "checkUidPermission",
+                    String::class.java,
+                    Int::class.javaPrimitiveType
+                ).also { checkUidPermissionMethod = it }
+            }
             for (permission in privilegedPermissions) {
                 val result = try {
-                    XposedHelpers.callMethod(pm, "checkUidPermission", permission, uid) as? Int
+                    checkMethod.invoke(pm, permission, uid) as? Int
                 } catch (_: Throwable) {
                     null
                 }
@@ -83,7 +96,11 @@ object PrivilegeChecker {
     private fun getPackagesForUid(uid: Int): List<String> {
         val pm = getPackageManager() ?: return emptyList()
         return try {
-            val method = pm.javaClass.getMethod("getPackagesForUid", Int::class.javaPrimitiveType)
+            val method = getPackagesForUidMethod ?: run {
+                pm.javaClass.getMethod("getPackagesForUid", Int::class.javaPrimitiveType).also {
+                    getPackagesForUidMethod = it
+                }
+            }
             val result = method.invoke(pm, uid)
             when (result) {
                 is Array<*> -> result.filterIsInstance<String>()
@@ -97,9 +114,7 @@ object PrivilegeChecker {
 
     private fun getPackageManager(): Any? {
         return try {
-            val appGlobals = Class.forName("android.app.AppGlobals")
-            val method = appGlobals.getMethod("getPackageManager")
-            method.invoke(null)
+            getPackageManagerMethod.invoke(null)
         } catch (_: Throwable) {
             null
         }
@@ -107,10 +122,26 @@ object PrivilegeChecker {
 
     private fun getApplicationInfo(pm: Any, pkg: String, userId: Int): ApplicationInfo? {
         return try {
-            XposedHelpers.callMethod(pm, "getApplicationInfo", pkg, 0, userId) as? ApplicationInfo
+            val method = getApplicationInfoMethodInt ?: run {
+                pm.javaClass.getMethod(
+                    "getApplicationInfo",
+                    String::class.java,
+                    Int::class.javaPrimitiveType,
+                    Int::class.javaPrimitiveType
+                ).also { getApplicationInfoMethodInt = it }
+            }
+            method.invoke(pm, pkg, 0, userId) as? ApplicationInfo
         } catch (_: Throwable) {
             try {
-                XposedHelpers.callMethod(pm, "getApplicationInfo", pkg, 0L, userId) as? ApplicationInfo
+                val method = getApplicationInfoMethodLong ?: run {
+                    pm.javaClass.getMethod(
+                        "getApplicationInfo",
+                        String::class.java,
+                        Long::class.javaPrimitiveType,
+                        Int::class.javaPrimitiveType
+                    ).also { getApplicationInfoMethodLong = it }
+                }
+                method.invoke(pm, pkg, 0L, userId) as? ApplicationInfo
             } catch (_: Throwable) {
                 null
             }
