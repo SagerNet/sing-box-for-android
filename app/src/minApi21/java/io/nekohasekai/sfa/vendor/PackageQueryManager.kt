@@ -54,7 +54,11 @@ object PackageQueryManager {
 
     suspend fun getInstalledPackages(flags: Int, retryFlags: Int): List<PackageInfo> {
         return when (val s = strategy) {
-            is PackageQueryStrategy.ForcedRoot -> RootClient.getInstalledPackages(flags)
+            is PackageQueryStrategy.ForcedRoot -> {
+                val userId = android.os.Process.myUserHandle().hashCode()
+                HookStatusClient.getInstalledPackages(Application.application, flags.toLong(), userId)
+                    ?: RootClient.getInstalledPackages(flags)
+            }
             is PackageQueryStrategy.UserSelected -> RootClient.getInstalledPackages(flags)
             is PackageQueryStrategy.Direct -> getPackagesViaPackageManager(flags, retryFlags)
         }

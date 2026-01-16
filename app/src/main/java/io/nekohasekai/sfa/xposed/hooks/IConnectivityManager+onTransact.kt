@@ -1,6 +1,7 @@
 package io.nekohasekai.sfa.xposed.hooks
 
 import android.content.Context
+import android.content.pm.PackageInfo
 import android.os.Binder
 import android.os.Parcel
 import de.robv.android.xposed.XposedHelpers
@@ -35,7 +36,8 @@ class HookIConnectivityManagerOnTransact(
                     val code = param.args[0] as Int
                     if (code != HookStatusKeys.TRANSACTION_STATUS &&
                         code != HookStatusKeys.TRANSACTION_UPDATE_PRIVILEGE_SETTINGS &&
-                        code != HookStatusKeys.TRANSACTION_GET_ERRORS) {
+                        code != HookStatusKeys.TRANSACTION_GET_ERRORS &&
+                        code != HookStatusKeys.TRANSACTION_GET_INSTALLED_PACKAGES) {
                         return
                     }
                     val data = param.args[1] as Parcel
@@ -69,6 +71,15 @@ class HookIConnectivityManagerOnTransact(
                         reply!!.writeNoException()
                         reply.writeInt(if (hasWarnings) 1 else 0)
                         ParceledListSlice(entries).writeToParcel(reply, 0)
+                        param.result = true
+                        return
+                    }
+                    if (code == HookStatusKeys.TRANSACTION_GET_INSTALLED_PACKAGES) {
+                        val flags = data.readLong()
+                        val userId = data.readInt()
+                        val packages = getInstalledPackages(flags, userId)
+                        reply!!.writeNoException()
+                        ParceledListSlice(packages).writeToParcel(reply, 0)
                         param.result = true
                         return
                     }
@@ -115,6 +126,75 @@ class HookIConnectivityManagerOnTransact(
         } catch (e: Throwable) {
             HookErrorStore.e(SOURCE, "isCallerAllowed failed for uid=$uid", e)
             false
+        }
+    }
+
+    private fun getInstalledPackages(flags: Long, userId: Int): List<PackageInfo> {
+        return binderLocalScope {
+            val pm = getPackageManager() ?: return@binderLocalScope emptyList()
+            getInstalledPackagesCompat(pm, flags, userId)
+        }
+    }
+
+    private inline fun <T> binderLocalScope(block: () -> T): T {
+        val token = Binder.clearCallingIdentity()
+        return try {
+            block()
+        } finally {
+            Binder.restoreCallingIdentity(token)
+        }
+    }
+
+    private fun getPackageManager(): Any? {
+        return try {
+            val appGlobals = Class.forName("android.app.AppGlobals")
+            val method = appGlobals.getMethod("getPackageManager")
+            method.invoke(null)
+        } catch (e: Throwable) {
+            HookErrorStore.e(SOURCE, "getPackageManager failed", e)
+            null
+        }
+    }
+
+    private fun getInstalledPackagesCompat(pm: Any, flags: Long, userId: Int): List<PackageInfo> {
+        val result = try {
+            val method = pm.javaClass.getMethod(
+                "getInstalledPackages",
+                Long::class.javaPrimitiveType,
+                Int::class.javaPrimitiveType,
+            )
+            method.invoke(pm, flags, userId)
+        } catch (_: Throwable) {
+            try {
+                val method = pm.javaClass.getMethod(
+                    "getInstalledPackages",
+                    Int::class.javaPrimitiveType,
+                    Int::class.javaPrimitiveType,
+                )
+                method.invoke(pm, flags.toInt(), userId)
+            } catch (e: Throwable) {
+                HookErrorStore.e(SOURCE, "getInstalledPackages failed", e)
+                return emptyList()
+            }
+        }
+        return unwrapParceledListSlice(result)
+    }
+
+    private fun unwrapParceledListSlice(raw: Any?): List<PackageInfo> {
+        if (raw == null) return emptyList()
+        if (raw is List<*>) {
+            return raw.filterIsInstance<PackageInfo>()
+        }
+        return try {
+            val method = raw.javaClass.getMethod("getList")
+            val list = method.invoke(raw)
+            if (list is List<*>) {
+                list.filterIsInstance<PackageInfo>()
+            } else {
+                emptyList()
+            }
+        } catch (_: Throwable) {
+            emptyList()
         }
     }
 }

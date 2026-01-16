@@ -1,6 +1,8 @@
 package io.nekohasekai.sfa.utils
 
 import android.content.Context
+import android.content.pm.PackageInfo
+import io.nekohasekai.sfa.bg.ParceledListSlice
 import io.nekohasekai.sfa.xposed.HookStatusKeys
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -44,6 +46,21 @@ object HookStatusClient {
                 version = reply.readInt(),
                 systemPid = reply.readInt(),
             )
+        }
+    }
+
+    fun getInstalledPackages(context: Context, flags: Long, userId: Int): List<PackageInfo>? {
+        val binder = ConnectivityBinderUtils.getBinder(context) ?: return null
+        return ConnectivityBinderUtils.withParcel { data, reply ->
+            data.writeInterfaceToken(HookStatusKeys.DESCRIPTOR)
+            data.writeLong(flags)
+            data.writeInt(userId)
+            val ok = binder.transact(HookStatusKeys.TRANSACTION_GET_INSTALLED_PACKAGES, data, reply, 0)
+            if (!ok) return@withParcel null
+            reply.readException()
+            val slice = ParceledListSlice.CREATOR.createFromParcel(reply, PackageInfo::class.java.classLoader)
+            @Suppress("UNCHECKED_CAST")
+            (slice as ParceledListSlice<PackageInfo>).list
         }
     }
 }
