@@ -871,6 +871,7 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
                                                 Icon(screen.icon, contentDescription = null)
                                             }
                                         },
+                                        label = { Text(stringResource(screen.titleRes)) },
                                         selected =
                                             currentDestination?.hierarchy?.any {
                                                 it.route == screen.route
