@@ -10,8 +10,8 @@ import java.util.Properties
 
 plugins {
     id("com.android.application")
-    id("kotlin-android")
-    id("kotlin-parcelize")
+    id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.parcelize")
     id("com.google.devtools.ksp")
     id("org.jetbrains.kotlin.plugin.compose")
     id("org.jetbrains.kotlin.plugin.serialization")
@@ -118,16 +118,16 @@ android {
 
     sourceSets {
         getByName("play") {
-            java.srcDirs("src/minApi23/java")
-            aidl.srcDirs("src/minApi23/aidl")
+            java.directories.add("src/minApi23/java")
+            aidl.directories.add("src/minApi23/aidl")
         }
         getByName("other") {
-            java.srcDirs("src/minApi23/java", "src/github/java")
-            aidl.srcDirs("src/minApi23/aidl")
+            java.directories.addAll(listOf("src/minApi23/java", "src/github/java"))
+            aidl.directories.add("src/minApi23/aidl")
         }
         getByName("otherLegacy") {
-            java.srcDirs("src/minApi21/java", "src/github/java")
-            aidl.srcDirs("src/minApi23/aidl")
+            java.directories.addAll(listOf("src/minApi21/java", "src/github/java"))
+            aidl.directories.add("src/minApi23/aidl")
         }
     }
 
@@ -149,6 +149,7 @@ android {
         viewBinding = true
         aidl = true
         compose = true
+        buildConfig = true
     }
 
     packaging {
