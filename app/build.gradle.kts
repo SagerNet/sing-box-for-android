@@ -2,7 +2,6 @@ import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.tasks.Sync
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import java.io.ByteArrayInputStream
 import java.io.FileInputStream
 import java.util.Base64
@@ -16,7 +15,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
     id("org.jetbrains.kotlin.plugin.serialization")
     id("com.github.triplet.play")
-    id("org.jlleitschuh.gradle.ktlint")
+    alias(libs.plugins.spotless)
 }
 
 fun getProps(propName: String): String {
@@ -342,14 +341,19 @@ tasks.withType<KotlinCompile>().configureEach {
     }
 }
 
-ktlint {
-    android.set(false)
-    version.set("1.0.1")
-    verbose.set(true)
-    outputToConsole.set(true)
-    reporters {
-        reporter(ReporterType.PLAIN)
-        reporter(ReporterType.CHECKSTYLE)
-        reporter(ReporterType.HTML)
+spotless {
+    kotlin {
+        target("src/**/*.kt")
+        ktlint(libs.versions.ktlint.get())
+            .editorConfigOverride(mapOf(
+                "ktlint_standard_backing-property-naming" to "disabled",
+                "ktlint_standard_filename" to "disabled",
+                "ktlint_standard_max-line-length" to "disabled",
+                "ktlint_standard_property-naming" to "disabled",
+            ))
+    }
+    java {
+        target("src/**/*.java")
+        googleJavaFormat()
     }
 }

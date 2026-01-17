@@ -1,0 +1,6 @@
+[versions]
+spotless = "8.1.0"
+ktlint = "1.7.1"
+
+[plugins]
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
