@@ -16,6 +16,7 @@ import io.nekohasekai.libbox.SetupOptions
 import io.nekohasekai.sfa.bg.AppChangeReceiver
 import io.nekohasekai.sfa.bg.UpdateProfileWork
 import io.nekohasekai.sfa.constant.Bugs
+import io.nekohasekai.sfa.utils.AppLifecycleObserver
 import io.nekohasekai.sfa.utils.HookModuleUpdateNotifier
 import io.nekohasekai.sfa.utils.PrivilegeSettingsClient
 import io.nekohasekai.sfa.utils.HookStatusClient
@@ -35,6 +36,7 @@ class Application : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        AppLifecycleObserver.register()
 
         Seq.setContext(this)
         Libbox.setLocale(Locale.getDefault().toLanguageTag().replace("-", "_"))
