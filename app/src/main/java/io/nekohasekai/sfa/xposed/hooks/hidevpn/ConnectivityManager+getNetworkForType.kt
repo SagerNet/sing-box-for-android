@@ -23,7 +23,7 @@ class HookConnectivityManagerGetNetworkForType(private val helper: ConnectivityS
                     if (!helper.shouldHide(param.thisObject, uid)) return
                     param.result = null
                 }
-            }
+            },
         )
     }
 }

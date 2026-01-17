@@ -3,18 +3,14 @@ package io.nekohasekai.sfa.ktx
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import androidx.annotation.StringRes
 import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.StringRes
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.nekohasekai.sfa.R
 
-fun Context.errorDialogBuilder(
-    @StringRes messageId: Int,
-): MaterialAlertDialogBuilder {
-    return errorDialogBuilder(getString(messageId))
-}
+fun Context.errorDialogBuilder(@StringRes messageId: Int): MaterialAlertDialogBuilder = errorDialogBuilder(getString(messageId))
 
 fun Context.errorDialogBuilder(message: String): MaterialAlertDialogBuilder {
     val contentView = buildSelectableMessageView(message)
@@ -27,9 +23,7 @@ fun Context.errorDialogBuilder(message: String): MaterialAlertDialogBuilder {
         .setPositiveButton(android.R.string.ok, null)
 }
 
-fun Context.errorDialogBuilder(exception: Throwable): MaterialAlertDialogBuilder {
-    return errorDialogBuilder(exception.localizedMessage ?: exception.toString())
-}
+fun Context.errorDialogBuilder(exception: Throwable): MaterialAlertDialogBuilder = errorDialogBuilder(exception.localizedMessage ?: exception.toString())
 
 private fun Context.buildSelectableMessageView(message: String): ScrollView {
     val density = resources.displayMetrics.density

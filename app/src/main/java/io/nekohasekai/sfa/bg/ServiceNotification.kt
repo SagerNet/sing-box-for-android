@@ -16,8 +16,8 @@ import androidx.lifecycle.MutableLiveData
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.StatusMessage
 import io.nekohasekai.sfa.Application
-import io.nekohasekai.sfa.compose.MainActivity
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.compose.MainActivity
 import io.nekohasekai.sfa.constant.Action
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.database.Settings
@@ -27,10 +27,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.withContext
 
-class ServiceNotification(
-    private val status: MutableLiveData<Status>,
-    private val service: Service,
-) : BroadcastReceiver(), CommandClient.Handler {
+class ServiceNotification(private val status: MutableLiveData<Status>, private val service: Service) :
+    BroadcastReceiver(),
+    CommandClient.Handler {
     companion object {
         private const val notificationId = 1
         private const val notificationChannel = "service"
@@ -82,10 +81,7 @@ class ServiceNotification(
             }
     }
 
-    fun show(
-        lastProfileName: String,
-        @StringRes contentTextId: Int,
-    ) {
+    fun show(lastProfileName: String, @StringRes contentTextId: Int) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Application.notification.createNotificationChannel(
                 NotificationChannel(
@@ -132,10 +128,7 @@ class ServiceNotification(
         )
     }
 
-    override fun onReceive(
-        context: Context,
-        intent: Intent,
-    ) {
+    override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
             Intent.ACTION_SCREEN_ON -> {
                 commandClient.connect()

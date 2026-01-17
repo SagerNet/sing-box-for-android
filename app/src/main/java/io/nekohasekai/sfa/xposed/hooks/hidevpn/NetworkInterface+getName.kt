@@ -1,6 +1,5 @@
 package io.nekohasekai.sfa.xposed.hooks.hidevpn
 
-import android.system.ErrnoException
 import android.system.Os
 import android.system.OsConstants
 import android.system.StructTimeval
@@ -93,13 +92,9 @@ class HookNetworkInterfaceGetName(private val classLoader: ClassLoader) : XHook 
         param.result = renamed
     }
 
-    private fun findVpnClass(): Class<*> {
-        return XposedHelpers.findClass("com.android.server.connectivity.Vpn", classLoader)
-    }
+    private fun findVpnClass(): Class<*> = XposedHelpers.findClass("com.android.server.connectivity.Vpn", classLoader)
 
-    private fun isTunInterface(name: String): Boolean {
-        return name.startsWith("tun")
-    }
+    private fun isTunInterface(name: String): Boolean = name.startsWith("tun")
 
     private fun renameInterface(oldName: String, prefix: String): String? {
         val oldIndex = getInterfaceIndex(oldName)
@@ -131,9 +126,7 @@ class HookNetworkInterfaceGetName(private val classLoader: ClassLoader) : XHook 
         return newName
     }
 
-    private fun getInterfaceIndex(name: String): Int {
-        return Os.if_nametoindex(name)
-    }
+    private fun getInterfaceIndex(name: String): Int = Os.if_nametoindex(name)
 
     private fun findAvailableName(prefix: String): String? {
         val base = prefix.trim()
@@ -227,17 +220,9 @@ class HookNetworkInterfaceGetName(private val classLoader: ClassLoader) : XHook 
         return fd
     }
 
-    private fun buildNetlinkAddress(): SocketAddress {
-        return netlinkSocketAddressCtor.newInstance(0, 0) as SocketAddress
-    }
+    private fun buildNetlinkAddress(): SocketAddress = netlinkSocketAddressCtor.newInstance(0, 0) as SocketAddress
 
-    private fun buildLinkMessage(
-        index: Int,
-        ifName: String?,
-        flags: Int,
-        change: Int,
-        seq: Int,
-    ): ByteArray {
+    private fun buildLinkMessage(index: Int, ifName: String?, flags: Int, change: Int, seq: Int): ByteArray {
         val nameBytes = ifName?.let { (it + "\u0000").toByteArray(Charsets.US_ASCII) }
         val attrLen = if (nameBytes != null) NLA_HEADER_LEN + nameBytes.size else 0
         val attrAligned = align(attrLen)
@@ -266,15 +251,9 @@ class HookNetworkInterfaceGetName(private val classLoader: ClassLoader) : XHook 
         return buffer.array()
     }
 
-    private fun align(length: Int): Int {
-        return (length + 3) and -4
-    }
+    private fun align(length: Int): Int = (length + 3) and -4
 
-    private fun sendNetlinkMessage(
-        fd: FileDescriptor,
-        message: ByteArray,
-        suppressErrno: Int? = null,
-    ): Int? {
+    private fun sendNetlinkMessage(fd: FileDescriptor, message: ByteArray, suppressErrno: Int? = null): Int? {
         Os.write(fd, message, 0, message.size)
         val ack = readNetlinkAck(fd)
         if (ack == null) {

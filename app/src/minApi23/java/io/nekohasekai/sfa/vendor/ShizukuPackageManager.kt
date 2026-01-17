@@ -4,9 +4,9 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Process
 import io.nekohasekai.sfa.Application
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import rikka.shizuku.Shizuku
 
@@ -46,13 +46,11 @@ object ShizukuPackageManager {
         refresh()
     }
 
-    fun isShizukuInstalled(): Boolean {
-        return try {
-            Application.packageManager.getPackageInfo(SHIZUKU_PACKAGE, 0)
-            true
-        } catch (e: PackageManager.NameNotFoundException) {
-            false
-        }
+    fun isShizukuInstalled(): Boolean = try {
+        Application.packageManager.getPackageInfo(SHIZUKU_PACKAGE, 0)
+        true
+    } catch (e: PackageManager.NameNotFoundException) {
+        false
     }
 
     fun unregisterListeners() {

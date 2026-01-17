@@ -26,7 +26,7 @@ class HookConnectivityManagerGetActiveNetworkInfo(private val helper: Connectivi
                         param.result = replacement
                     }
                 }
-            }
+            },
         )
 
         XposedHelpers.findAndHookMethod(
@@ -45,7 +45,7 @@ class HookConnectivityManagerGetActiveNetworkInfo(private val helper: Connectivi
                         param.result = replacement
                     }
                 }
-            }
+            },
         )
     }
 }

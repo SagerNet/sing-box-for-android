@@ -102,13 +102,7 @@ class MLKitQRCodeAnalyzer(
             }
     }
 
-    private fun tryInvertedScan(
-        yData: ByteArray,
-        width: Int,
-        height: Int,
-        rotationDegrees: Int,
-        onComplete: () -> Unit,
-    ) {
+    private fun tryInvertedScan(yData: ByteArray, width: Int, height: Int, rotationDegrees: Int, onComplete: () -> Unit) {
         val inverted = toLumaBitmap(yData, width, 0, 0, width, height, invert = true)
         barcodeScanner.process(InputImage.fromBitmap(inverted, rotationDegrees))
             .addOnSuccessListener { codes ->
@@ -140,15 +134,7 @@ class MLKitQRCodeAnalyzer(
         return yData
     }
 
-    private fun toLumaBitmap(
-        yData: ByteArray,
-        srcWidth: Int,
-        left: Int,
-        top: Int,
-        width: Int,
-        height: Int,
-        invert: Boolean,
-    ): Bitmap {
+    private fun toLumaBitmap(yData: ByteArray, srcWidth: Int, left: Int, top: Int, width: Int, height: Int, invert: Boolean): Bitmap {
         val size = width * height
         val pixels = pixelBuffer?.takeIf { it.size >= size } ?: IntArray(size).also { pixelBuffer = it }
 

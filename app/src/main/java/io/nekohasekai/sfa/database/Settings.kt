@@ -82,12 +82,10 @@ object Settings {
     const val PACKAGE_QUERY_MODE_ROOT = "ROOT"
     var perAppProxyPackageQueryMode by dataStore.string(SettingsKey.PER_APP_PROXY_PACKAGE_QUERY_MODE) { PACKAGE_QUERY_MODE_SHIZUKU }
 
-    fun getEffectivePerAppProxyList(): Set<String> {
-        return if (perAppProxyManagedMode) {
-            perAppProxyList union perAppProxyManagedList
-        } else {
-            perAppProxyList
-        }
+    fun getEffectivePerAppProxyList(): Set<String> = if (perAppProxyManagedMode) {
+        perAppProxyList union perAppProxyManagedList
+    } else {
+        perAppProxyList
     }
 
     var systemProxyEnabled by dataStore.boolean(SettingsKey.SYSTEM_PROXY_ENABLED) { true }
@@ -95,7 +93,7 @@ object Settings {
     var privilegeSettingsEnabled by dataStore.boolean(SettingsKey.PRIVILEGE_SETTINGS_ENABLED) { false }
     var privilegeSettingsList by dataStore.stringSet(SettingsKey.PRIVILEGE_SETTINGS_LIST) { emptySet() }
     var privilegeSettingsInterfaceRenameEnabled by dataStore.boolean(
-        SettingsKey.PRIVILEGE_SETTINGS_INTERFACE_RENAME_ENABLED
+        SettingsKey.PRIVILEGE_SETTINGS_INTERFACE_RENAME_ENABLED,
     ) { false }
     var privilegeSettingsInterfacePrefix by dataStore.string(SettingsKey.PRIVILEGE_SETTINGS_INTERFACE_PREFIX) { "wlan" }
 
@@ -106,11 +104,9 @@ object Settings {
     var cachedApkPath by dataStore.string(SettingsKey.CACHED_APK_PATH) { "" }
     var lastShownUpdateVersion by dataStore.int(SettingsKey.LAST_SHOWN_UPDATE_VERSION) { 0 }
 
-    fun serviceClass(): Class<*> {
-        return when (serviceMode) {
-            ServiceMode.VPN -> VPNService::class.java
-            else -> ProxyService::class.java
-        }
+    fun serviceClass(): Class<*> = when (serviceMode) {
+        ServiceMode.VPN -> VPNService::class.java
+        else -> ProxyService::class.java
     }
 
     suspend fun rebuildServiceMode(): Boolean {

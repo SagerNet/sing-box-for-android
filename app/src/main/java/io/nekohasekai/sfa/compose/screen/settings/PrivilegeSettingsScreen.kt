@@ -1,7 +1,6 @@
 package io.nekohasekai.sfa.compose.screen.settings
 
 import android.content.Intent
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -61,18 +60,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.navigation.NavController
-import io.nekohasekai.sfa.R
 import io.nekohasekai.libbox.Libbox
+import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.base.GlobalEventBus
 import io.nekohasekai.sfa.compose.base.SelectableMessageDialog
 import io.nekohasekai.sfa.compose.base.UiEvent
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
-import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.constant.Status
+import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.utils.DetectionResult
 import io.nekohasekai.sfa.utils.HookModuleUpdateNotifier
-import io.nekohasekai.sfa.utils.PrivilegeSettingsClient
 import io.nekohasekai.sfa.utils.HookStatusClient
+import io.nekohasekai.sfa.utils.PrivilegeSettingsClient
 import io.nekohasekai.sfa.utils.VpnDetectionTest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -122,7 +121,7 @@ fun PrivilegeSettingsScreen(navController: NavController, serviceStatus: Status 
     var messageDialogMessage by remember { mutableStateOf("") }
 
     val saveFileLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.CreateDocument("application/zip")
+        contract = ActivityResultContracts.CreateDocument("application/zip"),
     ) { uri ->
         val file = exportedFile
         if (uri != null && file != null) {
@@ -146,9 +145,9 @@ fun PrivilegeSettingsScreen(navController: NavController, serviceStatus: Status 
         HookStatusClient.refresh()
     }
 
-        val hasPendingDowngrade = HookModuleUpdateNotifier.isDowngrade(systemHookStatus)
-        val hasPendingUpdate = HookModuleUpdateNotifier.isUpgrade(systemHookStatus)
-        val hasPendingChange = hasPendingDowngrade || hasPendingUpdate
+    val hasPendingDowngrade = HookModuleUpdateNotifier.isDowngrade(systemHookStatus)
+    val hasPendingUpdate = HookModuleUpdateNotifier.isUpgrade(systemHookStatus)
+    val hasPendingChange = hasPendingDowngrade || hasPendingUpdate
     androidx.compose.runtime.LaunchedEffect(systemHookStatus) {
         HookModuleUpdateNotifier.maybeNotify(context, systemHookStatus)
     }
@@ -231,8 +230,11 @@ fun PrivilegeSettingsScreen(navController: NavController, serviceStatus: Status 
                     CircularProgressIndicator(modifier = Modifier.size(24.dp))
                     Spacer(modifier = Modifier.width(12.dp))
                     Text(
-                        if (exportError != null) exportError!!
-                        else stringResource(R.string.exporting)
+                        if (exportError != null) {
+                            exportError!!
+                        } else {
+                            stringResource(R.string.exporting)
+                        },
                     )
                 }
             },
@@ -273,7 +275,7 @@ fun PrivilegeSettingsScreen(navController: NavController, serviceStatus: Status 
                         val uri = FileProvider.getUriForFile(
                             context,
                             "${context.packageName}.cache",
-                            file
+                            file,
                         )
                         val intent = Intent(Intent.ACTION_SEND).apply {
                             type = "application/zip"
@@ -283,7 +285,7 @@ fun PrivilegeSettingsScreen(navController: NavController, serviceStatus: Status 
                         context.startActivity(Intent.createChooser(intent, null))
                         showExportSuccessDialog = false
                         exportedFile = null
-                    }
+                    },
                 ) {
                     Text(stringResource(R.string.menu_share))
                 }
@@ -293,7 +295,7 @@ fun PrivilegeSettingsScreen(navController: NavController, serviceStatus: Status 
                     onClick = {
                         val file = exportedFile ?: return@TextButton
                         saveFileLauncher.launch(file.name)
-                    }
+                    },
                 ) {
                     Text(stringResource(R.string.save))
                 }
@@ -413,11 +415,11 @@ fun PrivilegeSettingsScreen(navController: NavController, serviceStatus: Status 
                             )
                         },
                         modifier =
-                            Modifier
-                                .clip(logItemShape)
-                                .clickable {
-                                    navController.navigate("settings/privilege/logs")
-                                },
+                        Modifier
+                            .clip(logItemShape)
+                            .clickable {
+                                navController.navigate("settings/privilege/logs")
+                            },
                         colors = ListItemDefaults.colors(
                             containerColor = Color.Transparent,
                         ),
@@ -439,42 +441,42 @@ fun PrivilegeSettingsScreen(navController: NavController, serviceStatus: Status 
                             )
                         },
                         modifier =
-                            Modifier
-                                .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
-                                .clickable {
-                                    val exportBase = File(context.cacheDir, "debug")
-                                    if (!exportBase.exists()) {
-                                        exportBase.mkdirs()
+                        Modifier
+                            .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
+                            .clickable {
+                                val exportBase = File(context.cacheDir, "debug")
+                                if (!exportBase.exists()) {
+                                    exportBase.mkdirs()
+                                }
+                                val timestamp =
+                                    SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
+                                val outZip = File(exportBase, "sing-box-lsposed-debug-$timestamp.zip")
+                                exportCancelled = false
+                                exportError = null
+                                showExportProgressDialog = true
+                                scope.launch {
+                                    val result = withContext(Dispatchers.IO) {
+                                        PrivilegeSettingsClient.exportDebugInfo(outZip.absolutePath)
                                     }
-                                    val timestamp =
-                                        SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
-                                    val outZip = File(exportBase, "sing-box-lsposed-debug-${timestamp}.zip")
-                                    exportCancelled = false
-                                    exportError = null
-                                    showExportProgressDialog = true
-                                    scope.launch {
-                                        val result = withContext(Dispatchers.IO) {
-                                            PrivilegeSettingsClient.exportDebugInfo(outZip.absolutePath)
-                                        }
-                                        if (exportCancelled) {
-                                            outZip.delete()
-                                            return@launch
-                                        }
-                                        showExportProgressDialog = false
-                                        val failure = result.error
-                                        if (failure == null) {
-                                            exportedFile = outZip
-                                            showExportSuccessDialog = true
-                                        } else {
-                                            messageDialogTitle = context.getString(R.string.error_title)
-                                            messageDialogMessage = context.getString(
-                                                R.string.privilege_settings_export_debug_failed,
-                                                failure
-                                            )
-                                            showMessageDialog = true
-                                        }
+                                    if (exportCancelled) {
+                                        outZip.delete()
+                                        return@launch
                                     }
-                                },
+                                    showExportProgressDialog = false
+                                    val failure = result.error
+                                    if (failure == null) {
+                                        exportedFile = outZip
+                                        showExportSuccessDialog = true
+                                    } else {
+                                        messageDialogTitle = context.getString(R.string.error_title)
+                                        messageDialogMessage = context.getString(
+                                            R.string.privilege_settings_export_debug_failed,
+                                            failure,
+                                        )
+                                        showMessageDialog = true
+                                    }
+                                }
+                            },
                         colors = ListItemDefaults.colors(
                             containerColor = Color.Transparent,
                         ),
@@ -496,44 +498,44 @@ fun PrivilegeSettingsScreen(navController: NavController, serviceStatus: Status 
                             )
                         },
                         modifier =
-                            Modifier
-                                .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
-                                .clickable {
-                                    scope.launch {
-                                        val failure = withContext(Dispatchers.IO) {
-                                            runCatching {
-                                                val process = Runtime.getRuntime().exec(
-                                                    arrayOf(
-                                                        "su",
-                                                        "-c",
-                                                        "/system/bin/svc power reboot || /system/bin/reboot",
-                                                    ),
-                                                )
-                                                val error = process.errorStream.bufferedReader().use { it.readText().trim() }
-                                                process.inputStream.close()
-                                                process.outputStream.close()
-                                                process.errorStream.close()
-                                                val code = process.waitFor()
-                                                if (code == 0) {
-                                                    null
-                                                } else {
-                                                    error.ifBlank { "exit=$code" }
-                                                }
-                                            }.getOrElse { it.message ?: "unknown" }
-                                        }
-                                        if (failure != null) {
-                                            val message =
-                                                if (failure == "unknown" || failure.startsWith("exit=")) {
-                                                    context.getString(R.string.root_access_required)
-                                                } else {
-                                                    context.getString(R.string.privilege_module_restart_failed, failure)
-                                                }
-                                            messageDialogTitle = context.getString(R.string.error_title)
-                                            messageDialogMessage = message
-                                            showMessageDialog = true
-                                        }
+                        Modifier
+                            .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
+                            .clickable {
+                                scope.launch {
+                                    val failure = withContext(Dispatchers.IO) {
+                                        runCatching {
+                                            val process = Runtime.getRuntime().exec(
+                                                arrayOf(
+                                                    "su",
+                                                    "-c",
+                                                    "/system/bin/svc power reboot || /system/bin/reboot",
+                                                ),
+                                            )
+                                            val error = process.errorStream.bufferedReader().use { it.readText().trim() }
+                                            process.inputStream.close()
+                                            process.outputStream.close()
+                                            process.errorStream.close()
+                                            val code = process.waitFor()
+                                            if (code == 0) {
+                                                null
+                                            } else {
+                                                error.ifBlank { "exit=$code" }
+                                            }
+                                        }.getOrElse { it.message ?: "unknown" }
                                     }
-                                },
+                                    if (failure != null) {
+                                        val message =
+                                            if (failure == "unknown" || failure.startsWith("exit=")) {
+                                                context.getString(R.string.root_access_required)
+                                            } else {
+                                                context.getString(R.string.privilege_module_restart_failed, failure)
+                                            }
+                                        messageDialogTitle = context.getString(R.string.error_title)
+                                        messageDialogMessage = message
+                                        showMessageDialog = true
+                                    }
+                                }
+                            },
                         colors = ListItemDefaults.colors(
                             containerColor = Color.Transparent,
                         ),
@@ -621,7 +623,7 @@ fun PrivilegeSettingsScreen(navController: NavController, serviceStatus: Status 
                                 RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
                             } else {
                                 RoundedCornerShape(12.dp)
-                            }
+                            },
                         ),
                     colors = ListItemDefaults.colors(
                         containerColor = Color.Transparent,
@@ -662,7 +664,6 @@ fun PrivilegeSettingsScreen(navController: NavController, serviceStatus: Status 
                         ),
                     )
                 }
-
             }
         }
 
@@ -730,7 +731,7 @@ fun PrivilegeSettingsScreen(navController: NavController, serviceStatus: Status 
                                 RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
                             } else {
                                 RoundedCornerShape(12.dp)
-                            }
+                            },
                         ),
                     colors = ListItemDefaults.colors(
                         containerColor = Color.Transparent,
@@ -847,11 +848,7 @@ fun PrivilegeSettingsScreen(navController: NavController, serviceStatus: Status 
 }
 
 @Composable
-private fun SelfTestDialog(
-    isRunning: Boolean,
-    result: DetectionResult?,
-    onDismiss: () -> Unit,
-) {
+private fun SelfTestDialog(isRunning: Boolean, result: DetectionResult?, onDismiss: () -> Unit) {
     val notDetectedText = stringResource(R.string.privilege_settings_hide_test_not_detected)
 
     AlertDialog(

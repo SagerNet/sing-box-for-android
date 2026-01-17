@@ -114,16 +114,15 @@ data class DashboardUiState(
         ),
     val showCardSettingsDialog: Boolean = false,
 ) {
-    data class DeprecatedNote(
-        val message: String,
-        val migrationLink: String?,
-    )
+    data class DeprecatedNote(val message: String, val migrationLink: String?)
 }
 
 // DashboardViewModel now only uses UiEvent for all events
 // No need for DashboardEvent anymore as all events are handled globally
 
-class DashboardViewModel : BaseViewModel<DashboardUiState, UiEvent>(), CommandClient.Handler {
+class DashboardViewModel :
+    BaseViewModel<DashboardUiState, UiEvent>(),
+    CommandClient.Handler {
     private val _serviceStatus = MutableStateFlow(Status.Stopped)
     val serviceStatus: StateFlow<Status> = _serviceStatus.asStateFlow()
 
@@ -395,10 +394,7 @@ class DashboardViewModel : BaseViewModel<DashboardUiState, UiEvent>(), CommandCl
         }
     }
 
-    fun moveProfile(
-        from: Int,
-        to: Int,
-    ) {
+    fun moveProfile(from: Int, to: Int) {
         val currentProfiles = currentState.profiles.toMutableList()
 
         if (from < to) {
@@ -614,10 +610,7 @@ class DashboardViewModel : BaseViewModel<DashboardUiState, UiEvent>(), CommandCl
         }
     }
 
-    override fun initializeClashMode(
-        modeList: List<String>,
-        currentMode: String,
-    ) {
+    override fun initializeClashMode(modeList: List<String>, currentMode: String) {
         viewModelScope.launch(Dispatchers.Main) {
             updateState {
                 copy(
@@ -702,16 +695,15 @@ class DashboardViewModel : BaseViewModel<DashboardUiState, UiEvent>(), CommandCl
     }
 
     // Helper functions for serialization
-    private fun getDefaultItemOrder() =
-        listOf(
-            CardGroup.UploadTraffic,
-            CardGroup.DownloadTraffic,
-            CardGroup.Debug,
-            CardGroup.Connections,
-            CardGroup.SystemProxy,
-            CardGroup.ClashMode,
-            CardGroup.Profiles,
-        )
+    private fun getDefaultItemOrder() = listOf(
+        CardGroup.UploadTraffic,
+        CardGroup.DownloadTraffic,
+        CardGroup.Debug,
+        CardGroup.Connections,
+        CardGroup.SystemProxy,
+        CardGroup.ClashMode,
+        CardGroup.Profiles,
+    )
 
     private fun loadItemOrder(): List<CardGroup> {
         val savedOrder = Settings.dashboardItemOrder
@@ -766,11 +758,9 @@ class DashboardViewModel : BaseViewModel<DashboardUiState, UiEvent>(), CommandCl
 
     private fun cardGroupToString(card: CardGroup): String = card.name
 
-    private fun stringToCardGroup(name: String): CardGroup? {
-        return try {
-            CardGroup.valueOf(name)
-        } catch (e: IllegalArgumentException) {
-            null
-        }
+    private fun stringToCardGroup(name: String): CardGroup? = try {
+        CardGroup.valueOf(name)
+    } catch (e: IllegalArgumentException) {
+        null
     }
 }

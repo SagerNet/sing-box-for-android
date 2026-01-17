@@ -18,11 +18,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.unit.Velocity
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
@@ -54,15 +49,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.nekohasekai.sfa.R
-import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
+import io.nekohasekai.sfa.compose.model.Connection
 import io.nekohasekai.sfa.compose.model.ConnectionSort
 import io.nekohasekai.sfa.compose.model.ConnectionStateFilter
+import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.constant.Status
-import io.nekohasekai.sfa.compose.model.Connection
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -118,7 +118,7 @@ fun ConnectionsPage(
                                 ConnectionStateFilter.All -> stringResource(R.string.connection_state_all)
                                 ConnectionStateFilter.Active -> stringResource(R.string.connection_state_active)
                                 ConnectionStateFilter.Closed -> stringResource(R.string.connection_state_closed)
-                            }
+                            },
                         )
                     },
                 )
@@ -230,7 +230,7 @@ fun ConnectionsPage(
                                     stringResource(R.string.close_search)
                                 } else {
                                     stringResource(R.string.search)
-                                }
+                                },
                             )
                         },
                         onClick = {
@@ -433,20 +433,10 @@ fun ConnectionsScreen(
 }
 
 @Composable
-private fun rememberBounceBlockingNestedScrollConnection(
-    lazyListState: LazyListState
-): NestedScrollConnection = remember(lazyListState) {
+private fun rememberBounceBlockingNestedScrollConnection(lazyListState: LazyListState): NestedScrollConnection = remember(lazyListState) {
     object : NestedScrollConnection {
-        override fun onPostScroll(
-            consumed: Offset,
-            available: Offset,
-            source: NestedScrollSource
-        ): Offset {
-            return if (available.y < 0) available else Offset.Zero
-        }
+        override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset = if (available.y < 0) available else Offset.Zero
 
-        override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
-            return if (available.y < 0) available else Velocity.Zero
-        }
+        override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity = if (available.y < 0) available else Velocity.Zero
     }
 }

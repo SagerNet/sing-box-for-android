@@ -6,14 +6,13 @@ import io.nekohasekai.libbox.Connections
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.compose.base.BaseViewModel
 import io.nekohasekai.sfa.compose.base.ScreenEvent
-import io.nekohasekai.sfa.constant.Status
-import io.nekohasekai.sfa.ktx.toList
 import io.nekohasekai.sfa.compose.model.Connection
 import io.nekohasekai.sfa.compose.model.ConnectionSort
 import io.nekohasekai.sfa.compose.model.ConnectionStateFilter
+import io.nekohasekai.sfa.constant.Status
+import io.nekohasekai.sfa.ktx.toList
 import io.nekohasekai.sfa.utils.AppLifecycleObserver
 import io.nekohasekai.sfa.utils.CommandClient
-import java.util.concurrent.atomic.AtomicLong
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,6 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import java.util.concurrent.atomic.AtomicLong
 
 data class ConnectionsUiState(
     val connections: List<Connection> = emptyList(),
@@ -38,7 +38,9 @@ sealed class ConnectionsEvent : ScreenEvent {
     data object AllConnectionsClosed : ConnectionsEvent()
 }
 
-class ConnectionsViewModel : BaseViewModel<ConnectionsUiState, ConnectionsEvent>(), CommandClient.Handler {
+class ConnectionsViewModel :
+    BaseViewModel<ConnectionsUiState, ConnectionsEvent>(),
+    CommandClient.Handler {
     private val commandClient = CommandClient(
         viewModelScope,
         CommandClient.ConnectionType.Connections,
@@ -62,7 +64,7 @@ class ConnectionsViewModel : BaseViewModel<ConnectionsUiState, ConnectionsEvent>
             combine(
                 AppLifecycleObserver.isForeground,
                 _isVisible,
-                _serviceStatus
+                _serviceStatus,
             ) { foreground, visible, status ->
                 Triple(foreground, visible, status)
             }.collect { (foreground, visible, status) ->

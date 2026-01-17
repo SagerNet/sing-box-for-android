@@ -36,9 +36,7 @@ object ApkInstaller {
         }
     }
 
-    fun canSystemSilentInstall(): Boolean {
-        return SystemPackageInstaller.canSystemSilentInstall()
-    }
+    fun canSystemSilentInstall(): Boolean = SystemPackageInstaller.canSystemSilentInstall()
 
     suspend fun canSilentInstall(): Boolean {
         val method = getConfiguredMethod()

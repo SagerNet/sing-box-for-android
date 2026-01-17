@@ -54,14 +54,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.navigation.NavController
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.bg.RootClient
+import io.nekohasekai.sfa.compose.screen.profileoverride.PerAppProxyScanner
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.database.Settings
-import io.nekohasekai.sfa.compose.screen.profileoverride.PerAppProxyScanner
 import io.nekohasekai.sfa.vendor.PackageQueryManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -162,22 +162,22 @@ fun ProfileOverrideScreen(navController: NavController) {
 
     Column(
         modifier =
-            Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surface)
-                .verticalScroll(rememberScrollState())
-                .padding(vertical = 8.dp),
+        Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface)
+            .verticalScroll(rememberScrollState())
+            .padding(vertical = 8.dp),
     ) {
         // Card 1: Auto Redirect
         Card(
             modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
             colors =
-                CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                ),
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            ),
         ) {
             ListItem(
                 headlineContent = {
@@ -232,9 +232,9 @@ fun ProfileOverrideScreen(navController: NavController) {
                 },
                 modifier = Modifier.clip(RoundedCornerShape(12.dp)),
                 colors =
-                    ListItemDefaults.colors(
-                        containerColor = Color.Transparent,
-                    ),
+                ListItemDefaults.colors(
+                    containerColor = Color.Transparent,
+                ),
             )
         }
 
@@ -254,13 +254,13 @@ fun ProfileOverrideScreen(navController: NavController) {
 
         Card(
             modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
             colors =
-                CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                ),
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            ),
         ) {
             Column {
                 // Mode selector (only when privileged query is needed)
@@ -272,32 +272,44 @@ fun ProfileOverrideScreen(navController: NavController) {
                             Text(
                                 stringResource(R.string.per_app_proxy_package_query_mode),
                                 style = MaterialTheme.typography.bodyLarge,
-                                color = if (modeEnabled) Color.Unspecified
-                                else MaterialTheme.colorScheme.onSurface.copy(alpha = disabledAlpha),
+                                color = if (modeEnabled) {
+                                    Color.Unspecified
+                                } else {
+                                    MaterialTheme.colorScheme.onSurface.copy(alpha = disabledAlpha)
+                                },
                             )
                         },
                         supportingContent = {
                             Text(
                                 if (useRootMode) "ROOT" else "Shizuku",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = if (modeEnabled) MaterialTheme.colorScheme.onSurfaceVariant
-                                else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = disabledAlpha),
+                                color = if (modeEnabled) {
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                } else {
+                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = disabledAlpha)
+                                },
                             )
                         },
                         leadingContent = {
                             Icon(
                                 imageVector = Icons.Outlined.Tune,
                                 contentDescription = null,
-                                tint = if (modeEnabled) MaterialTheme.colorScheme.primary
-                                else MaterialTheme.colorScheme.onSurface.copy(alpha = disabledAlpha),
+                                tint = if (modeEnabled) {
+                                    MaterialTheme.colorScheme.primary
+                                } else {
+                                    MaterialTheme.colorScheme.onSurface.copy(alpha = disabledAlpha)
+                                },
                             )
                         },
                         trailingContent = {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
                                 contentDescription = null,
-                                tint = if (modeEnabled) MaterialTheme.colorScheme.onSurfaceVariant
-                                else MaterialTheme.colorScheme.onSurface.copy(alpha = disabledAlpha),
+                                tint = if (modeEnabled) {
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                } else {
+                                    MaterialTheme.colorScheme.onSurface.copy(alpha = disabledAlpha)
+                                },
                             )
                         },
                         modifier = Modifier
@@ -355,19 +367,19 @@ fun ProfileOverrideScreen(navController: NavController) {
                         )
                     },
                     modifier =
-                        Modifier.clip(
-                            if (showModeSelector) {
-                                RoundedCornerShape(0.dp)
-                            } else if (perAppProxyEnabled && canUsePerAppProxy) {
-                                RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
-                            } else {
-                                RoundedCornerShape(12.dp)
-                            },
-                        ),
+                    Modifier.clip(
+                        if (showModeSelector) {
+                            RoundedCornerShape(0.dp)
+                        } else if (perAppProxyEnabled && canUsePerAppProxy) {
+                            RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
+                        } else {
+                            RoundedCornerShape(12.dp)
+                        },
+                    ),
                     colors =
-                        ListItemDefaults.colors(
-                            containerColor = Color.Transparent,
-                        ),
+                    ListItemDefaults.colors(
+                        containerColor = Color.Transparent,
+                    ),
                 )
 
                 if (perAppProxyEnabled && canUsePerAppProxy) {
@@ -409,13 +421,13 @@ fun ProfileOverrideScreen(navController: NavController) {
                             )
                         },
                         modifier =
-                            Modifier.clickable(enabled = manageEnabled) {
-                                navController.navigate("settings/profile_override/manage")
-                            },
+                        Modifier.clickable(enabled = manageEnabled) {
+                            navController.navigate("settings/profile_override/manage")
+                        },
                         colors =
-                            ListItemDefaults.colors(
-                                containerColor = Color.Transparent,
-                            ),
+                        ListItemDefaults.colors(
+                            containerColor = Color.Transparent,
+                        ),
                     )
 
                     // Managed Mode toggle
@@ -477,9 +489,9 @@ fun ProfileOverrideScreen(navController: NavController) {
                         },
                         modifier = Modifier.clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)),
                         colors =
-                            ListItemDefaults.colors(
-                                containerColor = Color.Transparent,
-                            ),
+                        ListItemDefaults.colors(
+                            containerColor = Color.Transparent,
+                        ),
                     )
                 }
             }
@@ -601,7 +613,7 @@ fun ProfileOverrideScreen(navController: NavController) {
                                     Toast.makeText(
                                         context,
                                         R.string.root_access_denied,
-                                        Toast.LENGTH_LONG
+                                        Toast.LENGTH_LONG,
                                     ).show()
                                 }
                             }
@@ -706,7 +718,7 @@ private suspend fun scanAllChinaApps(): Set<String> = withContext(Dispatchers.De
     val chinaApps = mutableSetOf<String>()
     installedPackages.map { packageInfo ->
         async {
-        if (PerAppProxyScanner.scanChinaPackage(packageInfo)) {
+            if (PerAppProxyScanner.scanChinaPackage(packageInfo)) {
                 synchronized(chinaApps) {
                     chinaApps.add(packageInfo.packageName)
                 }

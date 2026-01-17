@@ -26,7 +26,7 @@ class HookConnectivityManagerGetNetworkInfo(private val helper: ConnectivityServ
                     if (!helper.shouldHide(param.thisObject, uid)) return
                     param.result = null
                 }
-            }
+            },
         )
 
         XposedHelpers.findAndHookMethod(
@@ -48,7 +48,7 @@ class HookConnectivityManagerGetNetworkInfo(private val helper: ConnectivityServ
                         null
                     }
                 }
-            }
+            },
         )
     }
 }

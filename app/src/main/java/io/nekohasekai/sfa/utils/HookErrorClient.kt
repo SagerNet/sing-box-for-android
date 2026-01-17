@@ -14,12 +14,7 @@ object HookErrorClient {
         PROTOCOL_ERROR,
     }
 
-    data class Result(
-        val logs: List<LogEntry>,
-        val hasWarnings: Boolean,
-        val failure: Failure? = null,
-        val detail: String? = null,
-    )
+    data class Result(val logs: List<LogEntry>, val hasWarnings: Boolean, val failure: Failure? = null, val detail: String? = null)
 
     private fun failureResult(failure: Failure, detail: String? = null) = Result(
         logs = emptyList(),

@@ -124,21 +124,18 @@ class NewProfileViewModel(application: Application) : AndroidViewModel(applicati
         _uiState.update { it.copy(autoUpdateInterval = intValue.coerceAtLeast(15)) }
     }
 
-    fun setImportUri(
-        uri: Uri,
-        fileName: String?,
-    ) {
+    fun setImportUri(uri: Uri, fileName: String?) {
         _uiState.update {
             it.copy(
                 importUri = uri,
                 importFileName = fileName,
                 importError = null, // Clear error when file is selected
                 name =
-                    if (it.name.isEmpty()) {
-                        fileName?.substringBeforeLast(".") ?: "Imported Profile"
-                    } else {
-                        it.name
-                    },
+                if (it.name.isEmpty()) {
+                    fileName?.substringBeforeLast(".") ?: "Imported Profile"
+                } else {
+                    it.name
+                },
             )
         }
     }

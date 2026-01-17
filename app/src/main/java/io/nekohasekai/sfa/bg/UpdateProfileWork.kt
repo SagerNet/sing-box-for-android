@@ -59,10 +59,7 @@ class UpdateProfileWork {
         }
     }
 
-    class UpdateTask(
-        appContext: Context,
-        params: WorkerParameters,
-    ) : CoroutineWorker(appContext, params) {
+    class UpdateTask(appContext: Context, params: WorkerParameters) : CoroutineWorker(appContext, params) {
         override suspend fun doWork(): Result {
             var selectedProfileUpdated = false
             val remoteProfiles =

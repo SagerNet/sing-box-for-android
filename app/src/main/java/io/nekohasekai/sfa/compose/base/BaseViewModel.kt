@@ -56,10 +56,7 @@ abstract class BaseViewModel<State, Event> : ViewModel() {
         sendGlobalEvent(UiEvent.ErrorMessage(message))
     }
 
-    protected fun launch(
-        onError: ((Throwable) -> Unit)? = null,
-        block: suspend CoroutineScope.() -> Unit,
-    ) {
+    protected fun launch(onError: ((Throwable) -> Unit)? = null, block: suspend CoroutineScope.() -> Unit) {
         val errorHandler =
             CoroutineExceptionHandler { _, throwable ->
                 onError?.invoke(throwable) ?: sendError(throwable)

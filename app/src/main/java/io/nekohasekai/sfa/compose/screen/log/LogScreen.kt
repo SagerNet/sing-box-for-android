@@ -1,9 +1,9 @@
 package io.nekohasekai.sfa.compose.screen.log
 
 import android.content.ClipData
-import android.os.Build
-import android.content.res.Configuration
 import android.content.Intent
+import android.content.res.Configuration
+import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -144,17 +144,17 @@ fun LogScreen(
                         IconButton(onClick = { resolvedViewModel.togglePause() }) {
                             Icon(
                                 imageVector =
-                                    if (uiState.isPaused) {
-                                        Icons.Default.PlayArrow
-                                    } else {
-                                        Icons.Default.Pause
-                                    },
+                                if (uiState.isPaused) {
+                                    Icons.Default.PlayArrow
+                                } else {
+                                    Icons.Default.Pause
+                                },
                                 contentDescription =
-                                    if (uiState.isPaused) {
-                                        stringResource(R.string.content_description_resume_logs)
-                                    } else {
-                                        stringResource(R.string.content_description_pause_logs)
-                                    },
+                                if (uiState.isPaused) {
+                                    stringResource(R.string.content_description_resume_logs)
+                                } else {
+                                    stringResource(R.string.content_description_pause_logs)
+                                },
                             )
                         }
                     }
@@ -162,23 +162,23 @@ fun LogScreen(
                     IconButton(onClick = { resolvedViewModel.toggleSearch() }) {
                         Icon(
                             imageVector =
-                                if (uiState.isSearchActive) {
-                                    Icons.Default.ExpandLess
-                                } else {
-                                    Icons.Default.Search
-                                },
+                            if (uiState.isSearchActive) {
+                                Icons.Default.ExpandLess
+                            } else {
+                                Icons.Default.Search
+                            },
                             contentDescription =
-                                if (uiState.isSearchActive) {
-                                    stringResource(R.string.content_description_collapse_search)
-                                } else {
-                                    stringResource(R.string.content_description_search_logs)
-                                },
+                            if (uiState.isSearchActive) {
+                                stringResource(R.string.content_description_collapse_search)
+                            } else {
+                                stringResource(R.string.content_description_search_logs)
+                            },
                             tint =
-                                if (uiState.isSearchActive) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.onSurface
-                                },
+                            if (uiState.isSearchActive) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurface
+                            },
                         )
                     }
 
@@ -281,9 +281,9 @@ fun LogScreen(
                 ) {
                     Row(
                         modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 8.dp, vertical = 4.dp),
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
@@ -298,10 +298,10 @@ fun LogScreen(
                             }
                             Text(
                                 text =
-                                    stringResource(
-                                        R.string.selected_count,
-                                        uiState.selectedLogIndices.size,
-                                    ),
+                                stringResource(
+                                    R.string.selected_count,
+                                    uiState.selectedLogIndices.size,
+                                ),
                                 style = MaterialTheme.typography.titleMedium,
                                 modifier = Modifier.padding(start = 8.dp),
                             )
@@ -343,18 +343,18 @@ fun LogScreen(
                 ) {
                     Row(
                         modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
                             text =
-                                stringResource(
-                                    R.string.filter_label,
-                                    uiState.filterLogLevel.label,
-                                ),
+                            stringResource(
+                                R.string.filter_label,
+                                uiState.filterLogLevel.label,
+                            ),
                             style = MaterialTheme.typography.bodySmall,
                         )
                         TextButton(
@@ -375,19 +375,19 @@ fun LogScreen(
             AnimatedVisibility(
                 visible = uiState.isSearchActive,
                 enter =
-                    expandVertically(
+                expandVertically(
+                    animationSpec = tween(300),
+                ) +
+                    fadeIn(
                         animationSpec = tween(300),
-                    ) +
-                        fadeIn(
-                            animationSpec = tween(300),
-                        ),
+                    ),
                 exit =
-                    shrinkVertically(
+                shrinkVertically(
+                    animationSpec = tween(300),
+                ) +
+                    fadeOut(
                         animationSpec = tween(300),
-                    ) +
-                        fadeOut(
-                            animationSpec = tween(300),
-                        ),
+                    ),
             ) {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
@@ -405,10 +405,10 @@ fun LogScreen(
                         value = uiState.searchQuery,
                         onValueChange = { resolvedViewModel.updateSearchQuery(it) },
                         modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(start = 16.dp, end = 16.dp, bottom = 12.dp)
-                                .focusRequester(focusRequester),
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(start = 16.dp, end = 16.dp, bottom = 12.dp)
+                            .focusRequester(focusRequester),
                         placeholder = { Text(stringResource(R.string.search_logs_placeholder)) },
                         leadingIcon = {
                             Icon(
@@ -429,11 +429,11 @@ fun LogScreen(
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                         keyboardActions =
-                            KeyboardActions(
-                                onSearch = {
-                                    focusManager.clearFocus()
-                                },
-                            ),
+                        KeyboardActions(
+                            onSearch = {
+                                focusManager.clearFocus()
+                            },
+                        ),
                     )
                 }
             }
@@ -495,12 +495,12 @@ fun LogScreen(
                     state = listState,
                     modifier = Modifier.fillMaxSize(),
                     contentPadding =
-                        PaddingValues(
-                            start = 8.dp,
-                            end = 8.dp,
-                            top = 8.dp,
-                            bottom = bottomPadding,
-                        ),
+                    PaddingValues(
+                        start = 8.dp,
+                        end = 8.dp,
+                        top = 8.dp,
+                        bottom = bottomPadding,
+                    ),
                     verticalArrangement = Arrangement.spacedBy(2.dp),
                 ) {
                     itemsIndexed(
@@ -532,9 +532,9 @@ fun LogScreen(
         // Options Menu - Material 3 style
         Box(
             modifier =
-                Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(end = 8.dp),
+            Modifier
+                .align(Alignment.TopEnd)
+                .padding(end = 8.dp),
         ) {
             var expandedLogLevel by remember { mutableStateOf(false) }
             var expandedSave by remember { mutableStateOf(false) }
@@ -595,11 +595,11 @@ fun LogScreen(
                     trailingIcon = {
                         Icon(
                             imageVector =
-                                if (expandedLogLevel) {
-                                    Icons.Default.ExpandLess
-                                } else {
-                                    Icons.Default.ExpandMore
-                                },
+                            if (expandedLogLevel) {
+                                Icons.Default.ExpandLess
+                            } else {
+                                Icons.Default.ExpandMore
+                            },
                             contentDescription = null,
                         )
                     },
@@ -620,23 +620,23 @@ fun LogScreen(
                             leadingIcon = {
                                 Icon(
                                     imageVector =
-                                        if (uiState.filterLogLevel == level) {
-                                            Icons.Default.RadioButtonChecked
-                                        } else {
-                                            Icons.Default.RadioButtonUnchecked
-                                        },
+                                    if (uiState.filterLogLevel == level) {
+                                        Icons.Default.RadioButtonChecked
+                                    } else {
+                                        Icons.Default.RadioButtonUnchecked
+                                    },
                                     contentDescription =
-                                        if (uiState.filterLogLevel == level) {
-                                            stringResource(R.string.group_selected_title)
-                                        } else {
-                                            null
-                                        },
+                                    if (uiState.filterLogLevel == level) {
+                                        stringResource(R.string.group_selected_title)
+                                    } else {
+                                        null
+                                    },
                                     tint =
-                                        if (uiState.filterLogLevel == level) {
-                                            MaterialTheme.colorScheme.primary
-                                        } else {
-                                            MaterialTheme.colorScheme.onSurfaceVariant
-                                        },
+                                    if (uiState.filterLogLevel == level) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                    },
                                     modifier = Modifier.padding(start = 24.dp),
                                 )
                             },
@@ -665,11 +665,11 @@ fun LogScreen(
                     trailingIcon = {
                         Icon(
                             imageVector =
-                                if (expandedSave) {
-                                    Icons.Default.ExpandLess
-                                } else {
-                                    Icons.Default.ExpandMore
-                                },
+                            if (expandedSave) {
+                                Icons.Default.ExpandLess
+                            } else {
+                                Icons.Default.ExpandMore
+                            },
                             contentDescription = null,
                         )
                     },
@@ -841,9 +841,9 @@ fun LogScreen(
         val fabEndPadding = if (isTablet) 20.dp else 16.dp
         Column(
             modifier =
-                Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(bottom = fabBottomPadding, end = fabEndPadding, top = 16.dp),
+            Modifier
+                .align(Alignment.BottomEnd)
+                .padding(bottom = fabBottomPadding, end = fabEndPadding, top = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             // Scroll to bottom FAB
@@ -880,34 +880,34 @@ fun LogItem(
 ) {
     Card(
         modifier =
-            Modifier
-                .fillMaxWidth()
-                .combinedClickable(
-                    onClick = onClick,
-                    onLongClick = onLongClick,
-                ),
+        Modifier
+            .fillMaxWidth()
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick,
+            ),
         shape = RoundedCornerShape(4.dp),
         colors =
-            CardDefaults.cardColors(
-                containerColor =
-                    if (isSelected) {
-                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
-                    } else {
-                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                    },
-            ),
-        border =
+        CardDefaults.cardColors(
+            containerColor =
             if (isSelected) {
-                CardDefaults.outlinedCardBorder().copy(
-                    width = 2.dp,
-                    brush =
-                        androidx.compose.ui.graphics.SolidColor(
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                        ),
-                )
+                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
             } else {
-                null
+                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
             },
+        ),
+        border =
+        if (isSelected) {
+            CardDefaults.outlinedCardBorder().copy(
+                width = 2.dp,
+                brush =
+                androidx.compose.ui.graphics.SolidColor(
+                    MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                ),
+            )
+        } else {
+            null
+        },
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -917,13 +917,13 @@ fun LogItem(
                 Icon(
                     imageVector = if (isSelected) Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank,
                     contentDescription =
-                        if (isSelected) {
-                            stringResource(R.string.group_selected_title)
-                        } else {
-                            stringResource(
-                                R.string.not_selected,
-                            )
-                        },
+                    if (isSelected) {
+                        stringResource(R.string.group_selected_title)
+                    } else {
+                        stringResource(
+                            R.string.not_selected,
+                        )
+                    },
                     modifier = Modifier.padding(start = 12.dp, end = 4.dp),
                     tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -931,14 +931,14 @@ fun LogItem(
             Text(
                 text = annotatedString,
                 modifier =
-                    Modifier
-                        .weight(1f)
-                        .padding(
-                            start = if (isSelectionMode) 4.dp else 12.dp,
-                            end = 12.dp,
-                            top = 8.dp,
-                            bottom = 8.dp,
-                        ),
+                Modifier
+                    .weight(1f)
+                    .padding(
+                        start = if (isSelectionMode) 4.dp else 12.dp,
+                        end = 12.dp,
+                        top = 8.dp,
+                        bottom = 8.dp,
+                    ),
                 fontSize = 13.sp,
                 fontFamily = FontFamily.Monospace,
                 lineHeight = 18.sp,

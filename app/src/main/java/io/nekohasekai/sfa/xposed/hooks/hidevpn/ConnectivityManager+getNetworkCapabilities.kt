@@ -83,7 +83,7 @@ class HookConnectivityManagerGetNetworkCapabilities(private val helper: Connecti
                     if (!VpnSanitizer.shouldHide(callerUid)) return
                     param.result = VpnSanitizer.sanitizeNetworkCapabilities(nc)
                 }
-            }
+            },
         )
     }
 
@@ -96,7 +96,7 @@ class HookConnectivityManagerGetNetworkCapabilities(private val helper: Connecti
                 override fun afterHook(param: MethodHookParam) {
                     sanitizeNetworkCapabilitiesResult(param)
                 }
-            }
+            },
         )
     }
 
@@ -110,7 +110,7 @@ class HookConnectivityManagerGetNetworkCapabilities(private val helper: Connecti
                 override fun afterHook(param: MethodHookParam) {
                     sanitizeNetworkCapabilitiesResult(param)
                 }
-            }
+            },
         )
     }
 
@@ -125,7 +125,7 @@ class HookConnectivityManagerGetNetworkCapabilities(private val helper: Connecti
                 override fun afterHook(param: MethodHookParam) {
                     sanitizeNetworkCapabilitiesResult(param)
                 }
-            }
+            },
         )
     }
 
@@ -155,7 +155,7 @@ class HookConnectivityManagerGetNetworkCapabilities(private val helper: Connecti
                     if (!nc.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) return
                     param.result = VpnSanitizer.sanitizeNetworkCapabilities(nc)
                 }
-            }
+            },
         )
     }
 }

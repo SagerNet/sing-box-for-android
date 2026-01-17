@@ -18,9 +18,7 @@ var TextInputLayout.error: String
         editText?.error = value
     }
 
-fun TextInputLayout.setSimpleItems(
-    @ArrayRes redId: Int,
-) {
+fun TextInputLayout.setSimpleItems(@ArrayRes redId: Int) {
     (editText as? MaterialAutoCompleteTextView)?.setSimpleItems(redId)
 }
 

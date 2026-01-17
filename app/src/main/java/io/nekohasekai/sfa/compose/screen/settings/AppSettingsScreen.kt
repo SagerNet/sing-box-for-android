@@ -4,7 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.util.Log
-import android.provider.Settings as AndroidSettings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -29,7 +28,6 @@ import androidx.compose.material.icons.outlined.NewReleases
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.SystemUpdateAlt
-import androidx.compose.material3.Switch
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Card
@@ -42,6 +40,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -53,8 +52,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -62,22 +59,25 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.navigation.NavController
 import io.nekohasekai.sfa.BuildConfig
 import io.nekohasekai.sfa.R
-import io.nekohasekai.sfa.database.Settings
-import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.compose.component.UpdateAvailableDialog
+import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
+import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.update.UpdateCheckException
 import io.nekohasekai.sfa.update.UpdateState
 import io.nekohasekai.sfa.update.UpdateTrack
-import io.nekohasekai.sfa.vendor.Vendor
 import io.nekohasekai.sfa.utils.HookStatusClient
+import io.nekohasekai.sfa.vendor.Vendor
 import io.nekohasekai.sfa.xposed.XposedActivation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import android.provider.Settings as AndroidSettings
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -136,10 +136,12 @@ fun AppSettingsScreen(navController: NavController) {
                 isMethodAvailable = success
                 silentInstallError = if (success) {
                     null
-                } else when (silentInstallMethod) {
-                    "PACKAGE_INSTALLER" -> context.getString(R.string.package_installer_not_available)
-                    "SHIZUKU" -> context.getString(R.string.shizuku_not_available)
-                    else -> context.getString(R.string.silent_install_verify_failed, silentInstallMethod)
+                } else {
+                    when (silentInstallMethod) {
+                        "PACKAGE_INSTALLER" -> context.getString(R.string.package_installer_not_available)
+                        "SHIZUKU" -> context.getString(R.string.shizuku_not_available)
+                        else -> context.getString(R.string.silent_install_verify_failed, silentInstallMethod)
+                    }
                 }
             }
         }
@@ -224,10 +226,12 @@ fun AppSettingsScreen(navController: NavController) {
                     isMethodAvailable = success
                     silentInstallError = if (success) {
                         null
-                    } else when (method) {
-                        "PACKAGE_INSTALLER" -> context.getString(R.string.package_installer_not_available)
-                        "SHIZUKU" -> context.getString(R.string.shizuku_not_available)
-                        else -> context.getString(R.string.silent_install_verify_failed, method)
+                    } else {
+                        when (method) {
+                            "PACKAGE_INSTALLER" -> context.getString(R.string.package_installer_not_available)
+                            "SHIZUKU" -> context.getString(R.string.shizuku_not_available)
+                            else -> context.getString(R.string.silent_install_verify_failed, method)
+                        }
                     }
                 }
             },
@@ -259,22 +263,22 @@ fun AppSettingsScreen(navController: NavController) {
 
     Column(
         modifier =
-            Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surface)
-                .verticalScroll(rememberScrollState())
-                .padding(vertical = 8.dp),
+        Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface)
+            .verticalScroll(rememberScrollState())
+            .padding(vertical = 8.dp),
     ) {
         // Info Card
         Card(
             modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
             colors =
-                CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                ),
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            ),
         ) {
             Column {
                 ListItem(
@@ -303,12 +307,12 @@ fun AppSettingsScreen(navController: NavController) {
                         }
                     },
                     modifier =
-                        Modifier
-                            .clip(RoundedCornerShape(12.dp)),
+                    Modifier
+                        .clip(RoundedCornerShape(12.dp)),
                     colors =
-                        ListItemDefaults.colors(
-                            containerColor = Color.Transparent,
-                        ),
+                    ListItemDefaults.colors(
+                        containerColor = Color.Transparent,
+                    ),
                 )
             }
         }
@@ -324,13 +328,13 @@ fun AppSettingsScreen(navController: NavController) {
 
         Card(
             modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
             colors =
-                CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                ),
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            ),
         ) {
             Column {
                 val updateItemCount =
@@ -393,12 +397,12 @@ fun AppSettingsScreen(navController: NavController) {
                             )
                         },
                         modifier =
-                            updateItemModifier()
-                                .clickable { showTrackDialog = true },
+                        updateItemModifier()
+                            .clickable { showTrackDialog = true },
                         colors =
-                            ListItemDefaults.colors(
-                                containerColor = Color.Transparent,
-                            ),
+                        ListItemDefaults.colors(
+                            containerColor = Color.Transparent,
+                        ),
                     )
                 }
 
@@ -429,9 +433,9 @@ fun AppSettingsScreen(navController: NavController) {
                     },
                     modifier = updateItemModifier(),
                     colors =
-                        ListItemDefaults.colors(
-                            containerColor = Color.Transparent,
-                        ),
+                    ListItemDefaults.colors(
+                        containerColor = Color.Transparent,
+                    ),
                 )
 
                 if (Vendor.supportsSilentInstall()) {
@@ -478,10 +482,12 @@ fun AppSettingsScreen(navController: NavController) {
                                                 isMethodAvailable = success
                                                 silentInstallError = if (success) {
                                                     null
-                                                } else when (silentInstallMethod) {
-                                                    "PACKAGE_INSTALLER" -> context.getString(R.string.package_installer_not_available)
-                                                    "SHIZUKU" -> context.getString(R.string.shizuku_not_available)
-                                                    else -> context.getString(R.string.silent_install_verify_failed, silentInstallMethod)
+                                                } else {
+                                                    when (silentInstallMethod) {
+                                                        "PACKAGE_INSTALLER" -> context.getString(R.string.package_installer_not_available)
+                                                        "SHIZUKU" -> context.getString(R.string.shizuku_not_available)
+                                                        else -> context.getString(R.string.silent_install_verify_failed, silentInstallMethod)
+                                                    }
                                                 }
                                             }
                                         } else {
@@ -493,9 +499,9 @@ fun AppSettingsScreen(navController: NavController) {
                         },
                         modifier = updateItemModifier(),
                         colors =
-                            ListItemDefaults.colors(
-                                containerColor = Color.Transparent,
-                            ),
+                        ListItemDefaults.colors(
+                            containerColor = Color.Transparent,
+                        ),
                     )
 
                     if (silentInstallEnabled) {
@@ -510,11 +516,13 @@ fun AppSettingsScreen(navController: NavController) {
                                 Text(
                                     if (xposedActivated) {
                                         stringResource(R.string.install_method_root)
-                                    } else when (silentInstallMethod) {
-                                        "PACKAGE_INSTALLER" -> stringResource(R.string.install_method_package_installer)
-                                        "SHIZUKU" -> stringResource(R.string.install_method_shizuku)
-                                        "ROOT" -> stringResource(R.string.install_method_root)
-                                        else -> silentInstallMethod
+                                    } else {
+                                        when (silentInstallMethod) {
+                                            "PACKAGE_INSTALLER" -> stringResource(R.string.install_method_package_installer)
+                                            "SHIZUKU" -> stringResource(R.string.install_method_shizuku)
+                                            "ROOT" -> stringResource(R.string.install_method_root)
+                                            else -> silentInstallMethod
+                                        }
                                     },
                                     style = MaterialTheme.typography.bodyMedium,
                                 )
@@ -527,12 +535,12 @@ fun AppSettingsScreen(navController: NavController) {
                                 )
                             },
                             modifier =
-                                updateItemModifier()
-                                    .let { if (!xposedActivated) it.clickable { showInstallMethodMenu = true } else it },
+                            updateItemModifier()
+                                .let { if (!xposedActivated) it.clickable { showInstallMethodMenu = true } else it },
                             colors =
-                                ListItemDefaults.colors(
-                                    containerColor = Color.Transparent,
-                                ),
+                            ListItemDefaults.colors(
+                                containerColor = Color.Transparent,
+                            ),
                         )
 
                         if (silentInstallMethod == "SHIZUKU" && !isMethodAvailable) {
@@ -558,15 +566,15 @@ fun AppSettingsScreen(navController: NavController) {
                                     )
                                 },
                                 modifier =
-                                    updateItemModifier()
-                                        .clickable {
-                                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://shizuku.rikka.app/"))
-                                            context.startActivity(intent)
-                                        },
+                                updateItemModifier()
+                                    .clickable {
+                                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://shizuku.rikka.app/"))
+                                        context.startActivity(intent)
+                                    },
                                 colors =
-                                    ListItemDefaults.colors(
-                                        containerColor = Color.Transparent,
-                                    ),
+                                ListItemDefaults.colors(
+                                    containerColor = Color.Transparent,
+                                ),
                             )
                         }
 
@@ -593,18 +601,18 @@ fun AppSettingsScreen(navController: NavController) {
                                     )
                                 },
                                 modifier =
-                                    updateItemModifier()
-                                        .clickable {
-                                            val intent = Intent(
-                                                AndroidSettings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
-                                                Uri.parse("package:${context.packageName}")
-                                            )
-                                            context.startActivity(intent)
-                                        },
+                                updateItemModifier()
+                                    .clickable {
+                                        val intent = Intent(
+                                            AndroidSettings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                                            Uri.parse("package:${context.packageName}"),
+                                        )
+                                        context.startActivity(intent)
+                                    },
                                 colors =
-                                    ListItemDefaults.colors(
-                                        containerColor = Color.Transparent,
-                                    ),
+                                ListItemDefaults.colors(
+                                    containerColor = Color.Transparent,
+                                ),
                             )
                         }
                     }
@@ -646,9 +654,9 @@ fun AppSettingsScreen(navController: NavController) {
                         },
                         modifier = updateItemModifier(),
                         colors =
-                            ListItemDefaults.colors(
-                                containerColor = Color.Transparent,
-                            ),
+                        ListItemDefaults.colors(
+                            containerColor = Color.Transparent,
+                        ),
                     )
                 }
             }
@@ -666,13 +674,13 @@ fun AppSettingsScreen(navController: NavController) {
 
         Card(
             modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
             colors =
-                CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                ),
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            ),
         ) {
             Column {
                 ListItem(
@@ -698,40 +706,40 @@ fun AppSettingsScreen(navController: NavController) {
                         }
                     },
                     modifier =
-                        Modifier
-                            .clip(
-                                if (hasUpdate) {
-                                    RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
-                                } else {
-                                    RoundedCornerShape(12.dp)
-                                },
-                            )
-                            .clickable(enabled = !isChecking) {
-                                if (hasUpdate && updateInfo != null) {
-                                    showUpdateAvailableDialog = true
-                                } else {
-                                    scope.launch {
-                                        UpdateState.isChecking.value = true
-                                        withContext(Dispatchers.IO) {
-                                            try {
-                                                val result = Vendor.checkUpdateAsync()
-                                                UpdateState.setUpdate(result)
-                                                if (result == null) {
-                                                    showErrorDialog = R.string.no_updates_available
-                                                }
-                                            } catch (_: UpdateCheckException.TrackNotSupported) {
-                                                showErrorDialog = R.string.update_track_not_supported
-                                            } catch (_: Exception) {
-                                            }
-                                        }
-                                        UpdateState.isChecking.value = false
-                                    }
-                                }
+                    Modifier
+                        .clip(
+                            if (hasUpdate) {
+                                RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
+                            } else {
+                                RoundedCornerShape(12.dp)
                             },
+                        )
+                        .clickable(enabled = !isChecking) {
+                            if (hasUpdate && updateInfo != null) {
+                                showUpdateAvailableDialog = true
+                            } else {
+                                scope.launch {
+                                    UpdateState.isChecking.value = true
+                                    withContext(Dispatchers.IO) {
+                                        try {
+                                            val result = Vendor.checkUpdateAsync()
+                                            UpdateState.setUpdate(result)
+                                            if (result == null) {
+                                                showErrorDialog = R.string.no_updates_available
+                                            }
+                                        } catch (_: UpdateCheckException.TrackNotSupported) {
+                                            showErrorDialog = R.string.update_track_not_supported
+                                        } catch (_: Exception) {
+                                        }
+                                    }
+                                    UpdateState.isChecking.value = false
+                                }
+                            }
+                        },
                     colors =
-                        ListItemDefaults.colors(
-                            containerColor = Color.Transparent,
-                        ),
+                    ListItemDefaults.colors(
+                        containerColor = Color.Transparent,
+                    ),
                 )
 
                 if (hasUpdate && updateInfo != null) {
@@ -756,15 +764,15 @@ fun AppSettingsScreen(navController: NavController) {
                             )
                         },
                         modifier =
-                            Modifier
-                                .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
-                                .clickable {
-                                    showUpdateAvailableDialog = true
-                                },
+                        Modifier
+                            .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
+                            .clickable {
+                                showUpdateAvailableDialog = true
+                            },
                         colors =
-                            ListItemDefaults.colors(
-                                containerColor = Color.Transparent,
-                            ),
+                        ListItemDefaults.colors(
+                            containerColor = Color.Transparent,
+                        ),
                     )
                 }
             }
@@ -791,11 +799,11 @@ private fun UpdateTrackDialog(
                 tracks.forEach { (value, label) ->
                     Row(
                         modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(8.dp))
-                                .clickable { onTrackSelected(value) }
-                                .padding(vertical = 8.dp),
+                        Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable { onTrackSelected(value) }
+                            .padding(vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         RadioButton(
@@ -841,11 +849,11 @@ private fun InstallMethodDialog(
                 methods.forEach { (value, label) ->
                     Row(
                         modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(8.dp))
-                                .clickable { onMethodSelected(value) }
-                                .padding(vertical = 8.dp),
+                        Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable { onMethodSelected(value) }
+                            .padding(vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         RadioButton(

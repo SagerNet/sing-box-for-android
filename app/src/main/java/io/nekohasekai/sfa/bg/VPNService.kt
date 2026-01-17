@@ -15,18 +15,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
-class VPNService : VpnService(), PlatformInterfaceWrapper {
+class VPNService :
+    VpnService(),
+    PlatformInterfaceWrapper {
     companion object {
         private const val TAG = "VPNService"
     }
 
     private val service = BoxService(this, this)
 
-    override fun onStartCommand(
-        intent: Intent?,
-        flags: Int,
-        startId: Int,
-    ) = service.onStartCommand()
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int) = service.onStartCommand()
 
     override fun onBind(intent: Intent): IBinder {
         val binder = super.onBind(intent)

@@ -109,12 +109,10 @@ class ZxingQRCodeAnalyzer(
         return yData
     }
 
-    private fun tryDecode(bitmap: BinaryBitmap): Result? {
-        return try {
-            qrCodeReader.decode(bitmap)
-        } catch (_: NotFoundException) {
-            qrCodeReader.reset()
-            null
-        }
+    private fun tryDecode(bitmap: BinaryBitmap): Result? = try {
+        qrCodeReader.decode(bitmap)
+    } catch (_: NotFoundException) {
+        qrCodeReader.reset()
+        null
     }
 }

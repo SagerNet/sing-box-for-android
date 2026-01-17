@@ -5,10 +5,10 @@ import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.OutboundGroup
 import io.nekohasekai.sfa.compose.base.BaseViewModel
 import io.nekohasekai.sfa.compose.base.ScreenEvent
-import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.compose.model.Group
 import io.nekohasekai.sfa.compose.model.GroupItem
 import io.nekohasekai.sfa.compose.model.toList
+import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.utils.AppLifecycleObserver
 import io.nekohasekai.sfa.utils.CommandClient
 import kotlinx.coroutines.Dispatchers
@@ -28,9 +28,9 @@ sealed class GroupsEvent : ScreenEvent {
     data class GroupSelected(val groupTag: String, val itemTag: String) : GroupsEvent()
 }
 
-class GroupsViewModel(
-    private val sharedCommandClient: CommandClient? = null,
-) : BaseViewModel<GroupsUiState, GroupsEvent>(), CommandClient.Handler {
+class GroupsViewModel(private val sharedCommandClient: CommandClient? = null) :
+    BaseViewModel<GroupsUiState, GroupsEvent>(),
+    CommandClient.Handler {
     private val commandClient: CommandClient
     private val isUsingSharedClient: Boolean
 
@@ -154,10 +154,7 @@ class GroupsViewModel(
         }
     }
 
-    fun selectGroupItem(
-        groupTag: String,
-        itemTag: String,
-    ) {
+    fun selectGroupItem(groupTag: String, itemTag: String) {
         // Check if this is actually a different selection
         val currentGroup = uiState.value.groups.find { it.tag == groupTag }
         if (currentGroup?.selected == itemTag) {
@@ -175,13 +172,13 @@ class GroupsViewModel(
                     updateState {
                         copy(
                             groups =
-                                groups.map { group ->
-                                    if (group.tag == groupTag) {
-                                        group.copy(selected = itemTag)
-                                    } else {
-                                        group
-                                    }
-                                },
+                            groups.map { group ->
+                                if (group.tag == groupTag) {
+                                    group.copy(selected = itemTag)
+                                } else {
+                                    group
+                                }
+                            },
                             showCloseConnectionsSnackbar = true,
                         )
                     }

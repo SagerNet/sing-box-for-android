@@ -54,9 +54,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
-import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.compose.model.Group
 import io.nekohasekai.sfa.compose.model.GroupItem
+import io.nekohasekai.sfa.constant.Status
 
 @Composable
 fun GroupsScreen(
@@ -121,12 +121,12 @@ fun GroupsScreen(
         LazyColumn(
             modifier = modifier.fillMaxSize(),
             contentPadding =
-                PaddingValues(
-                    start = 16.dp,
-                    end = 16.dp,
-                    top = 8.dp,
-                    bottom = 16.dp,
-                ),
+            PaddingValues(
+                start = 16.dp,
+                end = 16.dp,
+                top = 8.dp,
+                bottom = 16.dp,
+            ),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             items(
@@ -254,17 +254,17 @@ private fun ProxyGroupCard(
                                 imageVector = Icons.Default.ExpandMore,
                                 contentDescription = if (isExpanded) collapseContentDescription else expandContentDescription,
                                 modifier =
-                                    Modifier
-                                        .size(24.dp)
-                                        .graphicsLayer { rotationZ = rotationAngle },
+                                Modifier
+                                    .size(24.dp)
+                                    .graphicsLayer { rotationZ = rotationAngle },
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                     },
                     colors =
-                        ListItemDefaults.colors(
-                            containerColor = Color.Transparent,
-                        ),
+                    ListItemDefaults.colors(
+                        containerColor = Color.Transparent,
+                    ),
                 )
             }
 
@@ -294,12 +294,7 @@ private fun ProxyGroupCard(
 }
 
 @Composable
-private fun ProxyItemsList(
-    items: List<GroupItem>,
-    selectedTag: String,
-    isSelectable: Boolean,
-    onItemSelected: (String) -> Unit,
-) {
+private fun ProxyItemsList(items: List<GroupItem>, selectedTag: String, isSelectable: Boolean, onItemSelected: (String) -> Unit) {
     // Cache the chunked items to avoid re-chunking on every recomposition
     val itemsPerRow = 2
     val chunkedItems =
@@ -310,9 +305,9 @@ private fun ProxyItemsList(
     // Use Column with Rows for better control over item sizing
     Column(
         modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+        Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         chunkedItems.forEach { rowItems ->
@@ -344,13 +339,7 @@ private fun ProxyItemsList(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ProxyChip(
-    item: GroupItem,
-    isSelected: Boolean,
-    isSelectable: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
+private fun ProxyChip(item: GroupItem, isSelected: Boolean, isSelectable: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
     // Use simpler, faster animations
     val animatedElevation by animateFloatAsState(
         targetValue = if (isSelected) 6.dp.value else 1.dp.value,
@@ -369,18 +358,18 @@ private fun ProxyChip(
         androidx.compose.foundation.BorderStroke(
             width = if (isSelected) 2.dp else 1.dp,
             color =
-                when {
-                    isSelected -> MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
-                    else -> MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
-                },
+            when {
+                isSelected -> MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                else -> MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+            },
         )
 
     val content: @Composable () -> Unit = {
         Row(
             modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -394,11 +383,11 @@ private fun ProxyChip(
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
                     color =
-                        if (isSelected) {
-                            MaterialTheme.colorScheme.onPrimaryContainer
-                        } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        },
+                    if (isSelected) {
+                        MaterialTheme.colorScheme.onPrimaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -414,11 +403,11 @@ private fun ProxyChip(
                         text = Libbox.proxyDisplayType(item.type),
                         style = MaterialTheme.typography.labelSmall,
                         color =
-                            if (isSelected) {
-                                MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-                            } else {
-                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                            },
+                        if (isSelected) {
+                            MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                        },
                     )
 
                     // Latency
@@ -460,11 +449,7 @@ private fun ProxyChip(
 }
 
 @Composable
-private fun ProxyLatencyBadge(
-    delay: Int,
-    isSelected: Boolean,
-    modifier: Modifier = Modifier,
-) {
+private fun ProxyLatencyBadge(delay: Int, isSelected: Boolean, modifier: Modifier = Modifier) {
     // Direct color calculation without animation for better performance
     val colorScheme = MaterialTheme.colorScheme
     val latencyColor =

@@ -62,7 +62,7 @@ class HookConnectivityManagerProxyChangeAction(private val helper: ConnectivityS
                     }
                     param.result = null
                 }
-            }
+            },
         )
     }
 
@@ -75,11 +75,9 @@ class HookConnectivityManagerProxyChangeAction(private val helper: ConnectivityS
                 override fun beforeHook(param: MethodHookParam) {
                     param.args[0] = emptyProxyInfo()
                 }
-            }
+            },
         )
     }
 
-    private fun emptyProxyInfo(): ProxyInfo {
-        return ProxyInfo.buildDirectProxy("", 0)
-    }
+    private fun emptyProxyInfo(): ProxyInfo = ProxyInfo.buildDirectProxy("", 0)
 }

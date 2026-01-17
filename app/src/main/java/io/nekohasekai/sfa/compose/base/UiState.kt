@@ -8,8 +8,4 @@ sealed class UiState<out T> {
     data class Error(val exception: Throwable, val message: String? = null) : UiState<Nothing>()
 }
 
-data class BaseUiState<T>(
-    val isLoading: Boolean = false,
-    val data: T? = null,
-    val error: String? = null,
-)
+data class BaseUiState<T>(val isLoading: Boolean = false, val data: T? = null, val error: String? = null)

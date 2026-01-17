@@ -1,13 +1,12 @@
 package io.nekohasekai.sfa.bg
 
-import io.nekohasekai.sfa.vendor.PrivilegedServiceUtils
-
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
 import com.topjohnwu.superuser.ipc.RootService
 import io.nekohasekai.sfa.BuildConfig
+import io.nekohasekai.sfa.vendor.PrivilegedServiceUtils
 import java.io.IOException
 
 class RootServer : RootService() {
@@ -17,10 +16,7 @@ class RootServer : RootService() {
             stopSelf()
         }
 
-        override fun getInstalledPackages(
-            flags: Int,
-            userId: Int
-        ): ParceledListSlice<PackageInfo> {
+        override fun getInstalledPackages(flags: Int, userId: Int): ParceledListSlice<PackageInfo> {
             val allPackages = PrivilegedServiceUtils.getInstalledPackages(flags, userId)
             return ParceledListSlice(allPackages)
         }
@@ -30,16 +26,12 @@ class RootServer : RootService() {
             PrivilegedServiceUtils.installPackage(apk, size, userId)
         }
 
-        override fun exportDebugInfo(outputPath: String?): String {
-            return DebugInfoExporter.export(
-                this@RootServer,
-                outputPath!!,
-                BuildConfig.APPLICATION_ID
-            )
-        }
+        override fun exportDebugInfo(outputPath: String?): String = DebugInfoExporter.export(
+            this@RootServer,
+            outputPath!!,
+            BuildConfig.APPLICATION_ID,
+        )
     }
 
-    override fun onBind(intent: Intent): IBinder {
-        return binder
-    }
+    override fun onBind(intent: Intent): IBinder = binder
 }

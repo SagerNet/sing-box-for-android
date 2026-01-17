@@ -54,7 +54,7 @@ object PrivilegeChecker {
                 pm.javaClass.getMethod(
                     "checkUidPermission",
                     String::class.java,
-                    Int::class.javaPrimitiveType
+                    Int::class.javaPrimitiveType,
                 ).also { checkUidPermissionMethod = it }
             }
             for (permission in privilegedPermissions) {
@@ -76,7 +76,7 @@ object PrivilegeChecker {
     private fun isSystemApp(appInfo: ApplicationInfo): Boolean {
         val flags = appInfo.flags
         return flags and ApplicationInfo.FLAG_SYSTEM != 0 ||
-                flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP != 0
+            flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP != 0
     }
 
     private fun isExemptUid(uid: Int): Boolean {
@@ -112,39 +112,35 @@ object PrivilegeChecker {
         }
     }
 
-    private fun getPackageManager(): Any? {
-        return try {
-            getPackageManagerMethod.invoke(null)
-        } catch (_: Throwable) {
-            null
-        }
+    private fun getPackageManager(): Any? = try {
+        getPackageManagerMethod.invoke(null)
+    } catch (_: Throwable) {
+        null
     }
 
-    private fun getApplicationInfo(pm: Any, pkg: String, userId: Int): ApplicationInfo? {
-        return try {
-            val method = getApplicationInfoMethodInt ?: run {
+    private fun getApplicationInfo(pm: Any, pkg: String, userId: Int): ApplicationInfo? = try {
+        val method = getApplicationInfoMethodInt ?: run {
+            pm.javaClass.getMethod(
+                "getApplicationInfo",
+                String::class.java,
+                Int::class.javaPrimitiveType,
+                Int::class.javaPrimitiveType,
+            ).also { getApplicationInfoMethodInt = it }
+        }
+        method.invoke(pm, pkg, 0, userId) as? ApplicationInfo
+    } catch (_: Throwable) {
+        try {
+            val method = getApplicationInfoMethodLong ?: run {
                 pm.javaClass.getMethod(
                     "getApplicationInfo",
                     String::class.java,
+                    Long::class.javaPrimitiveType,
                     Int::class.javaPrimitiveType,
-                    Int::class.javaPrimitiveType
-                ).also { getApplicationInfoMethodInt = it }
+                ).also { getApplicationInfoMethodLong = it }
             }
-            method.invoke(pm, pkg, 0, userId) as? ApplicationInfo
+            method.invoke(pm, pkg, 0L, userId) as? ApplicationInfo
         } catch (_: Throwable) {
-            try {
-                val method = getApplicationInfoMethodLong ?: run {
-                    pm.javaClass.getMethod(
-                        "getApplicationInfo",
-                        String::class.java,
-                        Long::class.javaPrimitiveType,
-                        Int::class.javaPrimitiveType
-                    ).also { getApplicationInfoMethodLong = it }
-                }
-                method.invoke(pm, pkg, 0L, userId) as? ApplicationInfo
-            } catch (_: Throwable) {
-                null
-            }
+            null
         }
     }
 }

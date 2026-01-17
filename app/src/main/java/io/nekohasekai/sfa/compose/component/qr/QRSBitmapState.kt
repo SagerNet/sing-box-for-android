@@ -33,6 +33,7 @@ class QRSBitmapGenerator(
     private val actualBufferSize = bufferSize.coerceAtMost(frames.size)
     private val bitmapBuffer = arrayOfNulls<Bitmap>(actualBufferSize)
     private var generationJob: Job? = null
+
     @Volatile
     private var currentFrameIndex = 0
     private var generatedUpTo = -1

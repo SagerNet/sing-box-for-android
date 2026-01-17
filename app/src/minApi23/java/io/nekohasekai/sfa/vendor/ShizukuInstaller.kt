@@ -12,24 +12,20 @@ object ShizukuInstaller {
 
     private const val SHIZUKU_PERMISSION_REQUEST_CODE = 1001
 
-    fun isAvailable(): Boolean {
-        return try {
-            Shizuku.pingBinder()
-        } catch (e: Exception) {
-            false
-        }
+    fun isAvailable(): Boolean = try {
+        Shizuku.pingBinder()
+    } catch (e: Exception) {
+        false
     }
 
-    fun checkPermission(): Boolean {
-        return try {
-            if (Shizuku.isPreV11()) {
-                false
-            } else {
-                Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED
-            }
-        } catch (e: Exception) {
+    fun checkPermission(): Boolean = try {
+        if (Shizuku.isPreV11()) {
             false
+        } else {
+            Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED
         }
+    } catch (e: Exception) {
+        false
     }
 
     fun requestPermission() {
@@ -38,12 +34,10 @@ object ShizukuInstaller {
         }
     }
 
-    private fun isRunningAsRoot(): Boolean {
-        return try {
-            Shizuku.getUid() == 0
-        } catch (e: Exception) {
-            false
-        }
+    private fun isRunningAsRoot(): Boolean = try {
+        Shizuku.getUid() == 0
+    } catch (e: Exception) {
+        false
     }
 
     suspend fun install(apkFile: File) = withContext(Dispatchers.IO) {

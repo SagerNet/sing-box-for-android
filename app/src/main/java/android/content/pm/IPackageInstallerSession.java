@@ -6,9 +6,9 @@ import android.os.IInterface;
 
 public interface IPackageInstallerSession extends IInterface {
 
-    abstract class Stub extends Binder implements IPackageInstallerSession {
-        public static IPackageInstallerSession asInterface(IBinder binder) {
-            throw new UnsupportedOperationException();
-        }
+  abstract class Stub extends Binder implements IPackageInstallerSession {
+    public static IPackageInstallerSession asInterface(IBinder binder) {
+      throw new UnsupportedOperationException();
     }
+  }
 }

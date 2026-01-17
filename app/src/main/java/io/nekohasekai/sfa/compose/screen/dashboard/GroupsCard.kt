@@ -26,10 +26,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.UnfoldLess
-import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material.icons.filled.UnfoldLess
+import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -58,19 +58,19 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
-import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
-import io.nekohasekai.sfa.compose.screen.dashboard.groups.GroupsViewModel
-import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.compose.model.Group
 import io.nekohasekai.sfa.compose.model.GroupItem
+import io.nekohasekai.sfa.compose.screen.dashboard.groups.GroupsViewModel
+import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
+import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.utils.CommandClient
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -84,12 +84,12 @@ fun GroupsCard(
 ) {
     val actualViewModel: GroupsViewModel = viewModel ?: viewModel(
         factory =
-            object : ViewModelProvider.Factory {
-                override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
-                    @Suppress("UNCHECKED_CAST")
-                    return GroupsViewModel(commandClient) as T
-                }
-            },
+        object : ViewModelProvider.Factory {
+            override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST")
+                return GroupsViewModel(commandClient) as T
+            }
+        },
     )
     val snackbarHostState = remember { SnackbarHostState() }
     val uiState by actualViewModel.uiState.collectAsState()
@@ -104,17 +104,17 @@ fun GroupsCard(
                         IconButton(onClick = { actualViewModel.toggleAllGroups() }) {
                             Icon(
                                 imageVector =
-                                    if (allCollapsed) {
-                                        Icons.Default.UnfoldMore
-                                    } else {
-                                        Icons.Default.UnfoldLess
-                                    },
+                                if (allCollapsed) {
+                                    Icons.Default.UnfoldMore
+                                } else {
+                                    Icons.Default.UnfoldLess
+                                },
                                 contentDescription =
-                                    if (allCollapsed) {
-                                        stringResource(R.string.expand_all)
-                                    } else {
-                                        stringResource(R.string.collapse_all)
-                                    },
+                                if (allCollapsed) {
+                                    stringResource(R.string.expand_all)
+                                } else {
+                                    stringResource(R.string.collapse_all)
+                                },
                             )
                         }
                     }
@@ -186,9 +186,9 @@ private fun GroupsCardContent(
         if (uiState.isLoading) {
             Box(
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .height(200.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
                 contentAlignment = Alignment.Center,
             ) {
                 CircularProgressIndicator()
@@ -196,9 +196,9 @@ private fun GroupsCardContent(
         } else if (uiState.groups.isEmpty()) {
             Box(
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .height(100.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .height(100.dp),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
@@ -216,12 +216,12 @@ private fun GroupsCardContent(
                     .nestedScroll(bounceBlockingConnection),
                 state = lazyListState,
                 contentPadding =
-                    PaddingValues(
-                        start = 16.dp,
-                        end = 16.dp,
-                        top = 8.dp,
-                        bottom = 16.dp,
-                    ),
+                PaddingValues(
+                    start = 16.dp,
+                    end = 16.dp,
+                    top = 8.dp,
+                    bottom = 16.dp,
+                ),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 items(
@@ -347,17 +347,17 @@ private fun ProxyGroupItem(
                                 imageVector = Icons.Default.ExpandMore,
                                 contentDescription = if (isExpanded) "Collapse" else "Expand",
                                 modifier =
-                                    Modifier
-                                        .size(24.dp)
-                                        .graphicsLayer { rotationZ = rotationAngle },
+                                Modifier
+                                    .size(24.dp)
+                                    .graphicsLayer { rotationZ = rotationAngle },
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                     },
                     colors =
-                        ListItemDefaults.colors(
-                            containerColor = Color.Transparent,
-                        ),
+                    ListItemDefaults.colors(
+                        containerColor = Color.Transparent,
+                    ),
                 )
             }
 
@@ -365,21 +365,21 @@ private fun ProxyGroupItem(
             AnimatedVisibility(
                 visible = isExpanded && group.items.isNotEmpty(),
                 enter =
-                    expandVertically(animationSpec = tween(300)) +
-                        fadeIn(
-                            animationSpec =
-                                tween(
-                                    300,
-                                ),
+                expandVertically(animationSpec = tween(300)) +
+                    fadeIn(
+                        animationSpec =
+                        tween(
+                            300,
                         ),
+                    ),
                 exit =
-                    shrinkVertically(animationSpec = tween(300)) +
-                        fadeOut(
-                            animationSpec =
-                                tween(
-                                    300,
-                                ),
+                shrinkVertically(animationSpec = tween(300)) +
+                    fadeOut(
+                        animationSpec =
+                        tween(
+                            300,
                         ),
+                    ),
             ) {
                 Column {
                     HorizontalDivider(
@@ -401,12 +401,7 @@ private fun ProxyGroupItem(
 }
 
 @Composable
-private fun ProxyItemsList(
-    items: List<GroupItem>,
-    selectedTag: String,
-    isSelectable: Boolean,
-    onItemSelected: (String) -> Unit,
-) {
+private fun ProxyItemsList(items: List<GroupItem>, selectedTag: String, isSelectable: Boolean, onItemSelected: (String) -> Unit) {
     val itemsPerRow = 2
     val chunkedItems =
         remember(items) {
@@ -415,9 +410,9 @@ private fun ProxyItemsList(
 
     Column(
         modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+        Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         chunkedItems.forEach { rowItems ->
@@ -450,13 +445,7 @@ private fun ProxyItemsList(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ProxyChip(
-    item: GroupItem,
-    isSelected: Boolean,
-    isSelectable: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
+private fun ProxyChip(item: GroupItem, isSelected: Boolean, isSelectable: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
     // Use simpler, faster animations
     val animatedElevation by animateFloatAsState(
         targetValue = if (isSelected) 6.dp.value else 1.dp.value,
@@ -475,18 +464,18 @@ private fun ProxyChip(
         androidx.compose.foundation.BorderStroke(
             width = if (isSelected) 2.dp else 1.dp,
             color =
-                when {
-                    isSelected -> MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
-                    else -> MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
-                },
+            when {
+                isSelected -> MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                else -> MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+            },
         )
 
     val content: @Composable () -> Unit = {
         Row(
             modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -500,11 +489,11 @@ private fun ProxyChip(
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
                     color =
-                        if (isSelected) {
-                            MaterialTheme.colorScheme.onPrimaryContainer
-                        } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        },
+                    if (isSelected) {
+                        MaterialTheme.colorScheme.onPrimaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -520,11 +509,11 @@ private fun ProxyChip(
                         text = Libbox.proxyDisplayType(item.type),
                         style = MaterialTheme.typography.labelSmall,
                         color =
-                            if (isSelected) {
-                                MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-                            } else {
-                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                            },
+                        if (isSelected) {
+                            MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                        },
                     )
 
                     // Latency
@@ -566,11 +555,7 @@ private fun ProxyChip(
 }
 
 @Composable
-private fun ProxyLatencyBadge(
-    delay: Int,
-    isSelected: Boolean,
-    modifier: Modifier = Modifier,
-) {
+private fun ProxyLatencyBadge(delay: Int, isSelected: Boolean, modifier: Modifier = Modifier) {
     // Direct color calculation without animation for better performance
     val colorScheme = MaterialTheme.colorScheme
     val latencyColor =
@@ -624,15 +609,9 @@ private fun ProxyLatencyBadge(
 }
 
 @Composable
-private fun rememberBounceBlockingNestedScrollConnection(
-    lazyListState: LazyListState
-): NestedScrollConnection = remember(lazyListState) {
+private fun rememberBounceBlockingNestedScrollConnection(lazyListState: LazyListState): NestedScrollConnection = remember(lazyListState) {
     object : NestedScrollConnection {
-        override fun onPostScroll(
-            consumed: Offset,
-            available: Offset,
-            source: NestedScrollSource
-        ): Offset {
+        override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
             // Only block upward scroll (y < 0) at bottom to prevent sheet expansion
             // Allow downward scroll (y > 0) at top to let sheet collapse
             return if (available.y < 0) available else Offset.Zero

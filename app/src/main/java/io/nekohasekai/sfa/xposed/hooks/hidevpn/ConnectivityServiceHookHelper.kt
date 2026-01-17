@@ -103,7 +103,7 @@ class ConnectivityServiceHookHelper(private val classLoader: ClassLoader) : XHoo
                 "getFilteredNetworkInfo",
                 naiClass,
                 intType,
-                booleanType
+                booleanType,
             )
             if (getFilteredNetworkInfoMethod == null) {
                 HookErrorStore.w(SOURCE, "getFilteredNetworkInfo not found; network info sanitization disabled")
@@ -423,9 +423,7 @@ class ConnectivityServiceHookHelper(private val classLoader: ClassLoader) : XHoo
         return isVpnNai(nai)
     }
 
-    fun isVpnNai(nai: Any): Boolean {
-        return isVPNMethod.invoke(nai) as Boolean
-    }
+    fun isVpnNai(nai: Any): Boolean = isVPNMethod.invoke(nai) as Boolean
 
     fun getUnderlyingNetwork(connectivityService: Any, uid: Int): Network? {
         val nai = getUnderlyingNai(connectivityService, uid) ?: return null
@@ -465,11 +463,7 @@ class ConnectivityServiceHookHelper(private val classLoader: ClassLoader) : XHoo
         return null
     }
 
-    private fun findDeclaredMethod(
-        target: Class<*>,
-        name: String,
-        vararg parameterTypes: Class<*>,
-    ): Method? {
+    private fun findDeclaredMethod(target: Class<*>, name: String, vararg parameterTypes: Class<*>): Method? {
         var current: Class<*>? = target
         while (current != null) {
             try {
@@ -481,14 +475,8 @@ class ConnectivityServiceHookHelper(private val classLoader: ClassLoader) : XHoo
         return null
     }
 
-    private fun requireDeclaredMethod(
-        target: Class<*>,
-        name: String,
-        vararg parameterTypes: Class<*>,
-    ): Method {
-        return findDeclaredMethod(target, name, *parameterTypes)
-            ?: throw NoSuchMethodException("${target.name}#$name")
-    }
+    private fun requireDeclaredMethod(target: Class<*>, name: String, vararg parameterTypes: Class<*>): Method = findDeclaredMethod(target, name, *parameterTypes)
+        ?: throw NoSuchMethodException("${target.name}#$name")
 
     /**
      * Resolves a class from the Connectivity module, handling APEX package rewriting.

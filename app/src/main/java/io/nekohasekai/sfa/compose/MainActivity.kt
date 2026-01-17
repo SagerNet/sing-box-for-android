@@ -16,34 +16,29 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.UnfoldLess
 import androidx.compose.material.icons.filled.UnfoldMore
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.CircularProgressIndicator
-import dev.jeziellago.compose.markdowntext.MarkdownText
 import androidx.compose.material3.Badge
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.Job
 import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -53,9 +48,9 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -69,9 +64,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -81,6 +79,7 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import dev.jeziellago.compose.markdowntext.MarkdownText
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.BuildConfig
@@ -91,25 +90,24 @@ import io.nekohasekai.sfa.compose.base.GlobalEventBus
 import io.nekohasekai.sfa.compose.base.SelectableMessageDialog
 import io.nekohasekai.sfa.compose.base.UiEvent
 import io.nekohasekai.sfa.compose.component.ServiceStatusBar
-import io.nekohasekai.sfa.compose.component.UptimeText
 import io.nekohasekai.sfa.compose.component.UpdateAvailableDialog
+import io.nekohasekai.sfa.compose.component.UptimeText
 import io.nekohasekai.sfa.compose.navigation.NewProfileArgs
 import io.nekohasekai.sfa.compose.navigation.ProfileRoutes
 import io.nekohasekai.sfa.compose.navigation.SFANavHost
 import io.nekohasekai.sfa.compose.navigation.Screen
 import io.nekohasekai.sfa.compose.navigation.bottomNavigationScreens
-import io.nekohasekai.sfa.compose.topbar.LocalTopBarController
-import io.nekohasekai.sfa.compose.topbar.TopBarEntry
-import io.nekohasekai.sfa.compose.topbar.TopBarController
-import io.nekohasekai.sfa.compose.screen.dashboard.CardGroup
-import io.nekohasekai.sfa.compose.screen.dashboard.DashboardViewModel
-import io.nekohasekai.sfa.compose.screen.dashboard.GroupsCard
 import io.nekohasekai.sfa.compose.screen.connections.ConnectionDetailsScreen
 import io.nekohasekai.sfa.compose.screen.connections.ConnectionsPage
 import io.nekohasekai.sfa.compose.screen.connections.ConnectionsViewModel
+import io.nekohasekai.sfa.compose.screen.dashboard.DashboardViewModel
+import io.nekohasekai.sfa.compose.screen.dashboard.GroupsCard
 import io.nekohasekai.sfa.compose.screen.dashboard.groups.GroupsViewModel
 import io.nekohasekai.sfa.compose.screen.log.LogViewModel
 import io.nekohasekai.sfa.compose.theme.SFATheme
+import io.nekohasekai.sfa.compose.topbar.LocalTopBarController
+import io.nekohasekai.sfa.compose.topbar.TopBarController
+import io.nekohasekai.sfa.compose.topbar.TopBarEntry
 import io.nekohasekai.sfa.constant.Alert
 import io.nekohasekai.sfa.constant.ServiceMode
 import io.nekohasekai.sfa.constant.Status
@@ -119,10 +117,13 @@ import io.nekohasekai.sfa.ktx.launchCustomTab
 import io.nekohasekai.sfa.update.UpdateState
 import io.nekohasekai.sfa.vendor.Vendor
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class MainActivity : ComponentActivity(), ServiceConnection.Callback {
+class MainActivity :
+    ComponentActivity(),
+    ServiceConnection.Callback {
     private val connection = ServiceConnection(this, this)
     private lateinit var dashboardViewModel: DashboardViewModel
     private var currentServiceStatus by mutableStateOf(Status.Stopped)
@@ -253,21 +254,20 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
         }
     }
 
-    private suspend fun prepare() =
-        withContext(Dispatchers.Main) {
-            try {
-                val intent = VpnService.prepare(this@MainActivity)
-                if (intent != null) {
-                    prepareLauncher.launch(intent)
-                    true
-                } else {
-                    false
-                }
-            } catch (e: Exception) {
-                onServiceAlert(Alert.RequestVPNPermission, e.message)
+    private suspend fun prepare() = withContext(Dispatchers.Main) {
+        try {
+            val intent = VpnService.prepare(this@MainActivity)
+            if (intent != null) {
+                prepareLauncher.launch(intent)
                 true
+            } else {
+                false
             }
+        } catch (e: Exception) {
+            onServiceAlert(Alert.RequestVPNPermission, e.message)
+            true
         }
+    }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -388,8 +388,11 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
                 text = {
                     MarkdownText(
                         markdown = stringResource(
-                            if (BuildConfig.FLAVOR == "play") R.string.check_update_prompt_play
-                            else R.string.check_update_prompt_github
+                            if (BuildConfig.FLAVOR == "play") {
+                                R.string.check_update_prompt_play
+                            } else {
+                                R.string.check_update_prompt_github
+                            },
                         ),
                         style = MaterialTheme.typography.bodyMedium,
                     )
@@ -534,7 +537,7 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
                             @Suppress("UNCHECKED_CAST")
                             return GroupsViewModel(dashboardViewModel.commandClient) as T
                         }
-                    }
+                    },
                 )
             } else {
                 null
@@ -729,17 +732,17 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
                                 icon = {
                                     Icon(
                                         imageVector =
-                                            if (isRunning || isStopping) {
-                                                Icons.Default.Stop
-                                            } else {
-                                                Icons.Default.PlayArrow
-                                            },
+                                        if (isRunning || isStopping) {
+                                            Icons.Default.Stop
+                                        } else {
+                                            Icons.Default.PlayArrow
+                                        },
                                         contentDescription =
-                                            if (isRunning || isStopping) {
-                                                stringResource(R.string.stop)
-                                            } else {
-                                                stringResource(R.string.action_start)
-                                            },
+                                        if (isRunning || isStopping) {
+                                            stringResource(R.string.stop)
+                                        } else {
+                                            stringResource(R.string.action_start)
+                                        },
                                     )
                                 },
                                 text = {
@@ -873,9 +876,9 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
                                         },
                                         label = { Text(stringResource(screen.titleRes)) },
                                         selected =
-                                            currentDestination?.hierarchy?.any {
-                                                it.route == screen.route
-                                            } == true,
+                                        currentDestination?.hierarchy?.any {
+                                            it.route == screen.route
+                                        } == true,
                                         onClick = {
                                             navController.navigate(screen.route) {
                                                 // Pop up to the start destination of the graph to
@@ -909,7 +912,7 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
                         @Suppress("UNCHECKED_CAST")
                         return GroupsViewModel(dashboardViewModel.commandClient) as T
                     }
-                }
+                },
             )
             val groupsUiState by groupsViewModel.uiState.collectAsState()
             val allCollapsed = groupsUiState.expandedGroups.isEmpty()
@@ -943,12 +946,16 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
                         if (groupsUiState.groups.isNotEmpty()) {
                             IconButton(onClick = { groupsViewModel.toggleAllGroups() }) {
                                 Icon(
-                                    imageVector = if (allCollapsed) Icons.Default.UnfoldMore
-                                                  else Icons.Default.UnfoldLess,
-                                    contentDescription = if (allCollapsed)
+                                    imageVector = if (allCollapsed) {
+                                        Icons.Default.UnfoldMore
+                                    } else {
+                                        Icons.Default.UnfoldLess
+                                    },
+                                    contentDescription = if (allCollapsed) {
                                         stringResource(R.string.expand_all)
-                                    else
-                                        stringResource(R.string.collapse_all),
+                                    } else {
+                                        stringResource(R.string.collapse_all)
+                                    },
                                 )
                             }
                         }
@@ -1032,10 +1039,7 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
         connection.reconnect()
     }
 
-    override fun onServiceAlert(
-        type: Alert,
-        message: String?,
-    ) {
+    override fun onServiceAlert(type: Alert, message: String?) {
         when (type) {
             Alert.RequestLocationPermission -> {
                 return requestLocationPermission()
@@ -1071,11 +1075,7 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
     }
 
     @Composable
-    private fun ServiceAlertDialog(
-        alertType: Alert,
-        message: String?,
-        onDismiss: () -> Unit,
-    ) {
+    private fun ServiceAlertDialog(alertType: Alert, message: String?, onDismiss: () -> Unit) {
         val title =
             when (alertType) {
                 Alert.RequestNotificationPermission -> stringResource(R.string.notification_permission_title)
@@ -1106,10 +1106,7 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
     }
 
     @Composable
-    private fun LocationPermissionDialog(
-        onConfirm: () -> Unit,
-        onDismiss: () -> Unit,
-    ) {
+    private fun LocationPermissionDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
         AlertDialog(
             onDismissRequest = onDismiss,
             title = { Text(stringResource(R.string.location_permission_title)) },
@@ -1128,10 +1125,7 @@ class MainActivity : ComponentActivity(), ServiceConnection.Callback {
     }
 
     @Composable
-    private fun BackgroundLocationPermissionDialog(
-        onConfirm: () -> Unit,
-        onDismiss: () -> Unit,
-    ) {
+    private fun BackgroundLocationPermissionDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
         AlertDialog(
             onDismissRequest = onDismiss,
             title = { Text(stringResource(R.string.location_permission_title)) },

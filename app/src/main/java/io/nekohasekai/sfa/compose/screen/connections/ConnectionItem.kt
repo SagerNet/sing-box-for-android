@@ -45,16 +45,13 @@ import androidx.compose.ui.unit.dp
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.model.Connection
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 private fun Drawable.toBitmap(): Bitmap {
     if (this is BitmapDrawable) return bitmap
     val bitmap = Bitmap.createBitmap(
         intrinsicWidth.coerceAtLeast(1),
         intrinsicHeight.coerceAtLeast(1),
-        Bitmap.Config.ARGB_8888
+        Bitmap.Config.ARGB_8888,
     )
     val canvas = Canvas(bitmap)
     setBounds(0, 0, canvas.width, canvas.height)
@@ -62,10 +59,7 @@ private fun Drawable.toBitmap(): Bitmap {
     return bitmap
 }
 
-data class AppInfo(
-    val icon: ImageBitmap,
-    val label: String,
-)
+data class AppInfo(val icon: ImageBitmap, val label: String)
 
 @Composable
 private fun rememberAppInfo(packageName: String): AppInfo? {
@@ -86,12 +80,7 @@ private fun rememberAppInfo(packageName: String): AppInfo? {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ConnectionItem(
-    connection: Connection,
-    onClick: () -> Unit,
-    onClose: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
+fun ConnectionItem(connection: Connection, onClick: () -> Unit, onClose: () -> Unit, modifier: Modifier = Modifier) {
     var showContextMenu by remember { mutableStateOf(false) }
     val packageName = connection.processInfo?.packageName?.takeIf { it.isNotEmpty() }
     val appInfo = packageName?.let { rememberAppInfo(it) }

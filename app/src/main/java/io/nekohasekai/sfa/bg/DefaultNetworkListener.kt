@@ -60,103 +60,102 @@ object DefaultNetworkListener {
             val listeners = mutableMapOf<Any, (Network?) -> Unit>()
             var network: Network? = null
             val pendingRequests = arrayListOf<NetworkMessage.Get>()
-            for (message in channel) when (message) {
-                is NetworkMessage.Start -> {
-                    if (listeners.isEmpty()) register()
-                    listeners[message.key] = message.listener
-                    if (network != null) message.listener(network)
-                }
-
-                is NetworkMessage.Get -> {
-                    check(listeners.isNotEmpty()) { "Getting network without any listeners is not supported" }
-                    if (network == null) {
-                        pendingRequests += message
-                    } else {
-                        message.response.complete(
-                            network,
-                        )
-                    }
-                }
-
-                is NetworkMessage.Stop ->
-                    if (listeners.isNotEmpty() && // was not empty
-                        listeners.remove(message.key) != null && listeners.isEmpty()
-                    ) {
-                        network = null
-                        unregister()
+            for (message in channel) {
+                when (message) {
+                    is NetworkMessage.Start -> {
+                        if (listeners.isEmpty()) register()
+                        listeners[message.key] = message.listener
+                        if (network != null) message.listener(network)
                     }
 
-                is NetworkMessage.Put -> {
-                    network = message.network
-                    pendingRequests.forEach { it.response.complete(message.network) }
-                    pendingRequests.clear()
-                    listeners.values.forEach { it(network) }
-                }
-
-                is NetworkMessage.Update ->
-                    if (network == message.network) {
-                        listeners.values.forEach {
-                            it(
+                    is NetworkMessage.Get -> {
+                        check(listeners.isNotEmpty()) { "Getting network without any listeners is not supported" }
+                        if (network == null) {
+                            pendingRequests += message
+                        } else {
+                            message.response.complete(
                                 network,
                             )
                         }
                     }
 
-                is NetworkMessage.Lost ->
-                    if (network == message.network) {
-                        network = null
-                        listeners.values.forEach { it(null) }
+                    is NetworkMessage.Stop ->
+                        if (listeners.isNotEmpty() &&
+                            // was not empty
+                            listeners.remove(message.key) != null &&
+                            listeners.isEmpty()
+                        ) {
+                            network = null
+                            unregister()
+                        }
+
+                    is NetworkMessage.Put -> {
+                        network = message.network
+                        pendingRequests.forEach { it.response.complete(message.network) }
+                        pendingRequests.clear()
+                        listeners.values.forEach { it(network) }
                     }
+
+                    is NetworkMessage.Update ->
+                        if (network == message.network) {
+                            listeners.values.forEach {
+                                it(
+                                    network,
+                                )
+                            }
+                        }
+
+                    is NetworkMessage.Lost ->
+                        if (network == message.network) {
+                            network = null
+                            listeners.values.forEach { it(null) }
+                        }
+                }
             }
         }
 
-    suspend fun start(
-        key: Any,
-        listener: (Network?) -> Unit,
-    ) = networkActor.send(
+    suspend fun start(key: Any, listener: (Network?) -> Unit) = networkActor.send(
         NetworkMessage.Start(
             key,
             listener,
         ),
     )
 
-    suspend fun get(): Network = if (fallback) @TargetApi(23) {
+    suspend fun get(): Network = if (fallback) {
+        @TargetApi(23)
         Application.connectivity.activeNetwork
             ?: error("missing default network") // failed to listen, return current if available
-    } else NetworkMessage.Get().run {
-        networkActor.send(this)
-        response.await()
+    } else {
+        NetworkMessage.Get().run {
+            networkActor.send(this)
+            response.await()
+        }
     }
 
     suspend fun stop(key: Any) = networkActor.send(NetworkMessage.Stop(key))
 
     // NB: this runs in ConnectivityThread, and this behavior cannot be changed until API 26
     private object Callback : ConnectivityManager.NetworkCallback() {
-        override fun onAvailable(network: Network) =
-            runBlocking {
-                networkActor.send(
-                    NetworkMessage.Put(
-                        network,
-                    ),
-                )
-            }
+        override fun onAvailable(network: Network) = runBlocking {
+            networkActor.send(
+                NetworkMessage.Put(
+                    network,
+                ),
+            )
+        }
 
-        override fun onCapabilitiesChanged(
-            network: Network,
-            networkCapabilities: NetworkCapabilities,
-        ) {
+        override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
             // it's a good idea to refresh capabilities
             runBlocking { networkActor.send(NetworkMessage.Update(network)) }
         }
 
-        override fun onLost(network: Network) =
-            runBlocking {
-                networkActor.send(
-                    NetworkMessage.Lost(
-                        network,
-                    ),
-                )
-            }
+        override fun onLost(network: Network) = runBlocking {
+            networkActor.send(
+                NetworkMessage.Lost(
+                    network,
+                ),
+            )
+        }
     }
 
     private var fallback = false

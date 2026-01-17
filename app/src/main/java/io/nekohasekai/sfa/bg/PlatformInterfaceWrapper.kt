@@ -27,9 +27,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 import io.nekohasekai.libbox.NetworkInterface as LibboxNetworkInterface
 
 interface PlatformInterfaceWrapper : PlatformInterface {
-    override fun usePlatformAutoDetectInterfaceControl(): Boolean {
-        return true
-    }
+    override fun usePlatformAutoDetectInterfaceControl(): Boolean = true
 
     override fun autoDetectInterfaceControl(fd: Int) {
     }
@@ -38,9 +36,7 @@ interface PlatformInterfaceWrapper : PlatformInterface {
         error("invalid argument")
     }
 
-    override fun useProcFS(): Boolean {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
-    }
+    override fun useProcFS(): Boolean = Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun findConnectionOwner(
@@ -136,13 +132,9 @@ interface PlatformInterfaceWrapper : PlatformInterface {
         return InterfaceArray(interfaces.iterator())
     }
 
-    override fun underNetworkExtension(): Boolean {
-        return false
-    }
+    override fun underNetworkExtension(): Boolean = false
 
-    override fun includeAllNetworks(): Boolean {
-        return false
-    }
+    override fun includeAllNetworks(): Boolean = false
 
     override fun clearDNSCache() {
     }
@@ -161,9 +153,7 @@ interface PlatformInterfaceWrapper : PlatformInterface {
         return WIFIState(ssid, wifiInfo.bssid)
     }
 
-    override fun localDNSTransport(): LocalDNSTransport? {
-        return LocalResolver
-    }
+    override fun localDNSTransport(): LocalDNSTransport? = LocalResolver
 
     @OptIn(ExperimentalEncodingApi::class)
     override fun systemCertificates(): StringIterator {
@@ -182,15 +172,10 @@ interface PlatformInterfaceWrapper : PlatformInterface {
         return StringArray(certificates.iterator())
     }
 
-    private class InterfaceArray(private val iterator: Iterator<LibboxNetworkInterface>) :
-        NetworkInterfaceIterator {
-        override fun hasNext(): Boolean {
-            return iterator.hasNext()
-        }
+    private class InterfaceArray(private val iterator: Iterator<LibboxNetworkInterface>) : NetworkInterfaceIterator {
+        override fun hasNext(): Boolean = iterator.hasNext()
 
-        override fun next(): LibboxNetworkInterface {
-            return iterator.next()
-        }
+        override fun next(): LibboxNetworkInterface = iterator.next()
     }
 
     class StringArray(private val iterator: Iterator<String>) : StringIterator {
@@ -199,21 +184,15 @@ interface PlatformInterfaceWrapper : PlatformInterface {
             return 0
         }
 
-        override fun hasNext(): Boolean {
-            return iterator.hasNext()
-        }
+        override fun hasNext(): Boolean = iterator.hasNext()
 
-        override fun next(): String {
-            return iterator.next()
-        }
+        override fun next(): String = iterator.next()
     }
 
-    private fun InterfaceAddress.toPrefix(): String {
-        return if (address is Inet6Address) {
-            "${Inet6Address.getByAddress(address.address).hostAddress}/$networkPrefixLength"
-        } else {
-            "${address.hostAddress}/$networkPrefixLength"
-        }
+    private fun InterfaceAddress.toPrefix(): String = if (address is Inet6Address) {
+        "${Inet6Address.getByAddress(address.address).hostAddress}/$networkPrefixLength"
+    } else {
+        "${address.hostAddress}/$networkPrefixLength"
     }
 
     private val NetworkInterface.flags: Int

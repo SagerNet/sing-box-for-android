@@ -7,12 +7,16 @@ import java.util.concurrent.ConcurrentHashMap
 object PrivilegeSettingsStore {
     private const val SETTINGS_DIR = "/data/system/sing-box"
     private const val SETTINGS_FILE = "privilege_settings.conf"
+
     @Volatile
     private var enabled = false
+
     @Volatile
     private var packageSet: Set<String> = emptySet()
+
     @Volatile
     private var interfaceRenameEnabled = false
+
     @Volatile
     private var interfacePrefix = "en"
     private val uidCache = ConcurrentHashMap<Int, Boolean>()
@@ -21,12 +25,7 @@ object PrivilegeSettingsStore {
     private val getPackageManagerMethod by lazy { appGlobalsClass.getMethod("getPackageManager") }
     private var getPackagesForUidMethod: Method? = null
 
-    fun update(
-        enabled: Boolean,
-        packages: Set<String>,
-        interfaceRenameEnabled: Boolean,
-        interfacePrefix: String,
-    ) {
+    fun update(enabled: Boolean, packages: Set<String>, interfaceRenameEnabled: Boolean, interfacePrefix: String) {
         this.enabled = enabled
         packageSet = packages
         this.interfaceRenameEnabled = interfaceRenameEnabled
@@ -41,9 +40,7 @@ object PrivilegeSettingsStore {
 
     fun isEnabled(): Boolean = enabled
 
-    fun shouldRenameInterface(): Boolean {
-        return interfaceRenameEnabled
-    }
+    fun shouldRenameInterface(): Boolean = interfaceRenameEnabled
 
     fun interfacePrefix(): String = interfacePrefix
 
@@ -131,12 +128,10 @@ object PrivilegeSettingsStore {
         }
     }
 
-    private fun getPackageManager(): Any? {
-        return try {
-            getPackageManagerMethod.invoke(null)
-        } catch (e: Throwable) {
-            HookErrorStore.e("PrivilegeSettingsStore", "getPackageManager failed", e)
-            null
-        }
+    private fun getPackageManager(): Any? = try {
+        getPackageManagerMethod.invoke(null)
+    } catch (e: Throwable) {
+        HookErrorStore.e("PrivilegeSettingsStore", "getPackageManager failed", e)
+        null
     }
 }

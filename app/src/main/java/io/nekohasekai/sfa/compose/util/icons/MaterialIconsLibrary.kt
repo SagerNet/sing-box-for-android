@@ -52,16 +52,12 @@ object MaterialIconsLibrary {
     /**
      * Get all icons from all categories
      */
-    fun getAllIcons(): List<ProfileIcon> {
-        return categories.flatMap { it.icons }
-    }
+    fun getAllIcons(): List<ProfileIcon> = categories.flatMap { it.icons }
 
     /**
      * Get an icon by its ID
      */
-    fun getIconById(id: String): ImageVector? {
-        return getAllIcons().find { it.id == id }?.icon
-    }
+    fun getIconById(id: String): ImageVector? = getAllIcons().find { it.id == id }?.icon
 
     /**
      * Get the category name for a given icon ID
@@ -91,22 +87,16 @@ object MaterialIconsLibrary {
     /**
      * Get icons by category name
      */
-    fun getIconsByCategory(categoryName: String): List<ProfileIcon> {
-        return categories.find { it.name.equals(categoryName, ignoreCase = true) }?.icons
-            ?: emptyList()
-    }
+    fun getIconsByCategory(categoryName: String): List<ProfileIcon> = categories.find { it.name.equals(categoryName, ignoreCase = true) }?.icons
+        ?: emptyList()
 
     /**
      * Get total number of icons in the library
      */
-    fun getTotalIconCount(): Int {
-        return categories.sumOf { it.icons.size }
-    }
+    fun getTotalIconCount(): Int = categories.sumOf { it.icons.size }
 
     /**
      * Get category names
      */
-    fun getCategoryNames(): List<String> {
-        return categories.map { it.name }
-    }
+    fun getCategoryNames(): List<String> = categories.map { it.name }
 }

@@ -20,7 +20,7 @@ class HookConnectivityManagerGetActiveNetwork(private val helper: ConnectivitySe
                     val replacement = helper.getUnderlyingNetwork(param.thisObject, uid) ?: return
                     param.result = replacement
                 }
-            }
+            },
         )
 
         XposedHelpers.findAndHookMethod(
@@ -35,7 +35,7 @@ class HookConnectivityManagerGetActiveNetwork(private val helper: ConnectivitySe
                     val replacement = helper.getUnderlyingNetwork(param.thisObject, uid) ?: return
                     param.result = replacement
                 }
-            }
+            },
         )
     }
 }

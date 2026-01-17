@@ -6,6 +6,4 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
 
 @Suppress("UNUSED_PARAMETER")
-fun LazyItemScope.animateItemCompat(
-    placementSpec: FiniteAnimationSpec<IntOffset>,
-): Modifier = Modifier
+fun LazyItemScope.animateItemCompat(placementSpec: FiniteAnimationSpec<IntOffset>): Modifier = Modifier

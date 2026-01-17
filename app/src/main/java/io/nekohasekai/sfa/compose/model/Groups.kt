@@ -24,12 +24,7 @@ data class Group(
 }
 
 @Immutable
-data class GroupItem(
-    val tag: String,
-    val type: String,
-    val urlTestTime: Long,
-    val urlTestDelay: Int,
-) {
+data class GroupItem(val tag: String, val type: String, val urlTestTime: Long, val urlTestDelay: Int) {
     constructor(item: OutboundGroupItem) : this(
         item.tag,
         item.type,

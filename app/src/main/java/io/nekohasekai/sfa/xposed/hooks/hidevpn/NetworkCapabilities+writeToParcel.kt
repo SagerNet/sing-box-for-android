@@ -21,11 +21,11 @@ class HookNetworkCapabilitiesWriteToParcel : XHook {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
             NetworkCapabilities::class.java.getDeclaredConstructor(
                 NetworkCapabilities::class.java,
-                Long::class.javaPrimitiveType
+                Long::class.javaPrimitiveType,
             ).apply { isAccessible = true }
         } else {
             NetworkCapabilities::class.java.getDeclaredConstructor(
-                NetworkCapabilities::class.java
+                NetworkCapabilities::class.java,
             ).apply { isAccessible = true }
         }
     }
@@ -75,12 +75,10 @@ class HookNetworkCapabilitiesWriteToParcel : XHook {
         HookErrorStore.i(SOURCE, "Hooked NetworkCapabilities.writeToParcel (sender)")
     }
 
-    private fun copyNetworkCapabilities(caps: NetworkCapabilities): NetworkCapabilities {
-        return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-            copyCtor.newInstance(caps, 0L) as NetworkCapabilities
-        } else {
-            copyCtor.newInstance(caps) as NetworkCapabilities
-        }
+    private fun copyNetworkCapabilities(caps: NetworkCapabilities): NetworkCapabilities = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+        copyCtor.newInstance(caps, 0L) as NetworkCapabilities
+    } else {
+        copyCtor.newInstance(caps) as NetworkCapabilities
     }
 
     private fun sanitizeNetworkCapabilities(caps: NetworkCapabilities) {

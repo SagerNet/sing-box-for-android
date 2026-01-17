@@ -3,13 +3,13 @@ package io.nekohasekai.sfa.ktx
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.FileProvider
-import androidx.appcompat.R as AppCompatR
 import io.nekohasekai.libbox.ProfileContent
 import io.nekohasekai.sfa.database.Profile
 import io.nekohasekai.sfa.database.TypedProfile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
+import androidx.appcompat.R as AppCompatR
 
 suspend fun Context.shareProfile(profile: Profile) {
     val content = ProfileContent()

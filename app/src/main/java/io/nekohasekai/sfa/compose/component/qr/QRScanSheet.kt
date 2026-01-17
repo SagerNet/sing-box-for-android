@@ -40,8 +40,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
@@ -54,18 +54,14 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.compose.screen.qrscan.QRCodeCropArea
 import io.nekohasekai.sfa.compose.screen.qrscan.QRScanResult
 import io.nekohasekai.sfa.compose.screen.qrscan.QRScanViewModel
-import io.nekohasekai.sfa.compose.screen.qrscan.QRCodeCropArea
 import kotlin.math.max
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun QRScanSheet(
-    onDismiss: () -> Unit,
-    onScanResult: (QRScanResult) -> Unit,
-    viewModel: QRScanViewModel = viewModel(),
-) {
+fun QRScanSheet(onDismiss: () -> Unit, onScanResult: (QRScanResult) -> Unit, viewModel: QRScanViewModel = viewModel()) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -74,12 +70,12 @@ fun QRScanSheet(
     var hasPermission by remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
-                PackageManager.PERMISSION_GRANTED
+                PackageManager.PERMISSION_GRANTED,
         )
     }
 
     val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
+        contract = ActivityResultContracts.RequestPermission(),
     ) { isGranted ->
         if (isGranted) {
             hasPermission = true
@@ -113,7 +109,7 @@ fun QRScanSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.9f)
+                .fillMaxHeight(0.9f),
         ) {
             Row(
                 modifier = Modifier
@@ -138,44 +134,44 @@ fun QRScanSheet(
                     }
                     DropdownMenu(
                         expanded = showMenu,
-                        onDismissRequest = { showMenu = false }
+                        onDismissRequest = { showMenu = false },
                     ) {
                         DropdownMenuItem(
                             text = {
                                 Text(
                                     (if (uiState.useFrontCamera) "✓ " else "   ") +
-                                        stringResource(R.string.profile_add_scan_use_front_camera)
+                                        stringResource(R.string.profile_add_scan_use_front_camera),
                                 )
                             },
                             onClick = {
                                 viewModel.toggleFrontCamera(lifecycleOwner)
                                 showMenu = false
-                            }
+                            },
                         )
                         DropdownMenuItem(
                             text = {
                                 Text(
                                     (if (uiState.torchEnabled) "✓ " else "   ") +
-                                        stringResource(R.string.profile_add_scan_enable_torch)
+                                        stringResource(R.string.profile_add_scan_enable_torch),
                                 )
                             },
                             onClick = {
                                 viewModel.toggleTorch()
                                 showMenu = false
-                            }
+                            },
                         )
                         if (uiState.vendorAnalyzerAvailable) {
                             DropdownMenuItem(
                                 text = {
                                     Text(
                                         (if (uiState.useVendorAnalyzer) "✓ " else "   ") +
-                                            stringResource(R.string.profile_add_scan_use_vendor_analyzer)
+                                            stringResource(R.string.profile_add_scan_use_vendor_analyzer),
                                     )
                                 },
                                 onClick = {
                                     viewModel.toggleVendorAnalyzer()
                                     showMenu = false
-                                }
+                                },
                             )
                         }
                     }
@@ -185,7 +181,7 @@ fun QRScanSheet(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .weight(1f),
             ) {
                 if (hasPermission) {
                     CameraPreview(
@@ -201,7 +197,7 @@ fun QRScanSheet(
                         modifier = Modifier
                             .fillMaxSize()
                             .background(MaterialTheme.colorScheme.surface),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         CircularProgressIndicator()
                     }
@@ -214,7 +210,7 @@ fun QRScanSheet(
                         modifier = Modifier
                             .fillMaxSize()
                             .background(Color.Black.copy(alpha = 0.5f)),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             CircularProgressIndicator(
@@ -228,18 +224,18 @@ fun QRScanSheet(
                                 Text(
                                     text = "${minOf(99, (progress * 100).toInt())}%",
                                     style = MaterialTheme.typography.titleLarge.copy(
-                                        fontWeight = FontWeight.SemiBold
+                                        fontWeight = FontWeight.SemiBold,
                                     ),
-                                    color = Color.White
+                                    color = Color.White,
                                 )
                             }
                             Text(
                                 text = "QRS",
                                 style = MaterialTheme.typography.headlineLarge.copy(
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Bold,
                                 ),
                                 color = Color.White,
-                                modifier = Modifier.offset(y = (-88).dp)
+                                modifier = Modifier.offset(y = (-88).dp),
                             )
                         }
                     }
@@ -257,7 +253,7 @@ fun QRScanSheet(
                 TextButton(onClick = { viewModel.dismissError() }) {
                     Text(stringResource(android.R.string.ok))
                 }
-            }
+            },
         )
     }
 }
@@ -294,7 +290,7 @@ private fun CameraPreview(
                         }
                     }
                 }
-            }
+            },
         )
 
         Canvas(modifier = Modifier.fillMaxSize()) {
@@ -309,11 +305,7 @@ private fun CameraPreview(
     }
 }
 
-private fun mapCropAreaToPreview(
-    area: QRCodeCropArea,
-    viewWidth: Float,
-    viewHeight: Float,
-): Rect? {
+private fun mapCropAreaToPreview(area: QRCodeCropArea, viewWidth: Float, viewHeight: Float): Rect? {
     if (viewWidth <= 0f || viewHeight <= 0f) return null
 
     val rotation = ((area.rotationDegrees % 360) + 360) % 360

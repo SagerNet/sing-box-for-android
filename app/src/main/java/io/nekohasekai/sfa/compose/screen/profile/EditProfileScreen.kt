@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
@@ -61,6 +60,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -179,9 +179,9 @@ fun EditProfileScreen(
                 }
             },
             colors =
-                TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                ),
+            TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
         )
     }
 
@@ -199,324 +199,324 @@ fun EditProfileScreen(
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
-            // Progress indicator at top (only for initial loading)
-            if (uiState.isLoading) {
-                LinearProgressIndicator(
+        // Progress indicator at top (only for initial loading)
+        if (uiState.isLoading) {
+            LinearProgressIndicator(
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+
+        if (!uiState.isLoading) {
+            Column(
+                modifier =
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp)
+                    .padding(bottom = bottomBarPadding),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                // Basic Information Card
+                Card(
                     modifier = Modifier.fillMaxWidth(),
-                )
-            }
-
-            if (!uiState.isLoading) {
-                Column(
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState())
-                            .padding(16.dp)
-                            .padding(bottom = bottomBarPadding),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    colors =
+                    CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                    ),
                 ) {
-                    // Basic Information Card
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors =
-                            CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                            ),
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
-                        ) {
-                            Text(
-                                text = stringResource(R.string.basic_information),
-                                style = MaterialTheme.typography.titleSmall,
-                                color = MaterialTheme.colorScheme.primary,
-                            )
+                        Text(
+                            text = stringResource(R.string.basic_information),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
 
-                            OutlinedTextField(
-                                value = uiState.name,
-                                onValueChange = viewModel::updateName,
-                                label = { Text(stringResource(R.string.profile_name)) },
-                                modifier = Modifier.fillMaxWidth(),
-                                singleLine = true,
-                            )
-
-                            HorizontalDivider(
-                                modifier = Modifier.padding(vertical = 4.dp),
-                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
-                            )
-
-                            // Icon selection with Material You style
-                            Text(
-                                text = stringResource(R.string.icon),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(bottom = 4.dp),
-                            )
-
-                            Surface(
-                                modifier =
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .clip(RoundedCornerShape(12.dp))
-                                        .clickable { viewModel.showIconDialog() },
-                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                                shape = RoundedCornerShape(12.dp),
-                            ) {
-                                Row(
-                                    modifier =
-                                        Modifier
-                                            .fillMaxWidth()
-                                            .padding(16.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                ) {
-                                    // Display current icon
-                                    val currentIcon =
-                                        ProfileIcons.getIconById(uiState.icon)
-                                            ?: Icons.AutoMirrored.Filled.InsertDriveFile
-
-                                    Icon(
-                                        imageVector = currentIcon,
-                                        contentDescription = stringResource(R.string.profile_icon),
-                                        modifier = Modifier.size(24.dp),
-                                        tint = MaterialTheme.colorScheme.primary,
-                                    )
-
-                                    Text(
-                                        text =
-                                            uiState.icon?.let { iconId ->
-                                                MaterialIconsLibrary.getAllIcons()
-                                                    .find { it.id == iconId }?.label
-                                            } ?: stringResource(R.string.default_text),
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        color = MaterialTheme.colorScheme.onSurface,
-                                        modifier = Modifier.weight(1f),
-                                    )
-
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                                        contentDescription = stringResource(R.string.select_icon),
-                                        modifier = Modifier.size(20.dp),
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                    // Remote Profile Options
-                    if (uiState.profileType == TypedProfile.Type.Remote) {
-                        Card(
+                        OutlinedTextField(
+                            value = uiState.name,
+                            onValueChange = viewModel::updateName,
+                            label = { Text(stringResource(R.string.profile_name)) },
                             modifier = Modifier.fillMaxWidth(),
-                            colors =
-                                CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.3f),
-                                ),
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(16.dp),
-                                verticalArrangement = Arrangement.spacedBy(12.dp),
-                            ) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                ) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                    ) {
-                                        Icon(
-                                            Icons.Default.CloudDownload,
-                                            contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.tertiary,
-                                            modifier = Modifier.size(20.dp),
-                                        )
-                                        Column(
-                                            verticalArrangement = Arrangement.spacedBy(2.dp),
-                                        ) {
-                                            Text(
-                                                text = stringResource(R.string.remote_configuration),
-                                                style = MaterialTheme.typography.titleSmall,
-                                                color = MaterialTheme.colorScheme.tertiary,
-                                            )
-                                            uiState.lastUpdated?.let { lastUpdated ->
-                                                Text(
-                                                    text =
-                                                        stringResource(
-                                                            R.string.last_updated_format,
-                                                            RelativeTimeFormatter.format(
-                                                                context,
-                                                                lastUpdated,
-                                                            ),
-                                                        ),
-                                                    style = MaterialTheme.typography.bodySmall,
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                )
-                                            }
-                                        }
-                                    }
-                                    // Update button in top-right corner
-                                    IconButton(
-                                        onClick = { viewModel.updateRemoteProfile() },
-                                        enabled = !uiState.isUpdating && !uiState.showUpdateSuccess,
-                                    ) {
-                                        when {
-                                            uiState.isUpdating -> {
-                                                CircularProgressIndicator(
-                                                    modifier = Modifier.size(24.dp),
-                                                    strokeWidth = 2.dp,
-                                                )
-                                            }
-                                            uiState.showUpdateSuccess -> {
-                                                Icon(
-                                                    Icons.Default.Check,
-                                                    contentDescription = stringResource(R.string.success),
-                                                    tint = MaterialTheme.colorScheme.primary,
-                                                )
-                                            }
-                                            else -> {
-                                                Icon(
-                                                    Icons.Default.Update,
-                                                    contentDescription = stringResource(R.string.profile_update),
-                                                    tint = MaterialTheme.colorScheme.tertiary,
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
+                            singleLine = true,
+                        )
 
-                                OutlinedTextField(
-                                    value = uiState.remoteUrl,
-                                    onValueChange = viewModel::updateRemoteUrl,
-                                    label = { Text(stringResource(R.string.profile_url)) },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    singleLine = true,
+                        HorizontalDivider(
+                            modifier = Modifier.padding(vertical = 4.dp),
+                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+                        )
+
+                        // Icon selection with Material You style
+                        Text(
+                            text = stringResource(R.string.icon),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(bottom = 4.dp),
+                        )
+
+                        Surface(
+                            modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .clickable { viewModel.showIconDialog() },
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                            shape = RoundedCornerShape(12.dp),
+                        ) {
+                            Row(
+                                modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            ) {
+                                // Display current icon
+                                val currentIcon =
+                                    ProfileIcons.getIconById(uiState.icon)
+                                        ?: Icons.AutoMirrored.Filled.InsertDriveFile
+
+                                Icon(
+                                    imageVector = currentIcon,
+                                    contentDescription = stringResource(R.string.profile_icon),
+                                    modifier = Modifier.size(24.dp),
+                                    tint = MaterialTheme.colorScheme.primary,
                                 )
 
-                                HorizontalDivider()
+                                Text(
+                                    text =
+                                    uiState.icon?.let { iconId ->
+                                        MaterialIconsLibrary.getAllIcons()
+                                            .find { it.id == iconId }?.label
+                                    } ?: stringResource(R.string.default_text),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.weight(1f),
+                                )
 
-                                // Auto Update Toggle
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                ) {
-                                    Text(
-                                        text = stringResource(R.string.profile_auto_update),
-                                        style = MaterialTheme.typography.bodyLarge,
-                                    )
-                                    Switch(
-                                        checked = uiState.autoUpdate,
-                                        onCheckedChange = viewModel::updateAutoUpdate,
-                                    )
-                                }
-
-                                AnimatedVisibility(visible = uiState.autoUpdate) {
-                                    OutlinedTextField(
-                                        value = uiState.autoUpdateInterval.toString(),
-                                        onValueChange = viewModel::updateAutoUpdateInterval,
-                                        label = { Text(stringResource(R.string.profile_auto_update_interval)) },
-                                        supportingText = {
-                                            uiState.autoUpdateIntervalError?.let { error ->
-                                                Text(
-                                                    text = error,
-                                                    color = MaterialTheme.colorScheme.error,
-                                                )
-                                            } ?: Text(stringResource(R.string.profile_auto_update_interval_minimum_hint))
-                                        },
-                                        modifier = Modifier.fillMaxWidth(),
-                                        singleLine = true,
-                                        isError = uiState.autoUpdateIntervalError != null,
-                                    )
-                                }
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                    contentDescription = stringResource(R.string.select_icon),
+                                    modifier = Modifier.size(20.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
                             }
                         }
                     }
+                }
 
-                    // Content Card (for both Local and Remote profiles) - placed at the end
+                // Remote Profile Options
+                if (uiState.profileType == TypedProfile.Type.Remote) {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors =
-                            CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f),
-                            ),
+                        CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.3f),
+                        ),
                     ) {
                         Column(
                             modifier = Modifier.padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
                             Row(
+                                modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
                             ) {
-                                Icon(
-                                    Icons.AutoMirrored.Filled.InsertDriveFile,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.secondary,
-                                    modifier = Modifier.size(20.dp),
-                                )
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                ) {
+                                    Icon(
+                                        Icons.Default.CloudDownload,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.tertiary,
+                                        modifier = Modifier.size(20.dp),
+                                    )
+                                    Column(
+                                        verticalArrangement = Arrangement.spacedBy(2.dp),
+                                    ) {
+                                        Text(
+                                            text = stringResource(R.string.remote_configuration),
+                                            style = MaterialTheme.typography.titleSmall,
+                                            color = MaterialTheme.colorScheme.tertiary,
+                                        )
+                                        uiState.lastUpdated?.let { lastUpdated ->
+                                            Text(
+                                                text =
+                                                stringResource(
+                                                    R.string.last_updated_format,
+                                                    RelativeTimeFormatter.format(
+                                                        context,
+                                                        lastUpdated,
+                                                    ),
+                                                ),
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            )
+                                        }
+                                    }
+                                }
+                                // Update button in top-right corner
+                                IconButton(
+                                    onClick = { viewModel.updateRemoteProfile() },
+                                    enabled = !uiState.isUpdating && !uiState.showUpdateSuccess,
+                                ) {
+                                    when {
+                                        uiState.isUpdating -> {
+                                            CircularProgressIndicator(
+                                                modifier = Modifier.size(24.dp),
+                                                strokeWidth = 2.dp,
+                                            )
+                                        }
+                                        uiState.showUpdateSuccess -> {
+                                            Icon(
+                                                Icons.Default.Check,
+                                                contentDescription = stringResource(R.string.success),
+                                                tint = MaterialTheme.colorScheme.primary,
+                                            )
+                                        }
+                                        else -> {
+                                            Icon(
+                                                Icons.Default.Update,
+                                                contentDescription = stringResource(R.string.profile_update),
+                                                tint = MaterialTheme.colorScheme.tertiary,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
+                            OutlinedTextField(
+                                value = uiState.remoteUrl,
+                                onValueChange = viewModel::updateRemoteUrl,
+                                label = { Text(stringResource(R.string.profile_url)) },
+                                modifier = Modifier.fillMaxWidth(),
+                                singleLine = true,
+                            )
+
+                            HorizontalDivider()
+
+                            // Auto Update Toggle
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                            ) {
                                 Text(
-                                    text = stringResource(R.string.content),
-                                    style = MaterialTheme.typography.titleSmall,
-                                    color = MaterialTheme.colorScheme.secondary,
+                                    text = stringResource(R.string.profile_auto_update),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                )
+                                Switch(
+                                    checked = uiState.autoUpdate,
+                                    onCheckedChange = viewModel::updateAutoUpdate,
                                 )
                             }
 
-                            // JSON Editor/Viewer option
-                            Surface(
-                                modifier =
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .clip(RoundedCornerShape(12.dp))
-                                        .clickable {
-                                            onNavigateToEditContent(
-                                                uiState.name,
-                                                uiState.profileType == TypedProfile.Type.Remote,
+                            AnimatedVisibility(visible = uiState.autoUpdate) {
+                                OutlinedTextField(
+                                    value = uiState.autoUpdateInterval.toString(),
+                                    onValueChange = viewModel::updateAutoUpdateInterval,
+                                    label = { Text(stringResource(R.string.profile_auto_update_interval)) },
+                                    supportingText = {
+                                        uiState.autoUpdateIntervalError?.let { error ->
+                                            Text(
+                                                text = error,
+                                                color = MaterialTheme.colorScheme.error,
                                             )
-                                        },
-                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                                shape = RoundedCornerShape(12.dp),
+                                        } ?: Text(stringResource(R.string.profile_auto_update_interval_minimum_hint))
+                                    },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    singleLine = true,
+                                    isError = uiState.autoUpdateIntervalError != null,
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // Content Card (for both Local and Remote profiles) - placed at the end
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors =
+                    CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f),
+                    ),
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.InsertDriveFile,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.secondary,
+                                modifier = Modifier.size(20.dp),
+                            )
+                            Text(
+                                text = stringResource(R.string.content),
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.secondary,
+                            )
+                        }
+
+                        // JSON Editor/Viewer option
+                        Surface(
+                            modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .clickable {
+                                    onNavigateToEditContent(
+                                        uiState.name,
+                                        uiState.profileType == TypedProfile.Type.Remote,
+                                    )
+                                },
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                            shape = RoundedCornerShape(12.dp),
+                        ) {
+                            Row(
+                                modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
                             ) {
-                                Row(
-                                    modifier =
-                                        Modifier
-                                            .fillMaxWidth()
-                                            .padding(16.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Code,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(24.dp),
-                                        tint = MaterialTheme.colorScheme.primary,
-                                    )
-                                    Text(
-                                        text =
-                                            if (uiState.profileType == TypedProfile.Type.Remote) {
-                                                stringResource(R.string.json_viewer)
-                                            } else {
-                                                stringResource(R.string.json_editor)
-                                            },
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        color = MaterialTheme.colorScheme.onSurface,
-                                        modifier = Modifier.weight(1f),
-                                    )
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(20.dp),
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                }
+                                Icon(
+                                    imageVector = Icons.Default.Code,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(24.dp),
+                                    tint = MaterialTheme.colorScheme.primary,
+                                )
+                                Text(
+                                    text =
+                                    if (uiState.profileType == TypedProfile.Type.Remote) {
+                                        stringResource(R.string.json_viewer)
+                                    } else {
+                                        stringResource(R.string.json_editor)
+                                    },
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.weight(1f),
+                                )
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
                             }
                         }
                     }
                 }
             }
+        }
         AnimatedVisibility(
             visible = uiState.hasChanges,
             enter = fadeIn() + expandVertically(),
@@ -530,10 +530,10 @@ fun EditProfileScreen(
             ) {
                 Box(
                     modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .windowInsetsPadding(WindowInsets.navigationBars)
-                            .padding(16.dp),
+                    Modifier
+                        .fillMaxWidth()
+                        .windowInsetsPadding(WindowInsets.navigationBars)
+                        .padding(16.dp),
                 ) {
                     Button(
                         onClick = { viewModel.saveChanges() },

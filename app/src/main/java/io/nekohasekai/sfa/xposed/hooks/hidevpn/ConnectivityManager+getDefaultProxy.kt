@@ -24,7 +24,7 @@ class HookConnectivityManagerGetDefaultProxy(private val helper: ConnectivitySer
                     param.result as? ProxyInfo ?: return
                     param.result = null
                 }
-            }
+            },
         )
 
         XposedHelpers.findAndHookMethod(
@@ -37,7 +37,7 @@ class HookConnectivityManagerGetDefaultProxy(private val helper: ConnectivitySer
                     param.result as? ProxyInfo ?: return
                     param.result = null
                 }
-            }
+            },
         )
     }
 }

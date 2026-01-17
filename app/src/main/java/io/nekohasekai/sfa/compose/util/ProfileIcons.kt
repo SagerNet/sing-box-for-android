@@ -5,11 +5,7 @@ import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
 import androidx.compose.ui.graphics.vector.ImageVector
 import io.nekohasekai.sfa.compose.util.icons.MaterialIconsLibrary
 
-data class ProfileIcon(
-    val id: String,
-    val icon: ImageVector,
-    val label: String,
-)
+data class ProfileIcon(val id: String, val icon: ImageVector, val label: String)
 
 object ProfileIcons {
     // Use the complete Material Icons library with all available icons
@@ -26,13 +22,9 @@ object ProfileIcons {
         return Icons.AutoMirrored.Default.InsertDriveFile
     }
 
-    fun getCategoryForIcon(iconId: String): String? {
-        return MaterialIconsLibrary.getCategoryForIcon(iconId)
-    }
+    fun getCategoryForIcon(iconId: String): String? = MaterialIconsLibrary.getCategoryForIcon(iconId)
 
-    fun searchIcons(query: String): List<ProfileIcon> {
-        return MaterialIconsLibrary.searchIcons(query)
-    }
+    fun searchIcons(query: String): List<ProfileIcon> = MaterialIconsLibrary.searchIcons(query)
 
     fun getCategories() = MaterialIconsLibrary.categories
 }

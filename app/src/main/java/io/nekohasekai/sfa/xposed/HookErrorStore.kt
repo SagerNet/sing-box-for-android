@@ -27,13 +27,7 @@ object HookErrorStore {
         log(LogEntry.LEVEL_DEBUG, source, message, throwable, store = false)
     }
 
-    private fun log(
-        level: Int,
-        source: String,
-        message: String,
-        throwable: Throwable?,
-        store: Boolean,
-    ) {
+    private fun log(level: Int, source: String, message: String, throwable: Throwable?, store: Boolean) {
         if (BuildConfig.DEBUG) {
             when (level) {
                 LogEntry.LEVEL_DEBUG -> {

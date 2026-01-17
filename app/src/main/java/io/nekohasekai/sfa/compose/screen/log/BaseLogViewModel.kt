@@ -15,7 +15,9 @@ import java.util.LinkedList
 import java.util.concurrent.atomic.AtomicLong
 
 @OptIn(FlowPreview::class)
-abstract class BaseLogViewModel : ViewModel(), LogViewerViewModel {
+abstract class BaseLogViewModel :
+    ViewModel(),
+    LogViewerViewModel {
     protected val _uiState = MutableStateFlow(LogUiState())
     override val uiState: StateFlow<LogUiState> = _uiState.asStateFlow()
 
@@ -119,9 +121,7 @@ abstract class BaseLogViewModel : ViewModel(), LogViewerViewModel {
             .joinToString("\n")
     }
 
-    override fun getAllLogsText(): String {
-        return _uiState.value.logs.joinToString("\n") { AnsiColorUtils.stripAnsi(it.entry.message) }
-    }
+    override fun getAllLogsText(): String = _uiState.value.logs.joinToString("\n") { AnsiColorUtils.stripAnsi(it.entry.message) }
 
     protected fun updateDisplayedLogs() {
         val currentState = _uiState.value

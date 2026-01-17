@@ -1,19 +1,16 @@
 package io.nekohasekai.sfa.xposed
 
 import android.content.Context
+import io.github.libxposed.api.XposedInterface
+import io.github.libxposed.api.XposedModule
+import io.github.libxposed.api.XposedModuleInterface
 import io.nekohasekai.sfa.xposed.hooks.HookIConnectivityManagerOnTransact
 import io.nekohasekai.sfa.xposed.hooks.hidevpn.ConnectivityServiceHookHelper
 import io.nekohasekai.sfa.xposed.hooks.hidevpn.HookNetworkCapabilitiesWriteToParcel
 import io.nekohasekai.sfa.xposed.hooks.hidevpn.HookNetworkInterfaceGetName
 import io.nekohasekai.sfa.xposed.hooks.hidevpnapp.HookPackageManagerGetInstalledPackages
-import io.github.libxposed.api.XposedInterface
-import io.github.libxposed.api.XposedModule
-import io.github.libxposed.api.XposedModuleInterface
 
-class XposedInit(
-    base: XposedInterface,
-    param: XposedModuleInterface.ModuleLoadedParam,
-) : XposedModule(base, param) {
+class XposedInit(base: XposedInterface, param: XposedModuleInterface.ModuleLoadedParam) : XposedModule(base, param) {
 
     private val activityThreadClass by lazy { Class.forName("android.app.ActivityThread") }
     private val currentActivityThreadMethod by lazy { activityThreadClass.getMethod("currentActivityThread") }
@@ -47,13 +44,11 @@ class XposedInit(
         const val TAG = "sing-box-lsposed"
     }
 
-    private fun resolveSystemContext(): Context? {
-        return try {
-            val currentThread = currentActivityThreadMethod.invoke(null)
-            getSystemContextMethod.invoke(currentThread) as? Context
-        } catch (e: Throwable) {
-            HookErrorStore.e("XposedInit", "resolveSystemContext failed", e)
-            null
-        }
+    private fun resolveSystemContext(): Context? = try {
+        val currentThread = currentActivityThreadMethod.invoke(null)
+        getSystemContextMethod.invoke(currentThread) as? Context
+    } catch (e: Throwable) {
+        HookErrorStore.e("XposedInit", "resolveSystemContext failed", e)
+        null
     }
 }

@@ -30,7 +30,7 @@ class HookConnectivityManagerConnectivityAction(private val helper: Connectivity
                         ?: return
                     param.args[0] = VpnSanitizer.cloneNetworkInfo(replacement)
                 }
-            }
+            },
         )
     }
 }

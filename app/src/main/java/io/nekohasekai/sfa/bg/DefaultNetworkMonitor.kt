@@ -40,9 +40,7 @@ object DefaultNetworkMonitor {
         checkDefaultInterfaceUpdate(defaultNetwork)
     }
 
-    private fun checkDefaultInterfaceUpdate(
-        newNetwork: Network?
-    ) {
+    private fun checkDefaultInterfaceUpdate(newNetwork: Network?) {
         val listener = listener ?: return
         if (newNetwork != null) {
             val interfaceName =
@@ -61,5 +59,4 @@ object DefaultNetworkMonitor {
             listener.updateDefaultInterface("", -1, false, false)
         }
     }
-
 }

@@ -10,9 +10,7 @@ import android.content.pm.PackageInstaller as AndroidPackageInstaller
 
 object SystemPackageInstaller {
 
-    fun canSystemSilentInstall(): Boolean {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-    }
+    fun canSystemSilentInstall(): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 
     fun install(context: Context, apkFile: File) {
         val packageInstaller = context.packageManager.packageInstaller
@@ -38,7 +36,7 @@ object SystemPackageInstaller {
                 context,
                 sessionId,
                 intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE,
             )
 
             session.commit(pendingIntent.intentSender)

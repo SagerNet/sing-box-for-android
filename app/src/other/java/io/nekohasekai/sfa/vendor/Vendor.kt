@@ -9,8 +9,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.bg.RootClient
-import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.compose.screen.qrscan.QRCodeCropArea
+import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.update.UpdateCheckException
 import io.nekohasekai.sfa.update.UpdateInfo
 import io.nekohasekai.sfa.update.UpdateState
@@ -19,10 +19,7 @@ import io.nekohasekai.sfa.update.UpdateTrack
 object Vendor : VendorInterface {
     private const val TAG = "Vendor"
 
-    override fun checkUpdate(
-        activity: Activity,
-        byUser: Boolean,
-    ) {
+    override fun checkUpdate(activity: Activity, byUser: Boolean) {
         try {
             val updateInfo = checkUpdateAsync()
             if (updateInfo != null) {
@@ -94,13 +91,9 @@ object Vendor : VendorInterface {
         onSuccess: (String) -> Unit,
         onFailure: (Exception) -> Unit,
         onCropArea: ((QRCodeCropArea?) -> Unit)?,
-    ): ImageAnalysis.Analyzer? {
-        return null
-    }
+    ): ImageAnalysis.Analyzer? = null
 
-    override fun supportsTrackSelection(): Boolean {
-        return true
-    }
+    override fun supportsTrackSelection(): Boolean = true
 
     override fun checkUpdateAsync(): UpdateInfo? {
         val track = UpdateTrack.fromString(Settings.updateTrack)
@@ -109,13 +102,9 @@ object Vendor : VendorInterface {
         }
     }
 
-    override fun supportsSilentInstall(): Boolean {
-        return true
-    }
+    override fun supportsSilentInstall(): Boolean = true
 
-    override fun supportsAutoUpdate(): Boolean {
-        return true
-    }
+    override fun supportsAutoUpdate(): Boolean = true
 
     override fun scheduleAutoUpdate() {
         UpdateWorker.schedule(io.nekohasekai.sfa.Application.application)

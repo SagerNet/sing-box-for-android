@@ -63,10 +63,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ServiceSettingsScreen(
-    navController: NavController,
-    serviceConnection: ServiceConnection? = null,
-) {
+fun ServiceSettingsScreen(navController: NavController, serviceConnection: ServiceConnection? = null) {
     OverrideTopBar {
         TopAppBar(
             title = { Text(stringResource(R.string.service)) },
@@ -113,23 +110,23 @@ fun ServiceSettingsScreen(
 
     Column(
         modifier =
-            Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surface)
-                .verticalScroll(rememberScrollState())
-                .padding(vertical = 8.dp),
+        Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface)
+            .verticalScroll(rememberScrollState())
+            .padding(vertical = 8.dp),
     ) {
         // Background Permission Card (only show if battery optimization is not ignored)
         if (!isBatteryOptimizationIgnored && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             Card(
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
                 colors =
-                    CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.5f),
-                    ),
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.5f),
+                ),
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -193,13 +190,13 @@ fun ServiceSettingsScreen(
         // Options Section
         Card(
             modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
             colors =
-                CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                ),
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            ),
         ) {
             ListItem(
                 headlineContent = {
@@ -234,9 +231,9 @@ fun ServiceSettingsScreen(
                 },
                 modifier = Modifier.clip(RoundedCornerShape(12.dp)),
                 colors =
-                    ListItemDefaults.colors(
-                        containerColor = Color.Transparent,
-                    ),
+                ListItemDefaults.colors(
+                    containerColor = Color.Transparent,
+                ),
             )
         }
 

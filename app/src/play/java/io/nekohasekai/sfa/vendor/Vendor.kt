@@ -19,10 +19,7 @@ import io.nekohasekai.sfa.update.UpdateState
 object Vendor : VendorInterface {
     private const val TAG = "Vendor"
 
-    override fun checkUpdate(
-        activity: Activity,
-        byUser: Boolean,
-    ) {
+    override fun checkUpdate(activity: Activity, byUser: Boolean) {
         val appUpdateManager = AppUpdateManagerFactory.create(activity)
         val appUpdateInfoTask = appUpdateManager.appUpdateInfo
         appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
@@ -95,11 +92,7 @@ object Vendor : VendorInterface {
         }
     }
 
-    override fun supportsTrackSelection(): Boolean {
-        return false
-    }
+    override fun supportsTrackSelection(): Boolean = false
 
-    override fun checkUpdateAsync(): UpdateInfo? {
-        return null
-    }
+    override fun checkUpdateAsync(): UpdateInfo? = null
 }

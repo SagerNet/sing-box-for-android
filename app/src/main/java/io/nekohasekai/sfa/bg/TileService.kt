@@ -8,7 +8,9 @@ import androidx.annotation.RequiresApi
 import io.nekohasekai.sfa.constant.Status
 
 @RequiresApi(24)
-class TileService : TileService(), ServiceConnection.Callback {
+class TileService :
+    TileService(),
+    ServiceConnection.Callback {
     private val connection = ServiceConnection(this, this)
 
     override fun onServiceStatusChanged(status: Status) {

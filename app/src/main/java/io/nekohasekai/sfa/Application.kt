@@ -18,8 +18,8 @@ import io.nekohasekai.sfa.bg.UpdateProfileWork
 import io.nekohasekai.sfa.constant.Bugs
 import io.nekohasekai.sfa.utils.AppLifecycleObserver
 import io.nekohasekai.sfa.utils.HookModuleUpdateNotifier
-import io.nekohasekai.sfa.utils.PrivilegeSettingsClient
 import io.nekohasekai.sfa.utils.HookStatusClient
+import io.nekohasekai.sfa.utils.PrivilegeSettingsClient
 import io.nekohasekai.sfa.vendor.Vendor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope

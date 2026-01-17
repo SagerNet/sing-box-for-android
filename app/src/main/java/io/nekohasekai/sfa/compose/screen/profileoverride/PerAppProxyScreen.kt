@@ -6,9 +6,9 @@ import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -54,7 +54,6 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -66,9 +65,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
@@ -79,13 +76,13 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile
 import io.nekohasekai.sfa.R
-import io.nekohasekai.sfa.database.Settings
-import io.nekohasekai.sfa.ktx.clipboardText
-import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.compose.shared.AppSelectionCard
 import io.nekohasekai.sfa.compose.shared.PackageCache
 import io.nekohasekai.sfa.compose.shared.SortMode
 import io.nekohasekai.sfa.compose.shared.buildDisplayPackages
+import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
+import io.nekohasekai.sfa.database.Settings
+import io.nekohasekai.sfa.ktx.clipboardText
 import io.nekohasekai.sfa.vendor.PackageQueryManager
 import io.nekohasekai.sfa.vendor.PrivilegedAccessRequiredException
 import kotlinx.coroutines.Dispatchers
@@ -97,16 +94,9 @@ import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.zip.ZipFile
 
-private data class LoadResult(
-    val proxyMode: Int,
-    val packages: List<PackageCache>,
-    val selectedUids: Set<Int>,
-)
+private data class LoadResult(val proxyMode: Int, val packages: List<PackageCache>, val selectedUids: Set<Int>)
 
-private data class ScanProgress(
-    val current: Int,
-    val max: Int,
-)
+private data class ScanProgress(val current: Int, val max: Int)
 
 private sealed class ScanResult {
     data object Empty : ScanResult()
@@ -139,11 +129,9 @@ fun PerAppProxyScreen(onBack: () -> Unit) {
     var scanProgress by remember { mutableStateOf<ScanProgress?>(null) }
     var scanResult by remember { mutableStateOf<ScanResult?>(null) }
 
-    fun buildPackageList(newUids: Set<Int>): Set<String> {
-        return newUids.mapNotNull { uid ->
-            packages.find { it.uid == uid }?.packageName
-        }.toSet()
-    }
+    fun buildPackageList(newUids: Set<Int>): Set<String> = newUids.mapNotNull { uid ->
+        packages.find { it.uid == uid }?.packageName
+    }.toSet()
 
     fun updateCurrentPackages(filterQuery: String) {
         currentPackages =
@@ -411,10 +399,10 @@ fun PerAppProxyScreen(onBack: () -> Unit) {
                 )
             },
             colors =
-                TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface,
-                ),
+            TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+                titleContentColor = MaterialTheme.colorScheme.onSurface,
+            ),
         )
     }
 
@@ -435,11 +423,11 @@ fun PerAppProxyScreen(onBack: () -> Unit) {
         ) {
             Text(
                 text =
-                    if (proxyMode == Settings.PER_APP_PROXY_INCLUDE) {
-                        stringResource(R.string.per_app_proxy_mode_include_description)
-                    } else {
-                        stringResource(R.string.per_app_proxy_mode_exclude_description)
-                    },
+                if (proxyMode == Settings.PER_APP_PROXY_INCLUDE) {
+                    stringResource(R.string.per_app_proxy_mode_include_description)
+                } else {
+                    stringResource(R.string.per_app_proxy_mode_exclude_description)
+                },
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
                 style = MaterialTheme.typography.bodyMedium,
             )
@@ -465,10 +453,10 @@ fun PerAppProxyScreen(onBack: () -> Unit) {
                     updateCurrentPackages(it)
                 },
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .focusRequester(focusRequester),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .focusRequester(focusRequester),
                 placeholder = { Text(stringResource(R.string.search)) },
                 leadingIcon = {
                     Icon(
@@ -497,10 +485,10 @@ fun PerAppProxyScreen(onBack: () -> Unit) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding =
-                androidx.compose.foundation.layout.PaddingValues(
-                    horizontal = 16.dp,
-                    vertical = 12.dp,
-                ),
+            androidx.compose.foundation.layout.PaddingValues(
+                horizontal = 16.dp,
+                vertical = 12.dp,
+            ),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             items(currentPackages, key = { it.packageName }) { packageCache ->
@@ -609,10 +597,10 @@ fun PerAppProxyScreen(onBack: () -> Unit) {
                         Spacer(modifier = Modifier.height(16.dp))
                         Box(
                             modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .heightIn(max = 360.dp)
-                                    .verticalScroll(rememberScrollState()),
+                            Modifier
+                                .fillMaxWidth()
+                                .heightIn(max = 360.dp)
+                                .verticalScroll(rememberScrollState()),
                         ) {
                             Text(
                                 text = dialogContent,
@@ -722,11 +710,11 @@ private fun PerAppProxyMenus(
                 trailingIcon = {
                     Icon(
                         imageVector =
-                            if (showModeMenu) {
-                                Icons.Default.ExpandLess
-                            } else {
-                                Icons.Default.ExpandMore
-                            },
+                        if (showModeMenu) {
+                            Icons.Default.ExpandLess
+                        } else {
+                            Icons.Default.ExpandMore
+                        },
                         contentDescription = null,
                     )
                 },
@@ -742,18 +730,18 @@ private fun PerAppProxyMenus(
                     leadingIcon = {
                         Icon(
                             imageVector =
-                                if (proxyMode == Settings.PER_APP_PROXY_INCLUDE) {
-                                    Icons.Default.RadioButtonChecked
-                                } else {
-                                    Icons.Default.RadioButtonUnchecked
-                                },
+                            if (proxyMode == Settings.PER_APP_PROXY_INCLUDE) {
+                                Icons.Default.RadioButtonChecked
+                            } else {
+                                Icons.Default.RadioButtonUnchecked
+                            },
                             contentDescription = null,
                             tint =
-                                if (proxyMode == Settings.PER_APP_PROXY_INCLUDE) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                },
+                            if (proxyMode == Settings.PER_APP_PROXY_INCLUDE) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            },
                             modifier = Modifier.padding(start = 24.dp),
                         )
                     },
@@ -768,18 +756,18 @@ private fun PerAppProxyMenus(
                     leadingIcon = {
                         Icon(
                             imageVector =
-                                if (proxyMode == Settings.PER_APP_PROXY_EXCLUDE) {
-                                    Icons.Default.RadioButtonChecked
-                                } else {
-                                    Icons.Default.RadioButtonUnchecked
-                                },
+                            if (proxyMode == Settings.PER_APP_PROXY_EXCLUDE) {
+                                Icons.Default.RadioButtonChecked
+                            } else {
+                                Icons.Default.RadioButtonUnchecked
+                            },
                             contentDescription = null,
                             tint =
-                                if (proxyMode == Settings.PER_APP_PROXY_EXCLUDE) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                },
+                            if (proxyMode == Settings.PER_APP_PROXY_EXCLUDE) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            },
                             modifier = Modifier.padding(start = 24.dp),
                         )
                     },
@@ -799,11 +787,11 @@ private fun PerAppProxyMenus(
                 trailingIcon = {
                     Icon(
                         imageVector =
-                            if (showSortMenu) {
-                                Icons.Default.ExpandLess
-                            } else {
-                                Icons.Default.ExpandMore
-                            },
+                        if (showSortMenu) {
+                            Icons.Default.ExpandLess
+                        } else {
+                            Icons.Default.ExpandMore
+                        },
                         contentDescription = null,
                     )
                 },
@@ -819,18 +807,18 @@ private fun PerAppProxyMenus(
                     leadingIcon = {
                         Icon(
                             imageVector =
-                                if (sortMode == SortMode.NAME) {
-                                    Icons.Default.RadioButtonChecked
-                                } else {
-                                    Icons.Default.RadioButtonUnchecked
-                                },
+                            if (sortMode == SortMode.NAME) {
+                                Icons.Default.RadioButtonChecked
+                            } else {
+                                Icons.Default.RadioButtonUnchecked
+                            },
                             contentDescription = null,
                             tint =
-                                if (sortMode == SortMode.NAME) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                },
+                            if (sortMode == SortMode.NAME) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            },
                             modifier = Modifier.padding(start = 24.dp),
                         )
                     },
@@ -845,18 +833,18 @@ private fun PerAppProxyMenus(
                     leadingIcon = {
                         Icon(
                             imageVector =
-                                if (sortMode == SortMode.PACKAGE_NAME) {
-                                    Icons.Default.RadioButtonChecked
-                                } else {
-                                    Icons.Default.RadioButtonUnchecked
-                                },
+                            if (sortMode == SortMode.PACKAGE_NAME) {
+                                Icons.Default.RadioButtonChecked
+                            } else {
+                                Icons.Default.RadioButtonUnchecked
+                            },
                             contentDescription = null,
                             tint =
-                                if (sortMode == SortMode.PACKAGE_NAME) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                },
+                            if (sortMode == SortMode.PACKAGE_NAME) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            },
                             modifier = Modifier.padding(start = 24.dp),
                         )
                     },
@@ -871,18 +859,18 @@ private fun PerAppProxyMenus(
                     leadingIcon = {
                         Icon(
                             imageVector =
-                                if (sortMode == SortMode.UID) {
-                                    Icons.Default.RadioButtonChecked
-                                } else {
-                                    Icons.Default.RadioButtonUnchecked
-                                },
+                            if (sortMode == SortMode.UID) {
+                                Icons.Default.RadioButtonChecked
+                            } else {
+                                Icons.Default.RadioButtonUnchecked
+                            },
                             contentDescription = null,
                             tint =
-                                if (sortMode == SortMode.UID) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                },
+                            if (sortMode == SortMode.UID) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            },
                             modifier = Modifier.padding(start = 24.dp),
                         )
                     },
@@ -897,18 +885,18 @@ private fun PerAppProxyMenus(
                     leadingIcon = {
                         Icon(
                             imageVector =
-                                if (sortMode == SortMode.INSTALL_TIME) {
-                                    Icons.Default.RadioButtonChecked
-                                } else {
-                                    Icons.Default.RadioButtonUnchecked
-                                },
+                            if (sortMode == SortMode.INSTALL_TIME) {
+                                Icons.Default.RadioButtonChecked
+                            } else {
+                                Icons.Default.RadioButtonUnchecked
+                            },
                             contentDescription = null,
                             tint =
-                                if (sortMode == SortMode.INSTALL_TIME) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                },
+                            if (sortMode == SortMode.INSTALL_TIME) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            },
                             modifier = Modifier.padding(start = 24.dp),
                         )
                     },
@@ -923,18 +911,18 @@ private fun PerAppProxyMenus(
                     leadingIcon = {
                         Icon(
                             imageVector =
-                                if (sortMode == SortMode.UPDATE_TIME) {
-                                    Icons.Default.RadioButtonChecked
-                                } else {
-                                    Icons.Default.RadioButtonUnchecked
-                                },
+                            if (sortMode == SortMode.UPDATE_TIME) {
+                                Icons.Default.RadioButtonChecked
+                            } else {
+                                Icons.Default.RadioButtonUnchecked
+                            },
                             contentDescription = null,
                             tint =
-                                if (sortMode == SortMode.UPDATE_TIME) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                },
+                            if (sortMode == SortMode.UPDATE_TIME) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            },
                             modifier = Modifier.padding(start = 24.dp),
                         )
                     },
@@ -949,18 +937,18 @@ private fun PerAppProxyMenus(
                     leadingIcon = {
                         Icon(
                             imageVector =
-                                if (sortReverse) {
-                                    Icons.Default.Check
-                                } else {
-                                    Icons.Default.RadioButtonUnchecked
-                                },
+                            if (sortReverse) {
+                                Icons.Default.Check
+                            } else {
+                                Icons.Default.RadioButtonUnchecked
+                            },
                             contentDescription = null,
                             tint =
-                                if (sortReverse) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                },
+                            if (sortReverse) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            },
                             modifier = Modifier.padding(start = 24.dp),
                         )
                     },
@@ -980,11 +968,11 @@ private fun PerAppProxyMenus(
                 trailingIcon = {
                     Icon(
                         imageVector =
-                            if (showFilterMenu) {
-                                Icons.Default.ExpandLess
-                            } else {
-                                Icons.Default.ExpandMore
-                            },
+                        if (showFilterMenu) {
+                            Icons.Default.ExpandLess
+                        } else {
+                            Icons.Default.ExpandMore
+                        },
                         contentDescription = null,
                     )
                 },
@@ -1000,18 +988,18 @@ private fun PerAppProxyMenus(
                     leadingIcon = {
                         Icon(
                             imageVector =
-                                if (hideSystemApps) {
-                                    Icons.Default.Check
-                                } else {
-                                    Icons.Default.RadioButtonUnchecked
-                                },
+                            if (hideSystemApps) {
+                                Icons.Default.Check
+                            } else {
+                                Icons.Default.RadioButtonUnchecked
+                            },
                             contentDescription = null,
                             tint =
-                                if (hideSystemApps) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                },
+                            if (hideSystemApps) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            },
                             modifier = Modifier.padding(start = 24.dp),
                         )
                     },
@@ -1026,18 +1014,18 @@ private fun PerAppProxyMenus(
                     leadingIcon = {
                         Icon(
                             imageVector =
-                                if (hideOfflineApps) {
-                                    Icons.Default.Check
-                                } else {
-                                    Icons.Default.RadioButtonUnchecked
-                                },
+                            if (hideOfflineApps) {
+                                Icons.Default.Check
+                            } else {
+                                Icons.Default.RadioButtonUnchecked
+                            },
                             contentDescription = null,
                             tint =
-                                if (hideOfflineApps) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                },
+                            if (hideOfflineApps) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            },
                             modifier = Modifier.padding(start = 24.dp),
                         )
                     },
@@ -1052,18 +1040,18 @@ private fun PerAppProxyMenus(
                     leadingIcon = {
                         Icon(
                             imageVector =
-                                if (hideDisabledApps) {
-                                    Icons.Default.Check
-                                } else {
-                                    Icons.Default.RadioButtonUnchecked
-                                },
+                            if (hideDisabledApps) {
+                                Icons.Default.Check
+                            } else {
+                                Icons.Default.RadioButtonUnchecked
+                            },
                             contentDescription = null,
                             tint =
-                                if (hideDisabledApps) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                },
+                            if (hideDisabledApps) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            },
                             modifier = Modifier.padding(start = 24.dp),
                         )
                     },
@@ -1083,11 +1071,11 @@ private fun PerAppProxyMenus(
                 trailingIcon = {
                     Icon(
                         imageVector =
-                            if (showSelectMenu) {
-                                Icons.Default.ExpandLess
-                            } else {
-                                Icons.Default.ExpandMore
-                            },
+                        if (showSelectMenu) {
+                            Icons.Default.ExpandLess
+                        } else {
+                            Icons.Default.ExpandMore
+                        },
                         contentDescription = null,
                     )
                 },
@@ -1140,11 +1128,11 @@ private fun PerAppProxyMenus(
                 trailingIcon = {
                     Icon(
                         imageVector =
-                            if (showBackupMenu) {
-                                Icons.Default.ExpandLess
-                            } else {
-                                Icons.Default.ExpandMore
-                            },
+                        if (showBackupMenu) {
+                            Icons.Default.ExpandLess
+                        } else {
+                            Icons.Default.ExpandMore
+                        },
                         contentDescription = null,
                     )
                 },
@@ -1197,11 +1185,11 @@ private fun PerAppProxyMenus(
                 trailingIcon = {
                     Icon(
                         imageVector =
-                            if (showScanMenu) {
-                                Icons.Default.ExpandLess
-                            } else {
-                                Icons.Default.ExpandMore
-                            },
+                        if (showScanMenu) {
+                            Icons.Default.ExpandLess
+                        } else {
+                            Icons.Default.ExpandMore
+                        },
                         contentDescription = null,
                     )
                 },
@@ -1331,7 +1319,7 @@ object PerAppProxyScanner {
                     if (!(
                             packageEntry.name.startsWith("classes") &&
                                 packageEntry.name.endsWith(".dex")
-                        )
+                            )
                     ) {
                         continue
                     }

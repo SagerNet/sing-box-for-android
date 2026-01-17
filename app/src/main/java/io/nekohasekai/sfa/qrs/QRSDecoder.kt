@@ -88,17 +88,24 @@ class QRSDecoder {
 
             if (decompressedData != null) {
                 val checksumValid = codec!!.verifyChecksum(
-                    decompressedData, currentState.checksum, currentState.totalBlocks
+                    decompressedData,
+                    currentState.checksum,
+                    currentState.totalBlocks,
                 )
                 if (checksumValid) {
                     return DecodeProgress(
-                        currentState.decodedCount, currentState.totalBlocks, true, decompressedData
+                        currentState.decodedCount,
+                        currentState.totalBlocks,
+                        true,
+                        decompressedData,
                     )
                 }
             }
 
             val rawChecksumValid = codec!!.verifyChecksum(
-                compressedData, currentState.checksum, currentState.totalBlocks
+                compressedData,
+                currentState.checksum,
+                currentState.totalBlocks,
             )
             if (rawChecksumValid) {
                 DecodeProgress(currentState.decodedCount, currentState.totalBlocks, true, compressedData)
@@ -171,5 +178,4 @@ class QRSDecoder {
 
         return outputBuffer.toByteArray()
     }
-
 }

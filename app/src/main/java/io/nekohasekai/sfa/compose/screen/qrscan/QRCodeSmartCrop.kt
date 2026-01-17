@@ -14,12 +14,7 @@ data class QRCodeCropArea(
 )
 
 object QRCodeSmartCrop {
-    fun findCropArea(
-        yData: ByteArray,
-        width: Int,
-        height: Int,
-        rotationDegrees: Int,
-    ): QRCodeCropArea? {
+    fun findCropArea(yData: ByteArray, width: Int, height: Int, rotationDegrees: Int): QRCodeCropArea? {
         val minDim = min(width, height)
         if (minDim <= 0) return null
 
@@ -94,14 +89,7 @@ object QRCodeSmartCrop {
         return bestArea
     }
 
-    private data class CropComponent(
-        val minX: Int,
-        val minY: Int,
-        val maxX: Int,
-        val maxY: Int,
-        val count: Int,
-        val score: Float,
-    )
+    private data class CropComponent(val minX: Int, val minY: Int, val maxX: Int, val maxY: Int, val count: Int, val score: Float)
 
     private fun findBestComponent(
         yData: ByteArray,
@@ -233,13 +221,7 @@ object QRCodeSmartCrop {
         return best
     }
 
-    private fun buildCropArea(
-        component: CropComponent,
-        step: Int,
-        width: Int,
-        height: Int,
-        rotationDegrees: Int,
-    ): QRCodeCropArea? {
+    private fun buildCropArea(component: CropComponent, step: Int, width: Int, height: Int, rotationDegrees: Int): QRCodeCropArea? {
         val left = component.minX * step
         val top = component.minY * step
         val right = min(width, (component.maxX + 1) * step)

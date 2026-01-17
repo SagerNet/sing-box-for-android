@@ -178,9 +178,9 @@ fun AppSelectionCard(
             modifier = cardModifier,
             shape = cardShape,
             colors =
-                CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-                ),
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+            ),
         ) {
             Row(
                 modifier = Modifier.padding(12.dp),
@@ -236,11 +236,11 @@ fun AppSelectionCard(
                     trailingIcon = {
                         Icon(
                             imageVector =
-                                if (showCopyMenu) {
-                                    Icons.Default.ExpandLess
-                                } else {
-                                    Icons.Default.ExpandMore
-                                },
+                            if (showCopyMenu) {
+                                Icons.Default.ExpandLess
+                            } else {
+                                Icons.Default.ExpandMore
+                            },
                             contentDescription = null,
                         )
                     },

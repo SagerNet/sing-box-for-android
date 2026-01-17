@@ -41,9 +41,9 @@ fun LineChart(
 
     Canvas(
         modifier =
-            modifier
-                .fillMaxWidth()
-                .height(80.dp),
+        modifier
+            .fillMaxWidth()
+            .height(80.dp),
     ) {
         val width = size.width
         val height = size.height
@@ -96,11 +96,11 @@ fun LineChart(
                 path = path,
                 color = lineColor,
                 style =
-                    Stroke(
-                        width = 2.dp.toPx(),
-                        cap = StrokeCap.Round,
-                        join = StrokeJoin.Round,
-                    ),
+                Stroke(
+                    width = 2.dp.toPx(),
+                    cap = StrokeCap.Round,
+                    join = StrokeJoin.Round,
+                ),
             )
 
             // Draw gradient fill under the line

@@ -18,11 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
-class ServiceConnection(
-    private val context: Context,
-    callback: Callback,
-    private val register: Boolean = true,
-) : ServiceConnection {
+class ServiceConnection(private val context: Context, callback: Callback, private val register: Boolean = true) : ServiceConnection {
     companion object {
         private const val TAG = "ServiceConnection"
     }
@@ -66,10 +62,7 @@ class ServiceConnection(
         Log.d(TAG, "request reconnect")
     }
 
-    override fun onServiceConnected(
-        name: ComponentName,
-        binder: IBinder,
-    ) {
+    override fun onServiceConnected(name: ComponentName, binder: IBinder) {
         val service = IService.Stub.asInterface(binder)
         this.service = service
         try {
@@ -98,10 +91,7 @@ class ServiceConnection(
     interface Callback {
         fun onServiceStatusChanged(status: Status)
 
-        fun onServiceAlert(
-            type: Alert,
-            message: String?,
-        ) {
+        fun onServiceAlert(type: Alert, message: String?) {
         }
     }
 
@@ -110,10 +100,7 @@ class ServiceConnection(
             callback.onServiceStatusChanged(Status.values()[status])
         }
 
-        override fun onServiceAlert(
-            type: Int,
-            message: String?,
-        ) {
+        override fun onServiceAlert(type: Int, message: String?) {
             callback.onServiceAlert(Alert.values()[type], message)
         }
     }

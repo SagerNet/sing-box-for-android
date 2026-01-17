@@ -28,13 +28,13 @@ import io.nekohasekai.libbox.PlatformInterface
 import io.nekohasekai.libbox.SystemProxyStatus
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.compose.MainActivity
 import io.nekohasekai.sfa.constant.Action
 import io.nekohasekai.sfa.constant.Alert
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.database.ProfileManager
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.ktx.hasPermission
-import io.nekohasekai.sfa.compose.MainActivity
 import io.nekohasekai.sfa.vendor.Vendor
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -44,10 +44,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.File
 
-class BoxService(
-    private val service: Service,
-    private val platformInterface: PlatformInterface,
-) : CommandServerHandler {
+class BoxService(private val service: Service, private val platformInterface: PlatformInterface) : CommandServerHandler {
     companion object {
         private const val PROFILE_UPDATE_INTERVAL = 15L * 60 * 1000 // 15 minutes in milliseconds
         private const val TAG = "BoxService"
@@ -81,10 +78,7 @@ class BoxService(
     private var receiverRegistered = false
     private val receiver =
         object : BroadcastReceiver() {
-            override fun onReceive(
-                context: Context,
-                intent: Intent,
-            ) {
+            override fun onReceive(context: Context, intent: Intent) {
                 when (intent.action) {
                     Action.SERVICE_CLOSE -> {
                         stopService()
@@ -316,10 +310,7 @@ class BoxService(
         }
     }
 
-    private suspend fun stopAndAlert(
-        type: Alert,
-        message: String? = null,
-    ) {
+    private suspend fun stopAndAlert(type: Alert, message: String? = null) {
         Settings.startedByUser = false
         withContext(Dispatchers.Main) {
             if (receiverRegistered) {
@@ -368,9 +359,7 @@ class BoxService(
         return Service.START_NOT_STICKY
     }
 
-    internal fun onBind(): IBinder {
-        return binder
-    }
+    internal fun onBind(): IBinder = binder
 
     internal fun onDestroy() {
         binder.close()

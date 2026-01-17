@@ -52,7 +52,7 @@ class HookConnectivityManagerGetLinkProperties(private val helper: ConnectivityS
                     val underlying = helper.getUnderlyingLinkProperties(param.thisObject, callerUid)
                     param.result = underlying ?: VpnSanitizer.sanitizeLinkProperties(lp)
                 }
-            }
+            },
         )
     }
 
@@ -70,7 +70,7 @@ class HookConnectivityManagerGetLinkProperties(private val helper: ConnectivityS
                     val underlying = helper.getUnderlyingLinkProperties(param.thisObject, uid)
                     param.result = underlying ?: VpnSanitizer.sanitizeLinkProperties(lp)
                 }
-            }
+            },
         )
     }
 
@@ -88,7 +88,7 @@ class HookConnectivityManagerGetLinkProperties(private val helper: ConnectivityS
                         param.result = null
                     }
                 }
-            }
+            },
         )
     }
 }

@@ -6,10 +6,7 @@ import io.nekohasekai.sfa.compose.screen.qrscan.QRCodeCropArea
 import io.nekohasekai.sfa.update.UpdateInfo
 
 interface VendorInterface {
-    fun checkUpdate(
-        activity: Activity,
-        byUser: Boolean,
-    )
+    fun checkUpdate(activity: Activity, byUser: Boolean)
 
     fun createQRCodeAnalyzer(
         onSuccess: (String) -> Unit,
@@ -65,6 +62,5 @@ interface VendorInterface {
      * @param downloadUrl The URL to download the APK from
      * @throws Exception if download or install fails
      */
-    suspend fun downloadAndInstall(context: android.content.Context, downloadUrl: String): Unit =
-        throw UnsupportedOperationException("Not supported in this flavor")
+    suspend fun downloadAndInstall(context: android.content.Context, downloadUrl: String): Unit = throw UnsupportedOperationException("Not supported in this flavor")
 }

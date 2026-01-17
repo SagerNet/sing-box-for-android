@@ -29,7 +29,5 @@ object GlobalEventBus {
      * Try to emit an event without suspending.
      * Returns true if the event was emitted successfully.
      */
-    fun tryEmit(event: UiEvent): Boolean {
-        return _events.tryEmit(event)
-    }
+    fun tryEmit(event: UiEvent): Boolean = _events.tryEmit(event)
 }

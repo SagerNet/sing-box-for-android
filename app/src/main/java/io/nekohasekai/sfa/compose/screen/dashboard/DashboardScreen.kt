@@ -24,7 +24,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -37,10 +36,7 @@ import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.constant.Status
 import kotlinx.coroutines.launch
 
-data class CardRenderItem(
-    val cards: List<CardGroup>,
-    val isRow: Boolean,
-)
+data class CardRenderItem(val cards: List<CardGroup>, val isRow: Boolean)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -87,18 +83,18 @@ fun DashboardScreen(
                 }
             },
             dismissButton =
-                if (!note.migrationLink.isNullOrBlank()) {
-                    {
-                        TextButton(onClick = {
-                            viewModel.sendGlobalEvent(UiEvent.OpenUrl(note.migrationLink))
-                            viewModel.dismissDeprecatedNote()
-                        }) {
-                            Text(stringResource(R.string.error_deprecated_documentation))
-                        }
+            if (!note.migrationLink.isNullOrBlank()) {
+                {
+                    TextButton(onClick = {
+                        viewModel.sendGlobalEvent(UiEvent.OpenUrl(note.migrationLink))
+                        viewModel.dismissDeprecatedNote()
+                    }) {
+                        Text(stringResource(R.string.error_deprecated_documentation))
                     }
-                } else {
-                    null
-                },
+                }
+            } else {
+                null
+            },
         )
     }
 
@@ -134,9 +130,9 @@ fun DashboardScreen(
         }
         LazyColumn(
             modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp),
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(bottom = bottomPadding),
         ) {
@@ -172,8 +168,8 @@ fun DashboardScreen(
                             DashboardCardRenderer(
                                 cardGroup = cardGroup,
                                 cardWidth =
-                                    uiState.cardWidths[cardGroup]
-                                        ?: CardWidth.Full,
+                                uiState.cardWidths[cardGroup]
+                                    ?: CardWidth.Full,
                                 uiState = uiState,
                                 onClashModeSelected = viewModel::selectClashMode,
                                 onSystemProxyToggle = viewModel::toggleSystemProxy,
@@ -199,9 +195,9 @@ fun DashboardScreen(
                                 onOpenNewProfile = onOpenNewProfile,
                                 commandClient = viewModel.commandClient,
                                 modifier =
-                                    Modifier
-                                        .weight(1f)
-                                        .fillMaxWidth(),
+                                Modifier
+                                    .weight(1f)
+                                    .fillMaxWidth(),
                             )
                         }
                     }
@@ -211,8 +207,8 @@ fun DashboardScreen(
                         DashboardCardRenderer(
                             cardGroup = cardGroup,
                             cardWidth =
-                                uiState.cardWidths[cardGroup]
-                                    ?: CardWidth.Full,
+                            uiState.cardWidths[cardGroup]
+                                ?: CardWidth.Full,
                             uiState = uiState,
                             serviceStatus = serviceStatus,
                             onClashModeSelected = viewModel::selectClashMode,
@@ -307,17 +303,12 @@ fun processCardsForRendering(
  * This function is only relevant when the service is running.
  * Note: Profiles card is always available and should not use this function.
  */
-fun isCardAvailableWhenServiceRunning(
-    cardGroup: CardGroup,
-    uiState: DashboardUiState,
-): Boolean {
-    return when (cardGroup) {
-        CardGroup.ClashMode -> uiState.clashModeVisible
-        CardGroup.UploadTraffic -> uiState.trafficVisible
-        CardGroup.DownloadTraffic -> uiState.trafficVisible
-        CardGroup.Debug -> true // Debug info is always available when service is running
-        CardGroup.Connections -> uiState.trafficVisible
-        CardGroup.SystemProxy -> uiState.systemProxyVisible
-        CardGroup.Profiles -> true // This shouldn't be called for Profiles, but return true for safety
-    }
+fun isCardAvailableWhenServiceRunning(cardGroup: CardGroup, uiState: DashboardUiState): Boolean = when (cardGroup) {
+    CardGroup.ClashMode -> uiState.clashModeVisible
+    CardGroup.UploadTraffic -> uiState.trafficVisible
+    CardGroup.DownloadTraffic -> uiState.trafficVisible
+    CardGroup.Debug -> true // Debug info is always available when service is running
+    CardGroup.Connections -> uiState.trafficVisible
+    CardGroup.SystemProxy -> uiState.systemProxyVisible
+    CardGroup.Profiles -> true // This shouldn't be called for Profiles, but return true for safety
 }

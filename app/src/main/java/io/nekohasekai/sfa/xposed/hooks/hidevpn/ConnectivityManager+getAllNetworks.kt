@@ -23,7 +23,7 @@ class HookConnectivityManagerGetAllNetworks(private val helper: ConnectivityServ
                     val filtered = networks.filter { !helper.isVpnNetwork(param.thisObject, it) }
                     param.result = filtered.toTypedArray()
                 }
-            }
+            },
         )
     }
 }

@@ -17,17 +17,11 @@ object HookModuleUpdateNotifier {
     private const val CHANNEL_ID = "lsposed_module_update"
     private const val NOTIFICATION_ID = 0x5F10
 
-    fun needsRestart(status: HookStatusClient.Status?): Boolean {
-        return isDowngrade(status) || isUpgrade(status)
-    }
+    fun needsRestart(status: HookStatusClient.Status?): Boolean = isDowngrade(status) || isUpgrade(status)
 
-    fun isDowngrade(status: HookStatusClient.Status?): Boolean {
-        return status != null && status.version > HookModuleVersion.CURRENT
-    }
+    fun isDowngrade(status: HookStatusClient.Status?): Boolean = status != null && status.version > HookModuleVersion.CURRENT
 
-    fun isUpgrade(status: HookStatusClient.Status?): Boolean {
-        return status != null && status.version < HookModuleVersion.CURRENT
-    }
+    fun isUpgrade(status: HookStatusClient.Status?): Boolean = status != null && status.version < HookModuleVersion.CURRENT
 
     fun sync(context: Context) {
         HookStatusClient.refresh()

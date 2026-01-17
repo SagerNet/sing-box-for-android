@@ -1,18 +1,12 @@
 package io.nekohasekai.sfa.compose.model
 
 import androidx.compose.runtime.Immutable
+import io.nekohasekai.sfa.ktx.toList
 import io.nekohasekai.libbox.Connection as LibboxConnection
 import io.nekohasekai.libbox.ProcessInfo as LibboxProcessInfo
-import io.nekohasekai.sfa.ktx.toList
 
 @Immutable
-data class ProcessInfo(
-    val processId: Long,
-    val userId: Int,
-    val userName: String,
-    val processPath: String,
-    val packageName: String,
-) {
+data class ProcessInfo(val processId: Long, val userId: Int, val userName: String, val processPath: String, val packageName: String) {
     companion object {
         fun from(processInfo: LibboxProcessInfo?): ProcessInfo? {
             if (processInfo == null) return null
@@ -68,59 +62,53 @@ data class Connection(
         return true
     }
 
-    private fun performSearchPlain(content: String): Boolean {
-        return destination.contains(content, ignoreCase = true) ||
-            domain.contains(content, ignoreCase = true) ||
-            outbound.contains(content, ignoreCase = true) ||
-            rule.contains(content, ignoreCase = true) ||
-            processInfo?.packageName?.contains(content, ignoreCase = true) == true
-    }
+    private fun performSearchPlain(content: String): Boolean = destination.contains(content, ignoreCase = true) ||
+        domain.contains(content, ignoreCase = true) ||
+        outbound.contains(content, ignoreCase = true) ||
+        rule.contains(content, ignoreCase = true) ||
+        processInfo?.packageName?.contains(content, ignoreCase = true) == true
 
-    private fun performSearchType(type: String, value: String): Boolean {
-        return when (type) {
-            "network" -> network.equals(value, ignoreCase = true)
-            "inbound" -> inbound.contains(value, ignoreCase = true)
-            "inbound.type" -> inboundType.equals(value, ignoreCase = true)
-            "source" -> source.contains(value, ignoreCase = true)
-            "destination" -> destination.contains(value, ignoreCase = true)
-            "outbound" -> outbound.contains(value, ignoreCase = true)
-            "outbound.type" -> outboundType.equals(value, ignoreCase = true)
-            "rule" -> rule.contains(value, ignoreCase = true)
-            "protocol" -> protocolName.equals(value, ignoreCase = true)
-            "user" -> user.contains(value, ignoreCase = true)
-            "package" -> processInfo?.packageName?.contains(value, ignoreCase = true) == true
-            "chain" -> chain.any { it.contains(value, ignoreCase = true) }
-            else -> false
-        }
+    private fun performSearchType(type: String, value: String): Boolean = when (type) {
+        "network" -> network.equals(value, ignoreCase = true)
+        "inbound" -> inbound.contains(value, ignoreCase = true)
+        "inbound.type" -> inboundType.equals(value, ignoreCase = true)
+        "source" -> source.contains(value, ignoreCase = true)
+        "destination" -> destination.contains(value, ignoreCase = true)
+        "outbound" -> outbound.contains(value, ignoreCase = true)
+        "outbound.type" -> outboundType.equals(value, ignoreCase = true)
+        "rule" -> rule.contains(value, ignoreCase = true)
+        "protocol" -> protocolName.equals(value, ignoreCase = true)
+        "user" -> user.contains(value, ignoreCase = true)
+        "package" -> processInfo?.packageName?.contains(value, ignoreCase = true) == true
+        "chain" -> chain.any { it.contains(value, ignoreCase = true) }
+        else -> false
     }
 
     companion object {
-        fun from(connection: LibboxConnection): Connection {
-            return Connection(
-                id = connection.id,
-                inbound = connection.inbound,
-                inboundType = connection.inboundType,
-                ipVersion = connection.ipVersion,
-                network = connection.network,
-                source = connection.source,
-                destination = connection.destination,
-                domain = connection.domain,
-                displayDestination = connection.displayDestination(),
-                protocolName = connection.protocol,
-                user = connection.user,
-                fromOutbound = connection.fromOutbound,
-                createdAt = connection.createdAt,
-                closedAt = if (connection.closedAt > 0) connection.closedAt else null,
-                upload = connection.uplink,
-                download = connection.downlink,
-                uploadTotal = connection.uplinkTotal,
-                downloadTotal = connection.downlinkTotal,
-                rule = connection.rule,
-                outbound = connection.outbound,
-                outboundType = connection.outboundType,
-                chain = connection.chain().toList(),
-                processInfo = ProcessInfo.from(connection.processInfo),
-            )
-        }
+        fun from(connection: LibboxConnection): Connection = Connection(
+            id = connection.id,
+            inbound = connection.inbound,
+            inboundType = connection.inboundType,
+            ipVersion = connection.ipVersion,
+            network = connection.network,
+            source = connection.source,
+            destination = connection.destination,
+            domain = connection.domain,
+            displayDestination = connection.displayDestination(),
+            protocolName = connection.protocol,
+            user = connection.user,
+            fromOutbound = connection.fromOutbound,
+            createdAt = connection.createdAt,
+            closedAt = if (connection.closedAt > 0) connection.closedAt else null,
+            upload = connection.uplink,
+            download = connection.downlink,
+            uploadTotal = connection.uplinkTotal,
+            downloadTotal = connection.downlinkTotal,
+            rule = connection.rule,
+            outbound = connection.outbound,
+            outboundType = connection.outboundType,
+            chain = connection.chain().toList(),
+            processInfo = ProcessInfo.from(connection.processInfo),
+        )
     }
 }

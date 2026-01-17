@@ -1,5 +1,6 @@
 package io.nekohasekai.sfa.compose.screen.connections
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -32,14 +32,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.unit.Velocity
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
@@ -286,10 +286,7 @@ fun ConnectionDetailsScreen(
 }
 
 @Composable
-private fun DetailSection(
-    title: String,
-    content: @Composable ColumnScope.() -> Unit,
-) {
+private fun DetailSection(title: String, content: @Composable ColumnScope.() -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -317,12 +314,7 @@ private fun DetailSection(
 }
 
 @Composable
-private fun DetailRow(
-    label: String,
-    value: String,
-    monospace: Boolean = false,
-    valueColor: Color = MaterialTheme.colorScheme.onSurface,
-) {
+private fun DetailRow(label: String, value: String, monospace: Boolean = false, valueColor: Color = MaterialTheme.colorScheme.onSurface) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -346,20 +338,10 @@ private fun DetailRow(
 }
 
 @Composable
-private fun rememberBounceBlockingNestedScrollConnection(
-    scrollState: ScrollState
-): NestedScrollConnection = remember(scrollState) {
+private fun rememberBounceBlockingNestedScrollConnection(scrollState: ScrollState): NestedScrollConnection = remember(scrollState) {
     object : NestedScrollConnection {
-        override fun onPostScroll(
-            consumed: Offset,
-            available: Offset,
-            source: NestedScrollSource
-        ): Offset {
-            return if (available.y < 0) available else Offset.Zero
-        }
+        override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset = if (available.y < 0) available else Offset.Zero
 
-        override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
-            return if (available.y < 0) available else Velocity.Zero
-        }
+        override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity = if (available.y < 0) available else Velocity.Zero
     }
 }

@@ -15,10 +15,7 @@ import io.nekohasekai.sfa.update.UpdateState
 import io.nekohasekai.sfa.update.UpdateTrack
 import java.util.concurrent.TimeUnit
 
-class UpdateWorker(
-    private val appContext: Context,
-    params: WorkerParameters
-) : CoroutineWorker(appContext, params) {
+class UpdateWorker(private val appContext: Context, params: WorkerParameters) : CoroutineWorker(appContext, params) {
 
     companion object {
         private const val WORK_NAME = "AutoUpdate"
@@ -37,7 +34,8 @@ class UpdateWorker(
                 .build()
 
             val workRequest = PeriodicWorkRequestBuilder<UpdateWorker>(
-                24, TimeUnit.HOURS
+                24,
+                TimeUnit.HOURS,
             )
                 .setConstraints(constraints)
                 .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 1, TimeUnit.HOURS)
@@ -46,7 +44,7 @@ class UpdateWorker(
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 WORK_NAME,
                 ExistingPeriodicWorkPolicy.KEEP,
-                workRequest
+                workRequest,
             )
             Log.d(TAG, "Auto update scheduled")
         }

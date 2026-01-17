@@ -24,7 +24,7 @@ class HookConnectivityManagerGetAllNetworkInfo(private val helper: ConnectivityS
                     val filtered = infos.filter { it.type != ConnectivityManager.TYPE_VPN }
                     param.result = filtered.toTypedArray()
                 }
-            }
+            },
         )
     }
 }

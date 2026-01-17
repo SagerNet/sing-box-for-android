@@ -22,7 +22,7 @@ object ShizukuPrivilegedServiceClient {
     private var connection: ServiceConnection? = null
 
     private val args = Shizuku.UserServiceArgs(
-        ComponentName(Application.application, ShizukuPrivilegedService::class.java)
+        ComponentName(Application.application, ShizukuPrivilegedService::class.java),
     )
         .tag("sfa-privileged")
         .processNameSuffix("privileged")

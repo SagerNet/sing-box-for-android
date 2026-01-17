@@ -1,7 +1,6 @@
 package io.nekohasekai.sfa.compose.screen.dashboard
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -14,8 +13,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
@@ -44,20 +43,15 @@ import io.nekohasekai.sfa.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ClashModeCard(
-    modes: List<String>,
-    selectedMode: String,
-    onModeSelected: (String) -> Unit,
-    modifier: Modifier = Modifier,
-) {
+fun ClashModeCard(modes: List<String>, selectedMode: String, onModeSelected: (String) -> Unit, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier.fillMaxWidth(),
     ) {
         Column(
             modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -109,10 +103,10 @@ fun ClashModeCard(
                         modes.forEachIndexed { index, mode ->
                             SegmentedButton(
                                 shape =
-                                    SegmentedButtonDefaults.itemShape(
-                                        index = index,
-                                        count = modes.size,
-                                    ),
+                                SegmentedButtonDefaults.itemShape(
+                                    index = index,
+                                    count = modes.size,
+                                ),
                                 onClick = { onModeSelected(mode) },
                                 selected = mode == selectedMode,
                             ) {
@@ -127,11 +121,7 @@ fun ClashModeCard(
 }
 
 @Composable
-private fun ModeDropdown(
-    modes: List<String>,
-    selectedMode: String,
-    onModeSelected: (String) -> Unit,
-) {
+private fun ModeDropdown(modes: List<String>, selectedMode: String, onModeSelected: (String) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxWidth()) {
@@ -147,9 +137,9 @@ private fun ModeDropdown(
         ) {
             Row(
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(

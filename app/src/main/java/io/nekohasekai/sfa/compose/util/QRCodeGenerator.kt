@@ -87,12 +87,7 @@ object QRCodeGenerator {
         }
     }
 
-    fun generate(
-        content: String,
-        size: Int = 512,
-        foregroundColor: Int = Color.BLACK,
-        backgroundColor: Int = Color.WHITE,
-    ): Bitmap {
+    fun generate(content: String, size: Int = 512, foregroundColor: Int = Color.BLACK, backgroundColor: Int = Color.WHITE): Bitmap {
         val writer = QRCodeWriter()
         val bitMatrix = writer.encode(content, BarcodeFormat.QR_CODE, size, size)
 

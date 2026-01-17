@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
@@ -60,6 +59,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -149,9 +149,9 @@ fun NewProfileScreen(
                 }
             },
             colors =
-                TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                ),
+            TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
         )
     }
 
@@ -164,20 +164,20 @@ fun NewProfileScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier =
-                Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp)
-                    .padding(bottom = bottomBarPadding),
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp)
+                .padding(bottom = bottomBarPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             // Profile Name
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors =
-                    CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                    ),
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                ),
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -211,9 +211,9 @@ fun NewProfileScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors =
-                    CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                    ),
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                ),
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -233,30 +233,30 @@ fun NewProfileScreen(
                             onClick = { viewModel.updateProfileType(ProfileType.Local) },
                             modifier = Modifier.weight(1f),
                             shape =
-                                RoundedCornerShape(
-                                    topStart = 12.dp,
-                                    bottomStart = 12.dp,
-                                    topEnd = 0.dp,
-                                    bottomEnd = 0.dp,
-                                ),
+                            RoundedCornerShape(
+                                topStart = 12.dp,
+                                bottomStart = 12.dp,
+                                topEnd = 0.dp,
+                                bottomEnd = 0.dp,
+                            ),
                             colors =
-                                if (uiState.profileType == ProfileType.Local) {
-                                    ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    )
-                                } else {
-                                    ButtonDefaults.outlinedButtonColors()
-                                },
+                            if (uiState.profileType == ProfileType.Local) {
+                                ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                )
+                            } else {
+                                ButtonDefaults.outlinedButtonColors()
+                            },
                             border =
-                                BorderStroke(
-                                    1.dp,
-                                    if (uiState.profileType == ProfileType.Local) {
-                                        MaterialTheme.colorScheme.primary
-                                    } else {
-                                        MaterialTheme.colorScheme.outline
-                                    },
-                                ),
+                            BorderStroke(
+                                1.dp,
+                                if (uiState.profileType == ProfileType.Local) {
+                                    MaterialTheme.colorScheme.primary
+                                } else {
+                                    MaterialTheme.colorScheme.outline
+                                },
+                            ),
                         ) {
                             Text(stringResource(R.string.profile_type_local))
                         }
@@ -264,30 +264,30 @@ fun NewProfileScreen(
                             onClick = { viewModel.updateProfileType(ProfileType.Remote) },
                             modifier = Modifier.weight(1f),
                             shape =
-                                RoundedCornerShape(
-                                    topStart = 0.dp,
-                                    bottomStart = 0.dp,
-                                    topEnd = 12.dp,
-                                    bottomEnd = 12.dp,
-                                ),
+                            RoundedCornerShape(
+                                topStart = 0.dp,
+                                bottomStart = 0.dp,
+                                topEnd = 12.dp,
+                                bottomEnd = 12.dp,
+                            ),
                             colors =
-                                if (uiState.profileType == ProfileType.Remote) {
-                                    ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    )
-                                } else {
-                                    ButtonDefaults.outlinedButtonColors()
-                                },
+                            if (uiState.profileType == ProfileType.Remote) {
+                                ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                )
+                            } else {
+                                ButtonDefaults.outlinedButtonColors()
+                            },
                             border =
-                                BorderStroke(
-                                    1.dp,
-                                    if (uiState.profileType == ProfileType.Remote) {
-                                        MaterialTheme.colorScheme.primary
-                                    } else {
-                                        MaterialTheme.colorScheme.outline
-                                    },
-                                ),
+                            BorderStroke(
+                                1.dp,
+                                if (uiState.profileType == ProfileType.Remote) {
+                                    MaterialTheme.colorScheme.primary
+                                } else {
+                                    MaterialTheme.colorScheme.outline
+                                },
+                            ),
                         ) {
                             Text(stringResource(R.string.profile_type_remote))
                         }
@@ -304,9 +304,9 @@ fun NewProfileScreen(
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors =
-                        CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f),
-                        ),
+                    CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f),
+                    ),
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp),
@@ -326,30 +326,30 @@ fun NewProfileScreen(
                                 onClick = { viewModel.updateProfileSource(ProfileSource.CreateNew) },
                                 modifier = Modifier.weight(1f),
                                 shape =
-                                    RoundedCornerShape(
-                                        topStart = 12.dp,
-                                        bottomStart = 12.dp,
-                                        topEnd = 0.dp,
-                                        bottomEnd = 0.dp,
-                                    ),
+                                RoundedCornerShape(
+                                    topStart = 12.dp,
+                                    bottomStart = 12.dp,
+                                    topEnd = 0.dp,
+                                    bottomEnd = 0.dp,
+                                ),
                                 colors =
-                                    if (uiState.profileSource == ProfileSource.CreateNew) {
-                                        ButtonDefaults.buttonColors(
-                                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                                        )
-                                    } else {
-                                        ButtonDefaults.outlinedButtonColors()
-                                    },
+                                if (uiState.profileSource == ProfileSource.CreateNew) {
+                                    ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                                    )
+                                } else {
+                                    ButtonDefaults.outlinedButtonColors()
+                                },
                                 border =
-                                    BorderStroke(
-                                        1.dp,
-                                        if (uiState.profileSource == ProfileSource.CreateNew) {
-                                            MaterialTheme.colorScheme.secondary
-                                        } else {
-                                            MaterialTheme.colorScheme.outline
-                                        },
-                                    ),
+                                BorderStroke(
+                                    1.dp,
+                                    if (uiState.profileSource == ProfileSource.CreateNew) {
+                                        MaterialTheme.colorScheme.secondary
+                                    } else {
+                                        MaterialTheme.colorScheme.outline
+                                    },
+                                ),
                             ) {
                                 Icon(
                                     Icons.Default.CreateNewFolder,
@@ -363,30 +363,30 @@ fun NewProfileScreen(
                                 onClick = { viewModel.updateProfileSource(ProfileSource.Import) },
                                 modifier = Modifier.weight(1f),
                                 shape =
-                                    RoundedCornerShape(
-                                        topStart = 0.dp,
-                                        bottomStart = 0.dp,
-                                        topEnd = 12.dp,
-                                        bottomEnd = 12.dp,
-                                    ),
+                                RoundedCornerShape(
+                                    topStart = 0.dp,
+                                    bottomStart = 0.dp,
+                                    topEnd = 12.dp,
+                                    bottomEnd = 12.dp,
+                                ),
                                 colors =
-                                    if (uiState.profileSource == ProfileSource.Import) {
-                                        ButtonDefaults.buttonColors(
-                                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                                        )
-                                    } else {
-                                        ButtonDefaults.outlinedButtonColors()
-                                    },
+                                if (uiState.profileSource == ProfileSource.Import) {
+                                    ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                                    )
+                                } else {
+                                    ButtonDefaults.outlinedButtonColors()
+                                },
                                 border =
-                                    BorderStroke(
-                                        1.dp,
-                                        if (uiState.profileSource == ProfileSource.Import) {
-                                            MaterialTheme.colorScheme.secondary
-                                        } else {
-                                            MaterialTheme.colorScheme.outline
-                                        },
-                                    ),
+                                BorderStroke(
+                                    1.dp,
+                                    if (uiState.profileSource == ProfileSource.Import) {
+                                        MaterialTheme.colorScheme.secondary
+                                    } else {
+                                        MaterialTheme.colorScheme.outline
+                                    },
+                                ),
                             ) {
                                 Icon(
                                     Icons.Default.FileUpload,
@@ -408,20 +408,20 @@ fun NewProfileScreen(
                                     onClick = { filePickerLauncher.launch("*/*") },
                                     modifier = Modifier.fillMaxWidth(),
                                     border =
-                                        BorderStroke(
-                                            1.dp,
-                                            if (uiState.importError != null) {
-                                                MaterialTheme.colorScheme.error
-                                            } else {
-                                                MaterialTheme.colorScheme.outline
-                                            },
-                                        ),
+                                    BorderStroke(
+                                        1.dp,
+                                        if (uiState.importError != null) {
+                                            MaterialTheme.colorScheme.error
+                                        } else {
+                                            MaterialTheme.colorScheme.outline
+                                        },
+                                    ),
                                 ) {
                                     Row(
                                         modifier =
-                                            Modifier
-                                                .fillMaxWidth()
-                                                .padding(16.dp),
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                                     ) {
@@ -429,11 +429,11 @@ fun NewProfileScreen(
                                             Icons.Default.FileUpload,
                                             contentDescription = null,
                                             tint =
-                                                if (uiState.importError != null) {
-                                                    MaterialTheme.colorScheme.error
-                                                } else {
-                                                    MaterialTheme.colorScheme.primary
-                                                },
+                                            if (uiState.importError != null) {
+                                                MaterialTheme.colorScheme.error
+                                            } else {
+                                                MaterialTheme.colorScheme.primary
+                                            },
                                         )
                                         Column(modifier = Modifier.weight(1f)) {
                                             Text(
@@ -473,9 +473,9 @@ fun NewProfileScreen(
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors =
-                        CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.3f),
-                        ),
+                    CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.3f),
+                    ),
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp),
@@ -550,18 +550,18 @@ fun NewProfileScreen(
 
         Surface(
             modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter),
+            Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter),
             color = MaterialTheme.colorScheme.surface,
             tonalElevation = 3.dp,
         ) {
             Box(
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .windowInsetsPadding(WindowInsets.navigationBars)
-                        .padding(16.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .windowInsetsPadding(WindowInsets.navigationBars)
+                    .padding(16.dp),
             ) {
                 Button(
                     onClick = { viewModel.validateAndCreateProfile() },

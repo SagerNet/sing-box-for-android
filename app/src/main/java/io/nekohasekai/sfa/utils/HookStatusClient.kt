@@ -8,12 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 object HookStatusClient {
-    data class Status(
-        val active: Boolean,
-        val lastPatchedAt: Long,
-        val version: Int,
-        val systemPid: Int,
-    )
+    data class Status(val active: Boolean, val lastPatchedAt: Long, val version: Int, val systemPid: Int)
 
     private val statusFlow = MutableStateFlow<Status?>(null)
     val status: StateFlow<Status?> = statusFlow

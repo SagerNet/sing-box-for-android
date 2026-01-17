@@ -43,9 +43,7 @@ class ServiceBinder(private val status: MutableLiveData<Status>) : IService.Stub
         }
     }
 
-    override fun getStatus(): Int {
-        return (status.value ?: Status.Stopped).ordinal
-    }
+    override fun getStatus(): Int = (status.value ?: Status.Stopped).ordinal
 
     override fun registerCallback(callback: IServiceCallback) {
         callbacks.register(callback)

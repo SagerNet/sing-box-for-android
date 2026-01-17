@@ -25,7 +25,7 @@ object RootClient {
         Shell.setDefaultBuilder(
             Shell.Builder.create()
                 .setFlags(Shell.FLAG_MOUNT_MASTER)
-                .setTimeout(10)
+                .setTimeout(10),
         )
     }
 
@@ -95,6 +95,7 @@ object RootClient {
         val svc = bindService()
         return try {
             val slice = svc.getInstalledPackages(flags, userId)
+
             @Suppress("UNCHECKED_CAST")
             val list = slice.list as List<PackageInfo>
             list

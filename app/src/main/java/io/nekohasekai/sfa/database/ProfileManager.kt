@@ -35,17 +35,11 @@ object ProfileManager {
             .build()
     }
 
-    suspend fun nextOrder(): Long {
-        return instance.profileDao().nextOrder() ?: 0
-    }
+    suspend fun nextOrder(): Long = instance.profileDao().nextOrder() ?: 0
 
-    suspend fun nextFileID(): Long {
-        return instance.profileDao().nextFileID() ?: 1
-    }
+    suspend fun nextFileID(): Long = instance.profileDao().nextFileID() ?: 1
 
-    suspend fun get(id: Long): Profile? {
-        return instance.profileDao().get(id)
-    }
+    suspend fun get(id: Long): Profile? = instance.profileDao().get(id)
 
     suspend fun create(profile: Profile, andSelect: Boolean = false): Profile {
         profile.id = instance.profileDao().insert(profile)
@@ -98,7 +92,5 @@ object ProfileManager {
         }
     }
 
-    suspend fun list(): List<Profile> {
-        return instance.profileDao().list()
-    }
+    suspend fun list(): List<Profile> = instance.profileDao().list()
 }

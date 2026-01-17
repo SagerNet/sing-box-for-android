@@ -27,11 +27,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material.icons.filled.RestartAlt
-import io.nekohasekai.sfa.compat.animateItemCompat
 import androidx.compose.material.icons.outlined.BugReport
 import androidx.compose.material.icons.outlined.Cable
 import androidx.compose.material.icons.outlined.Download
-import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Route
 import androidx.compose.material.icons.outlined.SettingsEthernet
@@ -65,6 +63,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.compat.animateItemCompat
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -96,12 +95,12 @@ fun DashboardSettingsBottomSheet(
     var dragOffset by remember { mutableStateOf(0f) }
     val density = LocalDensity.current
 
-    fun onMove(
-        fromIndex: Int,
-        toIndex: Int,
-    ) {
-        if (fromIndex != toIndex && fromIndex >= 0 && toIndex >= 0 &&
-            fromIndex < reorderedList.size && toIndex < reorderedList.size
+    fun onMove(fromIndex: Int, toIndex: Int) {
+        if (fromIndex != toIndex &&
+            fromIndex >= 0 &&
+            toIndex >= 0 &&
+            fromIndex < reorderedList.size &&
+            toIndex < reorderedList.size
         ) {
             val newList = reorderedList.toMutableList()
             val item = newList.removeAt(fromIndex)
@@ -135,17 +134,17 @@ fun DashboardSettingsBottomSheet(
     ) {
         Column(
             modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.8f),
+            Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.8f),
         ) {
             // Header with reset button
             Row(
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp)
-                        .padding(bottom = 16.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -199,18 +198,18 @@ fun DashboardSettingsBottomSheet(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier =
-                    Modifier
-                        .padding(horizontal = 24.dp)
-                        .padding(bottom = 12.dp),
+                Modifier
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 12.dp),
             )
 
             // Reorderable list
             LazyColumn(
                 state = listState,
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
+                Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
                 contentPadding = PaddingValues(horizontal = 24.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
@@ -275,13 +274,13 @@ fun DashboardSettingsBottomSheet(
                             dragOffset = 0f
                         },
                         modifier =
-                            animateItemCompat(
-                                placementSpec =
-                                    spring(
-                                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                                        stiffness = Spring.StiffnessLow,
-                                    ),
+                        animateItemCompat(
+                            placementSpec =
+                            spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow,
                             ),
+                        ),
                     )
                 }
             }
@@ -315,40 +314,40 @@ fun DashboardItemCard(
 
     Card(
         modifier =
-            modifier
-                .fillMaxWidth()
-                .offset(y = with(LocalDensity.current) { offsetY.value.toDp() })
-                .zIndex(if (isDragging) 1f else 0f)
-                .clip(RoundedCornerShape(12.dp)),
+        modifier
+            .fillMaxWidth()
+            .offset(y = with(LocalDensity.current) { offsetY.value.toDp() })
+            .zIndex(if (isDragging) 1f else 0f)
+            .clip(RoundedCornerShape(12.dp)),
         elevation =
-            CardDefaults.cardElevation(
-                defaultElevation = cardElevation,
-            ),
+        CardDefaults.cardElevation(
+            defaultElevation = cardElevation,
+        ),
         colors =
-            CardDefaults.cardColors(
-                containerColor =
-                    if (isDragging) {
-                        MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
-                    } else {
-                        MaterialTheme.colorScheme.surface
-                    },
-            ),
+        CardDefaults.cardColors(
+            containerColor =
+            if (isDragging) {
+                MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
+            } else {
+                MaterialTheme.colorScheme.surface
+            },
+        ),
         border =
-            BorderStroke(
-                width = 1.dp,
-                color =
-                    if (isVisible) {
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
-                    } else {
-                        MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
-                    },
-            ),
+        BorderStroke(
+            width = 1.dp,
+            color =
+            if (isVisible) {
+                MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+            } else {
+                MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
+            },
+        ),
     ) {
         Row(
             modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             // Drag handle
@@ -361,66 +360,66 @@ fun DashboardItemCard(
                 imageVector = Icons.Default.DragHandle,
                 contentDescription = stringResource(R.string.drag_to_reorder),
                 modifier =
-                    Modifier
-                        .size(24.dp)
-                        .draggable(
-                            state = draggableState,
-                            orientation = Orientation.Vertical,
-                            onDragStarted = { onDragStart() },
-                            onDragStopped = { onDragEnd() },
-                        )
-                        .padding(4.dp),
+                Modifier
+                    .size(24.dp)
+                    .draggable(
+                        state = draggableState,
+                        orientation = Orientation.Vertical,
+                        onDragStarted = { onDragStart() },
+                        onDragStopped = { onDragEnd() },
+                    )
+                    .padding(4.dp),
                 tint =
-                    if (isDragging) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    },
+                if (isDragging) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                },
             )
 
             // Card icon
             Icon(
                 imageVector =
-                    when (cardGroup) {
-                        CardGroup.Debug -> Icons.Outlined.BugReport
-                        CardGroup.Connections -> Icons.Outlined.Cable
-                        CardGroup.UploadTraffic -> Icons.Outlined.Upload
-                        CardGroup.DownloadTraffic -> Icons.Outlined.Download
-                        CardGroup.ClashMode -> Icons.Outlined.Route
-                        CardGroup.SystemProxy -> Icons.Outlined.SettingsEthernet
-                        CardGroup.Profiles -> Icons.Outlined.Person
-                    },
+                when (cardGroup) {
+                    CardGroup.Debug -> Icons.Outlined.BugReport
+                    CardGroup.Connections -> Icons.Outlined.Cable
+                    CardGroup.UploadTraffic -> Icons.Outlined.Upload
+                    CardGroup.DownloadTraffic -> Icons.Outlined.Download
+                    CardGroup.ClashMode -> Icons.Outlined.Route
+                    CardGroup.SystemProxy -> Icons.Outlined.SettingsEthernet
+                    CardGroup.Profiles -> Icons.Outlined.Person
+                },
                 contentDescription = null,
                 modifier =
-                    Modifier
-                        .size(24.dp)
-                        .padding(horizontal = 4.dp),
+                Modifier
+                    .size(24.dp)
+                    .padding(horizontal = 4.dp),
                 tint =
-                    if (isVisible) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    },
+                if (isVisible) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                },
             )
 
             // Card info
             Column(
                 modifier =
-                    Modifier
-                        .weight(1f)
-                        .padding(horizontal = 8.dp),
+                Modifier
+                    .weight(1f)
+                    .padding(horizontal = 8.dp),
             ) {
                 Text(
                     text =
-                        when (cardGroup) {
-                            CardGroup.Debug -> stringResource(R.string.title_debug)
-                            CardGroup.Connections -> stringResource(R.string.title_connections)
-                            CardGroup.UploadTraffic -> stringResource(R.string.upload)
-                            CardGroup.DownloadTraffic -> stringResource(R.string.download)
-                            CardGroup.ClashMode -> stringResource(R.string.clash_mode)
-                            CardGroup.SystemProxy -> stringResource(R.string.system_proxy)
-                            CardGroup.Profiles -> stringResource(R.string.title_configuration)
-                        },
+                    when (cardGroup) {
+                        CardGroup.Debug -> stringResource(R.string.title_debug)
+                        CardGroup.Connections -> stringResource(R.string.title_connections)
+                        CardGroup.UploadTraffic -> stringResource(R.string.upload)
+                        CardGroup.DownloadTraffic -> stringResource(R.string.download)
+                        CardGroup.ClashMode -> stringResource(R.string.clash_mode)
+                        CardGroup.SystemProxy -> stringResource(R.string.system_proxy)
+                        CardGroup.Profiles -> stringResource(R.string.title_configuration)
+                    },
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurface,

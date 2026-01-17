@@ -144,7 +144,7 @@ class HookConnectivityManagerRequestNetwork(private val helper: ConnectivityServ
                     val nc = param.args[0] as? NetworkCapabilities ?: return
                     param.args[0] = VpnSanitizer.sanitizeRequestCapabilities(nc)
                 }
-            }
+            },
         )
     }
 
@@ -165,7 +165,7 @@ class HookConnectivityManagerRequestNetwork(private val helper: ConnectivityServ
                     val nc = param.args[0] as? NetworkCapabilities ?: return
                     param.args[0] = VpnSanitizer.sanitizeRequestCapabilities(nc)
                 }
-            }
+            },
         )
     }
 
@@ -190,7 +190,7 @@ class HookConnectivityManagerRequestNetwork(private val helper: ConnectivityServ
                     val nc = param.args[1] as? NetworkCapabilities ?: return
                     param.args[1] = VpnSanitizer.sanitizeRequestCapabilities(nc)
                 }
-            }
+            },
         )
     }
 
@@ -216,7 +216,7 @@ class HookConnectivityManagerRequestNetwork(private val helper: ConnectivityServ
                     val nc = param.args[1] as? NetworkCapabilities ?: return
                     param.args[1] = VpnSanitizer.sanitizeRequestCapabilities(nc)
                 }
-            }
+            },
         )
     }
 
@@ -238,7 +238,7 @@ class HookConnectivityManagerRequestNetwork(private val helper: ConnectivityServ
                     val nc = param.args[0] as? NetworkCapabilities ?: return
                     param.args[0] = VpnSanitizer.sanitizeRequestCapabilities(nc)
                 }
-            }
+            },
         )
     }
 
@@ -257,7 +257,7 @@ class HookConnectivityManagerRequestNetwork(private val helper: ConnectivityServ
                     val nc = param.args[0] as? NetworkCapabilities ?: return
                     param.args[0] = VpnSanitizer.sanitizeRequestCapabilities(nc)
                 }
-            }
+            },
         )
     }
 
@@ -278,7 +278,7 @@ class HookConnectivityManagerRequestNetwork(private val helper: ConnectivityServ
                     val nc = param.args[0] as? NetworkCapabilities ?: return
                     param.args[0] = VpnSanitizer.sanitizeRequestCapabilities(nc)
                 }
-            }
+            },
         )
     }
 
@@ -300,7 +300,7 @@ class HookConnectivityManagerRequestNetwork(private val helper: ConnectivityServ
                     val nc = param.args[0] as? NetworkCapabilities ?: return
                     param.args[0] = VpnSanitizer.sanitizeRequestCapabilities(nc)
                 }
-            }
+            },
         )
     }
 
@@ -321,7 +321,7 @@ class HookConnectivityManagerRequestNetwork(private val helper: ConnectivityServ
                     val nc = param.args[0] as? NetworkCapabilities ?: return
                     param.args[0] = VpnSanitizer.sanitizeRequestCapabilities(nc)
                 }
-            }
+            },
         )
     }
 
@@ -339,7 +339,7 @@ class HookConnectivityManagerRequestNetwork(private val helper: ConnectivityServ
                     val nc = param.args[0] as? NetworkCapabilities ?: return
                     param.args[0] = VpnSanitizer.sanitizeRequestCapabilities(nc)
                 }
-            }
+            },
         )
     }
 
@@ -358,7 +358,7 @@ class HookConnectivityManagerRequestNetwork(private val helper: ConnectivityServ
                     val nc = param.args[0] as? NetworkCapabilities ?: return
                     param.args[0] = VpnSanitizer.sanitizeRequestCapabilities(nc)
                 }
-            }
+            },
         )
     }
 
@@ -379,7 +379,7 @@ class HookConnectivityManagerRequestNetwork(private val helper: ConnectivityServ
                     val nc = param.args[0] as? NetworkCapabilities ?: return
                     param.args[0] = VpnSanitizer.sanitizeRequestCapabilities(nc)
                 }
-            }
+            },
         )
     }
 
@@ -397,7 +397,7 @@ class HookConnectivityManagerRequestNetwork(private val helper: ConnectivityServ
                     val nc = param.args[0] as? NetworkCapabilities ?: return
                     param.args[0] = VpnSanitizer.sanitizeRequestCapabilities(nc)
                 }
-            }
+            },
         )
     }
 
@@ -416,7 +416,7 @@ class HookConnectivityManagerRequestNetwork(private val helper: ConnectivityServ
                     val nc = param.args[0] as? NetworkCapabilities ?: return
                     param.args[0] = VpnSanitizer.sanitizeRequestCapabilities(nc)
                 }
-            }
+            },
         )
     }
 
@@ -436,7 +436,7 @@ class HookConnectivityManagerRequestNetwork(private val helper: ConnectivityServ
                     val nc = param.result as? NetworkCapabilities ?: return
                     param.result = VpnSanitizer.sanitizeRequestCapabilities(nc)
                 }
-            }
+            },
         )
     }
 
@@ -455,7 +455,7 @@ class HookConnectivityManagerRequestNetwork(private val helper: ConnectivityServ
                     val nc = param.result as? NetworkCapabilities ?: return
                     param.result = VpnSanitizer.sanitizeRequestCapabilities(nc)
                 }
-            }
+            },
         )
     }
 
@@ -512,7 +512,7 @@ class HookConnectivityManagerRequestNetwork(private val helper: ConnectivityServ
                 override fun afterHook(param: MethodHookParam) {
                     VpnHideContext.clear()
                 }
-            }
+            },
         )
     }
 
@@ -536,7 +536,7 @@ class HookConnectivityManagerRequestNetwork(private val helper: ConnectivityServ
                 override fun afterHook(param: MethodHookParam) {
                     VpnHideContext.clear()
                 }
-            }
+            },
         )
     }
 
@@ -566,7 +566,7 @@ class HookConnectivityManagerRequestNetwork(private val helper: ConnectivityServ
                 override fun afterHook(param: MethodHookParam) {
                     VpnHideContext.clear()
                 }
-            }
+            },
         )
     }
 

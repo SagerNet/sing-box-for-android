@@ -1,5 +1,6 @@
 package io.nekohasekai.sfa.vendor
 
+import android.content.IIntentSender
 import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.IPackageInstaller
@@ -11,11 +12,10 @@ import android.os.Bundle
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
 import android.system.Os
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
-import android.content.IIntentSender
 import io.nekohasekai.sfa.BuildConfig
 import java.io.IOException
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 object PrivilegedServiceUtils {
 
@@ -27,14 +27,14 @@ object PrivilegedServiceUtils {
         iPackageManagerClass.getMethod(
             "getInstalledPackages",
             Long::class.javaPrimitiveType,
-            Int::class.javaPrimitiveType
+            Int::class.javaPrimitiveType,
         )
     }
     private val getInstalledPackagesMethodInt by lazy {
         iPackageManagerClass.getMethod(
             "getInstalledPackages",
             Int::class.javaPrimitiveType,
-            Int::class.javaPrimitiveType
+            Int::class.javaPrimitiveType,
         )
     }
     private val getPackageInstallerMethod by lazy { iPackageManagerClass.getMethod("getPackageInstaller") }
@@ -44,14 +44,14 @@ object PrivilegedServiceUtils {
             IPackageInstaller::class.java,
             String::class.java,
             String::class.java,
-            Int::class.javaPrimitiveType
+            Int::class.javaPrimitiveType,
         )
     }
     private val packageInstallerCtorPre by lazy {
         PackageInstaller::class.java.getConstructor(
             IPackageInstaller::class.java,
             String::class.java,
-            Int::class.javaPrimitiveType
+            Int::class.javaPrimitiveType,
         )
     }
     private val sessionCtor by lazy {
@@ -149,17 +149,13 @@ object PrivilegedServiceUtils {
         installerPackageName: String,
         installerAttributionTag: String?,
         userId: Int,
-    ): PackageInstaller {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            packageInstallerCtorS.newInstance(installer, installerPackageName, installerAttributionTag, userId)
-        } else {
-            packageInstallerCtorPre.newInstance(installer, installerPackageName, userId)
-        }
+    ): PackageInstaller = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        packageInstallerCtorS.newInstance(installer, installerPackageName, installerAttributionTag, userId)
+    } else {
+        packageInstallerCtorPre.newInstance(installer, installerPackageName, userId)
     }
 
-    private fun createSession(session: IPackageInstallerSession): PackageInstaller.Session {
-        return sessionCtor.newInstance(session)
-    }
+    private fun createSession(session: IPackageInstallerSession): PackageInstaller.Session = sessionCtor.newInstance(session)
 
     private fun createIntentSender(onResult: (Intent) -> Unit): IntentSender {
         val sender = object : IIntentSender.Stub() {

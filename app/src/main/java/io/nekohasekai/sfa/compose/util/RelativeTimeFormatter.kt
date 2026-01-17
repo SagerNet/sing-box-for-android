@@ -11,10 +11,7 @@ object RelativeTimeFormatter {
      * Formats a date as relative time for recent dates (within 7 days)
      * or as full date/time for older dates.
      */
-    fun format(
-        context: Context,
-        date: Date?,
-    ): String {
+    fun format(context: Context, date: Date?): String {
         if (date == null) return ""
 
         val now = System.currentTimeMillis()
@@ -59,10 +56,7 @@ object RelativeTimeFormatter {
      * Formats a date as short relative time for compact displays.
      * Uses shorter format like "2h" instead of "2 hours ago".
      */
-    fun formatShort(
-        context: Context,
-        date: Date?,
-    ): String {
+    fun formatShort(context: Context, date: Date?): String {
         if (date == null) return ""
 
         val now = System.currentTimeMillis()

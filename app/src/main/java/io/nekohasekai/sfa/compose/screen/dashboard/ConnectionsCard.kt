@@ -24,19 +24,15 @@ import androidx.compose.ui.unit.dp
 import io.nekohasekai.sfa.R
 
 @Composable
-fun ConnectionsCard(
-    connectionsIn: String,
-    connectionsOut: String,
-    modifier: Modifier = Modifier,
-) {
+fun ConnectionsCard(connectionsIn: String, connectionsOut: String, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier.fillMaxWidth(),
     ) {
         Column(
             modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,

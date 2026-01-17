@@ -16,11 +16,9 @@ class TypedProfile() : Parcelable {
         Remote,
         ;
 
-        fun getString(context: Context): String {
-            return when (this) {
-                Local -> context.getString(R.string.profile_type_local)
-                Remote -> context.getString(R.string.profile_type_remote)
-            }
+        fun getString(context: Context): String = when (this) {
+            Local -> context.getString(R.string.profile_type_local)
+            Remote -> context.getString(R.string.profile_type_remote)
         }
 
         companion object {
@@ -54,10 +52,7 @@ class TypedProfile() : Parcelable {
         }
     }
 
-    override fun writeToParcel(
-        writer: Parcel,
-        flags: Int,
-    ) {
+    override fun writeToParcel(writer: Parcel, flags: Int) {
         writer.writeInt(1)
         writer.writeString(path)
         writer.writeInt(type.ordinal)
@@ -67,18 +62,12 @@ class TypedProfile() : Parcelable {
         writer.writeInt(autoUpdateInterval)
     }
 
-    override fun describeContents(): Int {
-        return 0
-    }
+    override fun describeContents(): Int = 0
 
     companion object CREATOR : Parcelable.Creator<TypedProfile> {
-        override fun createFromParcel(parcel: Parcel): TypedProfile {
-            return TypedProfile(parcel)
-        }
+        override fun createFromParcel(parcel: Parcel): TypedProfile = TypedProfile(parcel)
 
-        override fun newArray(size: Int): Array<TypedProfile?> {
-            return arrayOfNulls(size)
-        }
+        override fun newArray(size: Int): Array<TypedProfile?> = arrayOfNulls(size)
     }
 
     class Convertor {

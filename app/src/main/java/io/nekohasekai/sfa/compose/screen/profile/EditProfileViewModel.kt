@@ -109,9 +109,9 @@ class EditProfileViewModel(application: Application) : AndroidViewModel(applicat
             state.copy(
                 name = name,
                 hasChanges =
-                    checkHasChanges(
-                        state.copy(name = name),
-                    ),
+                checkHasChanges(
+                    state.copy(name = name),
+                ),
             )
         }
     }
@@ -121,9 +121,9 @@ class EditProfileViewModel(application: Application) : AndroidViewModel(applicat
             state.copy(
                 icon = icon,
                 hasChanges =
-                    checkHasChanges(
-                        state.copy(icon = icon),
-                    ),
+                checkHasChanges(
+                    state.copy(icon = icon),
+                ),
             )
         }
     }
@@ -141,9 +141,9 @@ class EditProfileViewModel(application: Application) : AndroidViewModel(applicat
             state.copy(
                 remoteUrl = url,
                 hasChanges =
-                    checkHasChanges(
-                        state.copy(remoteUrl = url),
-                    ),
+                checkHasChanges(
+                    state.copy(remoteUrl = url),
+                ),
             )
         }
     }
@@ -153,9 +153,9 @@ class EditProfileViewModel(application: Application) : AndroidViewModel(applicat
             state.copy(
                 autoUpdate = enabled,
                 hasChanges =
-                    checkHasChanges(
-                        state.copy(autoUpdate = enabled),
-                    ),
+                checkHasChanges(
+                    state.copy(autoUpdate = enabled),
+                ),
             )
         }
     }
@@ -174,22 +174,20 @@ class EditProfileViewModel(application: Application) : AndroidViewModel(applicat
                 autoUpdateInterval = intValue,
                 autoUpdateIntervalError = error,
                 hasChanges =
-                    if (error == null) {
-                        checkHasChanges(state.copy(autoUpdateInterval = intValue))
-                    } else {
-                        state.hasChanges
-                    },
+                if (error == null) {
+                    checkHasChanges(state.copy(autoUpdateInterval = intValue))
+                } else {
+                    state.hasChanges
+                },
             )
         }
     }
 
-    private fun checkHasChanges(state: EditProfileUiState): Boolean {
-        return state.name != state.originalName ||
-            state.icon != state.originalIcon ||
-            state.remoteUrl != state.originalRemoteUrl ||
-            state.autoUpdate != state.originalAutoUpdate ||
-            state.autoUpdateInterval != state.originalAutoUpdateInterval
-    }
+    private fun checkHasChanges(state: EditProfileUiState): Boolean = state.name != state.originalName ||
+        state.icon != state.originalIcon ||
+        state.remoteUrl != state.originalRemoteUrl ||
+        state.autoUpdate != state.originalAutoUpdate ||
+        state.autoUpdateInterval != state.originalAutoUpdateInterval
 
     fun saveChanges() {
         val state = _uiState.value
@@ -343,10 +341,7 @@ class EditProfileViewModel(application: Application) : AndroidViewModel(applicat
         }
     }
 
-    fun saveExportToUri(
-        context: Context,
-        uri: Uri,
-    ) {
+    fun saveExportToUri(context: Context, uri: Uri) {
         val content = pendingExportContent ?: return
 
         viewModelScope.launch(Dispatchers.IO) {

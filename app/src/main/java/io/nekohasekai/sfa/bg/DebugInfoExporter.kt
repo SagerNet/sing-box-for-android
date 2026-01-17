@@ -13,7 +13,6 @@ import java.io.StringWriter
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.zip.Deflater
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
@@ -134,11 +133,7 @@ object DebugInfoExporter {
         return count
     }
 
-    private fun addLogEntries(
-        zip: ZipOutputStream,
-        warnings: MutableList<String>,
-        context: Context,
-    ): Int {
+    private fun addLogEntries(zip: ZipOutputStream, warnings: MutableList<String>, context: Context): Int {
         var count = 0
         if (streamCommandToZip(zip, "logs/logcat.txt", warnings, listOf("logcat", "-d", "-b", "all")) != null) count++
         if (streamCommandToZip(zip, "logs/dmesg.txt", warnings, listOf("dmesg")) != null) count++
@@ -185,11 +180,7 @@ object DebugInfoExporter {
         }
     }
 
-    private fun addSystemEntries(
-        zip: ZipOutputStream,
-        warnings: MutableList<String>,
-        packageName: String,
-    ): Int {
+    private fun addSystemEntries(zip: ZipOutputStream, warnings: MutableList<String>, packageName: String): Int {
         var count = 0
         if (streamCommandToZip(zip, "system/getprop.txt", warnings, listOf("getprop")) != null) count++
         if (streamCommandToZip(zip, "system/uname.txt", warnings, listOf("uname", "-a")) != null) count++
@@ -210,27 +201,28 @@ object DebugInfoExporter {
         if (cmdPackages != null) count++
         if ((cmdPackages == null || cmdPackages.bytes == 0L) && (cmdPackages?.exitCode ?: 1) != 0) {
             if (streamCommandToZip(
-                zip,
-                "system/packages_pm.txt",
-                warnings,
-                listOf("pm", "list", "packages", "-f"),
-            ) != null) count++
+                    zip,
+                    "system/packages_pm.txt",
+                    warnings,
+                    listOf("pm", "list", "packages", "-f"),
+                ) != null
+            ) {
+                count++
+            }
         }
         if (streamCommandToZip(
-            zip,
-            "system/dumpsys_package_${packageName}.txt",
-            warnings,
-            listOf("dumpsys", "package", packageName),
-        ) != null) count++
+                zip,
+                "system/dumpsys_package_$packageName.txt",
+                warnings,
+                listOf("dumpsys", "package", packageName),
+            ) != null
+        ) {
+            count++
+        }
         return count
     }
 
-    private fun addFileEntry(
-        zip: ZipOutputStream,
-        file: File,
-        entryName: String,
-        warnings: MutableList<String>,
-    ): Boolean {
+    private fun addFileEntry(zip: ZipOutputStream, file: File, entryName: String, warnings: MutableList<String>): Boolean {
         if (!file.isFile) {
             warnings.add("missing file: ${file.path}")
             return false
@@ -262,51 +254,40 @@ object DebugInfoExporter {
         zip.closeEntry()
     }
 
-    private data class CommandResult(
-        val exitCode: Int,
-        val bytes: Long,
-    )
+    private data class CommandResult(val exitCode: Int, val bytes: Long)
 
     private fun streamCommandToZip(
         zip: ZipOutputStream,
         entryName: String,
         warnings: MutableList<String>,
         command: List<String>,
-    ): CommandResult? {
-        return try {
-            val process = ProcessBuilder(command).redirectErrorStream(true).start()
-            val entry = ZipEntry(entryName)
-            zip.putNextEntry(entry)
-            var bytes = 0L
-            process.inputStream.use { input ->
-                val buffer = ByteArray(16 * 1024)
-                while (true) {
-                    val read = input.read(buffer)
-                    if (read <= 0) break
-                    zip.write(buffer, 0, read)
-                    bytes += read
-                }
+    ): CommandResult? = try {
+        val process = ProcessBuilder(command).redirectErrorStream(true).start()
+        val entry = ZipEntry(entryName)
+        zip.putNextEntry(entry)
+        var bytes = 0L
+        process.inputStream.use { input ->
+            val buffer = ByteArray(16 * 1024)
+            while (true) {
+                val read = input.read(buffer)
+                if (read <= 0) break
+                zip.write(buffer, 0, read)
+                bytes += read
             }
-            zip.closeEntry()
-            val code = process.waitFor()
-            if (code != 0) {
-                warnings.add("command failed (${command.joinToString(" ")}): exit=$code")
-            }
-            CommandResult(code, bytes)
-        } catch (e: Throwable) {
-            warnings.add("command failed (${command.joinToString(" ")}): ${e.message}")
-            runCatching { zip.closeEntry() }
-            null
         }
+        zip.closeEntry()
+        val code = process.waitFor()
+        if (code != 0) {
+            warnings.add("command failed (${command.joinToString(" ")}): exit=$code")
+        }
+        CommandResult(code, bytes)
+    } catch (e: Throwable) {
+        warnings.add("command failed (${command.joinToString(" ")}): ${e.message}")
+        runCatching { zip.closeEntry() }
+        null
     }
 
-    private fun buildError(
-        stage: String,
-        detail: String,
-        throwable: Throwable?,
-        warnings: List<String>,
-        outputPath: String?,
-    ): String {
+    private fun buildError(stage: String, detail: String, throwable: Throwable?, warnings: List<String>, outputPath: String?): String {
         val sb = StringBuilder()
         sb.append("stage=").append(stage).append('\n')
         if (!outputPath.isNullOrBlank()) {

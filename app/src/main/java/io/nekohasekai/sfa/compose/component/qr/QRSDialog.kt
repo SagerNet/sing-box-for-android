@@ -1,9 +1,9 @@
 package io.nekohasekai.sfa.compose.component.qr
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.Color
 import android.net.Uri
-import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -58,11 +58,7 @@ import io.nekohasekai.sfa.qrs.QRSEncoder
 import kotlinx.coroutines.delay
 
 @Composable
-fun QRSDialog(
-    profileData: ByteArray,
-    profileName: String,
-    onDismiss: () -> Unit,
-) {
+fun QRSDialog(profileData: ByteArray, profileName: String, onDismiss: () -> Unit) {
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val isTablet = configuration.isLayoutSizeAtLeast(Configuration.SCREENLAYOUT_SIZE_LARGE)
@@ -126,16 +122,16 @@ fun QRSDialog(
     ) {
         Card(
             modifier =
-                if (isTablet) {
-                    Modifier
-                        .fillMaxWidth(0.85f)
-                        .sizeIn(maxWidth = 960.dp)
-                        .wrapContentHeight()
-                } else {
-                    Modifier
-                        .fillMaxWidth(0.9f)
-                        .wrapContentHeight()
-                },
+            if (isTablet) {
+                Modifier
+                    .fillMaxWidth(0.85f)
+                    .sizeIn(maxWidth = 960.dp)
+                    .wrapContentHeight()
+            } else {
+                Modifier
+                    .fillMaxWidth(0.9f)
+                    .wrapContentHeight()
+            },
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surface,

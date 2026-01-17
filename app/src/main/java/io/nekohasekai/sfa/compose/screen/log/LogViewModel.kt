@@ -13,7 +13,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.LinkedList
 
-class LogViewModel : BaseLogViewModel(), CommandClient.Handler {
+class LogViewModel :
+    BaseLogViewModel(),
+    CommandClient.Handler {
     companion object {
         private val maxLines = 3000
     }

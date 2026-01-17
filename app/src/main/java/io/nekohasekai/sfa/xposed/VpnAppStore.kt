@@ -45,9 +45,7 @@ object VpnAppStore {
         return result
     }
 
-    fun isVpnPackage(packageName: String, userId: Int): Boolean {
-        return getVpnPackages(userId).contains(packageName)
-    }
+    fun isVpnPackage(packageName: String, userId: Int): Boolean = getVpnPackages(userId).contains(packageName)
 
     fun isVpnUidExcludeSelf(uid: Int): Boolean {
         val packages = getPackagesForUid(uid)
@@ -149,18 +147,14 @@ object VpnAppStore {
         return unwrapParceledListSlice(result)
     }
 
-    private fun isSystemApp(info: ApplicationInfo): Boolean {
-        return info.flags and ApplicationInfo.FLAG_SYSTEM != 0 ||
-            info.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP != 0
-    }
+    private fun isSystemApp(info: ApplicationInfo): Boolean = info.flags and ApplicationInfo.FLAG_SYSTEM != 0 ||
+        info.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP != 0
 
-    private fun getPackageManager(): Any? {
-        return try {
-            getPackageManagerMethod.invoke(null)
-        } catch (e: Throwable) {
-            HookErrorStore.e("VpnAppStore", "getPackageManager failed", e)
-            null
-        }
+    private fun getPackageManager(): Any? = try {
+        getPackageManagerMethod.invoke(null)
+    } catch (e: Throwable) {
+        HookErrorStore.e("VpnAppStore", "getPackageManager failed", e)
+        null
     }
 
     private inline fun <T> binderLocalScope(block: () -> T): T {

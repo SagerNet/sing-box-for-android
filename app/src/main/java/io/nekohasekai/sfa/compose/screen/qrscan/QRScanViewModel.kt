@@ -83,7 +83,7 @@ class QRScanViewModel(application: Application) : AndroidViewModel(application) 
         _uiState.update {
             it.copy(
                 vendorAnalyzerAvailable = vendorAnalyzer != null,
-                useVendorAnalyzer = vendorAnalyzer != null
+                useVendorAnalyzer = vendorAnalyzer != null,
             )
         }
     }
@@ -196,7 +196,7 @@ class QRScanViewModel(application: Application) : AndroidViewModel(application) 
                 lifecycleOwner,
                 cameraSelector,
                 preview,
-                analysis
+                analysis,
             )
             val maxZoom = camera?.cameraInfo?.zoomState?.value?.maxZoomRatio ?: 1f
             _uiState.update { it.copy(maxZoomRatio = maxZoom, zoomRatio = 1f) }

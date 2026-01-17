@@ -47,10 +47,8 @@ open class CommandClient(
         }
     }
 
-    private fun getAllHandlers(): List<Handler> {
-        return synchronized(additionalHandlers) {
-            listOf(handler) + additionalHandlers
-        }
+    private fun getAllHandlers(): List<Handler> = synchronized(additionalHandlers) {
+        listOf(handler) + additionalHandlers
     }
 
     enum class ConnectionType {
@@ -76,10 +74,7 @@ open class CommandClient(
 
         fun updateGroups(newGroups: MutableList<OutboundGroup>) {}
 
-        fun initializeClashMode(
-            modeList: List<String>,
-            currentMode: String,
-        ) {}
+        fun initializeClashMode(modeList: List<String>, currentMode: String) {}
 
         fun updateClashMode(newMode: String) {}
 
@@ -162,10 +157,7 @@ open class CommandClient(
             getAllHandlers().forEach { it.updateStatus(message) }
         }
 
-        override fun initializeClashMode(
-            modeList: StringIterator,
-            currentMode: String,
-        ) {
+        override fun initializeClashMode(modeList: StringIterator, currentMode: String) {
             val modes = modeList.toList()
             getAllHandlers().forEach { it.initializeClashMode(modes, currentMode) }
         }

@@ -1,11 +1,9 @@
 package io.nekohasekai.sfa.qrs
 
-fun ByteArray.readIntLE(offset: Int): Int {
-    return (this[offset].toInt() and 0xFF) or
-        ((this[offset + 1].toInt() and 0xFF) shl 8) or
-        ((this[offset + 2].toInt() and 0xFF) shl 16) or
-        ((this[offset + 3].toInt() and 0xFF) shl 24)
-}
+fun ByteArray.readIntLE(offset: Int): Int = (this[offset].toInt() and 0xFF) or
+    ((this[offset + 1].toInt() and 0xFF) shl 8) or
+    ((this[offset + 2].toInt() and 0xFF) shl 16) or
+    ((this[offset + 3].toInt() and 0xFF) shl 24)
 
 fun ByteArray.writeIntLE(offset: Int, value: Int) {
     this[offset] = value.toByte()

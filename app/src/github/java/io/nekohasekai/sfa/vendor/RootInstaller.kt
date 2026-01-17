@@ -25,7 +25,7 @@ object RootInstaller {
                     handle.service.installPackage(
                         pfd,
                         apkFile.length(),
-                        android.os.Process.myUserHandle().hashCode()
+                        android.os.Process.myUserHandle().hashCode(),
                     )
                 }
             }
@@ -69,10 +69,7 @@ object RootInstaller {
         }
     }
 
-    private class RootServiceHandle(
-        val connection: ServiceConnection,
-        val service: IRootService
-    ) : java.io.Closeable {
+    private class RootServiceHandle(val connection: ServiceConnection, val service: IRootService) : java.io.Closeable {
         override fun close() {
             Handler(Looper.getMainLooper()).post {
                 RootService.unbind(connection)

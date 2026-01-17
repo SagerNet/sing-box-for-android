@@ -5,6 +5,7 @@ import android.os.Process
 object HookStatusStore {
     @Volatile
     private var active = false
+
     @Volatile
     private var lastPatchedAt = 0L
 
@@ -16,14 +17,7 @@ object HookStatusStore {
         lastPatchedAt = System.currentTimeMillis()
     }
 
-    fun snapshot(): Status {
-        return Status(active, lastPatchedAt, HookModuleVersion.CURRENT, Process.myPid())
-    }
+    fun snapshot(): Status = Status(active, lastPatchedAt, HookModuleVersion.CURRENT, Process.myPid())
 
-    data class Status(
-        val active: Boolean,
-        val lastPatchedAt: Long,
-        val version: Int,
-        val systemPid: Int,
-    )
+    data class Status(val active: Boolean, val lastPatchedAt: Long, val version: Int, val systemPid: Int)
 }

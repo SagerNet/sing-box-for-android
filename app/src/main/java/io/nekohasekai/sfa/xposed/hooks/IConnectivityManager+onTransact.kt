@@ -13,10 +13,7 @@ import io.nekohasekai.sfa.xposed.HookStatusKeys
 import io.nekohasekai.sfa.xposed.HookStatusStore
 import io.nekohasekai.sfa.xposed.PrivilegeSettingsStore
 
-class HookIConnectivityManagerOnTransact(
-    private val classLoader: ClassLoader,
-    private val context: Context?,
-) : XHook {
+class HookIConnectivityManagerOnTransact(private val classLoader: ClassLoader, private val context: Context?) : XHook {
     private companion object {
         private const val SOURCE = "HookIConnectivityManagerOnTransact"
     }
@@ -37,7 +34,8 @@ class HookIConnectivityManagerOnTransact(
                     if (code != HookStatusKeys.TRANSACTION_STATUS &&
                         code != HookStatusKeys.TRANSACTION_UPDATE_PRIVILEGE_SETTINGS &&
                         code != HookStatusKeys.TRANSACTION_GET_ERRORS &&
-                        code != HookStatusKeys.TRANSACTION_GET_INSTALLED_PACKAGES) {
+                        code != HookStatusKeys.TRANSACTION_GET_INSTALLED_PACKAGES
+                    ) {
                         return
                     }
                     val data = param.args[1] as Parcel
@@ -145,15 +143,13 @@ class HookIConnectivityManagerOnTransact(
         }
     }
 
-    private fun getPackageManager(): Any? {
-        return try {
-            val appGlobals = Class.forName("android.app.AppGlobals")
-            val method = appGlobals.getMethod("getPackageManager")
-            method.invoke(null)
-        } catch (e: Throwable) {
-            HookErrorStore.e(SOURCE, "getPackageManager failed", e)
-            null
-        }
+    private fun getPackageManager(): Any? = try {
+        val appGlobals = Class.forName("android.app.AppGlobals")
+        val method = appGlobals.getMethod("getPackageManager")
+        method.invoke(null)
+    } catch (e: Throwable) {
+        HookErrorStore.e(SOURCE, "getPackageManager failed", e)
+        null
     }
 
     private fun getInstalledPackagesCompat(pm: Any, flags: Long, userId: Int): List<PackageInfo> {

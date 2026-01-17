@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -24,24 +23,21 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 
 @Composable
-fun QRCodeDialog(
-    bitmap: Bitmap,
-    onDismiss: () -> Unit,
-) {
+fun QRCodeDialog(bitmap: Bitmap, onDismiss: () -> Unit) {
     Dialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
         Card(
             modifier =
-                Modifier
-                    .fillMaxWidth(0.9f)
-                    .wrapContentHeight(),
+            Modifier
+                .fillMaxWidth(0.9f)
+                .wrapContentHeight(),
             shape = RoundedCornerShape(16.dp),
             colors =
-                CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                ),
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
         ) {
             Surface(
                 modifier = Modifier
@@ -52,9 +48,9 @@ fun QRCodeDialog(
             ) {
                 Box(
                     modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.surface),
+                    Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.surface),
                     contentAlignment = Alignment.Center,
                 ) {
                     Image(

@@ -8,7 +8,6 @@ import android.provider.DocumentsContract
 import android.provider.DocumentsProvider
 import android.webkit.MimeTypeMap
 import java.io.File
-import java.io.FileNotFoundException
 
 class WorkingDirectoryProvider : DocumentsProvider() {
 
@@ -47,7 +46,7 @@ class WorkingDirectoryProvider : DocumentsProvider() {
             add(
                 DocumentsContract.Root.COLUMN_FLAGS,
                 DocumentsContract.Root.FLAG_SUPPORTS_CREATE or
-                    DocumentsContract.Root.FLAG_SUPPORTS_IS_CHILD
+                    DocumentsContract.Root.FLAG_SUPPORTS_IS_CHILD,
             )
             add(DocumentsContract.Root.COLUMN_ICON, R.mipmap.ic_launcher)
             add(DocumentsContract.Root.COLUMN_TITLE, context!!.getString(R.string.app_name))
@@ -64,11 +63,7 @@ class WorkingDirectoryProvider : DocumentsProvider() {
         return result
     }
 
-    override fun queryChildDocuments(
-        parentDocumentId: String,
-        projection: Array<out String>?,
-        sortOrder: String?
-    ): Cursor {
+    override fun queryChildDocuments(parentDocumentId: String, projection: Array<out String>?, sortOrder: String?): Cursor {
         val result = MatrixCursor(projection ?: DEFAULT_DOCUMENT_PROJECTION)
         val parent = getFileForDocId(parentDocumentId)
         parent.listFiles()?.forEach { file ->
@@ -77,21 +72,13 @@ class WorkingDirectoryProvider : DocumentsProvider() {
         return result
     }
 
-    override fun openDocument(
-        documentId: String,
-        mode: String,
-        signal: CancellationSignal?
-    ): ParcelFileDescriptor {
+    override fun openDocument(documentId: String, mode: String, signal: CancellationSignal?): ParcelFileDescriptor {
         val file = getFileForDocId(documentId)
         val accessMode = ParcelFileDescriptor.parseMode(mode)
         return ParcelFileDescriptor.open(file, accessMode)
     }
 
-    override fun createDocument(
-        parentDocumentId: String,
-        mimeType: String,
-        displayName: String
-    ): String {
+    override fun createDocument(parentDocumentId: String, mimeType: String, displayName: String): String {
         val parent = getFileForDocId(parentDocumentId)
         val file = File(parent, displayName)
 

@@ -4,9 +4,9 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -53,13 +53,13 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.nekohasekai.sfa.R
-import io.nekohasekai.sfa.database.Settings
-import io.nekohasekai.sfa.ktx.clipboardText
-import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.compose.shared.AppSelectionCard
 import io.nekohasekai.sfa.compose.shared.PackageCache
 import io.nekohasekai.sfa.compose.shared.SortMode
 import io.nekohasekai.sfa.compose.shared.buildDisplayPackages
+import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
+import io.nekohasekai.sfa.database.Settings
+import io.nekohasekai.sfa.ktx.clipboardText
 import io.nekohasekai.sfa.utils.PrivilegeSettingsClient
 import io.nekohasekai.sfa.vendor.PackageQueryManager
 import io.nekohasekai.sfa.vendor.PrivilegedAccessRequiredException
@@ -68,11 +68,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
-
-private data class LoadResult(
-    val packages: List<PackageCache>,
-    val selectedUids: Set<Int>,
-)
+private data class LoadResult(val packages: List<PackageCache>, val selectedUids: Set<Int>)
 
 private const val VPN_SERVICE_PERMISSION = "android.permission.BIND_VPN_SERVICE"
 
@@ -126,10 +122,11 @@ fun PrivilegeSettingsManageScreen(onBack: () -> Unit) {
         val hasManagement = permissions.any { it in managementPermissions }
         val isSelf = packageCache.packageName == context.packageName
         val hasVpnService =
-            !isSelf && (
-                permissions.any { it == VPN_SERVICE_PERMISSION } ||
-                packageCache.info.services?.any { it.permission == VPN_SERVICE_PERMISSION } == true
-            )
+            !isSelf &&
+                (
+                    permissions.any { it == VPN_SERVICE_PERMISSION } ||
+                        packageCache.info.services?.any { it.permission == VPN_SERVICE_PERMISSION } == true
+                    )
         return when {
             hasManagement && hasVpnService -> RiskCategory.BOTH
             hasManagement -> RiskCategory.MANAGEMENT_APP
@@ -138,11 +135,9 @@ fun PrivilegeSettingsManageScreen(onBack: () -> Unit) {
         }
     }
 
-    fun buildPackageList(newUids: Set<Int>): Set<String> {
-        return newUids.mapNotNull { uid ->
-            packages.find { it.uid == uid }?.packageName
-        }.toSet()
-    }
+    fun buildPackageList(newUids: Set<Int>): Set<String> = newUids.mapNotNull { uid ->
+        packages.find { it.uid == uid }?.packageName
+    }.toSet()
 
     fun updateCurrentPackages(filterQuery: String) {
         currentPackages =
@@ -443,10 +438,10 @@ fun PrivilegeSettingsManageScreen(onBack: () -> Unit) {
                 )
             },
             colors =
-                TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface,
-                ),
+            TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+                titleContentColor = MaterialTheme.colorScheme.onSurface,
+            ),
         )
     }
 
@@ -492,10 +487,10 @@ fun PrivilegeSettingsManageScreen(onBack: () -> Unit) {
                     updateCurrentPackages(it)
                 },
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .focusRequester(focusRequester),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .focusRequester(focusRequester),
                 placeholder = { Text(stringResource(R.string.search)) },
                 leadingIcon = {
                     Icon(
@@ -524,10 +519,10 @@ fun PrivilegeSettingsManageScreen(onBack: () -> Unit) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding =
-                androidx.compose.foundation.layout.PaddingValues(
-                    horizontal = 16.dp,
-                    vertical = 12.dp,
-                ),
+            androidx.compose.foundation.layout.PaddingValues(
+                horizontal = 16.dp,
+                vertical = 12.dp,
+            ),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             items(currentPackages, key = { it.packageName }) { packageCache ->

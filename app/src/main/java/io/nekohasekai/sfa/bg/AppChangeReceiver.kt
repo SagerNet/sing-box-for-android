@@ -8,8 +8,8 @@ import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import io.nekohasekai.sfa.R
-import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.compose.screen.profileoverride.PerAppProxyScanner
+import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.vendor.PackageQueryManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,10 +21,7 @@ class AppChangeReceiver : BroadcastReceiver() {
         private const val TAG = "AppChangeReceiver"
     }
 
-    override fun onReceive(
-        context: Context,
-        intent: Intent,
-    ) {
+    override fun onReceive(context: Context, intent: Intent) {
         Log.d(TAG, "onReceive: ${intent.action}")
         if (!Settings.perAppProxyEnabled) {
             Log.d(TAG, "per app proxy disabled")

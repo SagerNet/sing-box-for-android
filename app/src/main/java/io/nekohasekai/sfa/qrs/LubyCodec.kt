@@ -3,9 +3,7 @@ package io.nekohasekai.sfa.qrs
 import java.util.zip.CRC32
 import kotlin.random.Random
 
-class LubyCodec(
-    private val sliceSize: Int = QRSConstants.DEFAULT_SLICE_SIZE,
-) {
+class LubyCodec(private val sliceSize: Int = QRSConstants.DEFAULT_SLICE_SIZE) {
     internal class IntArrayKey(val indices: IntArray) {
         private val hash = indices.contentHashCode()
 
@@ -49,11 +47,7 @@ class LubyCodec(
         }
     }
 
-    class DecodingState(
-        val totalBlocks: Int,
-        val compressedSize: Int,
-        val checksum: Long,
-    ) {
+    class DecodingState(val totalBlocks: Int, val compressedSize: Int, val checksum: Long) {
         val decodedBlocks: Array<ByteArray?> = arrayOfNulls(totalBlocks)
         var decodedCount: Int = 0
 
@@ -62,10 +56,7 @@ class LubyCodec(
         val blockIndexMap: MutableMap<Int, MutableSet<PendingBlock>> = mutableMapOf()
         val blockDisposeMap: MutableMap<Int, MutableList<() -> Unit>> = mutableMapOf()
 
-        class PendingBlock(
-            var indices: MutableList<Int>,
-            var data: ByteArray,
-        )
+        class PendingBlock(var indices: MutableList<Int>, var data: ByteArray)
     }
 
     fun encode(originalData: ByteArray, compressedData: ByteArray, compressedSize: Int): Sequence<EncodedBlock> = sequence {
@@ -99,18 +90,16 @@ class LubyCodec(
                     compressedSize = compressedSize,
                     checksum = checksum,
                     data = blockData,
-                )
+                ),
             )
         }
     }
 
-    fun createDecodingState(firstBlock: EncodedBlock): DecodingState {
-        return DecodingState(
-            totalBlocks = firstBlock.totalBlocks,
-            compressedSize = firstBlock.compressedSize,
-            checksum = firstBlock.checksum,
-        )
-    }
+    fun createDecodingState(firstBlock: EncodedBlock): DecodingState = DecodingState(
+        totalBlocks = firstBlock.totalBlocks,
+        compressedSize = firstBlock.compressedSize,
+        checksum = firstBlock.checksum,
+    )
 
     fun processBlock(state: DecodingState, block: EncodedBlock): Boolean {
         val queue = ArrayDeque<DecodingState.PendingBlock>()
@@ -127,7 +116,7 @@ class LubyCodec(
     private fun processPendingBlock(
         state: DecodingState,
         pending: DecodingState.PendingBlock,
-        queue: ArrayDeque<DecodingState.PendingBlock>
+        queue: ArrayDeque<DecodingState.PendingBlock>,
     ) {
         var indices = pending.indices
         val data = pending.data
@@ -212,9 +201,7 @@ class LubyCodec(
         }
     }
 
-    private fun indicesToKey(indices: List<Int>): IntArrayKey {
-        return IntArrayKey(indices.sorted().toIntArray())
-    }
+    private fun indicesToKey(indices: List<Int>): IntArrayKey = IntArrayKey(indices.sorted().toIntArray())
 
     private fun propagateDecoding(state: DecodingState, decodedIdx: Int, queue: ArrayDeque<DecodingState.PendingBlock>) {
         val toProcess = ArrayDeque<Int>()

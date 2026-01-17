@@ -24,20 +24,15 @@ import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.LineChart
 
 @Composable
-fun UploadTrafficCard(
-    uplink: String,
-    uplinkTotal: String,
-    uplinkHistory: List<Float>,
-    modifier: Modifier = Modifier,
-) {
+fun UploadTrafficCard(uplink: String, uplinkTotal: String, uplinkHistory: List<Float>, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier.fillMaxWidth(),
     ) {
         Column(
             modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,

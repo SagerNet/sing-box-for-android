@@ -5,6 +5,4 @@ import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
 
-fun LazyItemScope.animateItemCompat(
-    placementSpec: FiniteAnimationSpec<IntOffset>,
-): Modifier = Modifier.animateItem(placementSpec = placementSpec)
+fun LazyItemScope.animateItemCompat(placementSpec: FiniteAnimationSpec<IntOffset>): Modifier = Modifier.animateItem(placementSpec = placementSpec)
