@@ -51,7 +51,7 @@ class ConnectionsViewModel :
     val serviceStatus = _serviceStatus.asStateFlow()
     private var lastServiceStatus: Status = Status.Stopped
 
-    private val _isVisible = MutableStateFlow(false)
+    private val _visibleCount = MutableStateFlow(0)
 
     private var connectionsStore: Connections? = null
     private val connectionsMutex = Mutex()
@@ -63,12 +63,12 @@ class ConnectionsViewModel :
         viewModelScope.launch {
             combine(
                 AppLifecycleObserver.isForeground,
-                _isVisible,
+                _visibleCount,
                 _serviceStatus,
-            ) { foreground, visible, status ->
-                Triple(foreground, visible, status)
-            }.collect { (foreground, visible, status) ->
-                val shouldConnect = foreground && visible && status == Status.Started
+            ) { foreground, visibleCount, status ->
+                Triple(foreground, visibleCount, status)
+            }.collect { (foreground, visibleCount, status) ->
+                val shouldConnect = foreground && visibleCount > 0 && status == Status.Started
                 if (shouldConnect) {
                     updateState { copy(isLoading = true) }
                     commandClient.connect()
@@ -80,7 +80,7 @@ class ConnectionsViewModel :
     }
 
     fun setVisible(visible: Boolean) {
-        _isVisible.value = visible
+        _visibleCount.value += if (visible) 1 else -1
     }
 
     override fun onCleared() {

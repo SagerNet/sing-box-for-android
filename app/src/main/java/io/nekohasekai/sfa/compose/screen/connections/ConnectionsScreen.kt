@@ -306,6 +306,16 @@ fun ConnectionDetailsRoute(
         )
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.setVisible(true)
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.setVisible(false)
+        }
+    }
+
     LaunchedEffect(serviceStatus) {
         viewModel.updateServiceStatus(serviceStatus)
     }
