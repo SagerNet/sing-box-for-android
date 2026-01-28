@@ -59,16 +59,25 @@ class ConnectionsViewModel :
 
     override fun createInitialState() = ConnectionsUiState()
 
+    private data class ConnectionState(
+        val foreground: Boolean,
+        val screenOn: Boolean,
+        val visibleCount: Int,
+        val status: Status,
+    )
+
     init {
         viewModelScope.launch {
             combine(
                 AppLifecycleObserver.isForeground,
+                AppLifecycleObserver.isScreenOn,
                 _visibleCount,
                 _serviceStatus,
-            ) { foreground, visibleCount, status ->
-                Triple(foreground, visibleCount, status)
-            }.collect { (foreground, visibleCount, status) ->
-                val shouldConnect = foreground && visibleCount > 0 && status == Status.Started
+            ) { foreground, screenOn, visibleCount, status ->
+                ConnectionState(foreground, screenOn, visibleCount, status)
+            }.collect { state ->
+                val shouldConnect = state.foreground && state.screenOn &&
+                    state.visibleCount > 0 && state.status == Status.Started
                 if (shouldConnect) {
                     updateState { copy(isLoading = true) }
                     commandClient.connect()
@@ -190,7 +199,7 @@ class ConnectionsViewModel :
             val generation = connectionsGeneration.get()
             val snapshot = connectionsMutex.withLock {
                 if (connectionsStore == null) {
-                    connectionsStore = Libbox.newConnections()
+                    connectionsStore = Connections()
                 }
                 val store = connectionsStore ?: return@withLock null
                 store.applyEvents(events)

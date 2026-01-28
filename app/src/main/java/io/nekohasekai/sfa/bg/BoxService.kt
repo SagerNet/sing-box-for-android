@@ -292,7 +292,7 @@ class BoxService(private val service: Service, private val platformInterface: Pl
             closeService()
             commandServer.apply {
                 close()
-                Seq.destroyRef(refnum)
+//                Seq.destroyRef(refnum)
             }
             Settings.startedByUser = false
             withContext(Dispatchers.Main) {

@@ -36,9 +36,9 @@ class Application : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        AppLifecycleObserver.register()
+        AppLifecycleObserver.register(this)
 
-        Seq.setContext(this)
+//        Seq.setContext(this)
         Libbox.setLocale(Locale.getDefault().toLanguageTag().replace("-", "_"))
         HookStatusClient.register(this)
         PrivilegeSettingsClient.register(this)
