@@ -43,7 +43,7 @@
     <string name="default_text">По умолчанию</string>
 
     <!-- Navigation Titles -->
-    <string name="title_dashboard">Панель управления</string>
+    <string name="title_dashboard">Главная</string>
     <string name="title_configuration">Профили</string>
     <string name="title_log">Логи</string>
     <string name="title_settings">Параметры</string>
@@ -64,7 +64,7 @@
     <string name="status_started">Запущена</string>
 
     <!-- Dashboard -->
-    <string name="dashboard_items">Элементы панели управления</string>
+    <string name="dashboard_items">Элементы главной страницы</string>
     <string name="memory">Память</string>
     <string name="goroutines">Подпрограммы</string>
     <string name="upload">Загрузка</string>
