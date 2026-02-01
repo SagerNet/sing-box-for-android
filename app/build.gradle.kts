@@ -326,7 +326,7 @@ if (playCredentialsJSON.exists()) {
         defaultToAppBundles.set(true)
         val version = getVersionProps("VERSION_NAME")
         track.set(
-            if (version.contains("alpha") || version.contains("beta") || version.contains("rc")) {
+            if (version.contains("alpha") || version.contains("beta")/* || version.contains("rc")*/) {
                 "beta"
             } else {
                 "production"
