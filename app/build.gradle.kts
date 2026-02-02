@@ -271,6 +271,7 @@ dependencies {
 
     "playImplementation"(composeBom23)
     "playImplementation"("androidx.compose.material3:material3")
+    "playImplementation"("androidx.compose.material3.adaptive:adaptive")
     "playImplementation"("androidx.compose.ui:ui")
     "playImplementation"("androidx.compose.ui:ui-tooling-preview")
     "playImplementation"("androidx.compose.material:material-icons-extended")
@@ -281,6 +282,7 @@ dependencies {
 
     "otherImplementation"(composeBom23)
     "otherImplementation"("androidx.compose.material3:material3")
+    "otherImplementation"("androidx.compose.material3.adaptive:adaptive")
     "otherImplementation"("androidx.compose.ui:ui")
     "otherImplementation"("androidx.compose.ui:ui-tooling-preview")
     "otherImplementation"("androidx.compose.material:material-icons-extended")
@@ -296,6 +298,7 @@ dependencies {
 
     "otherLegacyImplementation"(composeBom21)
     "otherLegacyImplementation"("androidx.compose.material3:material3")
+    "otherLegacyImplementation"("androidx.compose.material3.adaptive:adaptive")
     "otherLegacyImplementation"("androidx.compose.ui:ui")
     "otherLegacyImplementation"("androidx.compose.ui:ui-tooling-preview")
     "otherLegacyImplementation"("androidx.compose.material:material-icons-extended")

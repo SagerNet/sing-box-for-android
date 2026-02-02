@@ -1,7 +1,6 @@
 package io.nekohasekai.sfa.compose.component.qr
 
 import android.content.Intent
-import android.content.res.Configuration
 import android.graphics.Color
 import android.net.Uri
 import androidx.compose.foundation.Image
@@ -33,6 +32,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -46,12 +46,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.window.core.layout.WindowSizeClass
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.qrs.QRSConstants
 import io.nekohasekai.sfa.qrs.QRSEncoder
@@ -60,8 +60,8 @@ import kotlinx.coroutines.delay
 @Composable
 fun QRSDialog(profileData: ByteArray, profileName: String, onDismiss: () -> Unit) {
     val context = LocalContext.current
-    val configuration = LocalConfiguration.current
-    val isTablet = configuration.isLayoutSizeAtLeast(Configuration.SCREENLAYOUT_SIZE_LARGE)
+    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+    val isTablet = windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
     val coroutineScope = rememberCoroutineScope()
     var fps by remember { mutableIntStateOf(QRSConstants.DEFAULT_FPS) }
     var sliceSize by remember { mutableIntStateOf(QRSConstants.DEFAULT_SLICE_SIZE) }
