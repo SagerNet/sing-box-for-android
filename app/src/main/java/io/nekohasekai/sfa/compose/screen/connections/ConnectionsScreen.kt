@@ -281,6 +281,12 @@ fun ConnectionDetailsRoute(
     val connection =
         uiState.allConnections.find { it.id == connectionId }
             ?: uiState.connections.find { it.id == connectionId }
+    var cachedConnection by remember { mutableStateOf(connection) }
+    if (connection != null) {
+        cachedConnection = connection
+    } else if (cachedConnection?.isActive == true) {
+        cachedConnection = cachedConnection?.copy(closedAt = System.currentTimeMillis())
+    }
 
     OverrideTopBar {
         TopAppBar(
@@ -294,7 +300,7 @@ fun ConnectionDetailsRoute(
                 }
             },
             actions = {
-                if (connection?.isActive == true) {
+                if (cachedConnection?.isActive == true) {
                     IconButton(onClick = { viewModel.closeConnection(connectionId) }) {
                         Icon(
                             imageVector = Icons.Default.Close,
@@ -320,14 +326,14 @@ fun ConnectionDetailsRoute(
         viewModel.updateServiceStatus(serviceStatus)
     }
 
-    if (connection == null) {
+    if (cachedConnection == null) {
         LaunchedEffect(connectionId) {
             onBack()
         }
         Box(modifier = modifier.fillMaxSize())
     } else {
         ConnectionDetailsScreen(
-            connection = connection,
+            connection = cachedConnection!!,
             onBack = onBack,
             onClose = { viewModel.closeConnection(connectionId) },
             modifier = modifier,

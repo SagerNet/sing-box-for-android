@@ -92,6 +92,7 @@ import io.nekohasekai.sfa.compose.base.UiEvent
 import io.nekohasekai.sfa.compose.component.ServiceStatusBar
 import io.nekohasekai.sfa.compose.component.UpdateAvailableDialog
 import io.nekohasekai.sfa.compose.component.UptimeText
+import io.nekohasekai.sfa.compose.model.Connection
 import io.nekohasekai.sfa.compose.navigation.NewProfileArgs
 import io.nekohasekai.sfa.compose.navigation.ProfileRoutes
 import io.nekohasekai.sfa.compose.navigation.SFANavHost
@@ -979,6 +980,13 @@ class MainActivity :
             val connectionsUiState by connectionsViewModel.uiState.collectAsState()
             var selectedConnectionId by remember { mutableStateOf<String?>(null) }
             val selectedConnection = connectionsUiState.allConnections.find { it.id == selectedConnectionId }
+            var cachedConnection by remember { mutableStateOf<Connection?>(null) }
+            if (selectedConnection != null) {
+                cachedConnection = selectedConnection
+            } else if (selectedConnectionId != null && cachedConnection?.isActive == true) {
+                cachedConnection = cachedConnection?.copy(closedAt = System.currentTimeMillis())
+            }
+            val displayConnection = if (selectedConnectionId != null) cachedConnection else null
 
             LaunchedEffect(Unit) {
                 connectionsViewModel.setVisible(true)
@@ -1004,13 +1012,12 @@ class MainActivity :
                         .fillMaxWidth()
                         .fillMaxHeight(0.9f),
                 ) {
-                    if (selectedConnection != null) {
+                    if (displayConnection != null) {
                         ConnectionDetailsScreen(
-                            connection = selectedConnection,
+                            connection = displayConnection,
                             onBack = { selectedConnectionId = null },
                             onClose = {
                                 selectedConnectionId?.let { connectionsViewModel.closeConnection(it) }
-                                selectedConnectionId = null
                             },
                         )
                     } else {
