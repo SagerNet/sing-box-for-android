@@ -6,6 +6,7 @@ import android.net.ProxyInfo
 import android.net.VpnService
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import io.nekohasekai.libbox.Notification
 import io.nekohasekai.libbox.TunOptions
 import io.nekohasekai.sfa.database.Settings
@@ -130,8 +131,11 @@ class VPNService :
             if (includePackage.hasNext()) {
                 while (includePackage.hasNext()) {
                     try {
-                        builder.addAllowedApplication(includePackage.next())
-                    } catch (_: NameNotFoundException) {
+                        val nextPackage = includePackage.next()
+                        builder.addAllowedApplication(nextPackage)
+                        Log.d("VPNService", "addAllowedApplication: $nextPackage")
+                    } catch (e: NameNotFoundException) {
+                        Log.e("VPNService", "addAllowedApplication failed", e)
                     }
                 }
             }
@@ -140,8 +144,11 @@ class VPNService :
             if (excludePackage.hasNext()) {
                 while (excludePackage.hasNext()) {
                     try {
-                        builder.addDisallowedApplication(excludePackage.next())
-                    } catch (_: NameNotFoundException) {
+                        val nextPackage = excludePackage.next()
+                        builder.addDisallowedApplication(nextPackage)
+                        Log.d("VPNService", "addDisallowedApplication: $nextPackage")
+                    } catch (e: NameNotFoundException) {
+                        Log.e("VPNService", "addDisallowedApplication failed", e)
                     }
                 }
             }

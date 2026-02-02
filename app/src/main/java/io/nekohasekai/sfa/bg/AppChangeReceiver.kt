@@ -3,14 +3,11 @@ package io.nekohasekai.sfa.bg
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.screen.profileoverride.PerAppProxyScanner
 import io.nekohasekai.sfa.database.Settings
-import io.nekohasekai.sfa.vendor.PackageQueryManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -48,29 +45,7 @@ class AppChangeReceiver : BroadcastReceiver() {
 
     private suspend fun rescanAllApps() {
         Log.d(TAG, "rescanning all apps")
-        val packageManagerFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            PackageManager.MATCH_UNINSTALLED_PACKAGES or
-                PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES or
-                PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS
-        } else {
-            @Suppress("DEPRECATION")
-            PackageManager.GET_UNINSTALLED_PACKAGES or
-                PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES or
-                PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS
-        }
-        val retryFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            PackageManager.MATCH_UNINSTALLED_PACKAGES or PackageManager.GET_PERMISSIONS
-        } else {
-            @Suppress("DEPRECATION")
-            PackageManager.GET_UNINSTALLED_PACKAGES or PackageManager.GET_PERMISSIONS
-        }
-        val installedPackages = PackageQueryManager.getInstalledPackages(packageManagerFlags, retryFlags)
-        val chinaApps = mutableSetOf<String>()
-        for (packageInfo in installedPackages) {
-            if (PerAppProxyScanner.scanChinaPackage(packageInfo)) {
-                chinaApps.add(packageInfo.packageName)
-            }
-        }
+        val chinaApps = PerAppProxyScanner.scanAllChinaApps()
         Settings.perAppProxyManagedList = chinaApps
         Log.d(TAG, "rescan complete, found ${chinaApps.size} china apps")
     }

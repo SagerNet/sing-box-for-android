@@ -3,6 +3,7 @@ package io.nekohasekai.sfa.compose.screen.profileoverride
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
+import io.nekohasekai.sfa.Application
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
@@ -1275,8 +1276,40 @@ object PerAppProxyScanner {
         ("(" + chinaAppPrefixList.joinToString("|").replace(".", "\\.") + ").*").toRegex()
     }
 
+    suspend fun scanAllChinaApps(): Set<String> = withContext(Dispatchers.Default) {
+        val packageManagerFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            PackageManager.MATCH_UNINSTALLED_PACKAGES or
+                PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES or
+                PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS
+        } else {
+            @Suppress("DEPRECATION")
+            PackageManager.GET_UNINSTALLED_PACKAGES or
+                PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES or
+                PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS
+        }
+        val retryFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            PackageManager.MATCH_UNINSTALLED_PACKAGES or PackageManager.GET_PERMISSIONS
+        } else {
+            @Suppress("DEPRECATION")
+            PackageManager.GET_UNINSTALLED_PACKAGES or PackageManager.GET_PERMISSIONS
+        }
+        val installedPackages = PackageQueryManager.getInstalledPackages(packageManagerFlags, retryFlags)
+        val chinaApps = mutableSetOf<String>()
+        installedPackages.map { packageInfo ->
+            async {
+                if (scanChinaPackage(packageInfo)) {
+                    synchronized(chinaApps) {
+                        chinaApps.add(packageInfo.packageName)
+                    }
+                }
+            }
+        }.awaitAll()
+        chinaApps.toSet()
+    }
+
     fun scanChinaPackage(packageInfo: PackageInfo): Boolean {
         val packageName = packageInfo.packageName
+        if (packageName == Application.application.packageName) return false
         skipPrefixList.forEach {
             if (packageName == it || packageName.startsWith("$it.")) return false
         }

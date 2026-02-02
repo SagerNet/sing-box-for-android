@@ -1,9 +1,7 @@
 package io.nekohasekai.sfa.compose.screen.settings
 
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -64,8 +62,6 @@ import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.vendor.PackageQueryManager
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -93,6 +89,18 @@ fun ProfileOverrideScreen(navController: NavController) {
     var perAppProxyEnabled by remember { mutableStateOf(Settings.perAppProxyEnabled) }
     var managedModeEnabled by remember { mutableStateOf(Settings.perAppProxyManagedMode) }
     var isScanning by remember { mutableStateOf(false) }
+
+    fun scanAndSaveManagedList() {
+        isScanning = true
+        scope.launch {
+            val chinaApps = PerAppProxyScanner.scanAllChinaApps()
+            withContext(Dispatchers.IO) {
+                Settings.perAppProxyManagedList = chinaApps
+            }
+            isScanning = false
+        }
+    }
+
     var showShizukuDialog by remember { mutableStateOf(false) }
     var showRootDialog by remember { mutableStateOf(false) }
     var showModeDialog by remember { mutableStateOf(false) }
@@ -150,12 +158,7 @@ fun ProfileOverrideScreen(navController: NavController) {
                 Settings.perAppProxyEnabled = true
             }
             if (managedModeEnabled) {
-                isScanning = true
-                val chinaApps = scanAllChinaApps()
-                withContext(Dispatchers.IO) {
-                    Settings.perAppProxyManagedList = chinaApps
-                }
-                isScanning = false
+                scanAndSaveManagedList()
             }
         }
     }
@@ -352,14 +355,7 @@ fun ProfileOverrideScreen(navController: NavController) {
                                         Settings.perAppProxyEnabled = checked
                                     }
                                     if (checked && managedModeEnabled) {
-                                        isScanning = true
-                                        scope.launch {
-                                            val chinaApps = scanAllChinaApps()
-                                            withContext(Dispatchers.IO) {
-                                                Settings.perAppProxyManagedList = chinaApps
-                                            }
-                                            isScanning = false
-                                        }
+                                        scanAndSaveManagedList()
                                     }
                                 }
                             },
@@ -465,18 +461,10 @@ fun ProfileOverrideScreen(navController: NavController) {
                                     onCheckedChange = { checked ->
                                         if (checked) {
                                             managedModeEnabled = true
-                                            isScanning = true
-                                            scope.launch {
-                                                withContext(Dispatchers.IO) {
-                                                    Settings.perAppProxyManagedMode = true
-                                                    Settings.perAppProxyMode = Settings.PER_APP_PROXY_EXCLUDE
-                                                }
-                                                val chinaApps = scanAllChinaApps()
-                                                withContext(Dispatchers.IO) {
-                                                    Settings.perAppProxyManagedList = chinaApps
-                                                }
-                                                isScanning = false
+                                            scope.launch(Dispatchers.IO) {
+                                                Settings.perAppProxyManagedMode = true
                                             }
+                                            scanAndSaveManagedList()
                                         } else {
                                             managedModeEnabled = false
                                             scope.launch(Dispatchers.IO) {
@@ -518,14 +506,7 @@ fun ProfileOverrideScreen(navController: NavController) {
                                         Settings.perAppProxyEnabled = true
                                     }
                                     if (managedModeEnabled) {
-                                        isScanning = true
-                                        scope.launch {
-                                            val chinaApps = scanAllChinaApps()
-                                            withContext(Dispatchers.IO) {
-                                                Settings.perAppProxyManagedList = chinaApps
-                                            }
-                                            isScanning = false
-                                        }
+                                        scanAndSaveManagedList()
                                     }
                                 },
                             ) {
@@ -601,12 +582,7 @@ fun ProfileOverrideScreen(navController: NavController) {
                                         Settings.perAppProxyEnabled = true
                                     }
                                     if (managedModeEnabled) {
-                                        isScanning = true
-                                        val chinaApps = scanAllChinaApps()
-                                        withContext(Dispatchers.IO) {
-                                            Settings.perAppProxyManagedList = chinaApps
-                                        }
-                                        isScanning = false
+                                        scanAndSaveManagedList()
                                     }
                                 } else {
                                     showRootDialog = false
@@ -693,38 +669,4 @@ fun ProfileOverrideScreen(navController: NavController) {
             )
         }
     }
-}
-
-private suspend fun scanAllChinaApps(): Set<String> = withContext(Dispatchers.Default) {
-    val packageManagerFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        PackageManager.MATCH_UNINSTALLED_PACKAGES or
-            PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES or
-            PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS
-    } else {
-        @Suppress("DEPRECATION")
-        PackageManager.GET_UNINSTALLED_PACKAGES or
-            PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES or
-            PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS
-    }
-    val retryFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        PackageManager.MATCH_UNINSTALLED_PACKAGES or PackageManager.GET_PERMISSIONS
-    } else {
-        @Suppress("DEPRECATION")
-        PackageManager.GET_UNINSTALLED_PACKAGES or PackageManager.GET_PERMISSIONS
-    }
-
-    val installedPackages = PackageQueryManager.getInstalledPackages(packageManagerFlags, retryFlags)
-
-    val chinaApps = mutableSetOf<String>()
-    installedPackages.map { packageInfo ->
-        async {
-            if (PerAppProxyScanner.scanChinaPackage(packageInfo)) {
-                synchronized(chinaApps) {
-                    chinaApps.add(packageInfo.packageName)
-                }
-            }
-        }
-    }.awaitAll()
-
-    chinaApps.toSet()
 }
