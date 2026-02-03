@@ -90,9 +90,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.window.core.layout.WindowSizeClass
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.compat.WindowSizeClassCompat
+import io.nekohasekai.sfa.compat.isWidthAtLeastBreakpointCompat
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.constant.Status
 import java.io.File
@@ -119,7 +120,7 @@ fun LogScreen(
     val uiState by resolvedViewModel.uiState.collectAsState()
     val context = LocalContext.current
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
-    val isTablet = windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
+    val isTablet = windowSizeClass.isWidthAtLeastBreakpointCompat(WindowSizeClassCompat.WIDTH_DP_MEDIUM_LOWER_BOUND)
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     val resolvedTitle = title ?: stringResource(R.string.title_log)

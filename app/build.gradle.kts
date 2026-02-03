@@ -265,7 +265,7 @@ dependencies {
     "otherLegacyImplementation"("com.github.topjohnwu.libsu:service:$libsuVersion")
 
     // Compose dependencies - API 23+ (play/other)
-    val composeBom23 = platform("androidx.compose:compose-bom:2025.12.01")
+    val composeBom23 = platform("androidx.compose:compose-bom:2026.01.01")
     val activityVersion23 = "1.12.2"
     val lifecycleComposeVersion23 = "2.10.0"
 

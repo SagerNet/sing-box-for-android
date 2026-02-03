@@ -51,8 +51,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.window.core.layout.WindowSizeClass
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.compat.WindowSizeClassCompat
+import io.nekohasekai.sfa.compat.isWidthAtLeastBreakpointCompat
 import io.nekohasekai.sfa.qrs.QRSConstants
 import io.nekohasekai.sfa.qrs.QRSEncoder
 import kotlinx.coroutines.delay
@@ -61,7 +62,7 @@ import kotlinx.coroutines.delay
 fun QRSDialog(profileData: ByteArray, profileName: String, onDismiss: () -> Unit) {
     val context = LocalContext.current
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
-    val isTablet = windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
+    val isTablet = windowSizeClass.isWidthAtLeastBreakpointCompat(WindowSizeClassCompat.WIDTH_DP_MEDIUM_LOWER_BOUND)
     val coroutineScope = rememberCoroutineScope()
     var fps by remember { mutableIntStateOf(QRSConstants.DEFAULT_FPS) }
     var sliceSize by remember { mutableIntStateOf(QRSConstants.DEFAULT_SLICE_SIZE) }
