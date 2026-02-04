@@ -2,7 +2,9 @@ package io.nekohasekai.sfa.compose
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.ContentResolver
 import android.content.Intent
+import android.net.Uri
 import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
@@ -99,6 +101,7 @@ import io.nekohasekai.sfa.compose.navigation.ProfileRoutes
 import io.nekohasekai.sfa.compose.navigation.SFANavHost
 import io.nekohasekai.sfa.compose.navigation.Screen
 import io.nekohasekai.sfa.compose.navigation.bottomNavigationScreens
+import io.nekohasekai.sfa.compose.screen.configuration.ProfileImportHandler
 import io.nekohasekai.sfa.compose.screen.connections.ConnectionDetailsScreen
 import io.nekohasekai.sfa.compose.screen.connections.ConnectionsPage
 import io.nekohasekai.sfa.compose.screen.connections.ConnectionsViewModel
@@ -134,7 +137,12 @@ class MainActivity :
     private var showBackgroundLocationDialog by mutableStateOf(false)
     private var showImportProfileDialog by mutableStateOf(false)
     private var pendingImportProfile by mutableStateOf<Triple<String, String, String>?>(null)
+    private var showImportLocalProfileDialog by mutableStateOf(false)
+    private var pendingImportLocalProfileName by mutableStateOf<String?>(null)
+    private var pendingImportLocalProfileUri by mutableStateOf<Uri?>(null)
     private var newProfileArgs by mutableStateOf(NewProfileArgs())
+    private var parseImportLocalProfileJob: Job? = null
+    private var pendingIntentErrorMessage by mutableStateOf<String?>(null)
 
     private val notificationPermissionLauncher =
         registerForActivityResult(
@@ -222,10 +230,34 @@ class MainActivity :
                 pendingImportProfile = Triple(profile.name, profile.host, profile.url)
                 showImportProfileDialog = true
             } catch (e: Exception) {
-                lifecycleScope.launch {
-                    GlobalEventBus.emit(UiEvent.ErrorMessage(e.message ?: "Failed to parse profile link"))
-                }
+                pendingIntentErrorMessage = e.message ?: "Failed to parse profile link"
             }
+            return
+        }
+
+        if (intent.action == Intent.ACTION_VIEW &&
+            (uri.scheme == ContentResolver.SCHEME_CONTENT || uri.scheme == ContentResolver.SCHEME_FILE)
+        ) {
+            parseImportLocalProfileJob?.cancel()
+            parseImportLocalProfileJob =
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val importHandler = ProfileImportHandler(this@MainActivity)
+                    when (val result = importHandler.parseUri(uri)) {
+                        is ProfileImportHandler.UriParseResult.Success -> {
+                            withContext(Dispatchers.Main) {
+                                pendingImportLocalProfileName = result.name
+                                pendingImportLocalProfileUri = uri
+                                showImportLocalProfileDialog = true
+                            }
+                        }
+
+                        is ProfileImportHandler.UriParseResult.Error -> {
+                            withContext(Dispatchers.Main) {
+                                pendingIntentErrorMessage = result.message
+                            }
+                        }
+                    }
+                }
         }
     }
 
@@ -279,6 +311,7 @@ class MainActivity :
         val currentDestination = navBackStackEntry?.destination
         val currentRoute = currentDestination?.route
         val scope = rememberCoroutineScope()
+        val importHandler = remember { ProfileImportHandler(this@MainActivity) }
 
         val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
         val useNavigationRail =
@@ -296,6 +329,14 @@ class MainActivity :
         // Error dialog state for UiEvent.ShowError
         var showErrorDialog by remember { mutableStateOf(false) }
         var errorMessage by remember { mutableStateOf("") }
+        val pendingIntentError = pendingIntentErrorMessage
+        LaunchedEffect(pendingIntentError) {
+            if (pendingIntentError != null) {
+                errorMessage = pendingIntentError
+                showErrorDialog = true
+                pendingIntentErrorMessage = null
+            }
+        }
         val topBarState = remember { mutableStateOf(emptyList<TopBarEntry>()) }
         val topBarController = remember { TopBarController(topBarState) }
         val topBarOverride = topBarState.value.lastOrNull()?.content
@@ -373,6 +414,51 @@ class MainActivity :
                         pendingImportProfile = null
                     }) {
                         Text(stringResource(android.R.string.cancel))
+                    }
+                },
+            )
+        }
+
+        if (showImportLocalProfileDialog && pendingImportLocalProfileUri != null && pendingImportLocalProfileName != null) {
+            val importName = pendingImportLocalProfileName!!
+            val importUri = pendingImportLocalProfileUri!!
+            AlertDialog(
+                onDismissRequest = {
+                    showImportLocalProfileDialog = false
+                    pendingImportLocalProfileName = null
+                    pendingImportLocalProfileUri = null
+                },
+                title = { Text(stringResource(R.string.import_profile_confirm_title)) },
+                text = { Text(stringResource(R.string.import_profile_confirm_message, importName)) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showImportLocalProfileDialog = false
+                        pendingImportLocalProfileName = null
+                        pendingImportLocalProfileUri = null
+                        scope.launch {
+                            when (val result = importHandler.importFromUri(importUri)) {
+                                is ProfileImportHandler.ImportResult.Success -> {
+                                    navController.navigate(ProfileRoutes.editProfile(result.profile.id)) {
+                                        launchSingleTop = true
+                                    }
+                                }
+                                is ProfileImportHandler.ImportResult.Error -> {
+                                    errorMessage = result.message
+                                    showErrorDialog = true
+                                }
+                            }
+                        }
+                    }) {
+                        Text(stringResource(R.string.import_action))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = {
+                        showImportLocalProfileDialog = false
+                        pendingImportLocalProfileName = null
+                        pendingImportLocalProfileUri = null
+                    }) {
+                        Text(stringResource(R.string.cancel))
                     }
                 },
             )
