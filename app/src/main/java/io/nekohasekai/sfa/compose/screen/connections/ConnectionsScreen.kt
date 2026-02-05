@@ -17,7 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberOverscrollEffect
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
@@ -44,6 +44,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,6 +63,7 @@ import io.nekohasekai.sfa.compose.model.Connection
 import io.nekohasekai.sfa.compose.model.ConnectionSort
 import io.nekohasekai.sfa.compose.model.ConnectionStateFilter
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
+import io.nekohasekai.sfa.compose.util.rememberSheetDismissFromContentOnlyIfGestureStartedAtTopModifier
 import io.nekohasekai.sfa.constant.Status
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,6 +71,7 @@ import io.nekohasekai.sfa.constant.Status
 fun ConnectionsPage(
     serviceStatus: Status,
     viewModel: ConnectionsViewModel = viewModel(),
+    asSheet: Boolean = false,
     showTitle: Boolean = true,
     showTopBar: Boolean = false,
     onConnectionClick: (String) -> Unit = {},
@@ -87,14 +90,21 @@ fun ConnectionsPage(
         }
     }
 
-    Column(
-        modifier = modifier.fillMaxSize(),
-    ) {
-        Row(
-            modifier = Modifier
+    val headerRowModifier =
+        if (asSheet) {
+            Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
+        } else {
+            Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
-                .padding(bottom = 16.dp),
+                .padding(bottom = 16.dp)
+        }
+
+    val headerContent: @Composable () -> Unit = {
+        Row(
+            modifier = headerRowModifier,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -258,13 +268,29 @@ fun ConnectionsPage(
                 }
             }
         }
+    }
 
+    if (asSheet) {
         ConnectionsScreen(
             serviceStatus = serviceStatus,
             viewModel = viewModel,
             onConnectionClick = { connection -> onConnectionClick(connection.id) },
-            modifier = Modifier.fillMaxSize(),
+            listHeaderContent = headerContent,
+            asSheet = true,
+            modifier = modifier.fillMaxSize(),
         )
+    } else {
+        Column(
+            modifier = modifier.fillMaxSize(),
+        ) {
+            headerContent()
+            ConnectionsScreen(
+                serviceStatus = serviceStatus,
+                viewModel = viewModel,
+                onConnectionClick = { connection -> onConnectionClick(connection.id) },
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
     }
 }
 
@@ -347,6 +373,8 @@ fun ConnectionsScreen(
     serviceStatus: Status,
     viewModel: ConnectionsViewModel = viewModel(),
     onConnectionClick: (Connection) -> Unit = {},
+    listHeaderContent: (@Composable () -> Unit)? = null,
+    asSheet: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -365,73 +393,96 @@ fun ConnectionsScreen(
         viewModel.updateServiceStatus(serviceStatus)
     }
 
-    Column(modifier = modifier.fillMaxSize()) {
-        AnimatedVisibility(
-            visible = uiState.isSearchActive,
-            enter = expandVertically() + fadeIn(),
-            exit = shrinkVertically() + fadeOut(),
-        ) {
-            val focusRequester = remember { FocusRequester() }
+    val lazyListState = rememberSaveable(saver = LazyListState.Saver) { LazyListState() }
 
-            LaunchedEffect(Unit) {
-                focusRequester.requestFocus()
+    if (asSheet) {
+        val sheetSwipeToDismissModifier =
+            rememberSheetDismissFromContentOnlyIfGestureStartedAtTopModifier {
+                lazyListState.firstVisibleItemIndex == 0 &&
+                    lazyListState.firstVisibleItemScrollOffset == 0
             }
-
-            OutlinedTextField(
-                value = uiState.searchText,
-                onValueChange = { viewModel.setSearchText(it) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .padding(bottom = 8.dp)
-                    .focusRequester(focusRequester),
-                placeholder = { Text(stringResource(R.string.search_connections)) },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                trailingIcon = {
-                    if (uiState.searchText.isNotEmpty()) {
-                        IconButton(onClick = { viewModel.setSearchText("") }) {
-                            Icon(Icons.Default.Clear, contentDescription = null)
-                        }
-                    }
-                },
-                singleLine = true,
-            )
-        }
-
-        when {
-            uiState.isLoading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    CircularProgressIndicator()
+        LazyColumn(
+            modifier =
+            modifier
+                .fillMaxSize()
+                .then(sheetSwipeToDismissModifier),
+            state = lazyListState,
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            overscrollEffect = null,
+        ) {
+            if (listHeaderContent != null) {
+                item(key = "connections_list_header") {
+                    listHeaderContent()
                 }
             }
 
-            uiState.connections.isEmpty() -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center,
+            item(key = "connections_search") {
+                AnimatedVisibility(
+                    visible = uiState.isSearchActive,
+                    enter = expandVertically() + fadeIn(),
+                    exit = shrinkVertically() + fadeOut(),
                 ) {
-                    Text(
-                        text = stringResource(R.string.empty_connections),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    val focusRequester = remember { FocusRequester() }
+
+                    LaunchedEffect(Unit) {
+                        focusRequester.requestFocus()
+                    }
+
+                    OutlinedTextField(
+                        value = uiState.searchText,
+                        onValueChange = { viewModel.setSearchText(it) },
+                        modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp)
+                            .focusRequester(focusRequester),
+                        placeholder = { Text(stringResource(R.string.search_connections)) },
+                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                        trailingIcon = {
+                            if (uiState.searchText.isNotEmpty()) {
+                                IconButton(onClick = { viewModel.setSearchText("") }) {
+                                    Icon(Icons.Default.Clear, contentDescription = null)
+                                }
+                            }
+                        },
+                        singleLine = true,
                     )
                 }
             }
 
-            else -> {
-                val lazyListState = rememberLazyListState()
-                val bounceBlockingConnection = rememberBounceBlockingNestedScrollConnection(lazyListState)
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .nestedScroll(bounceBlockingConnection),
-                    state = lazyListState,
-                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
+            when {
+                uiState.isLoading -> {
+                    item(key = "connections_loading") {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 48.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    }
+                }
+
+                uiState.connections.isEmpty() -> {
+                    item(key = "connections_empty") {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 48.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(
+                                text = stringResource(R.string.empty_connections),
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+                }
+
+                else -> {
                     items(
                         items = uiState.connections,
                         key = { it.id },
@@ -441,6 +492,90 @@ fun ConnectionsScreen(
                             onClick = { onConnectionClick(connection) },
                             onClose = { viewModel.closeConnection(connection.id) },
                         )
+                    }
+                }
+            }
+        }
+    } else {
+        Column(modifier = modifier.fillMaxSize()) {
+            AnimatedVisibility(
+                visible = uiState.isSearchActive,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut(),
+            ) {
+                val focusRequester = remember { FocusRequester() }
+
+                LaunchedEffect(Unit) {
+                    focusRequester.requestFocus()
+                }
+
+                OutlinedTextField(
+                    value = uiState.searchText,
+                    onValueChange = { viewModel.setSearchText(it) },
+                    modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .padding(bottom = 8.dp)
+                        .focusRequester(focusRequester),
+                    placeholder = { Text(stringResource(R.string.search_connections)) },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                    trailingIcon = {
+                        if (uiState.searchText.isNotEmpty()) {
+                            IconButton(onClick = { viewModel.setSearchText("") }) {
+                                Icon(Icons.Default.Clear, contentDescription = null)
+                            }
+                        }
+                    },
+                    singleLine = true,
+                )
+            }
+
+            when {
+                uiState.isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+
+                uiState.connections.isEmpty() -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = stringResource(R.string.empty_connections),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+
+                else -> {
+                    val bounceBlockingConnection = rememberBounceBlockingNestedScrollConnection(lazyListState)
+                    LazyColumn(
+                        modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .nestedScroll(bounceBlockingConnection),
+                        state = lazyListState,
+                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        overscrollEffect = rememberOverscrollEffect(),
+                    ) {
+                        items(
+                            items = uiState.connections,
+                            key = { it.id },
+                        ) { connection ->
+                            ConnectionItem(
+                                connection = connection,
+                                onClick = { onConnectionClick(connection) },
+                                onClose = { viewModel.closeConnection(connection.id) },
+                            )
+                        }
                     }
                 }
             }

@@ -1014,46 +1014,47 @@ class MainActivity :
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .fillMaxHeight(0.9f),
+                        .fillMaxHeight(),
                 ) {
-                    // Header
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 24.dp)
-                            .padding(bottom = 16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = stringResource(R.string.title_groups),
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                        if (groupsUiState.groups.isNotEmpty()) {
-                            IconButton(onClick = { groupsViewModel.toggleAllGroups() }) {
-                                Icon(
-                                    imageVector = if (allCollapsed) {
-                                        Icons.Default.UnfoldMore
-                                    } else {
-                                        Icons.Default.UnfoldLess
-                                    },
-                                    contentDescription = if (allCollapsed) {
-                                        stringResource(R.string.expand_all)
-                                    } else {
-                                        stringResource(R.string.collapse_all)
-                                    },
-                                )
-                            }
-                        }
-                    }
-
                     // Groups content
                     GroupsCard(
                         serviceStatus = currentServiceStatus,
                         commandClient = dashboardViewModel.commandClient,
                         viewModel = groupsViewModel,
+                        listHeaderContent = {
+                            Row(
+                                modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.title_groups),
+                                    style = MaterialTheme.typography.headlineSmall,
+                                    fontWeight = FontWeight.Medium,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                )
+                                if (groupsUiState.groups.isNotEmpty()) {
+                                    IconButton(onClick = { groupsViewModel.toggleAllGroups() }) {
+                                        Icon(
+                                            imageVector = if (allCollapsed) {
+                                                Icons.Default.UnfoldMore
+                                            } else {
+                                                Icons.Default.UnfoldLess
+                                            },
+                                            contentDescription = if (allCollapsed) {
+                                                stringResource(R.string.expand_all)
+                                            } else {
+                                                stringResource(R.string.collapse_all)
+                                            },
+                                        )
+                                    }
+                                }
+                            }
+                        },
+                        asSheet = true,
                         modifier = Modifier.fillMaxSize(),
                     )
                 }
@@ -1097,7 +1098,7 @@ class MainActivity :
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .fillMaxHeight(0.9f),
+                        .fillMaxHeight(),
                 ) {
                     if (displayConnection != null) {
                         ConnectionDetailsScreen(
@@ -1106,11 +1107,13 @@ class MainActivity :
                             onClose = {
                                 selectedConnectionId?.let { connectionsViewModel.closeConnection(it) }
                             },
+                            asSheet = true,
                         )
                     } else {
                         ConnectionsPage(
                             serviceStatus = currentServiceStatus,
                             viewModel = connectionsViewModel,
+                            asSheet = true,
                             showTitle = true,
                             onConnectionClick = { selectedConnectionId = it },
                             modifier = Modifier.fillMaxSize(),

@@ -23,7 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberOverscrollEffect
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandMore
@@ -49,6 +49,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -70,6 +71,7 @@ import io.nekohasekai.sfa.compose.model.Group
 import io.nekohasekai.sfa.compose.model.GroupItem
 import io.nekohasekai.sfa.compose.screen.dashboard.groups.GroupsViewModel
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
+import io.nekohasekai.sfa.compose.util.rememberSheetDismissFromContentOnlyIfGestureStartedAtTopModifier
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.utils.CommandClient
 
@@ -80,6 +82,8 @@ fun GroupsCard(
     commandClient: CommandClient? = null,
     viewModel: GroupsViewModel? = null,
     showTopBar: Boolean = false,
+    listHeaderContent: (@Composable () -> Unit)? = null,
+    asSheet: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     val actualViewModel: GroupsViewModel = viewModel ?: viewModel(
@@ -169,6 +173,8 @@ fun GroupsCard(
         onToggleExpanded = onToggleExpanded,
         onItemSelected = onItemSelected,
         onUrlTest = onUrlTest,
+        listHeaderContent = listHeaderContent,
+        asSheet = asSheet,
         modifier = modifier,
     )
 }
@@ -179,51 +185,78 @@ private fun GroupsCardContent(
     onToggleExpanded: (String) -> Unit,
     onItemSelected: (String, String) -> Unit,
     onUrlTest: (String) -> Unit,
+    listHeaderContent: (@Composable () -> Unit)? = null,
+    asSheet: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier.fillMaxWidth()) {
-        // Groups content
-        if (uiState.isLoading) {
-            Box(
-                modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(200.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                CircularProgressIndicator()
-            }
-        } else if (uiState.groups.isEmpty()) {
-            Box(
-                modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(100.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(
-                    text = "No groups available",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+    val lazyListState = rememberSaveable(saver = LazyListState.Saver) { LazyListState() }
+    val scrollModifier =
+        if (asSheet) {
+            rememberSheetDismissFromContentOnlyIfGestureStartedAtTopModifier {
+                lazyListState.firstVisibleItemIndex == 0 &&
+                    lazyListState.firstVisibleItemScrollOffset == 0
             }
         } else {
-            val lazyListState = rememberLazyListState()
-            val bounceBlockingConnection = rememberBounceBlockingNestedScrollConnection(lazyListState)
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .nestedScroll(bounceBlockingConnection),
-                state = lazyListState,
-                contentPadding =
-                PaddingValues(
-                    start = 16.dp,
-                    end = 16.dp,
-                    top = 8.dp,
-                    bottom = 16.dp,
-                ),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
+            Modifier.nestedScroll(rememberBounceBlockingNestedScrollConnection(lazyListState))
+        }
+    val overscrollEffect = if (asSheet) null else rememberOverscrollEffect()
+
+    LazyColumn(
+        modifier =
+        modifier
+            .fillMaxSize()
+            .then(scrollModifier),
+        state = lazyListState,
+        contentPadding =
+        PaddingValues(
+            start = 16.dp,
+            end = 16.dp,
+            top = 8.dp,
+            bottom = 16.dp,
+        ),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        overscrollEffect = overscrollEffect,
+    ) {
+        if (listHeaderContent != null) {
+            item(key = "groups_list_header") {
+                listHeaderContent()
+            }
+        }
+
+        when {
+            uiState.isLoading -> {
+                item(key = "groups_loading") {
+                    Box(
+                        modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+            }
+
+            uiState.groups.isEmpty() -> {
+                item(key = "groups_empty") {
+                    Box(
+                        modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(100.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = "No groups available",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+            }
+
+            else -> {
                 items(
                     items = uiState.groups,
                     key = { it.tag },

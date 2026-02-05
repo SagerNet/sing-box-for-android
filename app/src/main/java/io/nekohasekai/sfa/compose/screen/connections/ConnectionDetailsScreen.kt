@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberOverscrollEffect
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
@@ -46,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.model.Connection
+import io.nekohasekai.sfa.compose.util.rememberSheetDismissFromContentOnlyIfGestureStartedAtTopModifier
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -57,17 +59,25 @@ fun ConnectionDetailsScreen(
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
     showHeader: Boolean = true,
+    asSheet: Boolean = false,
 ) {
     val dateTimeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
     var showMenu by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
-    val bounceBlockingConnection = rememberBounceBlockingNestedScrollConnection(scrollState)
+    val scrollModifier =
+        if (asSheet) {
+            rememberSheetDismissFromContentOnlyIfGestureStartedAtTopModifier {
+                scrollState.value == 0
+            }
+        } else {
+            Modifier.nestedScroll(rememberBounceBlockingNestedScrollConnection(scrollState))
+        }
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .nestedScroll(bounceBlockingConnection)
-            .verticalScroll(scrollState),
+            .then(scrollModifier)
+            .verticalScroll(scrollState, overscrollEffect = if (asSheet) null else rememberOverscrollEffect()),
     ) {
         if (showHeader) {
             Row(
