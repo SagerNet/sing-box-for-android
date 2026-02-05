@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberOverscrollEffect
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandMore
@@ -67,6 +66,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.compat.LazyColumnCompat
+import io.nekohasekai.sfa.compat.rememberOverscrollEffectCompat
 import io.nekohasekai.sfa.compose.model.Group
 import io.nekohasekai.sfa.compose.model.GroupItem
 import io.nekohasekai.sfa.compose.screen.dashboard.groups.GroupsViewModel
@@ -199,9 +200,9 @@ private fun GroupsCardContent(
         } else {
             Modifier.nestedScroll(rememberBounceBlockingNestedScrollConnection(lazyListState))
         }
-    val overscrollEffect = if (asSheet) null else rememberOverscrollEffect()
+    val overscrollEffect = if (asSheet) null else rememberOverscrollEffectCompat()
 
-    LazyColumn(
+    LazyColumnCompat(
         modifier =
         modifier
             .fillMaxSize()

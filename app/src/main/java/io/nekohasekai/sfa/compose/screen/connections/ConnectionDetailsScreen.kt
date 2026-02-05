@@ -11,10 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberOverscrollEffect
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
@@ -46,6 +44,8 @@ import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.compat.rememberOverscrollEffectCompat
+import io.nekohasekai.sfa.compat.verticalScrollCompat
 import io.nekohasekai.sfa.compose.model.Connection
 import io.nekohasekai.sfa.compose.util.rememberSheetDismissFromContentOnlyIfGestureStartedAtTopModifier
 import java.text.SimpleDateFormat
@@ -77,7 +77,7 @@ fun ConnectionDetailsScreen(
         modifier = modifier
             .fillMaxSize()
             .then(scrollModifier)
-            .verticalScroll(scrollState, overscrollEffect = if (asSheet) null else rememberOverscrollEffect()),
+            .verticalScrollCompat(scrollState, overscrollEffect = if (asSheet) null else rememberOverscrollEffectCompat()),
     ) {
         if (showHeader) {
             Row(

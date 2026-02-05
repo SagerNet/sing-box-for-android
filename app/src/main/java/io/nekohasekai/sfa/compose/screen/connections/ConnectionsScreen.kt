@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberOverscrollEffect
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
@@ -59,6 +58,8 @@ import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.compat.LazyColumnCompat
+import io.nekohasekai.sfa.compat.rememberOverscrollEffectCompat
 import io.nekohasekai.sfa.compose.model.Connection
 import io.nekohasekai.sfa.compose.model.ConnectionSort
 import io.nekohasekai.sfa.compose.model.ConnectionStateFilter
@@ -401,7 +402,7 @@ fun ConnectionsScreen(
                 lazyListState.firstVisibleItemIndex == 0 &&
                     lazyListState.firstVisibleItemScrollOffset == 0
             }
-        LazyColumn(
+        LazyColumnCompat(
             modifier =
             modifier
                 .fillMaxSize()
@@ -556,7 +557,7 @@ fun ConnectionsScreen(
 
                 else -> {
                     val bounceBlockingConnection = rememberBounceBlockingNestedScrollConnection(lazyListState)
-                    LazyColumn(
+                    LazyColumnCompat(
                         modifier =
                         Modifier
                             .fillMaxSize()
@@ -564,7 +565,7 @@ fun ConnectionsScreen(
                         state = lazyListState,
                         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
-                        overscrollEffect = rememberOverscrollEffect(),
+                        overscrollEffect = rememberOverscrollEffectCompat(),
                     ) {
                         items(
                             items = uiState.connections,
