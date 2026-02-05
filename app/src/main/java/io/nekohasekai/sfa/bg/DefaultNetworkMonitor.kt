@@ -2,7 +2,7 @@ package io.nekohasekai.sfa.bg
 
 import android.net.Network
 import android.os.Build
-import io.nekohasekai.libbox.InterfaceUpdateListener
+import libbox.InterfaceUpdateListener
 import io.nekohasekai.sfa.Application
 import java.net.NetworkInterface
 

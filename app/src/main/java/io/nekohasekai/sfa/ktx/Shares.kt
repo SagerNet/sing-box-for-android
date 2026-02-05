@@ -3,7 +3,7 @@ package io.nekohasekai.sfa.ktx
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.FileProvider
-import io.nekohasekai.libbox.ProfileContent
+import libbox.ProfileContent
 import io.nekohasekai.sfa.database.Profile
 import io.nekohasekai.sfa.database.TypedProfile
 import kotlinx.coroutines.Dispatchers
@@ -16,11 +16,11 @@ suspend fun Context.shareProfile(profile: Profile) {
     content.name = profile.name
     when (profile.typed.type) {
         TypedProfile.Type.Local -> {
-            content.type = io.nekohasekai.libbox.Libbox.ProfileTypeLocal
+            content.type = libbox.Libbox.ProfileTypeLocal
         }
 
         TypedProfile.Type.Remote -> {
-            content.type = io.nekohasekai.libbox.Libbox.ProfileTypeRemote
+            content.type = libbox.Libbox.ProfileTypeRemote
         }
     }
     content.config = File(profile.typed.path).readText()

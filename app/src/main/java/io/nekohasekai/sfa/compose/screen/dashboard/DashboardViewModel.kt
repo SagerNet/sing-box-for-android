@@ -1,9 +1,9 @@
 package io.nekohasekai.sfa.compose.screen.dashboard
 
 import androidx.lifecycle.viewModelScope
-import io.nekohasekai.libbox.Libbox
-import io.nekohasekai.libbox.OutboundGroup
-import io.nekohasekai.libbox.StatusMessage
+import libbox.Libbox
+import libbox.OutboundGroup
+import libbox.StatusMessage
 import io.nekohasekai.sfa.bg.BoxService
 import io.nekohasekai.sfa.compose.base.BaseViewModel
 import io.nekohasekai.sfa.compose.base.UiEvent

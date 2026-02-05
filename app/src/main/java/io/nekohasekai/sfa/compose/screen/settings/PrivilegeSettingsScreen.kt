@@ -60,7 +60,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.navigation.NavController
-import io.nekohasekai.libbox.Libbox
+import libbox.Libbox
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.base.GlobalEventBus
 import io.nekohasekai.sfa.compose.base.SelectableMessageDialog

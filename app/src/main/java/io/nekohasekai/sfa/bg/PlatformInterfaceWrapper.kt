@@ -7,15 +7,15 @@ import android.os.Process
 import android.system.OsConstants
 import android.util.Log
 import androidx.annotation.RequiresApi
-import io.nekohasekai.libbox.ConnectionOwner
-import io.nekohasekai.libbox.InterfaceUpdateListener
-import io.nekohasekai.libbox.Libbox
-import io.nekohasekai.libbox.LocalDNSTransport
-import io.nekohasekai.libbox.NetworkInterfaceIterator
-import io.nekohasekai.libbox.PlatformInterface
-import io.nekohasekai.libbox.StringIterator
-import io.nekohasekai.libbox.TunOptions
-import io.nekohasekai.libbox.WIFIState
+import libbox.ConnectionOwner
+import libbox.InterfaceUpdateListener
+import libbox.Libbox
+import libbox.LocalDNSTransport
+import libbox.NetworkInterfaceIterator
+import libbox.PlatformInterface
+import libbox.StringIterator
+import libbox.TunOptions
+import libbox.WIFIState
 import io.nekohasekai.sfa.Application
 import java.net.Inet6Address
 import java.net.InetSocketAddress
@@ -24,7 +24,7 @@ import java.net.NetworkInterface
 import java.security.KeyStore
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
-import io.nekohasekai.libbox.NetworkInterface as LibboxNetworkInterface
+import libbox.NetworkInterface as LibboxNetworkInterface
 
 interface PlatformInterfaceWrapper : PlatformInterface {
     override fun usePlatformAutoDetectInterfaceControl(): Boolean = true

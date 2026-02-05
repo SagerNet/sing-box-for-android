@@ -64,7 +64,7 @@ import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import io.nekohasekai.libbox.Libbox
+import libbox.Libbox
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.model.Group
 import io.nekohasekai.sfa.compose.model.GroupItem

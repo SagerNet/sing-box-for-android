@@ -57,8 +57,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import io.nekohasekai.libbox.Libbox
-import io.nekohasekai.libbox.ProfileContent
+import libbox.Libbox
+import libbox.ProfileContent
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.component.qr.QRCodeDialog
 import io.nekohasekai.sfa.compose.util.ProfileIcons

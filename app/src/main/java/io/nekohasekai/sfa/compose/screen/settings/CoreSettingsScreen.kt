@@ -48,7 +48,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import io.nekohasekai.libbox.Libbox
+import libbox.Libbox
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.database.Settings

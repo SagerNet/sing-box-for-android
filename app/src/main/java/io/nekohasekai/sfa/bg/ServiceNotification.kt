@@ -13,8 +13,8 @@ import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.lifecycle.MutableLiveData
-import io.nekohasekai.libbox.Libbox
-import io.nekohasekai.libbox.StatusMessage
+import libbox.Libbox
+import libbox.StatusMessage
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.MainActivity

@@ -1,8 +1,8 @@
 package io.nekohasekai.sfa.compose.screen.dashboard.groups
 
 import androidx.lifecycle.viewModelScope
-import io.nekohasekai.libbox.Libbox
-import io.nekohasekai.libbox.OutboundGroup
+import libbox.Libbox
+import libbox.OutboundGroup
 import io.nekohasekai.sfa.compose.base.BaseViewModel
 import io.nekohasekai.sfa.compose.base.ScreenEvent
 import io.nekohasekai.sfa.compose.model.Group

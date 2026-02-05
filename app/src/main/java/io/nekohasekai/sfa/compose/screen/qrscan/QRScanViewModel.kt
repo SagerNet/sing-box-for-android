@@ -13,7 +13,7 @@ import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LifecycleOwner
-import io.nekohasekai.libbox.Libbox
+import libbox.Libbox
 import io.nekohasekai.sfa.qrs.QRSDecoder
 import io.nekohasekai.sfa.qrs.readIntLE
 import io.nekohasekai.sfa.vendor.Vendor

@@ -2,17 +2,17 @@ package io.nekohasekai.sfa.utils
 
 import android.util.Log
 import go.Seq
-import io.nekohasekai.libbox.CommandClient
-import io.nekohasekai.libbox.CommandClientHandler
-import io.nekohasekai.libbox.CommandClientOptions
-import io.nekohasekai.libbox.ConnectionEvents
-import io.nekohasekai.libbox.Libbox
-import io.nekohasekai.libbox.LogEntry
-import io.nekohasekai.libbox.LogIterator
-import io.nekohasekai.libbox.OutboundGroup
-import io.nekohasekai.libbox.OutboundGroupIterator
-import io.nekohasekai.libbox.StatusMessage
-import io.nekohasekai.libbox.StringIterator
+import libbox.CommandClient
+import libbox.CommandClientHandler
+import libbox.CommandClientOptions
+import libbox.ConnectionEvents
+import libbox.Libbox
+import libbox.LogEntry
+import libbox.LogIterator
+import libbox.OutboundGroup
+import libbox.OutboundGroupIterator
+import libbox.StatusMessage
+import libbox.StringIterator
 import io.nekohasekai.sfa.ktx.toList
 import kotlinx.coroutines.CoroutineScope
 

@@ -1,9 +1,9 @@
 package io.nekohasekai.sfa.compose.model
 
 import androidx.compose.runtime.Immutable
-import io.nekohasekai.libbox.OutboundGroup
-import io.nekohasekai.libbox.OutboundGroupItem
-import io.nekohasekai.libbox.OutboundGroupItemIterator
+import libbox.OutboundGroup
+import libbox.OutboundGroupItem
+import libbox.OutboundGroupItemIterator
 
 data class Group(
     val tag: String,

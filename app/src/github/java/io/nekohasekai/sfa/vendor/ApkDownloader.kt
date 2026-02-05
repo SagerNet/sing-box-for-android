@@ -1,11 +1,11 @@
 package io.nekohasekai.sfa.vendor
 
-import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.update.UpdateState
 import io.nekohasekai.sfa.utils.HTTPClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import libbox.Libbox
 import java.io.Closeable
 import java.io.File
 

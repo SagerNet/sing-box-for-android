@@ -1,7 +1,7 @@
 package io.nekohasekai.sfa.vendor
 
 import android.os.Build
-import io.nekohasekai.libbox.Libbox
+import libbox.Libbox
 import io.nekohasekai.sfa.BuildConfig
 import io.nekohasekai.sfa.ktx.unwrap
 import io.nekohasekai.sfa.update.UpdateCheckException

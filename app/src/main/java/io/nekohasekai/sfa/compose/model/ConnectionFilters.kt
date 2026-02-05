@@ -1,6 +1,6 @@
 package io.nekohasekai.sfa.compose.model
 
-import io.nekohasekai.libbox.Libbox
+import libbox.Libbox
 
 enum class ConnectionStateFilter(val libboxValue: Int) {
     All(Libbox.ConnectionStateAll.toInt()),

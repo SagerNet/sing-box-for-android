@@ -2,8 +2,8 @@ package io.nekohasekai.sfa.compose.model
 
 import androidx.compose.runtime.Immutable
 import io.nekohasekai.sfa.ktx.toList
-import io.nekohasekai.libbox.Connection as LibboxConnection
-import io.nekohasekai.libbox.ProcessInfo as LibboxProcessInfo
+import libbox.Connection as LibboxConnection
+import libbox.ProcessInfo as LibboxProcessInfo
 
 @Immutable
 data class ProcessInfo(val processId: Long, val userId: Int, val userName: String, val processPath: String, val packageName: String) {

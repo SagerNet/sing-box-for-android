@@ -3,8 +3,8 @@ package io.nekohasekai.sfa.compose.screen.configuration
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
-import io.nekohasekai.libbox.Libbox
-import io.nekohasekai.libbox.ProfileContent
+import libbox.Libbox
+import libbox.ProfileContent
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.database.Profile
 import io.nekohasekai.sfa.database.ProfileManager

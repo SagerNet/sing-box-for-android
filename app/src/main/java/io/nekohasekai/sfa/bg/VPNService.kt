@@ -7,8 +7,8 @@ import android.net.VpnService
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
-import io.nekohasekai.libbox.Notification
-import io.nekohasekai.libbox.TunOptions
+import libbox.Notification
+import libbox.TunOptions
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.ktx.toIpPrefix
 import io.nekohasekai.sfa.ktx.toList

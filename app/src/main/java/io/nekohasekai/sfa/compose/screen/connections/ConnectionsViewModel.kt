@@ -1,9 +1,9 @@
 package io.nekohasekai.sfa.compose.screen.connections
 
 import androidx.lifecycle.viewModelScope
-import io.nekohasekai.libbox.ConnectionEvents
-import io.nekohasekai.libbox.Connections
-import io.nekohasekai.libbox.Libbox
+import libbox.ConnectionEvents
+import libbox.Connections
+import libbox.Libbox
 import io.nekohasekai.sfa.compose.base.BaseViewModel
 import io.nekohasekai.sfa.compose.base.ScreenEvent
 import io.nekohasekai.sfa.compose.model.Connection

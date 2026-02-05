@@ -1,8 +1,8 @@
 package io.nekohasekai.sfa.compose.screen.log
 
 import androidx.lifecycle.viewModelScope
-import io.nekohasekai.libbox.Libbox
-import io.nekohasekai.libbox.LogEntry
+import libbox.Libbox
+import libbox.LogEntry
 import io.nekohasekai.sfa.compose.util.AnsiColorUtils
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.utils.AppLifecycleObserver

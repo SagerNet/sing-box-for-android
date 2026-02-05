@@ -6,7 +6,7 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import io.nekohasekai.libbox.Libbox
+import libbox.Libbox
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.bg.UpdateProfileWork
 import io.nekohasekai.sfa.database.Profile

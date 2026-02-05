@@ -1,6 +1,6 @@
 package io.nekohasekai.sfa.utils
 
-import io.nekohasekai.libbox.Libbox
+import libbox.Libbox
 import io.nekohasekai.sfa.BuildConfig
 import io.nekohasekai.sfa.ktx.unwrap
 import java.io.Closeable

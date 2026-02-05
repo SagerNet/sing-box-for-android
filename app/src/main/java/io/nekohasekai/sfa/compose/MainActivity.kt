@@ -79,7 +79,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dev.jeziellago.compose.markdowntext.MarkdownText
-import io.nekohasekai.libbox.Libbox
+import libbox.Libbox
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.BuildConfig
 import io.nekohasekai.sfa.R

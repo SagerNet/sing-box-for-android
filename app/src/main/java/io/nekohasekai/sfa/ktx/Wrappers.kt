@@ -3,14 +3,14 @@ package io.nekohasekai.sfa.ktx
 import android.net.IpPrefix
 import android.os.Build
 import androidx.annotation.RequiresApi
-import io.nekohasekai.libbox.ConnectionIterator
-import io.nekohasekai.libbox.LogEntry
-import io.nekohasekai.libbox.LogIterator
-import io.nekohasekai.libbox.RoutePrefix
-import io.nekohasekai.libbox.StringBox
-import io.nekohasekai.libbox.StringIterator
+import libbox.ConnectionIterator
+import libbox.LogEntry
+import libbox.LogIterator
+import libbox.RoutePrefix
+import libbox.StringBox
+import libbox.StringIterator
 import java.net.InetAddress
-import io.nekohasekai.libbox.Connection as LibboxConnection
+import libbox.Connection as LibboxConnection
 
 val StringBox?.unwrap: String
     get() {
