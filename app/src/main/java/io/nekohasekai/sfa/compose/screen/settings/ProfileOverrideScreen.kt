@@ -113,14 +113,19 @@ fun ProfileOverrideScreen(navController: NavController) {
     val isShizukuBinderReady by PackageQueryManager.shizukuBinderReady.collectAsState()
     val isShizukuPermissionGranted by PackageQueryManager.shizukuPermissionGranted.collectAsState()
     val isShizukuAvailable = isShizukuBinderReady && isShizukuPermissionGranted
+    var isShizukuStateInitialized by remember(showModeSelector) { mutableStateOf(!showModeSelector) }
 
     DisposableEffect(showModeSelector) {
         if (showModeSelector) {
+            isShizukuStateInitialized = false
             PackageQueryManager.registerListeners()
+            PackageQueryManager.refreshShizukuState()
+            isShizukuStateInitialized = true
         }
         onDispose {
             if (showModeSelector) {
                 PackageQueryManager.unregisterListeners()
+                isShizukuStateInitialized = false
             }
         }
     }
@@ -140,8 +145,14 @@ fun ProfileOverrideScreen(navController: NavController) {
     }
 
     // Auto-disable per-app proxy if Shizuku authorization is revoked (only when using Shizuku mode)
-    LaunchedEffect(isShizukuAvailable, useRootMode) {
-        if (showModeSelector && !useRootMode && !isShizukuAvailable && perAppProxyEnabled) {
+    LaunchedEffect(isShizukuAvailable, useRootMode, isShizukuStateInitialized, perAppProxyEnabled, showModeSelector) {
+        if (
+            showModeSelector &&
+            !useRootMode &&
+            isShizukuStateInitialized &&
+            perAppProxyEnabled &&
+            !PackageQueryManager.isShizukuAvailable()
+        ) {
             perAppProxyEnabled = false
             withContext(Dispatchers.IO) {
                 Settings.perAppProxyEnabled = false
