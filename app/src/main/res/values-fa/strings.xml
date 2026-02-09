@@ -1,0 +1,436 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <!-- App -->
+    <string name="app_name" translatable="false">sing-box</string>
+    <string name="app_version_title">نسخه برنامه</string>
+
+    <!-- Common Actions -->
+    <string name="ok">تأیید</string>
+    <string name="cancel">لغو</string>
+    <string name="save">ذخیره</string>
+    <string name="discard">چشم‌پوشی</string>
+    <string name="edit">ویرایش</string>
+    <string name="close">بستن</string>
+    <string name="dismiss">بستن</string>
+    <string name="stop">توقف</string>
+    <string name="reset">بازنشانی</string>
+    <string name="destroy">حذف</string>
+    <string name="clear">پاک کردن</string>
+    <string name="browse">مرور</string>
+    <string name="search">جستجو</string>
+    <string name="action">اقدام</string>
+    <string name="action_start">شروع</string>
+    <string name="action_deselect">لغو انتخاب</string>
+    <string name="expand">باز کردن</string>
+    <string name="collapse">جمع کردن</string>
+    <string name="expand_all">باز کردن همه</string>
+    <string name="collapse_all">جمع کردن همه</string>
+    <string name="previous">قبلی</string>
+    <string name="next">بعدی</string>
+    <string name="update">به‌روزرسانی</string>
+    <string name="read_more">بیشتر بخوانید</string>
+    <string name="no_thanks">نه، ممنون</string>
+    <string name="options">گزینه‌ها</string>
+    <string name="more_options">گزینه‌های بیشتر</string>
+
+    <!-- Common States -->
+    <string name="enabled">فعال</string>
+    <string name="disabled">غیرفعال</string>
+    <string name="loading">در حال بارگذاری…</string>
+    <string name="calculating">در حال محاسبه...</string>
+    <string name="auto">خودکار</string>
+    <string name="success">موفق</string>
+    <string name="default_text">پیش‌فرض</string>
+
+    <!-- Navigation Titles -->
+    <string name="title_dashboard">داشبورد</string>
+    <string name="title_configuration">پروفایل‌ها</string>
+    <string name="title_log">گزارش‌ها</string>
+    <string name="title_settings">تنظیمات</string>
+    <string name="title_app_settings">برنامه</string>
+    <string name="title_new_profile">پروفایل جدید</string>
+    <string name="title_edit_profile">ویرایش پروفایل</string>
+    <string name="title_edit_configuration">ویرایش پیکربندی</string>
+    <string name="title_groups">گروه‌ها</string>
+    <string name="title_debug">اشکال‌زدایی</string>
+    <string name="title_connections">اتصال‌ها</string>
+    <string name="title_others">سایر</string>
+    <string name="title_scan_result">نتیجه اسکن</string>
+
+    <!-- Status -->
+    <string name="status_default">سرویس شروع نشده است</string>
+    <string name="status_starting">در حال شروع</string>
+    <string name="status_stopping">در حال توقف</string>
+    <string name="status_started">شروع شده</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_items">آیتم‌های داشبورد</string>
+    <string name="memory">حافظه</string>
+    <string name="goroutines">گوروتین‌ها</string>
+    <string name="upload">آپلود</string>
+    <string name="download">دانلود</string>
+    <string name="connections_in">ورودی</string>
+    <string name="connections_out">خروجی</string>
+    <string name="clash_mode">حالت Clash</string>
+    <string name="mode">حالت</string>
+    <string name="system_proxy">پراکسی سیستم</string>
+    <string name="url_test">تست</string>
+    <string name="drag_handle_to_reorder">برای جابه‌جایی آیتم‌ها، دستگیره را بکشید</string>
+    <string name="drag_to_reorder">برای جابه‌جایی بکشید</string>
+    <string name="reset_order">بازنشانی ترتیب</string>
+
+    <!-- Connections -->
+    <string name="empty_connections">هیچ اتصالی وجود ندارد</string>
+    <string name="search_connections">جستجوی اتصال‌ها…</string>
+    <string name="close_connections_confirm">همه اتصال‌ها بسته شوند؟</string>
+    <string name="connection_state_all">همه</string>
+    <string name="connection_state_active">فعال</string>
+    <string name="connection_state_closed">بسته</string>
+    <string name="connection_sort_date">تاریخ</string>
+    <string name="connection_sort_traffic">ترافیک</string>
+    <string name="connection_sort_traffic_total">ترافیک کل</string>
+    <string name="connection_close">بستن</string>
+    <string name="connection_close_all">بستن همه</string>
+    <string name="connection_state">وضعیت</string>
+    <string name="connection_details">جزئیات اتصال</string>
+    <string name="connection_section_basic">اطلاعات پایه</string>
+    <string name="connection_section_metadata">فراداده</string>
+    <string name="connection_section_process">اطلاعات فرایند</string>
+    <string name="connection_created_at">زمان ایجاد</string>
+    <string name="connection_closed_at">زمان بسته شدن</string>
+    <string name="connection_duration">مدت‌زمان</string>
+    <string name="connection_uplink">آپ‌لینک</string>
+    <string name="connection_downlink">دان‌لینک</string>
+    <string name="connection_inbound">ورودی</string>
+    <string name="connection_inbound_type">نوع ورودی</string>
+    <string name="connection_outbound">خروجی</string>
+    <string name="connection_outbound_type">نوع خروجی</string>
+    <string name="connection_ip_version">نسخه IP</string>
+    <string name="connection_network">شبکه</string>
+    <string name="connection_source">مبدأ</string>
+    <string name="connection_destination">مقصد</string>
+    <string name="connection_domain">دامنه</string>
+    <string name="connection_protocol">پروتکل</string>
+    <string name="connection_user">کاربر</string>
+    <string name="connection_from_outbound">از خروجی</string>
+    <string name="connection_match_rule">قانون تطبیق</string>
+    <string name="connection_chain">زنجیره</string>
+    <string name="connection_process_id">شناسه فرایند</string>
+    <string name="connection_user_id">شناسه کاربر</string>
+    <string name="connection_user_name">نام کاربر</string>
+    <string name="connection_process_path">مسیر فرایند</string>
+    <string name="connection_package_name">نام بسته</string>
+
+    <!-- Profiles -->
+    <string name="no_profiles">هیچ پروفایلی تنظیم نشده است</string>
+    <string name="add_profile">افزودن پروفایل</string>
+    <string name="update_profile">به‌روزرسانی پروفایل</string>
+    <string name="import_remote_profile">وارد کردن پروفایل راه دور</string>
+    <string name="import_remote_profile_message">آیا از وارد کردن پروفایل راه دور %1$s مطمئن هستید؟ برای دانلود پیکربندی به %2$s متصل می‌شوید.</string>
+    <string name="import_from_file_description">وارد کردن پیکربندی از فایل محلی</string>
+    <string name="scan_qr_code_description">اسکن QR کد پیکربندی</string>
+    <string name="create_new_profile_description">ایجاد پروفایل جدید از ابتدا</string>
+    <string name="icloud_profile_unsupported">پروفایل iCloud در پلتفرم فعلی پشتیبانی نمی‌شود</string>
+    <string name="profile_name">نام</string>
+    <string name="profile_type">نوع</string>
+    <string name="profile_source">منبع</string>
+    <string name="profile_url" translatable="false">URL</string>
+    <string name="profile_import_file">وارد کردن فایل</string>
+    <string name="profile_create">ایجاد</string>
+    <string name="profile_share_url">اشتراک‌گذاری URL به‌صورت QR کد</string>
+    <string name="profile_input_required">الزامی</string>
+    <string name="profile_update">به‌روزرسانی</string>
+    <string name="profile_auto_update">به‌روزرسانی خودکار</string>
+    <string name="profile_auto_update_interval">بازه به‌روزرسانی خودکار (دقیقه)</string>
+    <string name="profile_auto_update_interval_minimum_hint">حداقل مقدار 15 است</string>
+    <string name="profile_type_local">محلی</string>
+    <string name="profile_type_remote">راه دور</string>
+    <string name="profile_type_remote_updated">راه دور • %s</string>
+    <string name="profile_source_create_new">ایجاد مورد جدید</string>
+    <string name="profile_source_import">وارد کردن</string>
+    <string name="profile_add_import_file">وارد کردن از فایل</string>
+    <string name="profile_add_scan_qr_code">اسکن QR کد</string>
+    <string name="profile_add_create_manually">ایجاد دستی</string>
+    <string name="profile_override">بازنویسی پروفایل</string>
+    <string name="basic_information">اطلاعات پایه</string>
+    <string name="remote_configuration">پیکربندی راه دور</string>
+    <string name="last_updated_format">آخرین به‌روزرسانی: %s</string>
+    <string name="content">محتوا</string>
+    <string name="json_viewer">نمایشگر JSON</string>
+    <string name="json_editor">ویرایشگر JSON</string>
+    <string name="view_configuration">مشاهده پیکربندی</string>
+    <string name="save_as_file">ذخیره به‌صورت فایل</string>
+    <string name="share_as_file">اشتراک‌گذاری به‌صورت فایل</string>
+    <string name="save_content_json">ذخیره محتوای JSON</string>
+    <string name="share_content_json">اشتراک‌گذاری محتوای JSON</string>
+    <string name="unsaved_changes">تغییرات ذخیره‌نشده</string>
+    <string name="unsaved_changes_message">تغییرات ذخیره‌نشده دارید. می‌خواهید از آن‌ها صرف‌نظر کنید؟</string>
+    <string name="import_profile_confirm_title">وارد کردن پروفایل</string>
+    <string name="import_profile_confirm_message">وارد کردن پروفایل \"%s\"؟</string>
+    <string name="import_action">وارد کردن</string>
+
+    <!-- Groups -->
+    <string name="group_selected_title">انتخاب‌شده</string>
+
+    <!-- Log -->
+    <string name="log_level">سطح لاگ</string>
+    <string name="filter_label">فیلتر: %s</string>
+    <string name="clear_filter">پاک کردن</string>
+    <string name="clear_logs">پاک کردن لاگ‌ها</string>
+    <string name="search_logs_placeholder">جستجوی لاگ‌ها…</string>
+    <string name="logs_copied_to_clipboard">لاگ‌ها در کلیپ‌بورد کپی شدند</string>
+    <string name="no_logs_to_copy">لاگی برای کپی وجود ندارد</string>
+    <string name="no_logs_to_share">لاگی برای اشتراک‌گذاری وجود ندارد</string>
+    <string name="intent_share_logs">اشتراک‌گذاری لاگ‌ها</string>
+    <string name="selected_count">%d انتخاب شده</string>
+    <string name="not_selected">انتخاب نشده</string>
+    <string name="save_to_clipboard">به کلیپ‌بورد</string>
+    <string name="save_to_file">به فایل</string>
+
+    <!-- Settings -->
+    <string name="service">سرویس</string>
+    <string name="core">هسته</string>
+    <string name="core_version_title">نسخه هسته</string>
+    <string name="core_data_size">اندازه داده</string>
+    <string name="about">درباره</string>
+    <string name="source_code">کد منبع</string>
+    <string name="sponsor">حامی مالی</string>
+    <string name="working_directory">پوشه کاری</string>
+    <string name="disable_deprecated_warnings">غیرفعال‌کردن هشدارهای منسوخ</string>
+    <string name="ignore_memory_limit">نادیده گرفتن محدودیت حافظه</string>
+    <string name="ignore_memory_limit_description">محدودیت حافظه روی sing-box اعمال نشود.</string>
+    <string name="auto_redirect">تغییر مسیر خودکار</string>
+    <string name="auto_redirect_description">نیازمند دسترسی ROOT</string>
+    <string name="system_http_proxy">پراکسی HTTP سیستم</string>
+    <string name="update_settings">تنظیمات به‌روزرسانی</string>
+
+    <!-- Per-App Proxy -->
+    <string name="per_app_proxy">پراکسی هر برنامه</string>
+    <string name="per_app_proxy_mode">حالت پراکسی</string>
+    <string name="per_app_proxy_mode_include">شامل</string>
+    <string name="per_app_proxy_mode_include_description">فقط برنامه‌های انتخاب‌شده از VPN عبور می‌کنند</string>
+    <string name="per_app_proxy_mode_exclude">استثنا</string>
+    <string name="per_app_proxy_mode_exclude_description">برنامه‌های انتخاب‌شده از VPN مستثنی می‌شوند</string>
+    <string name="per_app_proxy_action_copy">کپی</string>
+    <string name="per_app_proxy_action_copy_package_name">نام بسته</string>
+    <string name="per_app_proxy_action_copy_uid">UID</string>
+    <string name="per_app_proxy_sort_mode">مرتب‌سازی بر اساس</string>
+    <string name="per_app_proxy_sort_mode_name">بر اساس نام</string>
+    <string name="per_app_proxy_sort_mode_package_name">بر اساس نام بسته</string>
+    <string name="per_app_proxy_sort_mode_uid">بر اساس UID</string>
+    <string name="per_app_proxy_sort_mode_install_time">بر اساس زمان نصب</string>
+    <string name="per_app_proxy_sort_mode_update_time">بر اساس زمان به‌روزرسانی</string>
+    <string name="per_app_proxy_sort_mode_reverse">معکوس</string>
+    <string name="per_app_proxy_filter">فیلتر</string>
+    <string name="per_app_proxy_hide_system_apps">پنهان کردن برنامه‌های سیستمی</string>
+    <string name="per_app_proxy_hide_offline_apps">پنهان کردن برنامه‌های آفلاین</string>
+    <string name="per_app_proxy_hide_disabled_apps">پنهان کردن برنامه‌های غیرفعال</string>
+    <string name="per_app_proxy_select">انتخاب</string>
+    <string name="per_app_proxy_select_all">انتخاب همه</string>
+    <string name="per_app_proxy_select_none">لغو انتخاب همه</string>
+    <string name="per_app_proxy_backup">پشتیبان‌گیری</string>
+    <string name="per_app_proxy_import">وارد کردن از کلیپ‌بورد</string>
+    <string name="per_app_proxy_export">خروجی به کلیپ‌بورد</string>
+    <string name="per_app_proxy_scan">اسکن</string>
+    <string name="per_app_proxy_scan_china_apps">برنامه‌های چینی</string>
+    <string name="per_app_proxy_manage">مدیریت</string>
+    <string name="content_description_app_icon">آیکن برنامه</string>
+    <string name="per_app_proxy_managed_mode">حالت مدیریت‌شده</string>
+    <string name="per_app_proxy_managed_mode_description">برنامه‌های چینی را خودکار مستثنی کن</string>
+    <string name="per_app_proxy_package_query_mode">حالت</string>
+    <string name="per_app_proxy_shizuku_required">وقتی از Play Store نصب می‌شود، پراکسی هر برنامه به Shizuku نیاز دارد. Google Play اجازه استفاده از مجوز QUERY_ALL_PACKAGES را به ما نمی‌دهد (در حالی که برنامه‌های مشابه دیگر را منع نمی‌کند) و این مجوز برای فهرست کردن برنامه‌ها لازم است.</string>
+    <string name="per_app_proxy_root_required">وقتی از Play Store نصب می‌شود، پراکسی هر برنامه به ROOT نیاز دارد. Google Play اجازه استفاده از مجوز QUERY_ALL_PACKAGES را به ما نمی‌دهد (در حالی که برنامه‌های مشابه دیگر را منع نمی‌کند) و این مجوز برای فهرست کردن برنامه‌ها لازم است.</string>
+    <string name="privileged_access_required">برای دریافت فهرست کامل برنامه‌ها به دسترسی Root یا Shizuku نیاز است</string>
+
+    <!-- Permissions -->
+    <string name="background_permission">مجوز پس‌زمینه</string>
+    <string name="background_permission_description">برای کارکرد صحیح VPN، مجوزهای لازم را اعطا کنید.\n\nاگر از دستگاهی ساخت شرکت‌های چینی استفاده می‌کنید، ممکن است این کارت بعد از اعطای مجوز ناپدید نشود.</string>
+    <string name="request_background_permission">نادیده گرفتن</string>
+    <string name="location_permission_title">مجوز موقعیت مکانی</string>
+    <string name="location_permission_description">پروفایل شما شامل قوانین مسیریابی &lt;strong&gt;&lt;tt&gt;wifi_ssid&lt;/tt&gt; یا &lt;tt&gt;wifi_bssid&lt;/tt&gt;&lt;/strong&gt; است. برای کارکرد آن‌ها، sing-box از مجوز &lt;strong&gt;موقعیت مکانی&lt;/strong&gt; &lt;strong&gt;در پس‌زمینه&lt;/strong&gt; برای دریافت اطلاعات شبکه Wi-Fi متصل استفاده می‌کند. این اطلاعات &lt;strong&gt;فقط برای مسیریابی&lt;/strong&gt; استفاده می‌شوند.</string>
+    <string name="location_permission_background_description">در Android 10 و بالاتر، مجوز &lt;strong&gt;موقعیت مکانی پس‌زمینه&lt;/strong&gt; لازم است. برای اعطای مجوز، گزینه &lt;strong&gt;اجازه دائمی&lt;/strong&gt; را انتخاب کنید.</string>
+    <string name="notification_permission_title">مجوز اعلان</string>
+    <string name="notification_permission_required_description">بدون مجوز اعلان، sing-box نمی‌تواند سرعت لحظه‌ای شبکه را نمایش دهد. لطفا پیش از شروع سرویس، مجوز را بدهید یا اعلان سرعت لحظه‌ای شبکه را غیرفعال کنید.</string>
+    <string name="root_access_required">دسترسی Root لازم است</string>
+    <string name="root_access_denied">دسترسی Root رد شد</string>
+
+    <!-- Updates -->
+    <string name="check_update">بررسی به‌روزرسانی</string>
+    <string name="check_update_automatic">بررسی خودکار به‌روزرسانی</string>
+    <string name="check_update_prompt_play">می‌خواهید بررسی خودکار به‌روزرسانی از **Play Store** فعال شود؟</string>
+    <string name="check_update_prompt_github">می‌خواهید بررسی خودکار به‌روزرسانی از **GitHub** فعال شود؟</string>
+    <string name="update_track">کانال به‌روزرسانی</string>
+    <string name="update_track_stable">پایدار</string>
+    <string name="update_track_beta">بتا</string>
+    <string name="update_track_not_supported">کانال فعلی هنوز از بررسی به‌روزرسانی پشتیبانی نمی‌کند</string>
+    <string name="view_release">مشاهده انتشار</string>
+    <string name="downloading">در حال دانلود…</string>
+    <string name="exporting">در حال خروجی‌گیری…</string>
+    <string name="no_updates_available">به‌روزرسانی‌ای موجود نیست</string>
+    <string name="new_version_available">نسخه جدید موجود است: %s</string>
+    <string name="auto_update">به‌روزرسانی خودکار</string>
+    <string name="auto_update_description">دانلود و نصب خودکار به‌روزرسانی‌ها در پس‌زمینه</string>
+
+    <!-- Silent Install -->
+    <string name="silent_install">نصب بی‌صدا</string>
+    <string name="silent_install_description">نصب به‌روزرسانی بدون تعامل</string>
+    <string name="silent_install_method">روش نصب</string>
+    <string name="silent_install_verify_failed">%s در دسترس نیست یا دسترسی رد شده است</string>
+    <string name="install_method_package_installer">PackageInstaller</string>
+    <string name="install_method_shizuku">Shizuku</string>
+    <string name="install_method_root">ROOT</string>
+    <string name="package_installer_not_available">مجوز نصب داده نشده است</string>
+    <string name="grant_install_permission">اعطای مجوز نصب</string>
+    <string name="grant_install_permission_description">اجازه نصب برنامه از این منبع</string>
+
+    <!-- Shizuku -->
+    <string name="shizuku_not_available">Shizuku نصب نیست یا در حال اجرا نیست</string>
+    <string name="shizuku_description">Shizuku به برنامه‌ها اجازه می‌دهد APIهای سیستم را با سطح دسترسی بالاتر مستقیما استفاده کنند</string>
+    <string name="get_shizuku">دریافت Shizuku</string>
+    <string name="start_shizuku">شروع Shizuku</string>
+    <string name="request_shizuku">درخواست Shizuku</string>
+
+    <!-- Time -->
+    <string name="time_just_now">همین الآن</string>
+    <string name="time_yesterday">دیروز</string>
+    <string name="time_now">اکنون</string>
+    <string name="time_yesterday_short">1d</string>
+    <string name="time_minutes_short">%dm</string>
+    <string name="time_hours_short">%dh</string>
+    <string name="time_days_short">%dd</string>
+    <plurals name="time_minutes_ago">
+        <item quantity="one">%d دقیقه پیش</item>
+        <item quantity="other">%d دقیقه پیش</item>
+    </plurals>
+    <plurals name="time_hours_ago">
+        <item quantity="one">%d ساعت پیش</item>
+        <item quantity="other">%d ساعت پیش</item>
+    </plurals>
+    <plurals name="time_days_ago">
+        <item quantity="one">%d روز پیش</item>
+        <item quantity="other">%d روز پیش</item>
+    </plurals>
+
+    <!-- Menu -->
+    <string name="menu_undo">واگرد</string>
+    <string name="menu_redo">انجام دوباره</string>
+    <string name="menu_format">قالب‌بندی</string>
+    <string name="menu_delete">حذف</string>
+    <string name="menu_share">اشتراک‌گذاری</string>
+
+    <!-- Errors -->
+    <string name="error_title">خطا</string>
+    <string name="error_missing_vpn_permission">مجوز VPN وجود ندارد</string>
+    <string name="error_empty_configuration">پیکربندی خالی است</string>
+    <string name="error_empty_file">فایل خالی است</string>
+    <string name="error_decode_profile">بازگشایی پروفایل ناموفق بود: %s</string>
+    <string name="error_invalid_configuration">پیکربندی sing-box نامعتبر است: %s</string>
+    <string name="error_start_command_server">شروع سرور فرمان</string>
+    <string name="error_create_service">ایجاد سرویس</string>
+    <string name="error_start_service">شروع سرویس</string>
+    <string name="error_deprecated_warning">هشدار منسوخ</string>
+    <string name="error_deprecated_documentation">مستندات</string>
+    <string name="file_manager_missing">دستگاه شما فاقد فایل‌گزین استاندارد Android است، لطفا یکی مثل Material Files نصب کنید.</string>
+    <string name="no_file_manager">مدیر فایل پیدا نشد</string>
+
+    <!-- Failed Operations -->
+    <string name="failed_save_profile">ذخیره پروفایل ناموفق بود: %s</string>
+    <string name="failed_save_logs">ذخیره لاگ‌ها ناموفق بود: %s</string>
+    <string name="failed_share_logs">اشتراک‌گذاری لاگ‌ها ناموفق بود: %s</string>
+    <string name="failed_read_configuration">خواندن پیکربندی ناموفق بود: %s</string>
+
+    <!-- Success Messages -->
+    <string name="success_profile_saved">پروفایل با موفقیت ذخیره شد</string>
+    <string name="success_logs_saved">لاگ‌ها با موفقیت ذخیره شدند</string>
+    <string name="success_configuration_saved">پیکربندی ذخیره شد</string>
+    <string name="copied_to_clipboard">در کلیپ‌بورد کپی شد</string>
+
+    <!-- Toast Messages -->
+    <string name="toast_clipboard_empty">کلیپ‌بورد خالی است</string>
+    <string name="toast_copied_to_clipboard">در کلیپ‌بورد ذخیره شد</string>
+    <string name="toast_imported_from_clipboard">از کلیپ‌بورد وارد شد</string>
+
+    <!-- Scanning -->
+    <string name="profile_add_scan_use_front_camera">دوربین جلو</string>
+    <string name="profile_add_scan_use_vendor_analyzer">تحلیلگر MLKit</string>
+    <string name="profile_add_scan_enable_torch">چراغ‌قوه</string>
+    <string name="message_scanning">در حال اسکن…</string>
+    <string name="message_scan_app_no_apps_found">هیچ برنامهٔ منطبقی پیدا نشد</string>
+    <string name="message_scan_app_found">برنامه‌های زیر پیدا شدند، لطفا اقدام مورد نظر را انتخاب کنید.</string>
+
+    <!-- Icon Selection -->
+    <string name="icon">آیکن</string>
+    <string name="icon_count_format">%d آیکن</string>
+    <string name="no_icons_found">آیکنی پیدا نشد</string>
+    <string name="no_icons_match">هیچ آیکنی با \"%s\" مطابقت ندارد</string>
+    <string name="profile_icon">آیکن پروفایل</string>
+    <string name="select_icon">انتخاب آیکن</string>
+    <string name="select_profile_icon">انتخاب آیکن پروفایل</string>
+    <string name="search_icons_placeholder">جستجوی آیکن‌ها...</string>
+    <string name="search_icons">جستجوی آیکن‌ها</string>
+    <string name="close_search">بستن جستجو</string>
+    <string name="current_icon_format">فعلی: %s</string>
+    <string name="categories">دسته‌ها</string>
+    <string name="all_icons">همه آیکن‌ها</string>
+    <string name="back_to_categories">بازگشت به دسته‌ها</string>
+
+    <!-- QR Code -->
+
+    <!-- QR Stream (QRS) -->
+    <string name="share_as_qrs">اشتراک‌گذاری به‌صورت QR Stream</string>
+    <string name="qrs_fps">FPS</string>
+    <string name="qrs_slice_size">اندازه قطعه</string>
+    <string name="qrs_what_is_qrs">QRS چیست</string>
+
+    <!-- Search -->
+    <string name="search_placeholder">یافتن در سند</string>
+
+    <!-- Content Descriptions (Accessibility) -->
+    <string name="content_description_back">بازگشت</string>
+    <string name="content_description_scroll_to_bottom">پیمایش به پایین</string>
+    <string name="content_description_exit_selection_mode">خروج از حالت انتخاب</string>
+    <string name="content_description_copy_selected">کپی موارد انتخاب‌شده</string>
+    <string name="content_description_clear_search">پاک کردن جستجو</string>
+    <string name="content_description_qr_code">QR کد</string>
+    <string name="content_description_resume_logs">ادامه لاگ‌ها</string>
+    <string name="content_description_pause_logs">مکث لاگ‌ها</string>
+    <string name="content_description_collapse_search">جمع کردن جستجو</string>
+    <string name="content_description_search_logs">جستجوی لاگ‌ها</string>
+
+    <!-- Xposed Module -->
+    <string name="xposed_description">بهبود دسترسی ویژه برای sing-box</string>
+
+    <!-- Privileged Enhancement -->
+    <string name="privilege_module_title">ماژول‌های دسترسی ویژه</string>
+    <string name="lsposed_module_activated">ماژول LSPosed فعال است</string>
+    <string name="lsposed_module_pending_update">به‌روزرسانی ماژول LSPosed در انتظار است</string>
+    <string name="lsposed_module_pending_downgrade">دانگرید ماژول LSPosed در انتظار است</string>
+    <string name="lsposed_module_not_activated">ماژول LSPosed فعال نیست</string>
+    <string name="privilege_settings">بهبود دسترسی ویژه</string>
+    <string name="privilege_settings_hide_title">پنهان‌سازی تنظیمات</string>
+    <string name="privilege_settings_hide_description">مقاومت در برابر تشخیص VPN برای برنامه‌های انتخاب‌شده</string>
+    <string name="privilege_settings_hide_manage">مدیریت</string>
+    <string name="privilege_settings_hide_test">اجرای تست</string>
+    <string name="privilege_settings_hide_test_result">نتیجه تست</string>
+    <string name="privilege_settings_hide_test_running">در حال اجرای تست‌های تشخیص…</string>
+    <string name="privilege_settings_hide_test_not_detected">تشخیص داده نشد</string>
+    <string name="privilege_settings_interface_rename_title">تغییر نام رابط</string>
+    <string name="privilege_settings_interface_prefix">پیشوند رابط</string>
+    <string name="privilege_settings_vpn_detection_title">تشخیص VPN</string>
+    <string name="privilege_settings_view_logs">مشاهده لاگ‌ها</string>
+    <string name="privilege_settings_export_debug">خروجی گرفتن اطلاعات اشکال‌زدایی</string>
+    <string name="privilege_settings_hook_logs_empty">لاگی وجود ندارد</string>
+    <string name="privilege_settings_export_debug_complete">خروجی‌گیری کامل شد</string>
+    <string name="privilege_settings_export_debug_message">این فایل حاوی اطلاعات خصوصی است و نباید عمومی به اشتراک گذاشته شود. اندازه: %s</string>
+    <string name="privilege_settings_export_debug_failed">خروجی گرفتن اطلاعات اشکال‌زدایی ناموفق بود: %s</string>
+    <string name="privilege_settings_risky_app_title">هشدار</string>
+    <string name="privilege_settings_risky_vpn_message_single">این برنامه یک برنامه VPN است. مقاومت در برابر تشخیص VPN ممکن است مشکل ایجاد کند: %1$s</string>
+    <string name="privilege_settings_risky_vpn_message_multi">این برنامه‌ها VPN هستند. مقاومت در برابر تشخیص VPN ممکن است مشکل ایجاد کند: %1$s</string>
+    <string name="privilege_settings_risky_management_message_single">این برنامه مجوز مدیریت شبکه دارد. مقاومت در برابر تشخیص VPN ممکن است مشکل ایجاد کند: %1$s</string>
+    <string name="privilege_settings_risky_management_message_multi">این برنامه‌ها مجوز مدیریت شبکه دارند. مقاومت در برابر تشخیص VPN ممکن است مشکل ایجاد کند: %1$s</string>
+    <string name="privilege_module_restart_action">راه‌اندازی مجدد</string>
+    <string name="privilege_module_restart_failed">درخواست راه‌اندازی مجدد ناموفق بود: %1$s</string>
+    <string name="privilege_module_restart_notification_title">نیاز به راه‌اندازی مجدد</string>
+    <string name="privilege_module_restart_notification_message">ماژول LSPosed به‌روزرسانی شد. برای اعمال تغییرات دستگاه را راه‌اندازی مجدد کنید.</string>
+    <string name="privilege_module_restart_channel">ماژول LSPosed</string>
+</resources>
