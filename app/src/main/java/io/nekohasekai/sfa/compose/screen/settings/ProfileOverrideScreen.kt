@@ -642,7 +642,11 @@ fun ProfileOverrideScreen(navController: NavController) {
                                 scope.launch(Dispatchers.IO) {
                                     Settings.perAppProxyPackageQueryMode = Settings.PACKAGE_QUERY_MODE_SHIZUKU
                                 }
-                                if (perAppProxyEnabled && !isShizukuAvailable) {
+                                if (
+                                    perAppProxyEnabled &&
+                                    isShizukuStateInitialized &&
+                                    !PackageQueryManager.isShizukuAvailable()
+                                ) {
                                     perAppProxyEnabled = false
                                     scope.launch(Dispatchers.IO) {
                                         Settings.perAppProxyEnabled = false
