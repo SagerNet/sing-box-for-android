@@ -125,7 +125,6 @@
     <string name="no_profiles">No profiles configured</string>
     <string name="add_profile">Add Profile</string>
     <string name="update_profile">Update profile</string>
-    <string name="share_profile">Share Profile</string>
     <string name="import_remote_profile">Import remote profile</string>
     <string name="import_remote_profile_message">Are you sure to import remote profile %1$s? You will connect to %2$s to download the configuration.</string>
     <string name="import_from_file_description">Import configuration from a local file</string>
@@ -138,7 +137,6 @@
     <string name="profile_url" translatable="false">URL</string>
     <string name="profile_import_file">Import File</string>
     <string name="profile_create">Create</string>
-    <string name="profile_share">Share</string>
     <string name="profile_share_url">Share URL as QR Code</string>
     <string name="profile_input_required">Required</string>
     <string name="profile_update">Update</string>
@@ -167,7 +165,6 @@
     <string name="share_content_json">Share Content JSON File</string>
     <string name="unsaved_changes">Unsaved Changes</string>
     <string name="unsaved_changes_message">You have unsaved changes. Do you want to discard them?</string>
-    <string name="profile_qr_code_text">Profile QR Code: %s</string>
     <string name="import_profile_confirm_title">Import Profile</string>
     <string name="import_profile_confirm_message">Import profile \"%s\"?</string>
     <string name="import_action">Import</string>
@@ -276,7 +273,6 @@
 
     <!-- Silent Install -->
     <string name="silent_install">Silent Install</string>
-    <string name="silent_install_title">Silent Install</string>
     <string name="silent_install_description">Install updates without interaction</string>
     <string name="silent_install_method">Install Method</string>
     <string name="silent_install_verify_failed">%s is not available or permission denied</string>
@@ -341,8 +337,6 @@
     <string name="failed_save_profile">Failed to save profile: %s</string>
     <string name="failed_save_logs">Failed to save logs: %s</string>
     <string name="failed_share_logs">Failed to share logs: %s</string>
-    <string name="failed_save_qr_code">Failed to save QR code: %s</string>
-    <string name="failed_share_qr_code">Failed to share QR code: %s</string>
     <string name="failed_read_configuration">Failed to read configuration: %s</string>
 
     <!-- Success Messages -->
@@ -350,7 +344,6 @@
     <string name="success_logs_saved">Logs saved successfully</string>
     <string name="success_configuration_saved">Configuration saved</string>
     <string name="copied_to_clipboard">Copied to clipboard</string>
-    <string name="qr_code_saved_to_gallery">QR code saved to gallery</string>
 
     <!-- Toast Messages -->
     <string name="toast_clipboard_empty">Clipboard is empty</string>
@@ -382,16 +375,10 @@
     <string name="back_to_categories">Back to categories</string>
 
     <!-- QR Code -->
-    <string name="intent_share_qr_code">Share QR Code</string>
 
     <!-- QR Stream (QRS) -->
     <string name="share_as_qrs">Share as QR Stream</string>
-    <string name="qrs_progress">Receiving: %1$d / %2$d blocks</string>
-    <string name="qrs_speed">Speed</string>
-    <string name="qrs_interval_ms">Interval: %d ms</string>
-    <string name="qrs_scanning_mode">QR Stream Mode</string>
     <string name="qrs_fps">FPS</string>
-    <string name="qrs_fps_interval">(%d ms)</string>
     <string name="qrs_slice_size">Slice Size</string>
     <string name="qrs_what_is_qrs">What is QRS</string>
 
@@ -415,12 +402,10 @@
 
     <!-- Privileged Enhancement -->
     <string name="privilege_module_title">Privilege modules</string>
-    <string name="lsposed_module">LSPosed Module</string>
     <string name="lsposed_module_activated">LSPosed module activated</string>
     <string name="lsposed_module_pending_update">LSPosed module update pending</string>
     <string name="lsposed_module_pending_downgrade">LSPosed module downgrade pending</string>
     <string name="lsposed_module_not_activated">LSPosed module not activated</string>
-    <string name="lsposed_module_description">System Framework only.</string>
     <string name="privilege_settings">Privileged Enhancement</string>
     <string name="privilege_settings_hide_title">Hide Settings</string>
     <string name="privilege_settings_hide_description">Resist VPN detection for selected apps</string>
@@ -429,8 +414,6 @@
     <string name="privilege_settings_hide_test_result">Test Result</string>
     <string name="privilege_settings_hide_test_running">Running detection tests…</string>
     <string name="privilege_settings_hide_test_not_detected">Not detected</string>
-    <string name="privilege_settings_test_interfaces">Interfaces:</string>
-    <string name="privilege_settings_test_http_proxy">HTTP proxy:</string>
     <string name="privilege_settings_interface_rename_title">Interface Rename</string>
     <string name="privilege_settings_interface_prefix">Interface prefix</string>
     <string name="privilege_settings_vpn_detection_title">VPN Detection</string>
@@ -445,12 +428,9 @@
     <string name="privilege_settings_risky_vpn_message_multi">These apps are VPN apps. Resisting VPN detection may cause issues: %1$s</string>
     <string name="privilege_settings_risky_management_message_single">This app has network management permissions. Resisting VPN detection may cause issues: %1$s</string>
     <string name="privilege_settings_risky_management_message_multi">These apps have network management permissions. Resisting VPN detection may cause issues: %1$s</string>
-    <string name="privilege_module_restart_title">Reboot required</string>
-    <string name="privilege_module_restart_message">LSPosed module updated. Reboot to apply changes.</string>
     <string name="privilege_module_restart_action">Restart</string>
     <string name="privilege_module_restart_failed">Failed to request reboot: %1$s</string>
     <string name="privilege_module_restart_notification_title">Reboot required</string>
     <string name="privilege_module_restart_notification_message">LSPosed module updated. Reboot to apply changes.</string>
     <string name="privilege_module_restart_channel">LSPosed Module</string>
-    <string name="reboot_required">Reboot required</string>
 </resources>

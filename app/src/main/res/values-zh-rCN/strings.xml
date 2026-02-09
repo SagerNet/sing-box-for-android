@@ -1,6 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
     <!-- App -->
+    <string name="app_name" translatable="false">sing-box</string>
     <string name="app_version_title">应用版本</string>
 
     <!-- Common Actions -->
@@ -124,7 +125,6 @@
     <string name="no_profiles">没有配置的配置文件</string>
     <string name="add_profile">添加配置文件</string>
     <string name="update_profile">更新配置文件</string>
-    <string name="share_profile">分享配置文件</string>
     <string name="import_remote_profile">导入远程配置</string>
     <string name="import_remote_profile_message">您确定要导入远程配置文件 %1$s 吗？您将连接到 %2$s 来下载配置。</string>
     <string name="import_from_file_description">从本地文件导入配置</string>
@@ -134,9 +134,9 @@
     <string name="profile_name">名称</string>
     <string name="profile_type">类型</string>
     <string name="profile_source">源</string>
+    <string name="profile_url" translatable="false">URL</string>
     <string name="profile_import_file">导入文件</string>
     <string name="profile_create">创建</string>
-    <string name="profile_share">分享</string>
     <string name="profile_share_url">通过二维码分享 URL</string>
     <string name="profile_input_required">必须</string>
     <string name="profile_update">更新</string>
@@ -165,7 +165,6 @@
     <string name="share_content_json">分享配置 JSON 文件</string>
     <string name="unsaved_changes">未保存的更改</string>
     <string name="unsaved_changes_message">您有未保存的更改。要放弃它们吗？</string>
-    <string name="profile_qr_code_text">配置文件二维码：%s</string>
     <string name="import_profile_confirm_title">导入配置</string>
     <string name="import_profile_confirm_message">导入配置「%s」？</string>
     <string name="import_action">导入</string>
@@ -266,6 +265,7 @@
     <string name="update_track_not_supported">当前轨道尚不支持检查更新</string>
     <string name="view_release">查看发布</string>
     <string name="downloading">下载中…</string>
+    <string name="exporting">导出中…</string>
     <string name="no_updates_available">没有可用的更新</string>
     <string name="new_version_available">有新版本可用：%s</string>
     <string name="auto_update">自动更新</string>
@@ -273,7 +273,6 @@
 
     <!-- Silent Install -->
     <string name="silent_install">静默安装</string>
-    <string name="silent_install_title">静默安装</string>
     <string name="silent_install_description">无需交互即可安装更新</string>
     <string name="silent_install_method">安装方式</string>
     <string name="silent_install_verify_failed">%s 不可用或权限被拒绝</string>
@@ -335,8 +334,6 @@
     <string name="failed_save_profile">保存配置文件失败：%s</string>
     <string name="failed_save_logs">保存日志失败：%s</string>
     <string name="failed_share_logs">分享日志失败：%s</string>
-    <string name="failed_save_qr_code">保存二维码失败：%s</string>
-    <string name="failed_share_qr_code">分享二维码失败：%s</string>
     <string name="failed_read_configuration">读取配置失败：%s</string>
 
     <!-- Success Messages -->
@@ -344,7 +341,6 @@
     <string name="success_logs_saved">日志保存成功</string>
     <string name="success_configuration_saved">配置已保存</string>
     <string name="copied_to_clipboard">已复制到剪贴板</string>
-    <string name="qr_code_saved_to_gallery">二维码已保存到相册</string>
 
     <!-- Toast Messages -->
     <string name="toast_clipboard_empty">剪切板为空</string>
@@ -376,16 +372,10 @@
     <string name="back_to_categories">返回分类</string>
 
     <!-- QR Code -->
-    <string name="intent_share_qr_code">分享二维码</string>
 
     <!-- QR Stream (QRS) -->
     <string name="share_as_qrs">分享为 QRS</string>
-    <string name="qrs_progress">接收中：%1$d / %2$d 块</string>
-    <string name="qrs_speed">速度</string>
-    <string name="qrs_interval_ms">间隔：%d 毫秒</string>
-    <string name="qrs_scanning_mode">QRS 模式</string>
     <string name="qrs_fps">帧率</string>
-    <string name="qrs_fps_interval">（%d 毫秒）</string>
     <string name="qrs_slice_size">分块大小</string>
     <string name="qrs_what_is_qrs">什么是 QRS</string>
 
@@ -403,6 +393,9 @@
     <string name="content_description_pause_logs">暂停日志</string>
     <string name="content_description_collapse_search">折叠搜索</string>
     <string name="content_description_search_logs">搜索日志</string>
+
+    <!-- Xposed Module -->
+    <string name="xposed_description">sing-box 的特权增强</string>
     <!-- Privileged Enhancement -->
     <string name="privilege_settings">特权增强</string>
     <string name="privilege_module_title">特权模块</string>
@@ -413,8 +406,6 @@
     <string name="privilege_settings_hide_test_result">测试结果</string>
     <string name="privilege_settings_hide_test_running">正在运行检测测试…</string>
     <string name="privilege_settings_hide_test_not_detected">未检测到</string>
-    <string name="privilege_settings_test_interfaces">接口：</string>
-    <string name="privilege_settings_test_http_proxy">HTTP 代理：</string>
     <string name="privilege_settings_interface_rename_title">接口重命名</string>
     <string name="privilege_settings_interface_prefix">接口前缀</string>
     <string name="privilege_settings_vpn_detection_title">VPN 检测</string>
@@ -429,14 +420,11 @@
     <string name="privilege_settings_risky_vpn_message_multi">这些应用是 VPN 应用，抵抗 VPN 检测可能造成问题：%1$s</string>
     <string name="privilege_settings_risky_management_message_single">该应用具有网络管理权限，抵抗 VPN 检测可能造成问题：%1$s</string>
     <string name="privilege_settings_risky_management_message_multi">这些应用具有网络管理权限，抵抗 VPN 检测可能造成问题：%1$s</string>
-    <string name="privilege_module_restart_title">需要重启</string>
-    <string name="privilege_module_restart_message">LSPosed 模块已更新，请重启以应用改动。</string>
     <string name="privilege_module_restart_action">重新启动</string>
     <string name="privilege_module_restart_failed">请求重启失败：%1$s</string>
     <string name="privilege_module_restart_notification_title">需要重启</string>
     <string name="privilege_module_restart_notification_message">LSPosed 模块已更新，请重启以应用改动。</string>
     <string name="privilege_module_restart_channel">LSPosed 模块</string>
-    <string name="lsposed_module">LSPosed 模块</string>
     <string name="lsposed_module_activated">LSPosed 模块已激活</string>
     <string name="lsposed_module_pending_update">LSPosed 模块待更新</string>
     <string name="lsposed_module_pending_downgrade">LSPosed 模块待降级</string>

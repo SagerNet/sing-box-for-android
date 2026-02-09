@@ -11,7 +11,7 @@
     <string name="discard">Отказаться</string>
     <string name="edit">Редактировать</string>
     <string name="close">Закрыть</string>
-    <string name="dismiss">Отклонить</string>
+    <string name="dismiss">Закрыть</string>
     <string name="stop">Остановить</string>
     <string name="reset">Сброс</string>
     <string name="destroy">Уничтожить</string>
@@ -67,8 +67,8 @@
     <string name="dashboard_items">Элементы главной страницы</string>
     <string name="memory">Память</string>
     <string name="goroutines">Подпрограммы</string>
-    <string name="upload">Загрузка</string>
-    <string name="download">Скачивание</string>
+    <string name="upload">Отправка</string>
+    <string name="download">Получение</string>
     <string name="connections_in">Входящие</string>
     <string name="connections_out">Исходящие</string>
     <string name="clash_mode">Режим Clash</string>
@@ -125,7 +125,6 @@
     <string name="no_profiles">Профили не настроены</string>
     <string name="add_profile">Добавить профиль</string>
     <string name="update_profile">Обновить профиль</string>
-    <string name="share_profile">Поделиться профилем</string>
     <string name="import_remote_profile">Импортировать удалённый профиль</string>
     <string name="import_remote_profile_message">Импортировать удалённый профиль %1$s? Для загрузки конфигурации будет установлено соединение с %2$s.</string>
     <string name="import_from_file_description">Импорт конфигурации из локального файла</string>
@@ -138,7 +137,6 @@
     <string name="profile_url" translatable="false">URL</string>
     <string name="profile_import_file">Импортировать файл</string>
     <string name="profile_create">Создать</string>
-    <string name="profile_share">Поделиться</string>
     <string name="profile_share_url">Поделиться URL в виде QR-кода</string>
     <string name="profile_input_required">Обязательно</string>
     <string name="profile_update">Обновить</string>
@@ -167,9 +165,8 @@
     <string name="share_content_json">Поделиться содержимым в файле JSON</string>
     <string name="unsaved_changes">Несохранённые изменения</string>
     <string name="unsaved_changes_message">Есть несохранённые изменения. Отменить их?</string>
-    <string name="profile_qr_code_text">QR-код профиля: %s</string>
     <string name="import_profile_confirm_title">Импорт профиля</string>
-    <string name="import_profile_confirm_message">Импортировать профиль '%s'?</string>
+    <string name="import_profile_confirm_message">Импортировать профиль \'%s\'?</string>
     <string name="import_action">Импортировать</string>
 
     <!-- Groups -->
@@ -248,7 +245,7 @@
     <!-- Permissions -->
     <string name="background_permission">Фоновое разрешение</string>
     <string name="background_permission_description">Предоставить необходимые разрешения для корректной работы VPN.\n\nЕсли Вы используете устройство китайского производителя, уведомление может не исчезнуть даже после предоставления разрешения.</string>
-    <string name="request_background_permission">Игнорировать</string>
+    <string name="request_background_permission">Игнорировать оптимизацию батареи</string>
     <string name="location_permission_title">Разрешение на определение местоположения</string>
     <string name="location_permission_description">Ваш профиль содержит правила маршрутизации &lt;strong&gt;&lt;tt&gt;wifi_ssid&lt;/tt&gt; или &lt;tt&gt;wifi_bssid&lt;/tt&gt;&lt;/strong&gt;. Для их работы sing-box использует разрешение на &lt;strong&gt;определение местоположения&lt;/strong&gt; &lt;strong&gt;в фоновом режиме&lt;/strong&gt;, чтобы получить информацию о подключённой сети Wi-Fi. Эта информация будет использоваться &lt;strong&gt;исключительно для маршрутизации&lt;/strong&gt;.</string>
     <string name="location_permission_background_description">В Android 10 и новее требуется разрешение на &lt;strong&gt;определение местоположения в фоне&lt;/strong&gt;. Выберите &lt;strong&gt;«Разрешить всегда»&lt;/strong&gt; для предоставления этого разрешения.</string>
@@ -260,7 +257,7 @@
     <!-- Updates -->
     <string name="check_update">Проверить обновления</string>
     <string name="check_update_automatic">Автоматическая проверка обновлений</string>
-    <string name="check_update_prompt_play">Включить автоматическую проверку обновлений через **Play Market**?</string>
+    <string name="check_update_prompt_play">Включить автоматическую проверку обновлений через **Google Play**?</string>
     <string name="check_update_prompt_github">Включить автоматическую проверку обновлений через **GitHub**?</string>
     <string name="update_track">Канал обновлений</string>
     <string name="update_track_stable">Стабильный</string>
@@ -276,7 +273,6 @@
 
     <!-- Silent Install -->
     <string name="silent_install">Тихая установка</string>
-    <string name="silent_install_title">Тихая установка</string>
     <string name="silent_install_description">Устанавливать обновления без Вашего участия</string>
     <string name="silent_install_method">Метод установки</string>
     <string name="silent_install_verify_failed">%s недоступен или доступ запрещен</string>
@@ -347,8 +343,6 @@
     <string name="failed_save_profile">Не удалось сохранить профиль: %s</string>
     <string name="failed_save_logs">Не удалось сохранить лог: %s</string>
     <string name="failed_share_logs">Не удалось отправить лог: %s</string>
-    <string name="failed_save_qr_code">Не удалось сохранить QR-код: %s</string>
-    <string name="failed_share_qr_code">Не удалось отправить QR-код: %s</string>
     <string name="failed_read_configuration">Не удалось прочитать конфигурацию: %s</string>
     
     <!-- Success Messages -->
@@ -356,7 +350,6 @@
     <string name="success_logs_saved">Лог успешно сохранён</string>
     <string name="success_configuration_saved">Конфигурация сохранена</string>
     <string name="copied_to_clipboard">Скопировано в буфер обмена</string>
-    <string name="qr_code_saved_to_gallery">QR-код сохранён в галерею</string>
     
     <!-- Toast Messages -->
     <string name="toast_clipboard_empty">Буфер обмена пуст</string>
@@ -375,7 +368,7 @@
     <string name="icon">Иконка</string>
     <string name="icon_count_format">%d иконок</string>
     <string name="no_icons_found">Иконки не найдены</string>
-    <string name="no_icons_match">Нет иконок, соответствующих '%s'</string>
+    <string name="no_icons_match">Нет иконок, соответствующих \'%s\'</string>
     <string name="profile_icon">Иконка профиля</string>
     <string name="select_icon">Выбрать иконку</string>
     <string name="select_profile_icon">Выбрать иконку профиля</string>
@@ -388,16 +381,10 @@
     <string name="back_to_categories">Назад к категориям</string>
     
     <!-- QR Code -->
-    <string name="intent_share_qr_code">Отправить QR-код</string>
     
     <!-- QR Stream (QRS) -->
     <string name="share_as_qrs">Отправить как QR Stream</string>
-    <string name="qrs_progress">Получено: %1$d / %2$d блоков</string>
-    <string name="qrs_speed">Скорость</string>
-    <string name="qrs_interval_ms">Интервал: %d мс.</string>
-    <string name="qrs_scanning_mode">Режим QR Stream</string>
     <string name="qrs_fps">Кадров/сек.</string>
-    <string name="qrs_fps_interval">(%d мс.)</string>
     <string name="qrs_slice_size">Размер фрагмента</string>
     <string name="qrs_what_is_qrs">Что такое QRS</string>
     
@@ -421,12 +408,10 @@
 
     <!-- Privileged Enhancement -->
     <string name="privilege_module_title">Привилегированные модули</string>
-    <string name="lsposed_module">Модуль LSPosed</string>
     <string name="lsposed_module_activated">Модуль LSPosed активирован</string>
     <string name="lsposed_module_pending_update">Ожидается обновление модуля LSPosed</string>
     <string name="lsposed_module_pending_downgrade">Ожидается откат модуля LSPosed</string>
     <string name="lsposed_module_not_activated">Модуль LSPosed не активирован</string>
-    <string name="lsposed_module_description">Только для системного фреймворка.</string>
     <string name="privilege_settings">Привилегированное расширение</string>
     <string name="privilege_settings_hide_title">Скрытие настроек</string>
     <string name="privilege_settings_hide_description">Защита от обнаружения VPN для выбранных приложений</string>
@@ -435,8 +420,6 @@
     <string name="privilege_settings_hide_test_result">Результат теста</string>
     <string name="privilege_settings_hide_test_running">Выполняются тесты на обнаружение...</string>
     <string name="privilege_settings_hide_test_not_detected">Не обнаружено</string>
-    <string name="privilege_settings_test_interfaces">Интерфейсы:</string>
-    <string name="privilege_settings_test_http_proxy">HTTP-прокси:</string>
     <string name="privilege_settings_interface_rename_title">Переименование интерфейса</string>
     <string name="privilege_settings_interface_prefix">Префикс интерфейса</string>
     <string name="privilege_settings_vpn_detection_title">Обнаружение VPN</string>
@@ -451,12 +434,9 @@
     <string name="privilege_settings_risky_vpn_message_multi">Эти приложения - VPN-клиенты. Скрытие VPN может вызвать проблемы: %1$s</string>
     <string name="privilege_settings_risky_management_message_single">Это приложение имеет права управления сетью. Скрытие VPN может вызвать проблемы: %1$s</string>
     <string name="privilege_settings_risky_management_message_multi">Эти приложения имеют права управления сетью. Скрытие VPN может вызвать проблемы: %1$s</string>
-    <string name="privilege_module_restart_title">Требуется перезагрузка</string>
-    <string name="privilege_module_restart_message">Модуль LSPosed обновлён. Перезагрузите устройство, чтобы применить изменения.</string>
     <string name="privilege_module_restart_action">Перезагрузить</string>
     <string name="privilege_module_restart_failed">Не удалось запросить перезагрузку: %1$s</string>
     <string name="privilege_module_restart_notification_title">Требуется перезагрузка</string>
     <string name="privilege_module_restart_notification_message">Модуль LSPosed обновлён. Перезагрузите устройство, чтобы применить изменения.</string>
     <string name="privilege_module_restart_channel">Модуль LSPosed</string>
-    <string name="reboot_required">Требуется перезагрузка</string>
 </resources>
