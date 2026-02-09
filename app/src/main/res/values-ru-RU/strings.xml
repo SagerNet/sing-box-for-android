@@ -1,0 +1,462 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <!-- App -->
+    <string name="app_name" translatable="false">sing-box</string>
+    <string name="app_version_title">Версия приложения</string>
+
+    <!-- Common Actions -->
+    <string name="ok">OK</string>
+    <string name="cancel">Отмена</string>
+    <string name="save">Сохранить</string>
+    <string name="discard">Отказаться</string>
+    <string name="edit">Редактировать</string>
+    <string name="close">Закрыть</string>
+    <string name="dismiss">Отклонить</string>
+    <string name="stop">Остановить</string>
+    <string name="reset">Сброс</string>
+    <string name="destroy">Уничтожить</string>
+    <string name="clear">Очистить</string>
+    <string name="browse">Просмотр</string>
+    <string name="search">Поиск</string>
+    <string name="action">Действие</string>
+    <string name="action_start">Начать</string>
+    <string name="action_deselect">Отменить выбор</string>
+    <string name="expand">Развернуть</string>
+    <string name="collapse">Свернуть</string>
+    <string name="expand_all">Развернуть все</string>
+    <string name="collapse_all">Свернуть все</string>
+    <string name="previous">Предыдущий</string>
+    <string name="next">Следующий</string>
+    <string name="update">Обновление</string>
+    <string name="read_more">Подробнее</string>
+    <string name="no_thanks">Нет, спасибо</string>
+    <string name="options">Настройки</string>
+    <string name="more_options">Дополнительные параметры</string>
+
+    <!-- Common States -->
+    <string name="enabled">Включено</string>
+    <string name="disabled">Выключено</string>
+    <string name="loading">Загрузка...</string>
+    <string name="calculating">Вычисление...</string>
+    <string name="auto">Авто</string>
+    <string name="success">Успешно</string>
+    <string name="default_text">По умолчанию</string>
+
+    <!-- Navigation Titles -->
+    <string name="title_dashboard">Главная</string>
+    <string name="title_configuration">Профили</string>
+    <string name="title_log">Логи</string>
+    <string name="title_settings">Параметры</string>
+    <string name="title_app_settings">Приложение</string>
+    <string name="title_new_profile">Новый профиль</string>
+    <string name="title_edit_profile">Редактировать профиль</string>
+    <string name="title_edit_configuration">Редактировать конфигурацию</string>
+    <string name="title_groups">Группы</string>
+    <string name="title_debug">Отладка</string>
+    <string name="title_connections">Соединения</string>
+    <string name="title_others">Другое</string>
+    <string name="title_scan_result">Результат сканирования</string>
+
+    <!-- Status -->
+    <string name="status_default">Служба не запущена</string>
+    <string name="status_starting">Запуск</string>
+    <string name="status_stopping">Остановка</string>
+    <string name="status_started">Запущена</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_items">Элементы главной страницы</string>
+    <string name="memory">Память</string>
+    <string name="goroutines">Подпрограммы</string>
+    <string name="upload">Загрузка</string>
+    <string name="download">Скачивание</string>
+    <string name="connections_in">Входящие</string>
+    <string name="connections_out">Исходящие</string>
+    <string name="clash_mode">Режим Clash</string>
+    <string name="mode">Режим</string>
+    <string name="system_proxy">Системный прокси</string>
+    <string name="url_test">Тест</string>
+    <string name="drag_handle_to_reorder">Перетащите ползунок, чтобы изменить порядок элементов</string>
+    <string name="drag_to_reorder">Перетащите, чтобы изменить порядок</string>
+    <string name="reset_order">Сбросить порядок</string>
+
+    <!-- Connections -->
+    <string name="empty_connections">Нет подключений</string>
+    <string name="search_connections">Поиск подключений...</string>
+    <string name="close_connections_confirm">Закрыть все соединения?</string>
+    <string name="connection_state_all">Все</string>
+    <string name="connection_state_active">Активно</string>
+    <string name="connection_state_closed">Закрыто</string>
+    <string name="connection_sort_date">Дата</string>
+    <string name="connection_sort_traffic">Трафик</string>
+    <string name="connection_sort_traffic_total">Общий трафик</string>
+    <string name="connection_close">Закрыть</string>
+    <string name="connection_close_all">Закрыть все</string>
+    <string name="connection_state">Состояние</string>
+    <string name="connection_details">Данные подключения</string>
+    <string name="connection_section_basic">Основная информация</string>
+    <string name="connection_section_metadata">Метаданные</string>
+    <string name="connection_section_process">Информация о процессе</string>
+    <string name="connection_created_at">Создано в</string>
+    <string name="connection_closed_at">Закрыто в</string>
+    <string name="connection_duration">Продолжительность</string>
+    <string name="connection_uplink">Восходящий канал</string>
+    <string name="connection_downlink">Нисходящий канал</string>
+    <string name="connection_inbound">Входящий</string>
+    <string name="connection_inbound_type">Входящий тип</string>
+    <string name="connection_outbound">Исходящий</string>
+    <string name="connection_outbound_type">Исходящий тип</string>
+    <string name="connection_ip_version">Версия IP</string>
+    <string name="connection_network">Сеть</string>
+    <string name="connection_source">Источник</string>
+    <string name="connection_destination">Место назначения</string>
+    <string name="connection_domain">Домен</string>
+    <string name="connection_protocol">Протокол</string>
+    <string name="connection_user">Пользователь</string>
+    <string name="connection_from_outbound">Из исходящих</string>
+    <string name="connection_match_rule">Правило соответствия</string>
+    <string name="connection_chain">Цепь</string>
+    <string name="connection_process_id">ID процесса</string>
+    <string name="connection_user_id">ID пользователя</string>
+    <string name="connection_user_name">Имя пользователя</string>
+    <string name="connection_process_path">Путь процесса</string>
+    <string name="connection_package_name">Название пакета</string>
+
+    <!-- Profiles -->
+    <string name="no_profiles">Профили не настроены</string>
+    <string name="add_profile">Добавить профиль</string>
+    <string name="update_profile">Обновить профиль</string>
+    <string name="share_profile">Поделиться профилем</string>
+    <string name="import_remote_profile">Импортировать удалённый профиль</string>
+    <string name="import_remote_profile_message">Импортировать удалённый профиль %1$s? Для загрузки конфигурации будет установлено соединение с %2$s.</string>
+    <string name="import_from_file_description">Импорт конфигурации из локального файла</string>
+    <string name="scan_qr_code_description">Сканирование QR-кода с конфигурацией</string>
+    <string name="create_new_profile_description">Создать новый профиль с нуля</string>
+    <string name="icloud_profile_unsupported">Профили iCloud не поддерживаются на текущей платформе</string>
+    <string name="profile_name">Имя</string>
+    <string name="profile_type">Тип</string>
+    <string name="profile_source">Источник</string>
+    <string name="profile_url" translatable="false">URL</string>
+    <string name="profile_import_file">Импортировать файл</string>
+    <string name="profile_create">Создать</string>
+    <string name="profile_share">Поделиться</string>
+    <string name="profile_share_url">Поделиться URL в виде QR-кода</string>
+    <string name="profile_input_required">Обязательно</string>
+    <string name="profile_update">Обновить</string>
+    <string name="profile_auto_update">Автообновление</string>
+    <string name="profile_auto_update_interval">Интервал автообновления (минуты)</string>
+    <string name="profile_auto_update_interval_minimum_hint">Минимальное значение - 15</string>
+    <string name="profile_type_local">Локальный</string>
+    <string name="profile_type_remote">Удалённый</string>
+    <string name="profile_type_remote_updated">Удалённый • %s</string>
+    <string name="profile_source_create_new">Создать новый</string>
+    <string name="profile_source_import">Импорт</string>
+    <string name="profile_add_import_file">Импорт из файла</string>
+    <string name="profile_add_scan_qr_code">Сканировать QR-код</string>
+    <string name="profile_add_create_manually">Создать вручную</string>
+    <string name="profile_override">Перезапись профиля</string>
+    <string name="basic_information">Основная информация</string>
+    <string name="remote_configuration">Удалённая конфигурация</string>
+    <string name="last_updated_format">Последнее обновление: %s</string>
+    <string name="content">Содержимое</string>
+    <string name="json_viewer">Просмотр JSON</string>
+    <string name="json_editor">Редактор JSON</string>
+    <string name="view_configuration">Просмотреть конфигурацию</string>
+    <string name="save_as_file">Сохранить как файл</string>
+    <string name="share_as_file">Поделиться как файлом</string>
+    <string name="save_content_json">Сохранить содержимое в файл JSON</string>
+    <string name="share_content_json">Поделиться содержимым в файле JSON</string>
+    <string name="unsaved_changes">Несохранённые изменения</string>
+    <string name="unsaved_changes_message">Есть несохранённые изменения. Отменить их?</string>
+    <string name="profile_qr_code_text">QR-код профиля: %s</string>
+    <string name="import_profile_confirm_title">Импорт профиля</string>
+    <string name="import_profile_confirm_message">Импортировать профиль '%s'?</string>
+    <string name="import_action">Импортировать</string>
+
+    <!-- Groups -->
+    <string name="group_selected_title">Выбрано</string>
+    
+    <!-- Log -->
+    <string name="log_level">Уровень логов</string>
+    <string name="filter_label">Фильтр: %s</string>
+    <string name="clear_filter">Очистить</string>
+    <string name="clear_logs">Очистить логи</string>
+    <string name="search_logs_placeholder">Поиск в логах...</string>
+    <string name="logs_copied_to_clipboard">Лог скопирован в буфер обмена</string>
+    <string name="no_logs_to_copy">Нет записей для копирования</string>
+    <string name="no_logs_to_share">Нет записей для отправки</string>
+    <string name="intent_share_logs">Отправить лог</string>
+    <string name="selected_count">Выбрано: %d</string>
+    <string name="not_selected">Не выбрано</string>
+    <string name="save_to_clipboard">В буфер обмена</string>
+    <string name="save_to_file">В файл</string>
+
+    <!-- Settings -->
+    <string name="service">Служба</string>
+    <string name="core">Ядро</string>
+    <string name="core_version_title">Версия ядра</string>
+    <string name="core_data_size">Размер данных</string>
+    <string name="about">О приложении</string>
+    <string name="source_code">Исходный код</string>
+    <string name="sponsor">Поддержать</string>
+    <string name="working_directory">Рабочая директория</string>
+    <string name="disable_deprecated_warnings">Отключить предупреждения об устаревании</string>
+    <string name="ignore_memory_limit">Игнорировать ограничение памяти</string>
+    <string name="ignore_memory_limit_description">Не применять ограничения по памяти для sing-box.</string>
+    <string name="auto_redirect">Автоматическое перенаправление</string>
+    <string name="auto_redirect_description">Требуются права ROOT</string>
+    <string name="system_http_proxy">Системный HTTP-прокси</string>
+    <string name="update_settings">Настройки обновлений</string>
+
+    <!-- Per-App Proxy -->
+    <string name="per_app_proxy">Прокси для отдельных приложений</string>
+    <string name="per_app_proxy_mode">Режим прокси</string>
+    <string name="per_app_proxy_mode_include">Включить</string>
+    <string name="per_app_proxy_mode_include_description">Только выбранные приложения будут использовать VPN</string>
+    <string name="per_app_proxy_mode_exclude">Исключить</string>
+    <string name="per_app_proxy_mode_exclude_description">Выбранные приложения не будут использовать VPN</string>
+    <string name="per_app_proxy_action_copy">Копировать</string>
+    <string name="per_app_proxy_action_copy_package_name">Имя пакета</string>
+    <string name="per_app_proxy_action_copy_uid">Уникальный ID</string>
+    <string name="per_app_proxy_sort_mode">Сортировка</string>
+    <string name="per_app_proxy_sort_mode_name">По имени</string>
+    <string name="per_app_proxy_sort_mode_package_name">По имени пакета</string>
+    <string name="per_app_proxy_sort_mode_uid">По уникальному ID</string>
+    <string name="per_app_proxy_sort_mode_install_time">По дате установки</string>
+    <string name="per_app_proxy_sort_mode_update_time">По дате обновления</string>
+    <string name="per_app_proxy_sort_mode_reverse">В обратном порядке</string>
+    <string name="per_app_proxy_filter">Фильтр</string>
+    <string name="per_app_proxy_hide_system_apps">Скрыть системные приложения</string>
+    <string name="per_app_proxy_hide_offline_apps">Скрыть оффлайн-приложения</string>
+    <string name="per_app_proxy_hide_disabled_apps">Скрыть отключённые приложения</string>
+    <string name="per_app_proxy_select">Выбрать</string>
+    <string name="per_app_proxy_select_all">Выбрать все</string>
+    <string name="per_app_proxy_select_none">Снять выделение</string>
+    <string name="per_app_proxy_backup">Резервная копия</string>
+    <string name="per_app_proxy_import">Импорт из буфера обмена</string>
+    <string name="per_app_proxy_export">Экспорт в буфер обмена</string>
+    <string name="per_app_proxy_scan">Сканирование</string>
+    <string name="per_app_proxy_scan_china_apps">Китайские приложения</string>
+    <string name="per_app_proxy_manage">Управление</string>
+    <string name="content_description_app_icon">Значок приложения</string>
+    <string name="per_app_proxy_managed_mode">Управляемый режим</string>
+    <string name="per_app_proxy_managed_mode_description">Автоматически исключать китайские приложения</string>
+    <string name="per_app_proxy_package_query_mode">Режим</string>
+    <string name="per_app_proxy_shizuku_required">При установке из Play Store для работы прокси для каждого приложения требуется Shizuku. Google Play не позволяет нам использовать разрешение QUERY_ALL_PACKAGES (хотя другим подобным приложениям это разрешено), которое необходимо для отображения списка приложений.</string>
+    <string name="per_app_proxy_root_required">При установке из Play Store для функции прокси для отдельных приложений требуются права ROOT. Google Play не разрешает нам использовать разрешение QUERY_ALL_PACKAGES (хотя другим подобным приложениям это разрешено), которое необходимо для отображения списка приложений.</string>
+    <string name="privileged_access_required">Для полного списка приложений необходимы права ROOT или доступ через Shizuku</string>
+
+    <!-- Permissions -->
+    <string name="background_permission">Фоновое разрешение</string>
+    <string name="background_permission_description">Предоставить необходимые разрешения для корректной работы VPN.\n\nЕсли Вы используете устройство китайского производителя, уведомление может не исчезнуть даже после предоставления разрешения.</string>
+    <string name="request_background_permission">Игнорировать</string>
+    <string name="location_permission_title">Разрешение на определение местоположения</string>
+    <string name="location_permission_description">Ваш профиль содержит правила маршрутизации &lt;strong&gt;&lt;tt&gt;wifi_ssid&lt;/tt&gt; или &lt;tt&gt;wifi_bssid&lt;/tt&gt;&lt;/strong&gt;. Для их работы sing-box использует разрешение на &lt;strong&gt;определение местоположения&lt;/strong&gt; &lt;strong&gt;в фоновом режиме&lt;/strong&gt;, чтобы получить информацию о подключённой сети Wi-Fi. Эта информация будет использоваться &lt;strong&gt;исключительно для маршрутизации&lt;/strong&gt;.</string>
+    <string name="location_permission_background_description">В Android 10 и новее требуется разрешение на &lt;strong&gt;определение местоположения в фоне&lt;/strong&gt;. Выберите &lt;strong&gt;«Разрешить всегда»&lt;/strong&gt; для предоставления этого разрешения.</string>
+    <string name="notification_permission_title">Разрешение на уведомления</string>
+    <string name="notification_permission_required_description">Без разрешения на отправку уведомлений sing-box не сможет отображать скорость сети в реальном времени. Предоставьте разрешение или отключите уведомления о скорости перед запуском службы.</string>
+    <string name="root_access_required">Требуются права ROOT</string>
+    <string name="root_access_denied">Доступ ROOT запрещен</string>
+
+    <!-- Updates -->
+    <string name="check_update">Проверить обновления</string>
+    <string name="check_update_automatic">Автоматическая проверка обновлений</string>
+    <string name="check_update_prompt_play">Включить автоматическую проверку обновлений через **Play Market**?</string>
+    <string name="check_update_prompt_github">Включить автоматическую проверку обновлений через **GitHub**?</string>
+    <string name="update_track">Канал обновлений</string>
+    <string name="update_track_stable">Стабильный</string>
+    <string name="update_track_beta">Бета</string>
+    <string name="update_track_not_supported">Этот канал пока не поддерживает проверку обновлений</string>
+    <string name="view_release">Посмотреть релиз</string>
+    <string name="downloading">Загрузка...</string>
+    <string name="exporting">Экспорт...</string>
+    <string name="no_updates_available">Обновлений нет</string>
+    <string name="new_version_available">Доступна новая версия: %s</string>
+    <string name="auto_update">Автообновление</string>
+    <string name="auto_update_description">Автоматически загружать и устанавливать обновления в фоне</string>
+
+    <!-- Silent Install -->
+    <string name="silent_install">Тихая установка</string>
+    <string name="silent_install_title">Тихая установка</string>
+    <string name="silent_install_description">Устанавливать обновления без Вашего участия</string>
+    <string name="silent_install_method">Метод установки</string>
+    <string name="silent_install_verify_failed">%s недоступен или доступ запрещен</string>
+    <string name="install_method_package_installer">PackageInstaller</string>
+    <string name="install_method_shizuku">Shizuku</string>
+    <string name="install_method_root">ROOT</string>
+    <string name="package_installer_not_available">Разрешение на установку не предоставлено</string>
+    <string name="grant_install_permission">Предоставить разрешение на установку</string>
+    <string name="grant_install_permission_description">Разрешить установку приложений из этого источника</string>
+    
+    <!-- Shizuku -->
+    <string name="shizuku_not_available">Shizuku не установлен или не запущен</string>
+    <string name="shizuku_description">Shizuku позволяет приложениям напрямую использовать системные API с повышенными привилегиями</string>
+    <string name="get_shizuku">Установить Shizuku</string>
+    <string name="start_shizuku">Запустить Shizuku</string>
+    <string name="request_shizuku">Запросить Shizuku</string>
+
+    <!-- Time -->
+    <string name="time_just_now">Только что</string>
+    <string name="time_yesterday">Вчера</string>
+    <string name="time_now">Сейчас</string>
+    <string name="time_yesterday_short">1 день</string>
+    <string name="time_minutes_short">%d мин.</string>
+    <string name="time_hours_short">%d ч.</string>
+    <string name="time_days_short">%d дн.</string>
+    <plurals name="time_minutes_ago">
+        <item quantity="one">%d минуту назад</item>
+        <item quantity="few">%d минуты назад</item>
+        <item quantity="many">%d минут назад</item>
+        <item quantity="other">%d минут назад</item>
+    </plurals>
+    <plurals name="time_hours_ago">
+        <item quantity="one">%d час назад</item>
+        <item quantity="few">%d часа назад</item>
+        <item quantity="many">%d часов назад</item>
+        <item quantity="other">%d часов назад</item>
+    </plurals>
+    <plurals name="time_days_ago">
+        <item quantity="one">%d день назад</item>
+        <item quantity="few">%d дня назад</item>
+        <item quantity="many">%d дней назад</item>
+        <item quantity="other">%d дней назад</item>
+    </plurals>
+    
+    <!-- Menu -->
+    <string name="menu_undo">Отменить</string>
+    <string name="menu_redo">Повторить</string>
+    <string name="menu_format">Форматировать</string>
+    <string name="menu_delete">Удалить</string>
+    <string name="menu_share">Поделиться</string>
+
+    <!-- Errors -->
+    <string name="error_title">Ошибка</string>
+    <string name="error_missing_vpn_permission">Отсутствует разрешение на VPN</string>
+    <string name="error_empty_configuration">Пустая конфигурация</string>
+    <string name="error_empty_file">Пустой файл</string>
+    <string name="error_decode_profile">Не удалось декодировать профиль: %s</string>
+    <string name="error_invalid_configuration">Недопустимая конфигурация sing-box: %s</string>
+    <string name="error_start_command_server">Запуск сервера команд</string>
+    <string name="error_create_service">Создание службы</string>
+    <string name="error_start_service">Запуск службы</string>
+    <string name="error_deprecated_warning">Предупреждение об устаревании</string>
+    <string name="error_deprecated_documentation">Документация</string>
+    <string name="file_manager_missing">На Вашем устройстве отсутствует стандартный файловый менеджер Android. Установите, например, Material Files.</string>
+    <string name="no_file_manager">Файловый менеджер не найден</string>
+    
+    <!-- Failed Operations -->
+    <string name="failed_save_profile">Не удалось сохранить профиль: %s</string>
+    <string name="failed_save_logs">Не удалось сохранить лог: %s</string>
+    <string name="failed_share_logs">Не удалось отправить лог: %s</string>
+    <string name="failed_save_qr_code">Не удалось сохранить QR-код: %s</string>
+    <string name="failed_share_qr_code">Не удалось отправить QR-код: %s</string>
+    <string name="failed_read_configuration">Не удалось прочитать конфигурацию: %s</string>
+    
+    <!-- Success Messages -->
+    <string name="success_profile_saved">Профиль успешно сохранён</string>
+    <string name="success_logs_saved">Лог успешно сохранён</string>
+    <string name="success_configuration_saved">Конфигурация сохранена</string>
+    <string name="copied_to_clipboard">Скопировано в буфер обмена</string>
+    <string name="qr_code_saved_to_gallery">QR-код сохранён в галерею</string>
+    
+    <!-- Toast Messages -->
+    <string name="toast_clipboard_empty">Буфер обмена пуст</string>
+    <string name="toast_copied_to_clipboard">Экспортировано в буфер обмена</string>
+    <string name="toast_imported_from_clipboard">Импортировано из буфера обмена</string>
+    
+    <!-- Scanning -->
+    <string name="profile_add_scan_use_front_camera">Фронтальная камера</string>
+    <string name="profile_add_scan_use_vendor_analyzer">Анализатор MLKit</string>
+    <string name="profile_add_scan_enable_torch">Фонарик</string>
+    <string name="message_scanning">Сканирование…</string>
+    <string name="message_scan_app_no_apps_found">Совпадающих приложений не найдено</string>
+    <string name="message_scan_app_found">Найдены следующие приложения. Выберите нужное действие.</string>
+
+    <!-- Icon Selection -->
+    <string name="icon">Иконка</string>
+    <string name="icon_count_format">%d иконок</string>
+    <string name="no_icons_found">Иконки не найдены</string>
+    <string name="no_icons_match">Нет иконок, соответствующих '%s'</string>
+    <string name="profile_icon">Иконка профиля</string>
+    <string name="select_icon">Выбрать иконку</string>
+    <string name="select_profile_icon">Выбрать иконку профиля</string>
+    <string name="search_icons_placeholder">Поиск иконок...</string>
+    <string name="search_icons">Поиск иконок</string>
+    <string name="close_search">Закрыть поиск</string>
+    <string name="current_icon_format">Текущая: %s</string>
+    <string name="categories">Категории</string>
+    <string name="all_icons">Все иконки</string>
+    <string name="back_to_categories">Назад к категориям</string>
+    
+    <!-- QR Code -->
+    <string name="intent_share_qr_code">Отправить QR-код</string>
+    
+    <!-- QR Stream (QRS) -->
+    <string name="share_as_qrs">Отправить как QR Stream</string>
+    <string name="qrs_progress">Получено: %1$d / %2$d блоков</string>
+    <string name="qrs_speed">Скорость</string>
+    <string name="qrs_interval_ms">Интервал: %d мс.</string>
+    <string name="qrs_scanning_mode">Режим QR Stream</string>
+    <string name="qrs_fps">Кадров/сек.</string>
+    <string name="qrs_fps_interval">(%d мс.)</string>
+    <string name="qrs_slice_size">Размер фрагмента</string>
+    <string name="qrs_what_is_qrs">Что такое QRS</string>
+    
+    <!-- Search -->
+    <string name="search_placeholder">Найти в документе</string>
+
+    <!-- Content Descriptions (Accessibility) -->
+    <string name="content_description_back">Назад</string>
+    <string name="content_description_scroll_to_bottom">Прокрутить вниз</string>
+    <string name="content_description_exit_selection_mode">Выйти из режима выбора</string>
+    <string name="content_description_copy_selected">Копировать выделенное</string>
+    <string name="content_description_clear_search">Очистить поиск</string>
+    <string name="content_description_qr_code">QR-код</string>
+    <string name="content_description_resume_logs">Возобновить лог</string>
+    <string name="content_description_pause_logs">Приостановить лог</string>
+    <string name="content_description_collapse_search">Свернуть поиск</string>
+    <string name="content_description_search_logs">Поиск в логе</string>
+    
+    <!-- Xposed Module -->
+    <string name="xposed_description">Привилегированное расширение для sing-box</string>
+
+    <!-- Privileged Enhancement -->
+    <string name="privilege_module_title">Привилегированные модули</string>
+    <string name="lsposed_module">Модуль LSPosed</string>
+    <string name="lsposed_module_activated">Модуль LSPosed активирован</string>
+    <string name="lsposed_module_pending_update">Ожидается обновление модуля LSPosed</string>
+    <string name="lsposed_module_pending_downgrade">Ожидается откат модуля LSPosed</string>
+    <string name="lsposed_module_not_activated">Модуль LSPosed не активирован</string>
+    <string name="lsposed_module_description">Только для системного фреймворка.</string>
+    <string name="privilege_settings">Привилегированное расширение</string>
+    <string name="privilege_settings_hide_title">Скрытие настроек</string>
+    <string name="privilege_settings_hide_description">Защита от обнаружения VPN для выбранных приложений</string>
+    <string name="privilege_settings_hide_manage">Управление</string>
+    <string name="privilege_settings_hide_test">Запустить тест</string>
+    <string name="privilege_settings_hide_test_result">Результат теста</string>
+    <string name="privilege_settings_hide_test_running">Выполняются тесты на обнаружение...</string>
+    <string name="privilege_settings_hide_test_not_detected">Не обнаружено</string>
+    <string name="privilege_settings_test_interfaces">Интерфейсы:</string>
+    <string name="privilege_settings_test_http_proxy">HTTP-прокси:</string>
+    <string name="privilege_settings_interface_rename_title">Переименование интерфейса</string>
+    <string name="privilege_settings_interface_prefix">Префикс интерфейса</string>
+    <string name="privilege_settings_vpn_detection_title">Обнаружение VPN</string>
+    <string name="privilege_settings_view_logs">Просмотреть журнал</string>
+    <string name="privilege_settings_export_debug">Экспорт отладочной информации</string>
+    <string name="privilege_settings_hook_logs_empty">Журнал пуст</string>
+    <string name="privilege_settings_export_debug_complete">Экспорт завершён</string>
+    <string name="privilege_settings_export_debug_message">Файл содержит конфиденциальную информацию и не должен распространяться публично. Размер: %s</string>
+    <string name="privilege_settings_export_debug_failed">Не удалось экспортировать отладочную информацию: %s</string>
+    <string name="privilege_settings_risky_app_title">Предупреждение</string>
+    <string name="privilege_settings_risky_vpn_message_single">Это приложение - VPN-клиент. Скрытие VPN может вызвать проблемы: %1$s</string>
+    <string name="privilege_settings_risky_vpn_message_multi">Эти приложения - VPN-клиенты. Скрытие VPN может вызвать проблемы: %1$s</string>
+    <string name="privilege_settings_risky_management_message_single">Это приложение имеет права управления сетью. Скрытие VPN может вызвать проблемы: %1$s</string>
+    <string name="privilege_settings_risky_management_message_multi">Эти приложения имеют права управления сетью. Скрытие VPN может вызвать проблемы: %1$s</string>
+    <string name="privilege_module_restart_title">Требуется перезагрузка</string>
+    <string name="privilege_module_restart_message">Модуль LSPosed обновлён. Перезагрузите устройство, чтобы применить изменения.</string>
+    <string name="privilege_module_restart_action">Перезагрузить</string>
+    <string name="privilege_module_restart_failed">Не удалось запросить перезагрузку: %1$s</string>
+    <string name="privilege_module_restart_notification_title">Требуется перезагрузка</string>
+    <string name="privilege_module_restart_notification_message">Модуль LSPosed обновлён. Перезагрузите устройство, чтобы применить изменения.</string>
+    <string name="privilege_module_restart_channel">Модуль LSPosed</string>
+    <string name="reboot_required">Требуется перезагрузка</string>
+</resources>
