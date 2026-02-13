@@ -199,6 +199,11 @@
     <string name="disable_deprecated_warnings">غیرفعال‌کردن هشدارهای منسوخ</string>
     <string name="ignore_memory_limit">نادیده گرفتن محدودیت حافظه</string>
     <string name="ignore_memory_limit_description">محدودیت حافظه روی sing-box اعمال نشود.</string>
+    <string name="notification_settings">اعلان‌ها</string>
+    <string name="enable_notification">فعال‌کردن اعلان</string>
+    <string name="dynamic_notification">نمایش سرعت بلادرنگ در اعلان</string>
+    <string name="disable_notification_description">به دلیل محدودیت‌های اندروید، ابتدا باید مجوز اعلان را بدهید، سپس دسته‌بندی اعلان را در تنظیمات غیرفعال کنید.</string>
+    <string name="disable_notification_description_legacy">به دلیل محدودیت‌های اندروید، ابتدا باید مجوز اعلان را بدهید، سپس اعلان‌ها را در اطلاعات برنامه غیرفعال کنید.</string>
     <string name="auto_redirect">تغییر مسیر خودکار</string>
     <string name="auto_redirect_description">نیازمند دسترسی ROOT</string>
     <string name="system_http_proxy">پراکسی HTTP سیستم</string>

@@ -199,6 +199,11 @@
     <string name="disable_deprecated_warnings">Disable Deprecated Warnings</string>
     <string name="ignore_memory_limit">Ignore Memory Limit</string>
     <string name="ignore_memory_limit_description">Do not enforce memory limits on sing-box.</string>
+    <string name="notification_settings">Notification</string>
+    <string name="enable_notification">Enable Notification</string>
+    <string name="dynamic_notification">Display realtime speed in notification</string>
+    <string name="disable_notification_description">Due to Android restrictions, you must first grant notification permission, then go to Settings to disable the notification category.</string>
+    <string name="disable_notification_description_legacy">Due to Android restrictions, you must first grant notification permission, then go to App Info to disable notifications.</string>
     <string name="auto_redirect">Auto Redirect</string>
     <string name="auto_redirect_description">ROOT permission required</string>
     <string name="system_http_proxy">System HTTP Proxy</string>

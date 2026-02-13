@@ -199,6 +199,11 @@
     <string name="disable_deprecated_warnings">Отключить предупреждения об устаревании</string>
     <string name="ignore_memory_limit">Игнорировать ограничение памяти</string>
     <string name="ignore_memory_limit_description">Не применять ограничения по памяти для sing-box.</string>
+    <string name="notification_settings">Уведомления</string>
+    <string name="enable_notification">Включить уведомления</string>
+    <string name="dynamic_notification">Отображать скорость в реальном времени в уведомлении</string>
+    <string name="disable_notification_description">Из-за ограничений Android необходимо сначала предоставить разрешение на уведомления, а затем отключить категорию уведомлений в настройках.</string>
+    <string name="disable_notification_description_legacy">Из-за ограничений Android необходимо сначала предоставить разрешение на уведомления, а затем отключить уведомления в сведениях о приложении.</string>
     <string name="auto_redirect">Автоматическое перенаправление</string>
     <string name="auto_redirect_description">Требуются права ROOT</string>
     <string name="system_http_proxy">Системный HTTP-прокси</string>

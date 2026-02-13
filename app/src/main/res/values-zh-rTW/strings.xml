@@ -199,6 +199,11 @@
     <string name="disable_deprecated_warnings">停用過時警告</string>
     <string name="ignore_memory_limit">忽略記憶體限制</string>
     <string name="ignore_memory_limit_description">不對 sing-box 強制執行記憶體限制。</string>
+    <string name="notification_settings">通知</string>
+    <string name="enable_notification">啟用通知</string>
+    <string name="dynamic_notification">在通知中顯示即時網速</string>
+    <string name="disable_notification_description">由於 Android 限制，您需要先授權通知權限，然後前往系統設定中關閉通知類別。</string>
+    <string name="disable_notification_description_legacy">由於 Android 限制，您需要先授權通知權限，然後前往應用程式資訊中關閉通知。</string>
     <string name="auto_redirect">自動重定向</string>
     <string name="auto_redirect_description">需要 ROOT 權限</string>
     <string name="system_http_proxy">系統 HTTP 代理</string>

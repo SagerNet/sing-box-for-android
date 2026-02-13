@@ -1,5 +1,7 @@
 package io.nekohasekai.sfa.compose.screen.settings
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -25,8 +27,10 @@ import androidx.compose.material.icons.outlined.Autorenew
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.NewReleases
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.material.icons.outlined.SystemUpdateAlt
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
@@ -62,6 +66,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.navigation.NavController
+import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.BuildConfig
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.component.UpdateAvailableDialog
@@ -121,13 +126,30 @@ fun AppSettingsScreen(navController: NavController) {
     var downloadError by remember { mutableStateOf<String?>(null) }
     var showUpdateAvailableDialog by remember { mutableStateOf(false) }
 
+    var notificationEnabled by remember { mutableStateOf(true) }
+    var dynamicNotification by remember { mutableStateOf(Settings.dynamicNotification) }
+    var showDisableNotificationDialog by remember { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
         HookStatusClient.refresh()
     }
 
-    // Re-check method availability when returning from background (e.g., after granting permission)
+    // Re-check states when returning from background (e.g., after granting permission)
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         HookStatusClient.refresh()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Application.notification.createNotificationChannel(
+                NotificationChannel(
+                    "service",
+                    "Service Notifications",
+                    NotificationManager.IMPORTANCE_LOW,
+                ),
+            )
+            val channel = Application.notification.getNotificationChannel("service")
+            notificationEnabled = channel?.importance != NotificationManager.IMPORTANCE_NONE
+        } else {
+            notificationEnabled = Application.notification.areNotificationsEnabled()
+        }
         if (silentInstallEnabled) {
             scope.launch {
                 val success = withContext(Dispatchers.IO) {
@@ -239,6 +261,51 @@ fun AppSettingsScreen(navController: NavController) {
         )
     }
 
+    if (showDisableNotificationDialog) {
+        AlertDialog(
+            onDismissRequest = { showDisableNotificationDialog = false },
+            title = { Text(stringResource(R.string.enable_notification)) },
+            text = {
+                Text(
+                    stringResource(
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            R.string.disable_notification_description
+                        } else {
+                            R.string.disable_notification_description_legacy
+                        },
+                    ),
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDisableNotificationDialog = false
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        context.startActivity(
+                            Intent(AndroidSettings.ACTION_CHANNEL_NOTIFICATION_SETTINGS).apply {
+                                putExtra(AndroidSettings.EXTRA_APP_PACKAGE, context.packageName)
+                                putExtra(AndroidSettings.EXTRA_CHANNEL_ID, "service")
+                            },
+                        )
+                    } else {
+                        context.startActivity(
+                            Intent(
+                                AndroidSettings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                Uri.parse("package:${context.packageName}"),
+                            ),
+                        )
+                    }
+                }) {
+                    Text(stringResource(R.string.ok))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDisableNotificationDialog = false }) {
+                    Text(stringResource(android.R.string.cancel))
+                }
+            },
+        )
+    }
+
     if (showUpdateAvailableDialog && updateInfo != null) {
         UpdateAvailableDialog(
             updateInfo = updateInfo!!,
@@ -309,6 +376,91 @@ fun AppSettingsScreen(navController: NavController) {
                     modifier =
                     Modifier
                         .clip(RoundedCornerShape(12.dp)),
+                    colors =
+                    ListItemDefaults.colors(
+                        containerColor = Color.Transparent,
+                    ),
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = stringResource(R.string.notification_settings),
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(horizontal = 32.dp, vertical = 8.dp),
+        )
+
+        Card(
+            modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            ),
+        ) {
+            Column {
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            stringResource(R.string.enable_notification),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    },
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Outlined.Notifications,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    },
+                    trailingContent = {
+                        Switch(
+                            checked = notificationEnabled,
+                            onCheckedChange = null,
+                        )
+                    },
+                    modifier =
+                    Modifier
+                        .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+                        .clickable { showDisableNotificationDialog = true },
+                    colors =
+                    ListItemDefaults.colors(
+                        containerColor = Color.Transparent,
+                    ),
+                )
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            stringResource(R.string.dynamic_notification),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    },
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Outlined.Speed,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    },
+                    trailingContent = {
+                        Switch(
+                            checked = dynamicNotification,
+                            onCheckedChange = { checked ->
+                                dynamicNotification = checked
+                                scope.launch(Dispatchers.IO) {
+                                    Settings.dynamicNotification = checked
+                                }
+                            },
+                        )
+                    },
+                    modifier =
+                    Modifier
+                        .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)),
                     colors =
                     ListItemDefaults.colors(
                         containerColor = Color.Transparent,
