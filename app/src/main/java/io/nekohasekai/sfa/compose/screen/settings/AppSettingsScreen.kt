@@ -1,11 +1,14 @@
 package io.nekohasekai.sfa.compose.screen.settings
 
+import android.app.LocaleConfig
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.util.Log
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -26,6 +29,7 @@ import androidx.compose.material.icons.outlined.AdminPanelSettings
 import androidx.compose.material.icons.outlined.Autorenew
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.NewReleases
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Refresh
@@ -63,6 +67,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.navigation.NavController
@@ -82,6 +87,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.xmlpull.v1.XmlPullParser
+import java.util.Locale
 import android.provider.Settings as AndroidSettings
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -129,6 +136,13 @@ fun AppSettingsScreen(navController: NavController) {
     var notificationEnabled by remember { mutableStateOf(true) }
     var dynamicNotification by remember { mutableStateOf(Settings.dynamicNotification) }
     var showDisableNotificationDialog by remember { mutableStateOf(false) }
+
+    var showLanguageDialog by remember { mutableStateOf(false) }
+    val availableLocales = remember { getSupportedLocales(context) }
+    var currentLocaleTag by remember {
+        val appLocales = AppCompatDelegate.getApplicationLocales()
+        mutableStateOf(if (appLocales.isEmpty) "" else appLocales.toLanguageTags())
+    }
 
     LaunchedEffect(Unit) {
         HookStatusClient.refresh()
@@ -328,6 +342,24 @@ fun AppSettingsScreen(navController: NavController) {
         )
     }
 
+    if (showLanguageDialog) {
+        LanguageDialog(
+            currentTag = currentLocaleTag,
+            availableLocales = availableLocales,
+            onLocaleSelected = { tag ->
+                currentLocaleTag = tag
+                val localeList = if (tag.isEmpty()) {
+                    LocaleListCompat.getEmptyLocaleList()
+                } else {
+                    LocaleListCompat.forLanguageTags(tag)
+                }
+                AppCompatDelegate.setApplicationLocales(localeList)
+                showLanguageDialog = false
+            },
+            onDismiss = { showLanguageDialog = false },
+        )
+    }
+
     Column(
         modifier =
         Modifier
@@ -375,7 +407,40 @@ fun AppSettingsScreen(navController: NavController) {
                     },
                     modifier =
                     Modifier
-                        .clip(RoundedCornerShape(12.dp)),
+                        .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)),
+                    colors =
+                    ListItemDefaults.colors(
+                        containerColor = Color.Transparent,
+                    ),
+                )
+
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            stringResource(R.string.language),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    },
+                    supportingContent = {
+                        val displayName = if (currentLocaleTag.isEmpty()) {
+                            stringResource(R.string.system_default)
+                        } else {
+                            val locale = Locale.forLanguageTag(currentLocaleTag)
+                            locale.getDisplayName(locale).replaceFirstChar { it.uppercase(locale) }
+                        }
+                        Text(displayName, style = MaterialTheme.typography.bodyMedium)
+                    },
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Outlined.Language,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    },
+                    modifier =
+                    Modifier
+                        .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
+                        .clickable { showLanguageDialog = true },
                     colors =
                     ListItemDefaults.colors(
                         containerColor = Color.Transparent,
@@ -977,6 +1042,104 @@ private fun UpdateTrackDialog(
             }
         },
     )
+}
+
+@Composable
+private fun LanguageDialog(
+    currentTag: String,
+    availableLocales: List<Locale>,
+    onLocaleSelected: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.language)) },
+        text = {
+            Column {
+                Row(
+                    modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable { onLocaleSelected("") }
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    RadioButton(
+                        selected = currentTag.isEmpty(),
+                        onClick = { onLocaleSelected("") },
+                    )
+                    Text(
+                        text = stringResource(R.string.system_default),
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(start = 8.dp),
+                    )
+                }
+                availableLocales.forEach { locale ->
+                    val tag = locale.toLanguageTag()
+                    Row(
+                        modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable { onLocaleSelected(tag) }
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        RadioButton(
+                            selected = currentTag == tag,
+                            onClick = { onLocaleSelected(tag) },
+                        )
+                        Text(
+                            text = locale.getDisplayName(locale).replaceFirstChar { it.uppercase(locale) },
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(start = 8.dp),
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(android.R.string.cancel))
+            }
+        },
+    )
+}
+
+private fun getSupportedLocales(context: Context): List<Locale> {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        val localeConfig = LocaleConfig(context)
+        val localeList = localeConfig.supportedLocales ?: return emptyList()
+        return (0 until localeList.size()).map { localeList.get(it) }
+    }
+    return parseLocalesConfig(context)
+}
+
+private fun parseLocalesConfig(context: Context): List<Locale> {
+    val locales = mutableListOf<Locale>()
+    try {
+        val resId = context.resources.getIdentifier(
+            "_generated_res_locale_config",
+            "xml",
+            context.packageName,
+        )
+        if (resId == 0) return emptyList()
+        val parser = context.resources.getXml(resId)
+        while (parser.next() != XmlPullParser.END_DOCUMENT) {
+            if (parser.eventType == XmlPullParser.START_TAG && parser.name == "locale") {
+                val name = parser.getAttributeValue(
+                    "http://schemas.android.com/apk/res/android",
+                    "name",
+                )
+                if (name != null) {
+                    locales.add(Locale.forLanguageTag(name))
+                }
+            }
+        }
+    } catch (_: Exception) {
+    }
+    return locales
 }
 
 @Composable

@@ -3,6 +3,8 @@
     <!-- App -->
     <string name="app_name" translatable="false">sing-box</string>
     <string name="app_version_title">App version</string>
+    <string name="language">Language</string>
+    <string name="system_default">System default</string>
 
     <!-- Common Actions -->
     <string name="ok">OK</string>

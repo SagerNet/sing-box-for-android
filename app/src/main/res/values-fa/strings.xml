@@ -3,6 +3,8 @@
     <!-- App -->
     <string name="app_name" translatable="false">sing-box</string>
     <string name="app_version_title">نسخه برنامه</string>
+    <string name="language">زبان</string>
+    <string name="system_default">پیش‌فرض سیستم</string>
 
     <!-- Common Actions -->
     <string name="ok">تأیید</string>

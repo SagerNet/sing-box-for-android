@@ -3,6 +3,8 @@
     <!-- App -->
     <string name="app_name" translatable="false">sing-box</string>
     <string name="app_version_title">應用程式版本</string>
+    <string name="language">語言</string>
+    <string name="system_default">跟隨系統</string>
 
     <!-- Common Actions -->
     <string name="ok">確定</string>
