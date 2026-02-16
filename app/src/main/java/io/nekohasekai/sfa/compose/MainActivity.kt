@@ -198,6 +198,7 @@ class MainActivity :
                     val updateInfo = Vendor.checkUpdateAsync()
                     UpdateState.setUpdate(updateInfo)
                 } catch (_: Exception) {
+                    UpdateState.setUpdate(null)
                 }
             }
         }
@@ -495,6 +496,7 @@ class MainActivity :
                                 val result = Vendor.checkUpdateAsync()
                                 UpdateState.setUpdate(result)
                             } catch (_: Exception) {
+                                UpdateState.setUpdate(null)
                             }
                         }
                     }) {

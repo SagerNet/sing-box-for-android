@@ -188,6 +188,7 @@ fun AppSettingsScreen(navController: NavController) {
             currentTrack = currentTrack,
             onTrackSelected = { track ->
                 currentTrack = track
+                UpdateState.clear()
                 scope.launch(Dispatchers.IO) {
                     Settings.updateTrack = track
                 }
@@ -932,25 +933,25 @@ fun AppSettingsScreen(navController: NavController) {
                             },
                         )
                         .clickable(enabled = !isChecking) {
-                            if (hasUpdate && updateInfo != null) {
-                                showUpdateAvailableDialog = true
-                            } else {
-                                scope.launch {
-                                    UpdateState.isChecking.value = true
-                                    withContext(Dispatchers.IO) {
-                                        try {
-                                            val result = Vendor.checkUpdateAsync()
-                                            UpdateState.setUpdate(result)
-                                            if (result == null) {
-                                                showErrorDialog = R.string.no_updates_available
-                                            }
-                                        } catch (_: UpdateCheckException.TrackNotSupported) {
-                                            showErrorDialog = R.string.update_track_not_supported
-                                        } catch (_: Exception) {
+                            scope.launch {
+                                UpdateState.isChecking.value = true
+                                withContext(Dispatchers.IO) {
+                                    try {
+                                        val result = Vendor.checkUpdateAsync()
+                                        UpdateState.setUpdate(result)
+                                        if (result == null) {
+                                            showErrorDialog = R.string.no_updates_available
+                                        } else {
+                                            showUpdateAvailableDialog = true
                                         }
+                                    } catch (_: UpdateCheckException.TrackNotSupported) {
+                                        UpdateState.setUpdate(null)
+                                        showErrorDialog = R.string.update_track_not_supported
+                                    } catch (_: Exception) {
+                                        UpdateState.setUpdate(null)
                                     }
-                                    UpdateState.isChecking.value = false
                                 }
+                                UpdateState.isChecking.value = false
                             }
                         },
                     colors =
