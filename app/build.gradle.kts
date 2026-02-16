@@ -183,8 +183,8 @@ dependencies {
     // API level specific versions
     val lifecycleVersion23 = "2.10.0"
     val roomVersion23 = "2.8.4"
-    val workVersion23 = "2.11.0"
-    val cameraVersion23 = "1.5.2"
+    val workVersion23 = "2.11.1"
+    val cameraVersion23 = "1.5.3"
     val browserVersion23 = "1.9.0"
 
     val lifecycleVersion21 = "2.9.4"
@@ -269,8 +269,8 @@ dependencies {
     "otherLegacyImplementation"("com.github.topjohnwu.libsu:service:$libsuVersion")
 
     // Compose dependencies - API 23+ (play/other)
-    val composeBom23 = platform("androidx.compose:compose-bom:2026.01.01")
-    val activityVersion23 = "1.12.2"
+    val composeBom23 = platform("androidx.compose:compose-bom:2026.02.00")
+    val activityVersion23 = "1.12.4"
     val lifecycleComposeVersion23 = "2.10.0"
 
     "playImplementation"(composeBom23)
@@ -280,7 +280,7 @@ dependencies {
     "playImplementation"("androidx.compose.ui:ui-tooling-preview")
     "playImplementation"("androidx.compose.material:material-icons-extended")
     "playImplementation"("androidx.activity:activity-compose:$activityVersion23")
-    "playImplementation"("androidx.navigation:navigation-compose:2.9.6")
+    "playImplementation"("androidx.navigation:navigation-compose:2.9.7")
     "playImplementation"("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleComposeVersion23")
     "playImplementation"("androidx.compose.runtime:runtime-livedata")
 
@@ -291,7 +291,7 @@ dependencies {
     "otherImplementation"("androidx.compose.ui:ui-tooling-preview")
     "otherImplementation"("androidx.compose.material:material-icons-extended")
     "otherImplementation"("androidx.activity:activity-compose:$activityVersion23")
-    "otherImplementation"("androidx.navigation:navigation-compose:2.9.6")
+    "otherImplementation"("androidx.navigation:navigation-compose:2.9.7")
     "otherImplementation"("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleComposeVersion23")
     "otherImplementation"("androidx.compose.runtime:runtime-livedata")
 
@@ -307,7 +307,7 @@ dependencies {
     "otherLegacyImplementation"("androidx.compose.ui:ui-tooling-preview")
     "otherLegacyImplementation"("androidx.compose.material:material-icons-extended")
     "otherLegacyImplementation"("androidx.activity:activity-compose:$activityVersion21")
-    "otherLegacyImplementation"("androidx.navigation:navigation-compose:2.9.6")
+    "otherLegacyImplementation"("androidx.navigation:navigation-compose:2.9.7")
     "otherLegacyImplementation"("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleComposeVersion21")
     "otherLegacyImplementation"("androidx.compose.runtime:runtime-livedata")
 
@@ -318,7 +318,7 @@ dependencies {
 
     // Common Compose-related libraries
     implementation("sh.calvin.reorderable:reorderable:3.0.0")
-    implementation("com.github.jeziellago:compose-markdown:0.5.4")
+    implementation("com.github.jeziellago:compose-markdown:0.5.8")
     implementation("org.kodein.emoji:emoji-kt:2.3.0")
 
     // Xposed API for self-hooking VPN hide module

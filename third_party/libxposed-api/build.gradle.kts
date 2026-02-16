@@ -22,5 +22,5 @@ android {
 }
 
 dependencies {
-    compileOnly("androidx.annotation:annotation:1.7.1")
+    compileOnly("androidx.annotation:annotation:1.9.1")
 }
