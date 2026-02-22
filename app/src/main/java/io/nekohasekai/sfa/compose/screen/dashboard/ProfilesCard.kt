@@ -53,6 +53,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -248,7 +249,11 @@ fun ProfilesCard(
                     onClick = onShowAddProfileSheet,
                     shape = RoundedCornerShape(12.dp),
                     color = if (isSystemInDarkTheme()) {
-                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                        lerp(
+                            MaterialTheme.colorScheme.surfaceContainerHighest,
+                            MaterialTheme.colorScheme.surfaceContainerHigh,
+                            0.5f,
+                        )
                     } else {
                         MaterialTheme.colorScheme.surfaceDim
                     },
@@ -753,7 +758,11 @@ private fun ActionButton(
         enabled = enabled,
         shape = RoundedCornerShape(12.dp),
         color = if (isSystemInDarkTheme()) {
-            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            lerp(
+                MaterialTheme.colorScheme.surfaceContainerHighest,
+                MaterialTheme.colorScheme.surfaceContainerHigh,
+                0.5f,
+            )
         } else {
             MaterialTheme.colorScheme.surfaceDim
         },

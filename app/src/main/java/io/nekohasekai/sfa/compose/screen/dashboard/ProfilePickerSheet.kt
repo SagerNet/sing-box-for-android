@@ -42,6 +42,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -268,11 +269,23 @@ private fun ProfilePickerRow(
         color = when {
             isDragging -> MaterialTheme.colorScheme.tertiaryContainer
             isSelected -> if (isSystemInDarkTheme()) {
-                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                lerp(
+                    MaterialTheme.colorScheme.surfaceContainerLow,
+                    MaterialTheme.colorScheme.surfaceContainerHigh,
+                    0.5f,
+                )
             } else {
                 MaterialTheme.colorScheme.surfaceDim
             }
-            else -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+            else -> if (isSystemInDarkTheme()) {
+                lerp(
+                    MaterialTheme.colorScheme.surfaceContainerLow,
+                    MaterialTheme.colorScheme.surfaceContainerHigh,
+                    0.35f,
+                )
+            } else {
+                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+            }
         },
         tonalElevation = animatedElevation.dp,
     ) {
