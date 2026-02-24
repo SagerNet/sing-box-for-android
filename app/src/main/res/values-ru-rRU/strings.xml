@@ -68,7 +68,7 @@
     <!-- Dashboard -->
     <string name="dashboard_items">Элементы главной страницы</string>
     <string name="memory">Память</string>
-    <string name="goroutines">Подпрограммы</string>
+    <string name="goroutines">Горутины</string>
     <string name="upload">Отправка</string>
     <string name="download">Получение</string>
     <string name="connections_in">Входящие</string>
