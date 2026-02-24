@@ -142,10 +142,10 @@ class BoxService(private val service: Service, private val platformInterface: Pl
                             val appList = Settings.getEffectivePerAppProxyList()
                             if (Settings.getEffectivePerAppProxyMode() == Settings.PER_APP_PROXY_INCLUDE) {
                                 includePackage =
-                                    PlatformInterfaceWrapper.StringArray(appList.iterator())
+                                    PlatformInterfaceWrapper.StringArray((appList + Application.application.packageName).iterator())
                             } else {
                                 excludePackage =
-                                    PlatformInterfaceWrapper.StringArray(appList.iterator())
+                                    PlatformInterfaceWrapper.StringArray((appList - Application.application.packageName).iterator())
                             }
                         }
                     },
@@ -224,9 +224,9 @@ class BoxService(private val service: Service, private val platformInterface: Pl
                     if (Vendor.isPerAppProxyAvailable() && Settings.perAppProxyEnabled) {
                         val appList = Settings.getEffectivePerAppProxyList()
                         if (Settings.getEffectivePerAppProxyMode() == Settings.PER_APP_PROXY_INCLUDE) {
-                            includePackage = PlatformInterfaceWrapper.StringArray(appList.iterator())
+                            includePackage = PlatformInterfaceWrapper.StringArray((appList + Application.application.packageName).iterator())
                         } else {
-                            excludePackage = PlatformInterfaceWrapper.StringArray(appList.iterator())
+                            excludePackage = PlatformInterfaceWrapper.StringArray((appList - Application.application.packageName).iterator())
                         }
                     }
                 },
