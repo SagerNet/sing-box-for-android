@@ -9,7 +9,6 @@ object SettingsKey {
     const val SILENT_INSTALL_ENABLED = "silent_install_enabled"
     const val SILENT_INSTALL_METHOD = "silent_install_method"
     const val AUTO_UPDATE_ENABLED = "auto_update_enabled"
-    const val DISABLE_MEMORY_LIMIT = "disable_memory_limit"
     const val DYNAMIC_NOTIFICATION = "dynamic_notification"
     const val DISABLE_DEPRECATED_WARNINGS = "disable_deprecated_warnings"
 

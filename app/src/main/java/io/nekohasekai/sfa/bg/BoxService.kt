@@ -131,7 +131,6 @@ class BoxService(private val service: Service, private val platformInterface: Pl
             }
 
             DefaultNetworkMonitor.start()
-            Libbox.setMemoryLimit(!Settings.disableMemoryLimit)
 
             try {
                 commandServer.startOrReloadService(
