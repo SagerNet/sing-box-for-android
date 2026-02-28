@@ -325,7 +325,7 @@
 
     <!-- Errors -->
     <string name="error_title">Error</string>
-    <string name="error_missing_vpn_permission">Missiong VPN permission</string>
+    <string name="error_missing_vpn_permission">Missing VPN permission</string>
     <string name="error_empty_configuration">Empty configuration</string>
     <string name="error_empty_file">Empty file</string>
     <string name="error_decode_profile">Failed to decode profile: %s</string>
