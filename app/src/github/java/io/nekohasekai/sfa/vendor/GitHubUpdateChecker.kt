@@ -86,9 +86,7 @@ class GitHubUpdateChecker : Closeable {
         }
     }
 
-    private fun isNewerThanCurrent(versionName: String): Boolean {
-        return Libbox.compareSemver(versionName, BuildConfig.VERSION_NAME)
-    }
+    private fun isNewerThanCurrent(versionName: String): Boolean = Libbox.compareSemver(versionName, BuildConfig.VERSION_NAME)
 
     private fun isBetterVersion(version: VersionMetadata, other: VersionMetadata): Boolean {
         if (Libbox.compareSemver(version.versionName, other.versionName)) {

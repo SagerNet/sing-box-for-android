@@ -1,5 +1,5 @@
 [versions]
-spotless = "8.1.0"
+spotless = "8.2.1"
 ktlint = "1.7.1"
 
 [plugins]
