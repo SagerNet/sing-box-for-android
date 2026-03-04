@@ -11,12 +11,16 @@ import io.nekohasekai.libbox.ConnectionOwner
 import io.nekohasekai.libbox.InterfaceUpdateListener
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.LocalDNSTransport
+import io.nekohasekai.libbox.NeighborEntryIterator
+import io.nekohasekai.libbox.NeighborUpdateListener
 import io.nekohasekai.libbox.NetworkInterfaceIterator
 import io.nekohasekai.libbox.PlatformInterface
 import io.nekohasekai.libbox.StringIterator
 import io.nekohasekai.libbox.TunOptions
 import io.nekohasekai.libbox.WIFIState
 import io.nekohasekai.sfa.Application
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import java.net.Inet6Address
 import java.net.InetSocketAddress
 import java.net.InterfaceAddress
@@ -24,7 +28,10 @@ import java.net.NetworkInterface
 import java.security.KeyStore
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
+import io.nekohasekai.libbox.NeighborEntry as LibboxNeighborEntry
 import io.nekohasekai.libbox.NetworkInterface as LibboxNetworkInterface
+
+private var neighborCallback: INeighborTableCallback.Stub? = null
 
 interface PlatformInterfaceWrapper : PlatformInterface {
     override fun usePlatformAutoDetectInterfaceControl(): Boolean = true
@@ -170,6 +177,45 @@ interface PlatformInterfaceWrapper : PlatformInterface {
             }
         }
         return StringArray(certificates.iterator())
+    }
+
+    override fun startNeighborMonitor(listener: NeighborUpdateListener?) {
+        if (listener == null) return
+        val callback = object : INeighborTableCallback.Stub() {
+            override fun onNeighborTableUpdated(entries: ParceledListSlice<*>?) {
+                if (entries == null) return
+                @Suppress("UNCHECKED_CAST")
+                val list = entries.list as List<NeighborEntry>
+                listener.updateNeighborTable(NeighborEntryArray(list.map { entry ->
+                    LibboxNeighborEntry().apply {
+                        address = entry.address
+                        macAddress = entry.macAddress
+                        hostname = entry.hostname
+                    }
+                }.iterator()))
+            }
+        }
+        neighborCallback = callback
+        runBlocking(Dispatchers.IO) {
+            RootClient.registerNeighborTableCallback(callback)
+        }
+    }
+
+    override fun registerMyInterface(name: String?) {
+    }
+
+    override fun closeNeighborMonitor(listener: NeighborUpdateListener?) {
+        val callback = neighborCallback ?: return
+        neighborCallback = null
+        runBlocking(Dispatchers.IO) {
+            RootClient.unregisterNeighborTableCallback(callback)
+        }
+    }
+
+    private class NeighborEntryArray(private val iterator: Iterator<LibboxNeighborEntry>) : NeighborEntryIterator {
+        override fun hasNext(): Boolean = iterator.hasNext()
+
+        override fun next(): LibboxNeighborEntry = iterator.next()
     }
 
     private class InterfaceArray(private val iterator: Iterator<LibboxNetworkInterface>) : NetworkInterfaceIterator {

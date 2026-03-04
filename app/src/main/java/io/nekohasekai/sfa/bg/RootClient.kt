@@ -133,4 +133,21 @@ object RootClient {
             throw e.rethrowFromSystemServer()
         }
     }
+
+    suspend fun registerNeighborTableCallback(callback: INeighborTableCallback) {
+        val svc = bindService()
+        try {
+            svc.registerNeighborTableCallback(callback)
+        } catch (e: RemoteException) {
+            throw e.rethrowFromSystemServer()
+        }
+    }
+
+    suspend fun unregisterNeighborTableCallback(callback: INeighborTableCallback) {
+        try {
+            service?.unregisterNeighborTableCallback(callback)
+        } catch (e: RemoteException) {
+            throw e.rethrowFromSystemServer()
+        }
+    }
 }
