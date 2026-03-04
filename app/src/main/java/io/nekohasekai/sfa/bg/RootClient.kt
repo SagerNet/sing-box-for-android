@@ -135,6 +135,23 @@ object RootClient {
         }
     }
 
+    suspend fun registerNeighborTableCallback(callback: INeighborTableCallback) {
+        val svc = bindService()
+        try {
+            svc.registerNeighborTableCallback(callback)
+        } catch (e: RemoteException) {
+            throw e.rethrowAsRuntime()
+        }
+    }
+
+    suspend fun unregisterNeighborTableCallback(callback: INeighborTableCallback) {
+        try {
+            service?.unregisterNeighborTableCallback(callback)
+        } catch (e: RemoteException) {
+            throw e.rethrowAsRuntime()
+        }
+    }
+
     private fun RemoteException.rethrowAsRuntime(): RuntimeException = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
         rethrowFromSystemServer()
     } else {
