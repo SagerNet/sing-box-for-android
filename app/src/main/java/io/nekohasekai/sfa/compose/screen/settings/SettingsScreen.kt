@@ -153,31 +153,31 @@ fun SettingsScreen(navController: NavController) {
                     ),
                 )
 
-                ListItem(
-                    headlineContent = {
-                        Text(
-                            stringResource(R.string.service),
-                            style = MaterialTheme.typography.bodyLarge,
-                        )
-                    },
-                    leadingContent = {
-                        Icon(
-                            imageVector = Icons.Outlined.Tune,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                        )
-                    },
-                    trailingContent = {
-                        if (!isBatteryOptimizationIgnored) {
+                if (!isBatteryOptimizationIgnored) {
+                    ListItem(
+                        headlineContent = {
+                            Text(
+                                stringResource(R.string.service),
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                        },
+                        leadingContent = {
+                            Icon(
+                                imageVector = Icons.Outlined.Tune,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                        },
+                        trailingContent = {
                             Badge(containerColor = MaterialTheme.colorScheme.primary)
-                        }
-                    },
-                    modifier = Modifier.clickable { navController.navigate("settings/service") },
-                    colors =
-                    ListItemDefaults.colors(
-                        containerColor = Color.Transparent,
-                    ),
-                )
+                        },
+                        modifier = Modifier.clickable { navController.navigate("settings/service") },
+                        colors =
+                        ListItemDefaults.colors(
+                            containerColor = Color.Transparent,
+                        ),
+                    )
+                }
 
                 ListItem(
                     headlineContent = {
