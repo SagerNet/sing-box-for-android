@@ -199,6 +199,8 @@
     <string name="sponsor">贊助</string>
     <string name="working_directory">工作目錄</string>
     <string name="disable_deprecated_warnings">停用過時警告</string>
+    <string name="cache_size">快取大小</string>
+    <string name="clear_cache">清除快取</string>
     <string name="notification_settings">通知</string>
     <string name="enable_notification">啟用通知</string>
     <string name="dynamic_notification">在通知中顯示即時網速</string>
@@ -275,6 +277,22 @@
     <string name="new_version_available">有新版本可用：%s</string>
     <string name="auto_update">自動更新</string>
     <string name="auto_update_description">在背景自動下載並安裝更新</string>
+    <string name="update_source">更新來源</string>
+    <string name="update_source_github">GitHub</string>
+    <string name="update_source_fdroid">F-Droid</string>
+    <string name="fdroid_mirror">F-Droid 鏡像</string>
+    <string name="fdroid_mirror_test_all">依延遲自動選擇</string>
+    <string name="fdroid_mirror_testing">測試中…</string>
+    <string name="fdroid_mirror_latency">%d ms</string>
+    <string name="fdroid_mirror_failed">失敗</string>
+    <string name="fdroid_mirror_untested">—</string>
+    <string name="fdroid_mirror_add">新增鏡像</string>
+    <string name="fdroid_mirror_name_hint">名稱</string>
+    <string name="fdroid_mirror_url_hint">URL</string>
+    <string name="fdroid_mirror_custom">自訂</string>
+    <string name="fdroid_mirror_invalid_url">無效的 URL</string>
+    <string name="fdroid_mirror_add_action">新增</string>
+    <string name="fdroid_mirror_delete">刪除</string>
 
     <!-- Silent Install -->
     <string name="silent_install">靜默安裝</string>

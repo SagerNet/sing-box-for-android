@@ -28,6 +28,7 @@ import io.nekohasekai.sfa.compose.screen.profile.EditProfileRoute
 import io.nekohasekai.sfa.compose.screen.profileoverride.PerAppProxyScreen
 import io.nekohasekai.sfa.compose.screen.settings.AppSettingsScreen
 import io.nekohasekai.sfa.compose.screen.settings.CoreSettingsScreen
+import io.nekohasekai.sfa.compose.screen.settings.FDroidMirrorScreen
 import io.nekohasekai.sfa.compose.screen.settings.PrivilegeSettingsScreen
 import io.nekohasekai.sfa.compose.screen.settings.ProfileOverrideScreen
 import io.nekohasekai.sfa.compose.screen.settings.ServiceSettingsScreen
@@ -222,6 +223,16 @@ fun SFANavHost(
             popExitTransition = slideOutToRight,
         ) {
             AppSettingsScreen(navController = navController)
+        }
+
+        composable(
+            route = "settings/fdroid_mirror",
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) {
+            FDroidMirrorScreen(navController = navController)
         }
 
         composable(

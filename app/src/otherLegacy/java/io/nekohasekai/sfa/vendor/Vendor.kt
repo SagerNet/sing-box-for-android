@@ -93,7 +93,7 @@ object Vendor : VendorInterface {
         onCropArea: ((QRCodeCropArea?) -> Unit)?,
     ): ImageAnalysis.Analyzer? = null
 
-    override fun supportsTrackSelection(): Boolean = true
+    override val hasCustomUpdate = true
 
     override fun checkUpdateAsync(): UpdateInfo? {
         val track = UpdateTrack.fromString(Settings.updateTrack)
@@ -101,10 +101,6 @@ object Vendor : VendorInterface {
             checker.checkUpdate(track)
         }
     }
-
-    override fun supportsSilentInstall(): Boolean = true
-
-    override fun supportsAutoUpdate(): Boolean = true
 
     override fun scheduleAutoUpdate() {
         UpdateWorker.schedule(io.nekohasekai.sfa.Application.application)

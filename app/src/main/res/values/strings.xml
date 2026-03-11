@@ -199,6 +199,8 @@
     <string name="sponsor">Sponsor</string>
     <string name="working_directory">Working Directory</string>
     <string name="disable_deprecated_warnings">Disable Deprecated Warnings</string>
+    <string name="cache_size">Cache Size</string>
+    <string name="clear_cache">Clear Cache</string>
     <string name="notification_settings">Notification</string>
     <string name="enable_notification">Enable Notification</string>
     <string name="dynamic_notification">Display realtime speed in notification</string>
@@ -264,6 +266,9 @@
     <string name="check_update_automatic">Automatic Update Check</string>
     <string name="check_update_prompt_play">Would you like to enable automatic update checking from **Play Store**?</string>
     <string name="check_update_prompt_github">Would you like to enable automatic update checking from **GitHub**?</string>
+    <string name="update_source">Update Source</string>
+    <string name="update_source_github">GitHub</string>
+    <string name="update_source_fdroid">F-Droid</string>
     <string name="update_track">Update Track</string>
     <string name="update_track_stable">Stable</string>
     <string name="update_track_beta">Beta</string>
@@ -275,6 +280,19 @@
     <string name="new_version_available">New version available: %s</string>
     <string name="auto_update">Auto Update</string>
     <string name="auto_update_description">Automatically download and install updates in background</string>
+    <string name="fdroid_mirror">F-Droid Mirror</string>
+    <string name="fdroid_mirror_test_all">Auto Select by Latency</string>
+    <string name="fdroid_mirror_testing">Testing…</string>
+    <string name="fdroid_mirror_latency">%d ms</string>
+    <string name="fdroid_mirror_failed">Failed</string>
+    <string name="fdroid_mirror_untested">—</string>
+    <string name="fdroid_mirror_add">Add Mirror</string>
+    <string name="fdroid_mirror_name_hint">Name</string>
+    <string name="fdroid_mirror_url_hint">URL</string>
+    <string name="fdroid_mirror_custom">Custom</string>
+    <string name="fdroid_mirror_invalid_url">Invalid URL</string>
+    <string name="fdroid_mirror_add_action">Add</string>
+    <string name="fdroid_mirror_delete">Delete</string>
 
     <!-- Silent Install -->
     <string name="silent_install">Silent Install</string>

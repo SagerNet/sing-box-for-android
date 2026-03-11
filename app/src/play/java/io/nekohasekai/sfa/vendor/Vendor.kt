@@ -92,7 +92,5 @@ object Vendor : VendorInterface {
         }
     }
 
-    override fun supportsTrackSelection(): Boolean = false
-
     override fun checkUpdateAsync(): UpdateInfo? = null
 }
