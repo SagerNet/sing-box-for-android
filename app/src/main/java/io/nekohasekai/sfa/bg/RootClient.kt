@@ -95,7 +95,7 @@ object RootClient {
                                 shell.execTask(task)
                             } else {
                                 continuation.resumeWithException(
-                                    IOException("permission denied")
+                                    IOException("permission denied"),
                                 )
                             }
                         } catch (e: Exception) {

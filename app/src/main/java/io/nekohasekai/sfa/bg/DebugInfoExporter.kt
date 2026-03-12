@@ -13,11 +13,13 @@ import java.io.StringWriter
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.zip.Deflater
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 object DebugInfoExporter {
     private const val TAG = "DebugInfoExporter"
+    private const val BUFFER_SIZE = 128 * 1024
 
     fun export(context: Context, outputPath: String, packageName: String): String {
         Log.i(TAG, "export start: output=$outputPath, package=$packageName")
@@ -94,43 +96,27 @@ object DebugInfoExporter {
 
     private fun addFrameworkEntries(zip: ZipOutputStream, warnings: MutableList<String>): Int {
         var count = 0
-        val roots =
-            listOf(
-                File("/system/framework"),
-                File("/system_ext/framework"),
-                File("/product/framework"),
-                File("/vendor/framework"),
-            )
+        val root = File("/system/framework")
+        if (!root.isDirectory) return 0
         val targetFiles = setOf("framework.jar", "services.jar")
-        for (root in roots) {
-            if (!root.isDirectory) continue
-            val destPrefix = "framework/${root.name}"
-            val files = root.listFiles() ?: emptyArray()
-            for (file in files) {
-                if (!file.isFile) continue
-                if (file.name !in targetFiles) continue
-                if (addFileEntry(zip, file, "$destPrefix/${file.name}", warnings)) {
-                    count++
-                }
+        val files = root.listFiles() ?: emptyArray()
+        for (file in files) {
+            if (!file.isFile) continue
+            if (file.name !in targetFiles) continue
+            if (addFileEntry(zip, file, "framework/${file.name}", warnings, noCompression = true)) {
+                count++
             }
         }
         return count
     }
 
     private fun addApexEntries(zip: ZipOutputStream, warnings: MutableList<String>): Int {
-        var count = 0
-        val tetheringApex = File("/apex/com.android.tethering/javalib")
-        if (!tetheringApex.isDirectory) return 0
-        val destPrefix = "framework/apex_com.android.tethering"
-        val files = tetheringApex.listFiles() ?: emptyArray()
-        for (file in files) {
-            if (!file.isFile) continue
-            if (!file.name.lowercase(Locale.US).endsWith(".jar")) continue
-            if (addFileEntry(zip, file, "$destPrefix/${file.name}", warnings)) {
-                count++
-            }
+        val file = File("/apex/com.android.tethering/javalib/service-connectivity.jar")
+        if (!file.isFile) {
+            warnings.add("missing file: ${file.path}")
+            return 0
         }
-        return count
+        return if (addFileEntry(zip, file, "framework/apex_com.android.tethering/service-connectivity.jar", warnings, noCompression = true)) 1 else 0
     }
 
     private fun addLogEntries(zip: ZipOutputStream, warnings: MutableList<String>, context: Context): Int {
@@ -222,16 +208,22 @@ object DebugInfoExporter {
         return count
     }
 
-    private fun addFileEntry(zip: ZipOutputStream, file: File, entryName: String, warnings: MutableList<String>): Boolean {
+    private fun addFileEntry(
+        zip: ZipOutputStream,
+        file: File,
+        entryName: String,
+        warnings: MutableList<String>,
+        noCompression: Boolean = false,
+    ): Boolean {
         if (!file.isFile) {
             warnings.add("missing file: ${file.path}")
             return false
         }
         try {
-            val entry = ZipEntry(entryName)
-            zip.putNextEntry(entry)
+            if (noCompression) zip.setLevel(Deflater.NO_COMPRESSION)
+            zip.putNextEntry(ZipEntry(entryName))
             BufferedInputStream(FileInputStream(file)).use { input ->
-                val buffer = ByteArray(16 * 1024)
+                val buffer = ByteArray(BUFFER_SIZE)
                 while (true) {
                     val read = input.read(buffer)
                     if (read <= 0) break
@@ -239,9 +231,11 @@ object DebugInfoExporter {
                 }
             }
             zip.closeEntry()
+            if (noCompression) zip.setLevel(Deflater.DEFAULT_COMPRESSION)
             return true
         } catch (e: Throwable) {
             warnings.add("zip failed ${file.path}: ${e.message}")
+            if (noCompression) zip.setLevel(Deflater.DEFAULT_COMPRESSION)
             return false
         }
     }
@@ -263,11 +257,10 @@ object DebugInfoExporter {
         command: List<String>,
     ): CommandResult? = try {
         val process = ProcessBuilder(command).redirectErrorStream(true).start()
-        val entry = ZipEntry(entryName)
-        zip.putNextEntry(entry)
+        zip.putNextEntry(ZipEntry(entryName))
         var bytes = 0L
         process.inputStream.use { input ->
-            val buffer = ByteArray(16 * 1024)
+            val buffer = ByteArray(BUFFER_SIZE)
             while (true) {
                 val read = input.read(buffer)
                 if (read <= 0) break
