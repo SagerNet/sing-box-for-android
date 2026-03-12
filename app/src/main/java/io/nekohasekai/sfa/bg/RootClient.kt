@@ -6,6 +6,7 @@ import android.content.ServiceConnection
 import android.content.pm.PackageInfo
 import android.os.IBinder
 import android.os.RemoteException
+import androidx.core.content.ContextCompat
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ipc.RootService
 import io.nekohasekai.sfa.Application
@@ -17,7 +18,9 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import java.io.IOException
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 object RootClient {
     init {
@@ -53,6 +56,10 @@ object RootClient {
     suspend fun bindService(): IRootService = connectionMutex.withLock {
         service?.let { return it }
 
+        if (Shell.isAppGrantedRoot() == false) {
+            throw IOException("permission denied")
+        }
+
         return withContext(Dispatchers.Main) {
             suspendCancellableCoroutine { continuation ->
                 val conn = object : ServiceConnection {
@@ -72,7 +79,30 @@ object RootClient {
                 }
 
                 val intent = Intent(Application.application, RootServer::class.java)
-                RootService.bind(intent, conn)
+                val task = RootService.bindOrTask(
+                    intent,
+                    ContextCompat.getMainExecutor(Application.application),
+                    conn,
+                )
+
+                if (task == null) {
+                    // Already connected, onServiceConnected will fire
+                } else {
+                    Shell.EXECUTOR.execute {
+                        try {
+                            val shell = Shell.getShell()
+                            if (shell.isRoot) {
+                                shell.execTask(task)
+                            } else {
+                                continuation.resumeWithException(
+                                    IOException("permission denied")
+                                )
+                            }
+                        } catch (e: Exception) {
+                            continuation.resumeWithException(e)
+                        }
+                    }
+                }
 
                 continuation.invokeOnCancellation {
                     RootService.unbind(conn)

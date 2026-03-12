@@ -136,7 +136,7 @@ public class ParceledListSlice<T extends Parcelable> implements Parcelable {
       new Parcelable.ClassLoaderCreator<ParceledListSlice>() {
         @Override
         public ParceledListSlice createFromParcel(Parcel in) {
-          return new ParceledListSlice(in, null);
+          return new ParceledListSlice(in, ParceledListSlice.class.getClassLoader());
         }
 
         @Override
