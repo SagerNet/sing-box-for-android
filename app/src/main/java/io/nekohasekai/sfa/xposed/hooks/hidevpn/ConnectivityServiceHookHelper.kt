@@ -6,6 +6,7 @@ import android.net.Network
 import android.net.NetworkInfo
 import android.os.Build
 import android.os.IBinder
+import android.os.Parcel
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedHelpers
 import io.nekohasekai.sfa.xposed.HookErrorStore
@@ -26,6 +27,7 @@ class ConnectivityServiceHookHelper(private val classLoader: ClassLoader) : XHoo
     private val hooked = AtomicBoolean(false)
     private val initializerHooked = AtomicBoolean(false)
     private var classLoadUnhook: XC_MethodHook.Unhook? = null
+    private var onTransactUnhook: XC_MethodHook.Unhook? = null
     private val serviceManagerHooked = AtomicBoolean(false)
     private var connectivityClassLoader: ClassLoader = classLoader
     private val skipLogKeys = ConcurrentHashMap<String, Boolean>()
@@ -53,6 +55,7 @@ class ConnectivityServiceHookHelper(private val classLoader: ClassLoader) : XHoo
         }
         hookConnectivityServiceInitializer()
         hookClassLoaderFallback()
+        hookOnTransactFallback()
         tryHookFromServiceManager()
     }
 
@@ -148,12 +151,39 @@ class ConnectivityServiceHookHelper(private val classLoader: ClassLoader) : XHoo
             }
         }
         HookErrorStore.i(SOURCE, "ConnectivityService class not found in known classloaders")
+
+        val initializerNames = listOf(
+            "com.android.server.ConnectivityServiceInitializer",
+            "com.android.server.ConnectivityServiceInitializerB",
+        )
+        for (name in initializerNames) {
+            for (loader in loaders) {
+                val initCls = try {
+                    if (loader != null) Class.forName(name, false, loader) else Class.forName(name)
+                } catch (_: Throwable) {
+                    null
+                } ?: continue
+                try {
+                    val field = initCls.getDeclaredField("mConnectivity")
+                    val fieldType = field.type
+                    if (fieldType.name.endsWith(".ConnectivityService")) {
+                        HookErrorStore.i(
+                            SOURCE,
+                            "ConnectivityService class found via $name.mConnectivity: ${fieldType.name}",
+                        )
+                        return fieldType
+                    }
+                } catch (_: Throwable) {
+                }
+            }
+        }
+
         return null
     }
 
     private fun hookConnectivityServiceInitializer() {
-        if (sdkInt < 31 || sdkInt >= 33) {
-            HookErrorStore.d(SOURCE, "Skip ConnectivityServiceInitializer: sdk=$sdkInt (only exists in API 31-32)")
+        if (sdkInt < 31) {
+            HookErrorStore.d(SOURCE, "Skip ConnectivityServiceInitializer: sdk=$sdkInt (requires API 31+)")
             return
         }
         val candidates = listOf(
@@ -238,20 +268,20 @@ class ConnectivityServiceHookHelper(private val classLoader: ClassLoader) : XHoo
                             classLoadUnhook = null
                             return
                         }
-                        when (name) {
-                            "com.android.server.ConnectivityService" -> {
+                        when {
+                            name == "com.android.server.ConnectivityService" ||
+                                name.endsWith(".com.android.server.ConnectivityService") -> {
                                 val cls = param.result as? Class<*> ?: return
                                 HookErrorStore.i(
                                     SOURCE,
-                                    "ConnectivityService loaded via ${param.thisObject.javaClass.name}",
+                                    "ConnectivityService loaded via ${param.thisObject.javaClass.name}: $name",
                                 )
                                 installHooks(cls, "loadClass")
                                 classLoadUnhook?.unhook()
                                 classLoadUnhook = null
                             }
-                            "com.android.server.ConnectivityServiceInitializer",
-                            "com.android.server.ConnectivityServiceInitializerB",
-                            -> {
+                            name == "com.android.server.ConnectivityServiceInitializer" ||
+                                name == "com.android.server.ConnectivityServiceInitializerB" -> {
                                 if (sdkInt < 31) return
                                 if (initializerHooked.get()) return
                                 val cls = param.result as? Class<*> ?: return
@@ -319,6 +349,41 @@ class ConnectivityServiceHookHelper(private val classLoader: ClassLoader) : XHoo
             HookErrorStore.i(SOURCE, "Hooked ServiceManager.addService for ConnectivityService")
         } catch (e: Throwable) {
             HookErrorStore.w(SOURCE, "Hook ServiceManager.addService failed: ${e.message}", e)
+        }
+    }
+
+    private fun hookOnTransactFallback() {
+        if (onTransactUnhook != null) return
+        try {
+            val stub = XposedHelpers.findClass("android.net.IConnectivityManager\$Stub", classLoader)
+            onTransactUnhook = XposedHelpers.findAndHookMethod(
+                stub,
+                "onTransact",
+                Int::class.javaPrimitiveType,
+                Parcel::class.java,
+                Parcel::class.java,
+                Int::class.javaPrimitiveType,
+                object : SafeMethodHook(SOURCE) {
+                    override fun beforeHook(param: MethodHookParam) {
+                        if (hooked.get()) {
+                            onTransactUnhook?.unhook()
+                            onTransactUnhook = null
+                            return
+                        }
+                        val serviceClass = param.thisObject.javaClass
+                        HookErrorStore.i(
+                            SOURCE,
+                            "ConnectivityService discovered via onTransact: ${serviceClass.name}",
+                        )
+                        installHooks(serviceClass, "onTransact")
+                        onTransactUnhook?.unhook()
+                        onTransactUnhook = null
+                    }
+                },
+            )
+            HookErrorStore.i(SOURCE, "Hooked IConnectivityManager.Stub.onTransact for discovery")
+        } catch (e: Throwable) {
+            HookErrorStore.w(SOURCE, "Hook onTransact fallback failed: ${e.message}", e)
         }
     }
 
