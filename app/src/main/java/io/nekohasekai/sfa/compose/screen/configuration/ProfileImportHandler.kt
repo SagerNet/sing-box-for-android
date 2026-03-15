@@ -241,8 +241,9 @@ class ProfileImportHandler(private val context: Context) {
         }
 
         // Save config file
+        val fileID = ProfileManager.nextFileID()
         val configDirectory = File(context.filesDir, "configs").also { it.mkdirs() }
-        val configFile = File(configDirectory, "${profile.userOrder}.json")
+        val configFile = File(configDirectory, "$fileID.json")
         configFile.writeText(content.config)
         typedProfile.path = configFile.path
 
@@ -268,8 +269,9 @@ class ProfileImportHandler(private val context: Context) {
             }
 
         // Create empty config file for remote profile
+        val fileID = ProfileManager.nextFileID()
         val configDirectory = File(context.filesDir, "configs").also { it.mkdirs() }
-        val configFile = File(configDirectory, "${profile.userOrder}.json")
+        val configFile = File(configDirectory, "$fileID.json")
         configFile.writeText("{}")
         typedProfile.path = configFile.path
 
@@ -370,8 +372,9 @@ class ProfileImportHandler(private val context: Context) {
                 }
 
             // Save the configuration file
+            val fileID = ProfileManager.nextFileID()
             val configDirectory = File(context.filesDir, "configs").also { it.mkdirs() }
-            val configFile = File(configDirectory, "${profile.userOrder}.json")
+            val configFile = File(configDirectory, "$fileID.json")
             configFile.writeText(jsonContent)
             typedProfile.path = configFile.path
 
