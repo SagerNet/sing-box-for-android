@@ -79,7 +79,7 @@ fun EditProfileScreen(
     profileId: Long,
     onNavigateBack: () -> Unit,
     onNavigateToIconSelection: (currentIconId: String?) -> Unit = {},
-    onNavigateToEditContent: (profileName: String, isReadOnly: Boolean) -> Unit = { _, _ -> },
+    onNavigateToEditContent: (isReadOnly: Boolean) -> Unit = {},
     viewModel: EditProfileViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -473,7 +473,6 @@ fun EditProfileScreen(
                                 .clip(RoundedCornerShape(12.dp))
                                 .clickable {
                                     onNavigateToEditContent(
-                                        uiState.name,
                                         uiState.profileType == TypedProfile.Type.Remote,
                                     )
                                 },
