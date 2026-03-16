@@ -1,7 +1,5 @@
 package io.nekohasekai.sfa.compose.screen.settings
 
-import android.os.Build
-import android.os.PowerManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -37,10 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -70,15 +65,8 @@ fun SettingsScreen(navController: NavController) {
     val hookStatus by HookStatusClient.status.collectAsState()
     val hasPendingPrivilegeDowngrade = HookModuleUpdateNotifier.isDowngrade(hookStatus)
     val hasPendingPrivilegeUpdate = HookModuleUpdateNotifier.isUpgrade(hookStatus)
-    var isBatteryOptimizationIgnored by remember { mutableStateOf(true) }
-
     LaunchedEffect(Unit) {
         HookStatusClient.refresh()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val pm = context.getSystemService(PowerManager::class.java)
-            isBatteryOptimizationIgnored =
-                pm?.isIgnoringBatteryOptimizations(context.packageName) == true
-        }
     }
 
     Column(
@@ -153,31 +141,26 @@ fun SettingsScreen(navController: NavController) {
                     ),
                 )
 
-                if (!isBatteryOptimizationIgnored) {
-                    ListItem(
-                        headlineContent = {
-                            Text(
-                                stringResource(R.string.service),
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-                        },
-                        leadingContent = {
-                            Icon(
-                                imageVector = Icons.Outlined.Tune,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                            )
-                        },
-                        trailingContent = {
-                            Badge(containerColor = MaterialTheme.colorScheme.primary)
-                        },
-                        modifier = Modifier.clickable { navController.navigate("settings/service") },
-                        colors =
-                        ListItemDefaults.colors(
-                            containerColor = Color.Transparent,
-                        ),
-                    )
-                }
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            stringResource(R.string.service),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    },
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Outlined.Tune,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    },
+                    modifier = Modifier.clickable { navController.navigate("settings/service") },
+                    colors =
+                    ListItemDefaults.colors(
+                        containerColor = Color.Transparent,
+                    ),
+                )
 
                 ListItem(
                     headlineContent = {

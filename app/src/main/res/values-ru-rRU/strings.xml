@@ -204,6 +204,9 @@
     <string name="dynamic_notification">Отображать скорость в реальном времени в уведомлении</string>
     <string name="disable_notification_description">Из-за ограничений Android необходимо сначала предоставить разрешение на уведомления, а затем отключить категорию уведомлений в настройках.</string>
     <string name="disable_notification_description_legacy">Из-за ограничений Android необходимо сначала предоставить разрешение на уведомления, а затем отключить уведомления в сведениях о приложении.</string>
+    <string name="allow_bypass">Разрешить обход VPN</string>
+    <string name="allow_bypass_description">Если включено, приложения могут обойти это VPN-соединение и использовать базовую сеть напрямую.</string>
+    <string name="android_documentation">Документация Android</string>
     <string name="auto_redirect">Автоматическое перенаправление</string>
     <string name="auto_redirect_description">Требуются права ROOT</string>
     <string name="system_http_proxy">Системный HTTP-прокси</string>

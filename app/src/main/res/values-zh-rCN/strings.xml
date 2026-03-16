@@ -206,6 +206,9 @@
     <string name="dynamic_notification">在通知中显示实时网速</string>
     <string name="disable_notification_description">由于 Android 限制，您需要先授权通知权限，然后前往系统设置中关闭通知类别。</string>
     <string name="disable_notification_description_legacy">由于 Android 限制，您需要先授权通知权限，然后前往应用信息中关闭通知。</string>
+    <string name="allow_bypass">允许绕过 VPN</string>
+    <string name="allow_bypass_description">启用后，应用可以绕过此 VPN 连接，直接使用底层网络。</string>
+    <string name="android_documentation">Android 文档</string>
     <string name="auto_redirect">自动重定向</string>
     <string name="auto_redirect_description">需要 ROOT 权限</string>
     <string name="system_http_proxy">系统 HTTP 代理</string>

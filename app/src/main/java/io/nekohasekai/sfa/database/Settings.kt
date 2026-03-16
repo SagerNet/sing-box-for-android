@@ -96,6 +96,7 @@ object Settings {
         perAppProxyList
     }
 
+    var allowBypass by dataStore.boolean(SettingsKey.ALLOW_BYPASS) { false }
     var systemProxyEnabled by dataStore.boolean(SettingsKey.SYSTEM_PROXY_ENABLED) { true }
 
     var privilegeSettingsEnabled by dataStore.boolean(SettingsKey.PRIVILEGE_SETTINGS_ENABLED) { false }

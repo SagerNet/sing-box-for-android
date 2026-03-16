@@ -206,6 +206,9 @@
     <string name="dynamic_notification">Display realtime speed in notification</string>
     <string name="disable_notification_description">Due to Android restrictions, you must first grant notification permission, then go to Settings to disable the notification category.</string>
     <string name="disable_notification_description_legacy">Due to Android restrictions, you must first grant notification permission, then go to App Info to disable notifications.</string>
+    <string name="allow_bypass">Allow Bypass</string>
+    <string name="allow_bypass_description">If enabled, applications can bypass this VPN connection and instead use the underlying network directly.</string>
+    <string name="android_documentation">Android Documentation</string>
     <string name="auto_redirect">Auto Redirect</string>
     <string name="auto_redirect_description">ROOT permission required</string>
     <string name="system_http_proxy">System HTTP Proxy</string>

@@ -204,6 +204,9 @@
     <string name="dynamic_notification">نمایش سرعت بلادرنگ در اعلان</string>
     <string name="disable_notification_description">به دلیل محدودیت‌های اندروید، ابتدا باید مجوز اعلان را بدهید، سپس دسته‌بندی اعلان را در تنظیمات غیرفعال کنید.</string>
     <string name="disable_notification_description_legacy">به دلیل محدودیت‌های اندروید، ابتدا باید مجوز اعلان را بدهید، سپس اعلان‌ها را در اطلاعات برنامه غیرفعال کنید.</string>
+    <string name="allow_bypass">اجازه دور زدن VPN</string>
+    <string name="allow_bypass_description">در صورت فعال بودن، برنامه‌ها می‌توانند این اتصال VPN را دور بزنند و مستقیماً از شبکه اصلی استفاده کنند.</string>
+    <string name="android_documentation">مستندات Android</string>
     <string name="auto_redirect">تغییر مسیر خودکار</string>
     <string name="auto_redirect_description">نیازمند دسترسی ROOT</string>
     <string name="system_http_proxy">پراکسی HTTP سیستم</string>

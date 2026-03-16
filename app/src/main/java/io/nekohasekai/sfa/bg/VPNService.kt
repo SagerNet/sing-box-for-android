@@ -66,6 +66,10 @@ class VPNService :
             builder.setMetered(false)
         }
 
+        if (Settings.allowBypass) {
+            builder.allowBypass()
+        }
+
         val inet4Address = options.inet4Address
         while (inet4Address.hasNext()) {
             val address = inet4Address.next()
