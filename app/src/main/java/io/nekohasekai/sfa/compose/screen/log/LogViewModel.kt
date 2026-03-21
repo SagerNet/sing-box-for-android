@@ -81,15 +81,19 @@ class LogViewModel :
 
     override fun setDefaultLogLevel(level: Int) {
         val logLevel = LogLevel.entries.find { it.priority == level } ?: error("Unknown log level: $level")
-        _uiState.update { it.copy(defaultLogLevel = logLevel) }
-        updateDisplayedLogs()
+        viewModelScope.launch(Dispatchers.Main) {
+            _uiState.update { it.copy(defaultLogLevel = logLevel) }
+            updateDisplayedLogs()
+        }
     }
 
     override fun clearLogs() {
-        allLogs.clear()
-        bufferedLogs.clear()
-        _uiState.update { it.copy(isPaused = false) }
-        updateDisplayedLogs()
+        viewModelScope.launch(Dispatchers.Main) {
+            allLogs.clear()
+            bufferedLogs.clear()
+            _uiState.update { it.copy(isPaused = false) }
+            updateDisplayedLogs()
+        }
     }
 
     override fun requestClearLogs() {
@@ -104,23 +108,25 @@ class LogViewModel :
 
     override fun appendLogs(message: List<LogEntry>) {
         val processedLogs = message.map { processLogEntry(it) }
-        if (_uiState.value.isPaused) {
-            bufferedLogs.addAll(processedLogs)
-        } else {
-            val totalSize = allLogs.size + processedLogs.size
-            val removeCount = (totalSize - maxLines).coerceAtLeast(0)
+        viewModelScope.launch(Dispatchers.Main) {
+            if (_uiState.value.isPaused) {
+                bufferedLogs.addAll(processedLogs)
+            } else {
+                val totalSize = allLogs.size + processedLogs.size
+                val removeCount = (totalSize - maxLines).coerceAtLeast(0)
 
-            if (removeCount > 0) {
-                repeat(removeCount) {
-                    allLogs.removeFirst()
+                if (removeCount > 0) {
+                    repeat(removeCount) {
+                        allLogs.removeFirst()
+                    }
                 }
-            }
 
-            allLogs.addAll(processedLogs)
-            updateDisplayedLogs()
+                allLogs.addAll(processedLogs)
+                updateDisplayedLogs()
 
-            if (_autoScrollEnabled.value && !_uiState.value.isPaused && !_uiState.value.isSearchActive) {
-                scrollToBottom()
+                if (_autoScrollEnabled.value && !_uiState.value.isPaused && !_uiState.value.isSearchActive) {
+                    scrollToBottom()
+                }
             }
         }
     }
