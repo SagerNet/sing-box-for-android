@@ -6,7 +6,7 @@ import io.nekohasekai.libbox.Connection as LibboxConnection
 import io.nekohasekai.libbox.ProcessInfo as LibboxProcessInfo
 
 @Immutable
-data class ProcessInfo(val processId: Long, val userId: Int, val userName: String, val processPath: String, val packageName: String) {
+data class ProcessInfo(val processId: Long, val userId: Int, val userName: String, val processPath: String, val packageNames: List<String>) {
     companion object {
         fun from(processInfo: LibboxProcessInfo?): ProcessInfo? {
             if (processInfo == null) return null
@@ -15,7 +15,7 @@ data class ProcessInfo(val processId: Long, val userId: Int, val userName: Strin
                 userId = processInfo.userID,
                 userName = processInfo.userName ?: "",
                 processPath = processInfo.processPath ?: "",
-                packageName = processInfo.packageName ?: "",
+                packageNames = processInfo.packageNames()?.toList() ?: emptyList(),
             )
         }
     }
@@ -66,7 +66,7 @@ data class Connection(
         domain.contains(content, ignoreCase = true) ||
         outbound.contains(content, ignoreCase = true) ||
         rule.contains(content, ignoreCase = true) ||
-        processInfo?.packageName?.contains(content, ignoreCase = true) == true
+        processInfo?.packageNames?.any { it.contains(content, ignoreCase = true) } == true
 
     private fun performSearchType(type: String, value: String): Boolean = when (type) {
         "network" -> network.equals(value, ignoreCase = true)
@@ -79,7 +79,7 @@ data class Connection(
         "rule" -> rule.contains(value, ignoreCase = true)
         "protocol" -> protocolName.equals(value, ignoreCase = true)
         "user" -> user.contains(value, ignoreCase = true)
-        "package" -> processInfo?.packageName?.contains(value, ignoreCase = true) == true
+        "package" -> processInfo?.packageNames?.any { it.contains(value, ignoreCase = true) } == true
         "chain" -> chain.any { it.contains(value, ignoreCase = true) }
         else -> false
     }

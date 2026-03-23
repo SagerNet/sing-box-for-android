@@ -247,7 +247,7 @@ fun ConnectionDetailsScreen(
         }
 
         connection.processInfo?.let { processInfo ->
-            if (processInfo.packageName.isNotEmpty() ||
+            if (processInfo.packageNames.isNotEmpty() ||
                 processInfo.processPath.isNotEmpty() ||
                 processInfo.processId > 0
             ) {
@@ -282,10 +282,10 @@ fun ConnectionDetailsScreen(
                             monospace = true,
                         )
                     }
-                    if (processInfo.packageName.isNotEmpty()) {
+                    if (processInfo.packageNames.isNotEmpty()) {
                         DetailRow(
                             label = stringResource(R.string.connection_package_name),
-                            value = processInfo.packageName,
+                            value = processInfo.packageNames.joinToString(", "),
                             monospace = true,
                         )
                     }

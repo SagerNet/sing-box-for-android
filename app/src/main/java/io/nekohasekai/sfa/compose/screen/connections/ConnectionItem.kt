@@ -82,7 +82,7 @@ private fun rememberAppInfo(packageName: String): AppInfo? {
 @Composable
 fun ConnectionItem(connection: Connection, onClick: () -> Unit, onClose: () -> Unit, modifier: Modifier = Modifier) {
     var showContextMenu by remember { mutableStateOf(false) }
-    val packageName = connection.processInfo?.packageName?.takeIf { it.isNotEmpty() }
+    val packageName = connection.processInfo?.packageNames?.firstOrNull()
     val appInfo = packageName?.let { rememberAppInfo(it) }
 
     Box(modifier = modifier) {

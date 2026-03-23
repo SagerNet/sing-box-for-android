@@ -58,7 +58,7 @@ interface PlatformInterfaceWrapper : PlatformInterface {
             val owner = ConnectionOwner()
             owner.userId = uid
             owner.userName = packages?.firstOrNull() ?: ""
-            owner.androidPackageName = packages?.firstOrNull() ?: ""
+            owner.setAndroidPackageNames(StringArray(packages?.toList()?.iterator() ?: emptyList<String>().iterator()))
             return owner
         } catch (e: Exception) {
             Log.e("PlatformInterface", "getConnectionOwnerUid", e)
