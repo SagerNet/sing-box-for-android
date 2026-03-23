@@ -162,7 +162,6 @@ class BoxService(private val service: Service, private val platformInterface: Pl
                         android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
                     }
                 if (!service.hasPermission(wifiPermission)) {
-                    closeService()
                     stopAndAlert(Alert.RequestLocationPermission)
                     return
                 }
@@ -243,7 +242,6 @@ class BoxService(private val service: Service, private val platformInterface: Pl
                     android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
                 }
             if (!service.hasPermission(wifiPermission)) {
-                closeService()
                 stopAndAlert(Alert.RequestLocationPermission)
                 return
             }
@@ -311,6 +309,16 @@ class BoxService(private val service: Service, private val platformInterface: Pl
 
     private suspend fun stopAndAlert(type: Alert, message: String? = null) {
         Settings.startedByUser = false
+        val pfd = fileDescriptor
+        if (pfd != null) {
+            pfd.close()
+            fileDescriptor = null
+        }
+        DefaultNetworkMonitor.stop()
+        if (::commandServer.isInitialized) {
+            closeService()
+            commandServer.close()
+        }
         withContext(Dispatchers.Main) {
             if (receiverRegistered) {
                 service.unregisterReceiver(receiver)
@@ -321,6 +329,7 @@ class BoxService(private val service: Service, private val platformInterface: Pl
                 callback.onServiceAlert(type.ordinal, message)
             }
             status.value = Status.Stopped
+            service.stopSelf()
         }
     }
 

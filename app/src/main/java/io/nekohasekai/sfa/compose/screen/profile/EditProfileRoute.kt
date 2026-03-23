@@ -1,5 +1,6 @@
 package io.nekohasekai.sfa.compose.screen.profile
 
+import android.net.Uri
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
@@ -10,7 +11,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import android.net.Uri
 import androidx.navigation.navArgument
 
 @Composable
