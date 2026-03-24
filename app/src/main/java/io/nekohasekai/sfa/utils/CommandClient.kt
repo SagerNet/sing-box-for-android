@@ -100,7 +100,12 @@ open class CommandClient(
         }
         options.statusInterval = 1 * 1000 * 1000 * 1000
         val commandClient = CommandClient(clientHandler, options)
-        commandClient.connect()
+        try {
+            commandClient.connect()
+        } catch (e: Exception) {
+            Log.d("CommandClient", "connect failed", e)
+            return
+        }
         this.commandClient = commandClient
     }
 
