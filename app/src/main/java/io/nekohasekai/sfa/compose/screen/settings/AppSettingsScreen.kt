@@ -47,6 +47,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -261,10 +262,22 @@ fun AppSettingsScreen(navController: NavController) {
                             color = MaterialTheme.colorScheme.error,
                         )
                     } else {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            CircularProgressIndicator(modifier = Modifier.size(24.dp))
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Text(stringResource(R.string.downloading))
+                        val progress by UpdateState.downloadProgress
+                        Column {
+                            if (progress != null) {
+                                Text("${stringResource(R.string.downloading)} ${(progress!! * 100).toInt()}%")
+                            } else {
+                                Text(stringResource(R.string.downloading))
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            if (progress != null) {
+                                LinearProgressIndicator(
+                                    progress = { progress!! },
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
+                            } else {
+                                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                            }
                         }
                     }
                 }
@@ -276,6 +289,7 @@ fun AppSettingsScreen(navController: NavController) {
                         downloadJob = null
                         showDownloadDialog = false
                         downloadError = null
+                        UpdateState.downloadProgress.value = null
                     },
                 ) {
                     Text(stringResource(if (downloadError != null) R.string.ok else android.R.string.cancel))

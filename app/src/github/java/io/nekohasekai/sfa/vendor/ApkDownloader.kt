@@ -1,5 +1,6 @@
 package io.nekohasekai.sfa.vendor
 
+import io.nekohasekai.libbox.HTTPResponseWriteToProgressHandler
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.update.UpdateState
@@ -27,7 +28,15 @@ class ApkDownloader : Closeable {
         request.setURL(url)
 
         val response = request.execute()
-        response.writeTo(apkFile.absolutePath)
+        response.writeToWithProgress(
+            apkFile.absolutePath,
+            object : HTTPResponseWriteToProgressHandler {
+                override fun update(progress: Long, total: Long) {
+                    UpdateState.downloadProgress.value =
+                        if (total > 0) progress.toFloat() / total.toFloat() else null
+                }
+            },
+        )
 
         if (!apkFile.exists() || apkFile.length() == 0L) {
             throw Exception("Download failed: empty file")

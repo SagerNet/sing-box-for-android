@@ -11,6 +11,7 @@ object UpdateState {
     val isChecking = mutableStateOf(false)
 
     val isDownloading = mutableStateOf(false)
+    val downloadProgress = mutableStateOf<Float?>(null)
     val downloadError = mutableStateOf<String?>(null)
 
     val cachedApkFile = mutableStateOf<File?>(null)
@@ -38,6 +39,7 @@ object UpdateState {
         hasUpdate.value = false
         updateInfo.value = null
         isDownloading.value = false
+        downloadProgress.value = null
         downloadError.value = null
         installStatus.value = InstallStatus.Idle
         cachedApkFile.value = null
@@ -46,6 +48,7 @@ object UpdateState {
 
     fun resetDownload() {
         isDownloading.value = false
+        downloadProgress.value = null
         downloadError.value = null
     }
 
