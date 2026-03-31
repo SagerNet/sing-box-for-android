@@ -1,0 +1,156 @@
+name: Build SFA arm64-v8a APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: 'APK 版本号 (例如: 1.13.3)'
+        required: true
+        default: '1.13.5'
+
+jobs:
+  build-libbox:
+    name: Build libbox.aar
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Lobs1994/sing-box
+        uses: actions/checkout@v4
+        with:
+          repository: Lobs1994/sing-box
+          ref: testing
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install NDK 28.0.13004108
+        run: |
+          sdkmanager --install "ndk;28.0.13004108"
+          echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/28.0.13004108" >> $GITHUB_ENV
+
+      - name: Install gomobile
+        run: |
+          go install github.com/sagernet/gomobile/cmd/gomobile@latest
+          go install github.com/sagernet/gomobile/cmd/gobind@latest
+
+      - name: Build libbox.aar
+        run: go run ./cmd/internal/build_libbox -target android
+
+      - name: 验证产物
+        run: ls -lh libbox.aar libbox-sources.jar
+
+      - name: Upload libbox.aar
+        uses: actions/upload-artifact@v4
+        with:
+          name: libbox-aar
+          path: |
+            libbox.aar
+            libbox-sources.jar
+          retention-days: 1
+
+  build-apk:
+    name: Build SFA APK
+    runs-on: ubuntu-latest
+    needs: build-libbox
+
+    steps:
+      - name: Checkout Lobs1994/sing-box-for-android
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install NDK 28.0.13004108
+        run: |
+          sdkmanager --install "ndk;28.0.13004108"
+          echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/28.0.13004108" >> $GITHUB_ENV
+          echo "ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/28.0.13004108" >> $GITHUB_ENV
+
+      - name: Download libbox.aar → app/libs/
+        uses: actions/download-artifact@v4
+        with:
+          name: libbox-aar
+          path: app/libs/
+
+      - name: Update version.properties
+        run: |
+          VERSION=${{ github.event.inputs.version_name }}
+          sed -i "s/^VERSION_NAME=.*/VERSION_NAME=${VERSION}/" version.properties
+
+      - name: Restore keystore from Secret
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > app/release.keystore
+          ls -lh app/release.keystore
+
+      - name: Setup local.properties
+        run: |
+          printf 'sdk.dir=%s\n' "$ANDROID_SDK_ROOT" > local.properties
+          printf 'KEYSTORE_PASS=android123\n' >> local.properties
+          printf 'ALIAS_NAME=mykey\n' >> local.properties
+          printf 'ALIAS_PASS=android123\n' >> local.properties
+
+      - name: Patch gradle.properties
+        run: |
+          printf 'ksp.incremental=false\n' >> gradle.properties
+          printf 'ksp.incremental.intermodule=false\n' >> gradle.properties
+          printf 'org.gradle.parallel=false\n' >> gradle.properties
+          printf 'org.gradle.workers.max=1\n' >> gradle.properties
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle-
+
+      - name: Grant gradlew permission
+        run: chmod +x gradlew
+
+      - name: Build APK
+        run: |
+          ./gradlew :app:assembleOtherRelease \
+            -Pandroid.injected.testOnly=false \
+            --no-daemon \
+            --no-configuration-cache \
+            --stacktrace
+
+      - name: 列出所有产物
+        run: find app/build/outputs/apk -name "*.apk" | sort
+
+      - name: 提取 arm64-v8a APK 并重命名
+        run: |
+          VERSION=${{ github.event.inputs.version_name }}
+          APK=$(find app/build/outputs/apk/other/release -name "*arm64-v8a*.apk" | head -1)
+          echo "找到 APK: $APK"
+          cp "$APK" "SFA-${VERSION}-arm64-v8a.apk"
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SFA-${{ github.event.inputs.version_name }}-arm64-v8a
+          path: SFA-*.apk
+          retention-days: 30
