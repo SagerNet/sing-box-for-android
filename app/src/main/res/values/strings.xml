@@ -23,6 +23,8 @@
     <string name="action">Action</string>
     <string name="action_start">Start</string>
     <string name="action_deselect">Deselect</string>
+    <string name="action_reload">Reload</string>
+    <string name="action_restart">Restart</string>
     <string name="expand">Expand</string>
     <string name="collapse">Collapse</string>
     <string name="expand_all">Expand All</string>
@@ -422,6 +424,40 @@
     <string name="content_description_pause_logs">Pause logs</string>
     <string name="content_description_collapse_search">Collapse search</string>
     <string name="content_description_search_logs">Search logs</string>
+
+    <!-- Tools -->
+    <string name="title_tools">Tools</string>
+
+    <!-- Shared Report -->
+    <string name="report_empty">Empty</string>
+    <string name="report_section_reports">Reports</string>
+    <string name="report_section_files">Files</string>
+    <string name="report_delete_all">Delete All</string>
+    <string name="report_delete">Delete</string>
+    <string name="report_share">Share</string>
+    <string name="report_share_with_config">Share With Configuration</string>
+    <string name="report_metadata">Metadata</string>
+    <string name="report_configuration">Configuration</string>
+    <string name="report_origin_local">Local</string>
+    <string name="service_not_started">Service not started</string>
+    <string name="service_reload_required">Reload service to apply changes</string>
+    <string name="service_restart_required">Restart service to apply changes</string>
+
+    <!-- Crash Report -->
+    <string name="crash_report">Crash Report</string>
+    <string name="crash_report_go_log">Go Crash Log</string>
+    <string name="crash_report_jvm_log">JVM Crash Log</string>
+    <string name="crash_report_description">You will receive a report when a crash occurs.</string>
+
+    <!-- OOM Report -->
+    <string name="oom_report">OOM Report</string>
+    <string name="oom_report_description">When memory limit is enabled, you will receive a report if the service memory exceeds the limit. You can also manually trigger report collection.</string>
+    <string name="oom_report_fetch">Fetch Memory Report</string>
+    <string name="oom_report_enable_memory_limit">Enable Memory Limit</string>
+    <string name="oom_report_enable_memory_limit_description">Provide a soft memory limit for the service. The service will perform multiple processes to try to stay within this memory limit.</string>
+    <string name="oom_report_memory_limit">Memory Limit</string>
+    <string name="oom_report_kill_connections">Kill Connections</string>
+    <string name="oom_report_kill_connections_description">Kill all connections to free memory when the service memory exceeds the limit.</string>
 
     <!-- Xposed Module -->
     <string name="xposed_description">Privileged Enhancement for sing-box</string>

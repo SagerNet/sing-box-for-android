@@ -405,6 +405,37 @@
     <string name="content_description_collapse_search">جمع کردن جستجو</string>
     <string name="content_description_search_logs">جستجوی لاگ‌ها</string>
 
+    <!-- Tools -->
+    <string name="title_tools">ابزارها</string>
+
+    <!-- Shared Report -->
+    <string name="report_empty">خالی</string>
+    <string name="report_section_reports">گزارش‌ها</string>
+    <string name="report_section_files">فایل‌ها</string>
+    <string name="report_delete_all">حذف همه</string>
+    <string name="report_delete">حذف</string>
+    <string name="report_share">اشتراک‌گذاری</string>
+    <string name="report_share_with_config">اشتراک‌گذاری با پیکربندی</string>
+    <string name="report_metadata">فراداده</string>
+    <string name="report_configuration">پیکربندی</string>
+    <string name="report_origin_local">محلی</string>
+    <string name="service_not_started">سرویس شروع نشده است</string>
+
+    <!-- Crash Report -->
+    <string name="crash_report">گزارش خرابی</string>
+    <string name="crash_report_go_log">Go Crash Log</string>
+    <string name="crash_report_jvm_log">JVM Crash Log</string>
+
+    <!-- OOM Report -->
+    <string name="oom_report">گزارش کمبود حافظه</string>
+    <string name="oom_report_description">هنگامی که محدودیت حافظه فعال است، در صورت تجاوز حافظه سرویس از حد مجاز، گزارشی دریافت خواهید کرد. همچنین می‌توانید جمع‌آوری گزارش را به صورت دستی فعال کنید.</string>
+    <string name="oom_report_fetch">دریافت گزارش حافظه</string>
+    <string name="oom_report_enable_memory_limit">فعال‌سازی محدودیت حافظه</string>
+    <string name="oom_report_enable_memory_limit_description">یک محدودیت نرم حافظه برای سرویس تعیین کنید. سرویس چندین فرآیند را انجام خواهد داد تا سعی کند در محدوده این محدودیت حافظه باقی بماند.</string>
+    <string name="oom_report_memory_limit">محدودیت حافظه</string>
+    <string name="oom_report_kill_connections">قطع اتصالات</string>
+    <string name="oom_report_kill_connections_description">هنگام تجاوز حافظه سرویس از حد مجاز، تمام اتصالات را برای آزادسازی حافظه قطع کنید.</string>
+
     <!-- Xposed Module -->
     <string name="xposed_description">بهبود دسترسی ویژه برای sing-box</string>
 
