@@ -33,6 +33,15 @@ import io.nekohasekai.sfa.compose.screen.settings.PrivilegeSettingsScreen
 import io.nekohasekai.sfa.compose.screen.settings.ProfileOverrideScreen
 import io.nekohasekai.sfa.compose.screen.settings.ServiceSettingsScreen
 import io.nekohasekai.sfa.compose.screen.settings.SettingsScreen
+import io.nekohasekai.sfa.compose.screen.tools.CrashReportDetailScreen
+import io.nekohasekai.sfa.compose.screen.tools.CrashReportFileContentScreen
+import io.nekohasekai.sfa.compose.screen.tools.CrashReportListScreen
+import io.nekohasekai.sfa.compose.screen.tools.CrashReportMetadataScreen
+import io.nekohasekai.sfa.compose.screen.tools.OOMReportDetailScreen
+import io.nekohasekai.sfa.compose.screen.tools.OOMReportFileContentScreen
+import io.nekohasekai.sfa.compose.screen.tools.OOMReportListScreen
+import io.nekohasekai.sfa.compose.screen.tools.OOMReportMetadataScreen
+import io.nekohasekai.sfa.compose.screen.tools.ToolsScreen
 import io.nekohasekai.sfa.constant.Status
 
 private val slideInFromRight: AnimatedContentTransitionScope<*>.() -> androidx.compose.animation.EnterTransition = {
@@ -210,6 +219,111 @@ fun SFANavHost(
             }
         }
 
+        composable(Screen.Tools.route) {
+            ToolsScreen(navController = navController)
+        }
+
+        // Tools subscreens with slide animations
+        composable(
+            route = "tools/crash_report",
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) {
+            CrashReportListScreen(navController = navController)
+        }
+
+        composable(
+            route = "tools/crash_report/{reportId}",
+            arguments = listOf(navArgument("reportId") { type = NavType.StringType }),
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) { backStackEntry ->
+            val reportId = backStackEntry.arguments?.getString("reportId") ?: return@composable
+            CrashReportDetailScreen(navController = navController, reportId = reportId)
+        }
+
+        composable(
+            route = "tools/crash_report/{reportId}/metadata",
+            arguments = listOf(navArgument("reportId") { type = NavType.StringType }),
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) { backStackEntry ->
+            val reportId = backStackEntry.arguments?.getString("reportId") ?: return@composable
+            CrashReportMetadataScreen(navController = navController, reportId = reportId)
+        }
+
+        composable(
+            route = "tools/crash_report/{reportId}/file/{fileKind}",
+            arguments = listOf(
+                navArgument("reportId") { type = NavType.StringType },
+                navArgument("fileKind") { type = NavType.StringType },
+            ),
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) { backStackEntry ->
+            val reportId = backStackEntry.arguments?.getString("reportId") ?: return@composable
+            val fileKind = backStackEntry.arguments?.getString("fileKind") ?: return@composable
+            CrashReportFileContentScreen(navController = navController, reportId = reportId, fileKind = fileKind)
+        }
+
+        composable(
+            route = "tools/oom_report",
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) {
+            OOMReportListScreen(navController = navController, serviceStatus = serviceStatus)
+        }
+
+        composable(
+            route = "tools/oom_report/{reportId}",
+            arguments = listOf(navArgument("reportId") { type = NavType.StringType }),
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) { backStackEntry ->
+            val reportId = backStackEntry.arguments?.getString("reportId") ?: return@composable
+            OOMReportDetailScreen(navController = navController, reportId = reportId)
+        }
+
+        composable(
+            route = "tools/oom_report/{reportId}/metadata",
+            arguments = listOf(navArgument("reportId") { type = NavType.StringType }),
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) { backStackEntry ->
+            val reportId = backStackEntry.arguments?.getString("reportId") ?: return@composable
+            OOMReportMetadataScreen(navController = navController, reportId = reportId)
+        }
+
+        composable(
+            route = "tools/oom_report/{reportId}/file/{fileKind}",
+            arguments = listOf(
+                navArgument("reportId") { type = NavType.StringType },
+                navArgument("fileKind") { type = NavType.StringType },
+            ),
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) { backStackEntry ->
+            val reportId = backStackEntry.arguments?.getString("reportId") ?: return@composable
+            val fileKind = backStackEntry.arguments?.getString("fileKind") ?: return@composable
+            OOMReportFileContentScreen(navController = navController, reportId = reportId, fileKind = fileKind)
+        }
+
         composable(Screen.Settings.route) {
             SettingsScreen(navController = navController)
         }
@@ -222,7 +336,7 @@ fun SFANavHost(
             popEnterTransition = slideInFromLeft,
             popExitTransition = slideOutToRight,
         ) {
-            AppSettingsScreen(navController = navController)
+            AppSettingsScreen(navController = navController, serviceStatus = serviceStatus)
         }
 
         composable(
@@ -252,7 +366,7 @@ fun SFANavHost(
             popEnterTransition = slideInFromLeft,
             popExitTransition = slideOutToRight,
         ) {
-            ServiceSettingsScreen(navController = navController)
+            ServiceSettingsScreen(navController = navController, serviceStatus = serviceStatus)
         }
 
         composable(
@@ -262,7 +376,7 @@ fun SFANavHost(
             popEnterTransition = slideInFromLeft,
             popExitTransition = slideOutToRight,
         ) {
-            ProfileOverrideScreen(navController = navController)
+            ProfileOverrideScreen(navController = navController, serviceStatus = serviceStatus)
         }
 
         composable(
@@ -272,7 +386,7 @@ fun SFANavHost(
             popEnterTransition = slideInFromLeft,
             popExitTransition = slideOutToRight,
         ) {
-            PerAppProxyScreen(onBack = { navController.navigateUp() })
+            PerAppProxyScreen(onBack = { navController.navigateUp() }, serviceStatus = serviceStatus)
         }
 
         composable(
@@ -292,7 +406,7 @@ fun SFANavHost(
             popEnterTransition = slideInFromLeft,
             popExitTransition = slideOutToRight,
         ) {
-            PrivilegeSettingsManageScreen(onBack = { navController.navigateUp() })
+            PrivilegeSettingsManageScreen(onBack = { navController.navigateUp() }, serviceStatus = serviceStatus)
         }
 
         composable(

@@ -94,6 +94,7 @@ class BoxService(private val service: Service, private val platformInterface: Pl
         }
 
     private fun startCommandServer() {
+        Application.application.reloadSetupOptions()
         val commandServer = CommandServer(this, platformInterface)
         commandServer.start()
         this.commandServer = commandServer
@@ -415,6 +416,13 @@ class BoxService(private val service: Service, private val platformInterface: Pl
             }
             Application.notification.notify(notification.typeID, builder.build())
         }
+    }
+
+    override fun triggerNativeCrash() {
+        Thread {
+            Thread.sleep(200)
+            throw RuntimeException("debug native crash")
+        }.start()
     }
 
     override fun writeDebugMessage(message: String?) {

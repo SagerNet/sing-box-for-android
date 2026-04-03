@@ -14,8 +14,11 @@ import go.Seq
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.SetupOptions
 import io.nekohasekai.sfa.bg.AppChangeReceiver
+import io.nekohasekai.sfa.bg.CrashReportManager
+import io.nekohasekai.sfa.bg.OOMReportManager
 import io.nekohasekai.sfa.bg.UpdateProfileWork
 import io.nekohasekai.sfa.constant.Bugs
+import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.utils.AppLifecycleObserver
 import io.nekohasekai.sfa.utils.HookModuleUpdateNotifier
 import io.nekohasekai.sfa.utils.HookStatusClient
@@ -69,6 +72,19 @@ class Application : Application() {
         workingDir.mkdirs()
         val tempDir = cacheDir
         tempDir.mkdirs()
+        CrashReportManager.install(tempDir, workingDir)
+        OOMReportManager.install(workingDir)
+        setupLibbox(baseDir, workingDir, tempDir)
+    }
+
+    fun reloadSetupOptions() {
+        val baseDir = filesDir
+        val workingDir = getExternalFilesDir(null) ?: return
+        val tempDir = cacheDir
+        setupLibbox(baseDir, workingDir, tempDir)
+    }
+
+    private fun setupLibbox(baseDir: File, workingDir: File, tempDir: File) {
         Libbox.setup(
             SetupOptions().also {
                 it.basePath = baseDir.path
@@ -77,9 +93,12 @@ class Application : Application() {
                 it.fixAndroidStack = Bugs.fixAndroidStack
                 it.logMaxLines = 3000
                 it.debug = BuildConfig.DEBUG
+                it.crashReportSource = "Application"
+                it.oomKillerEnabled = Settings.oomKillerEnabled
+                it.oomKillerDisabled = Settings.oomKillerDisabled
+                it.oomMemoryLimit = Settings.oomMemoryLimitMB.toLong() * 1024L * 1024L
             },
         )
-        Libbox.redirectStderr(File(workingDir, "stderr.log").path)
     }
 
     companion object {
