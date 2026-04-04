@@ -1,12 +1,16 @@
 package io.nekohasekai.sfa.xposed
 
-import io.github.libxposed.api.XposedInterface
 import io.github.libxposed.api.XposedModule
-import io.github.libxposed.api.XposedModuleInterface
+import io.github.libxposed.api.XposedModuleInterface.ModuleLoadedParam
+import io.github.libxposed.api.XposedModuleInterface.SystemServerStartingParam
 
-class XposedInit(base: XposedInterface, param: XposedModuleInterface.ModuleLoadedParam) : XposedModule(base, param) {
+class XposedInit : XposedModule() {
 
-    override fun onSystemServerLoaded(param: XposedModuleInterface.SystemServerLoadedParam) {
+    override fun onModuleLoaded(param: ModuleLoadedParam) {
+        HookErrorStore.i("XposedInit", "onModuleLoaded process=${param.processName} system=${param.isSystemServer}")
+    }
+
+    override fun onSystemServerStarting(param: SystemServerStartingParam) {
         HookInstaller.install(param.classLoader)
     }
 
