@@ -1,27 +1,25 @@
 package io.nekohasekai.sfa.xposed
 
-import android.content.Context
-import io.github.libxposed.api.XposedInterface
 import io.github.libxposed.api.XposedModule
-import io.github.libxposed.api.XposedModuleInterface
+import io.github.libxposed.api.XposedModuleInterface.ModuleLoadedParam
+import io.github.libxposed.api.XposedModuleInterface.SystemServerStartingParam
 import io.nekohasekai.sfa.xposed.hooks.HookIConnectivityManagerOnTransact
 import io.nekohasekai.sfa.xposed.hooks.hidevpn.ConnectivityServiceHookHelper
 import io.nekohasekai.sfa.xposed.hooks.hidevpn.HookNetworkCapabilitiesWriteToParcel
 import io.nekohasekai.sfa.xposed.hooks.hidevpn.HookNetworkInterfaceGetName
 import io.nekohasekai.sfa.xposed.hooks.hidevpnapp.HookPackageManagerGetInstalledPackages
 
-class XposedInit(base: XposedInterface, param: XposedModuleInterface.ModuleLoadedParam) : XposedModule(base, param) {
+class XposedInit : XposedModule() {
 
-    private val activityThreadClass by lazy { Class.forName("android.app.ActivityThread") }
-    private val currentActivityThreadMethod by lazy { activityThreadClass.getMethod("currentActivityThread") }
-    private val getSystemContextMethod by lazy { activityThreadClass.getMethod("getSystemContext") }
+    override fun onModuleLoaded(param: ModuleLoadedParam) {
+        HookErrorStore.i("XposedInit", "onModuleLoaded process=${param.processName} system=${param.isSystemServer}")
+    }
 
-    override fun onSystemServerLoaded(param: XposedModuleInterface.SystemServerLoadedParam) {
-        val systemContext = resolveSystemContext()
-        HookErrorStore.i("XposedInit", "handleSystemServerLoaded")
+    override fun onSystemServerStarting(param: SystemServerStartingParam) {
+        HookErrorStore.i("XposedInit", "handleSystemServerStarting")
         val hooks = arrayOf(
             ConnectivityServiceHookHelper(param.classLoader),
-            HookIConnectivityManagerOnTransact(param.classLoader, systemContext),
+            HookIConnectivityManagerOnTransact(param.classLoader),
             HookPackageManagerGetInstalledPackages(param.classLoader),
             HookNetworkCapabilitiesWriteToParcel(),
             HookNetworkInterfaceGetName(param.classLoader),
@@ -42,13 +40,5 @@ class XposedInit(base: XposedInterface, param: XposedModuleInterface.ModuleLoade
 
     companion object {
         const val TAG = "sing-box-lsposed"
-    }
-
-    private fun resolveSystemContext(): Context? = try {
-        val currentThread = currentActivityThreadMethod.invoke(null)
-        getSystemContextMethod.invoke(currentThread) as? Context
-    } catch (e: Throwable) {
-        HookErrorStore.e("XposedInit", "resolveSystemContext failed", e)
-        null
     }
 }
