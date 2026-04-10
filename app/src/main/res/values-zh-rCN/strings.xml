@@ -68,7 +68,7 @@
     <string name="status_started">已启动</string>
 
     <!-- Dashboard -->
-    <string name="dashboard_items">仪表项目</string>
+    <string name="dashboard_items">仪表项</string>
     <string name="memory">内存</string>
     <string name="goroutines">协程</string>
     <string name="upload">上传</string>
@@ -88,7 +88,7 @@
     <string name="search_connections">搜索连接…</string>
     <string name="close_connections_confirm">关闭所有连接？</string>
     <string name="connection_state_all">全部</string>
-    <string name="connection_state_active">活跃</string>
+    <string name="connection_state_active">活动</string>
     <string name="connection_state_closed">已关闭</string>
     <string name="connection_sort_date">日期</string>
     <string name="connection_sort_traffic">流量</string>
@@ -425,6 +425,60 @@
 
     <!-- Tools -->
     <string name="title_tools">工具</string>
+    <string name="title_network">网络</string>
+    <string name="network_quality">网络质量</string>
+    <string name="network_quality_url">URL</string>
+    <string name="network_quality_serial">串行</string>
+    <string name="network_quality_http3">HTTP/3</string>
+    <string name="network_quality_max_runtime">最大运行时间</string>
+    <string name="network_quality_max_runtime_30s">30s</string>
+    <string name="network_quality_max_runtime_60s">60s</string>
+    <string name="network_quality_start">开始测试</string>
+    <string name="network_quality_cancel">取消测试</string>
+    <string name="network_quality_idle_latency">空闲延迟</string>
+    <string name="network_quality_download">下载</string>
+    <string name="network_quality_upload">上传</string>
+    <string name="network_quality_download_rpm">下载 RPM</string>
+    <string name="network_quality_upload_rpm">上传 RPM</string>
+    <string name="network_quality_confidence_high">置信度高</string>
+    <string name="network_quality_confidence_medium">置信度中</string>
+    <string name="network_quality_confidence_low">置信度低</string>
+    <string name="network_quality_metered_title">按流量计费连接</string>
+    <string name="network_quality_metered_message">您正在使用按流量计费的连接。此测试将消耗大量数据。</string>
+    <string name="network_quality_metered_continue">继续</string>
+    <string name="tool_configuration">配置</string>
+    <string name="tool_results">结果</string>
+    <string name="tool_outbound">出站</string>
+    <string name="tool_default_outbound">默认</string>
+
+    <!-- STUN Test -->
+    <!-- Tailscale -->
+    <string name="tailscale_endpoints">端点</string>
+
+    <string name="tailscale_status">状态</string>
+    <string name="tailscale_state">状态</string>
+    <string name="tailscale_network">网络</string>
+    <string name="tailscale_open_auth_url">打开认证链接</string>
+    <string name="tailscale_open_auth_url_qr_code">显示认证链接二维码</string>
+    <string name="tailscale_this_device">此设备</string>
+    <string name="tailscale_connected">已连接</string>
+    <string name="tailscale_not_connected">未连接</string>
+    <string name="tailscale_addresses">Tailscale 地址</string>
+    <string name="tailscale_details">详情</string>
+    <string name="tailscale_key_expiry">密钥过期</string>
+    <string name="tailscale_exit_node">出口节点</string>
+    <string name="tailscale_active">活跃</string>
+
+    <string name="stun_test">STUN 测试</string>
+    <string name="stun_server">服务器</string>
+    <string name="stun_start">开始测试</string>
+    <string name="stun_cancel">取消测试</string>
+    <string name="stun_external_address">外部地址</string>
+    <string name="stun_latency">延迟</string>
+    <string name="stun_nat_mapping">NAT 映射</string>
+    <string name="stun_nat_filtering">NAT 过滤</string>
+    <string name="stun_nat_type_detection">NAT 类型检测</string>
+    <string name="stun_nat_not_supported">服务器不支持</string>
 
     <!-- Shared Report -->
     <string name="report_empty">空</string>

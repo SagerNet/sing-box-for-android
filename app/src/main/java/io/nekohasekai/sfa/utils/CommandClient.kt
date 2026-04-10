@@ -10,6 +10,7 @@ import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.LogEntry
 import io.nekohasekai.libbox.LogIterator
 import io.nekohasekai.libbox.OutboundGroup
+import io.nekohasekai.libbox.OutboundGroupItemIterator
 import io.nekohasekai.libbox.OutboundGroupIterator
 import io.nekohasekai.libbox.StatusMessage
 import io.nekohasekai.libbox.StringIterator
@@ -29,6 +30,7 @@ open class CommandClient(
 
     private val additionalHandlers = mutableListOf<Handler>()
     private var cachedGroups: MutableList<OutboundGroup>? = null
+    private var cachedOutbounds: List<io.nekohasekai.libbox.OutboundGroupItem>? = null
 
     fun addHandler(handler: Handler) {
         synchronized(additionalHandlers) {
@@ -36,6 +38,9 @@ open class CommandClient(
                 additionalHandlers.add(handler)
                 cachedGroups?.let { groups ->
                     handler.updateGroups(groups)
+                }
+                cachedOutbounds?.let { outbounds ->
+                    handler.updateOutbounds(outbounds)
                 }
             }
         }
@@ -57,6 +62,7 @@ open class CommandClient(
         Log,
         ClashMode,
         Connections,
+        Outbounds,
     }
 
     interface Handler {
@@ -73,6 +79,8 @@ open class CommandClient(
         fun appendLogs(message: List<LogEntry>) {}
 
         fun updateGroups(newGroups: MutableList<OutboundGroup>) {}
+
+        fun updateOutbounds(outbounds: List<io.nekohasekai.libbox.OutboundGroupItem>) {}
 
         fun initializeClashMode(modeList: List<String>, currentMode: String) {}
 
@@ -95,6 +103,7 @@ open class CommandClient(
                     ConnectionType.Log -> Libbox.CommandLog
                     ConnectionType.ClashMode -> Libbox.CommandClashMode
                     ConnectionType.Connections -> Libbox.CommandConnections
+                    ConnectionType.Outbounds -> Libbox.CommandOutbounds
                 }
             options.addCommand(command)
         }
@@ -140,6 +149,18 @@ open class CommandClient(
             }
             cachedGroups = groups
             getAllHandlers().forEach { it.updateGroups(groups) }
+        }
+
+        override fun writeOutbounds(message: OutboundGroupItemIterator?) {
+            if (message == null) {
+                return
+            }
+            val outbounds = mutableListOf<io.nekohasekai.libbox.OutboundGroupItem>()
+            while (message.hasNext()) {
+                outbounds.add(message.next())
+            }
+            cachedOutbounds = outbounds
+            getAllHandlers().forEach { it.updateOutbounds(outbounds) }
         }
 
         override fun setDefaultLogLevel(level: Int) {
