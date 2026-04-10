@@ -22,7 +22,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -46,6 +45,7 @@ import androidx.navigation.NavController
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.model.GroupItem
+import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.utils.CommandClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -111,64 +111,61 @@ fun OutboundPickerScreen(
         navController.navigateUp()
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.tool_outbound)) },
-                navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null,
-                        )
-                    }
-                },
-            )
-        },
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-        ) {
-            OutlinedTextField(
-                value = searchText,
-                onValueChange = { searchText = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                placeholder = { Text(stringResource(android.R.string.search_go)) },
-                leadingIcon = {
+    OverrideTopBar {
+        TopAppBar(
+            title = { Text(stringResource(R.string.tool_outbound)) },
+            navigationIcon = {
+                IconButton(onClick = { navController.navigateUp() }) {
                     Icon(
-                        imageVector = Icons.Default.Search,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = null,
                     )
-                },
-                singleLine = true,
-                shape = RoundedCornerShape(12.dp),
-            )
+                }
+            },
+        )
+    }
 
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                item {
-                    OutboundPickerItem(
-                        tag = stringResource(R.string.tool_default_outbound),
-                        isSelected = selectedOutbound.isEmpty(),
-                        onClick = { selectOutbound("") },
-                    )
-                    HorizontalDivider(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
-                    )
-                }
-                items(filteredOutbounds, key = { it.tag }) { item ->
-                    OutboundPickerItem(
-                        tag = item.tag,
-                        type = Libbox.proxyDisplayType(item.type),
-                        urlTestDelay = item.urlTestDelay,
-                        isSelected = selectedOutbound == item.tag,
-                        onClick = { selectOutbound(item.tag) },
-                    )
-                }
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
+    ) {
+        OutlinedTextField(
+            value = searchText,
+            onValueChange = { searchText = it },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            placeholder = { Text(stringResource(android.R.string.search_go)) },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = null,
+                )
+            },
+            singleLine = true,
+            shape = RoundedCornerShape(12.dp),
+        )
+
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
+            item {
+                OutboundPickerItem(
+                    tag = stringResource(R.string.tool_default_outbound),
+                    isSelected = selectedOutbound.isEmpty(),
+                    onClick = { selectOutbound("") },
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+                )
+            }
+            items(filteredOutbounds, key = { it.tag }) { item ->
+                OutboundPickerItem(
+                    tag = item.tag,
+                    type = Libbox.proxyDisplayType(item.type),
+                    urlTestDelay = item.urlTestDelay,
+                    isSelected = selectedOutbound == item.tag,
+                    onClick = { selectOutbound(item.tag) },
+                )
             }
         }
     }
