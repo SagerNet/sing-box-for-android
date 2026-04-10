@@ -62,9 +62,9 @@ import androidx.core.content.FileProvider
 import androidx.navigation.NavController
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
-import io.nekohasekai.sfa.compose.base.GlobalEventBus
 import io.nekohasekai.sfa.compose.base.SelectableMessageDialog
 import io.nekohasekai.sfa.compose.base.UiEvent
+import io.nekohasekai.sfa.compose.base.rememberApplyServiceChangeNotifier
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.database.Settings
@@ -101,6 +101,7 @@ fun PrivilegeSettingsScreen(navController: NavController, serviceStatus: Status 
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val notifyApplyChange = rememberApplyServiceChangeNotifier(serviceStatus)
     val systemHookStatus by HookStatusClient.status.collectAsState()
     var privilegeSettingsEnabled by remember { mutableStateOf(Settings.privilegeSettingsEnabled) }
 
@@ -198,8 +199,8 @@ fun PrivilegeSettingsScreen(navController: NavController, serviceStatus: Status 
                                 messageDialogTitle = context.getString(R.string.error_title)
                                 messageDialogMessage = failure.message ?: failure.toString()
                                 showMessageDialog = true
-                            } else if (serviceStatus == Status.Started) {
-                                GlobalEventBus.tryEmit(UiEvent.RestartToTakeEffect)
+                            } else {
+                                notifyApplyChange(UiEvent.ApplyServiceChange.Mode.Reload)
                             }
                         }
                     },
@@ -608,8 +609,8 @@ fun PrivilegeSettingsScreen(navController: NavController, serviceStatus: Status 
                                         messageDialogTitle = context.getString(R.string.error_title)
                                         messageDialogMessage = failure.message ?: failure.toString()
                                         showMessageDialog = true
-                                    } else if (checked && serviceStatus == Status.Started) {
-                                        GlobalEventBus.tryEmit(UiEvent.RestartToTakeEffect)
+                                    } else {
+                                        notifyApplyChange(UiEvent.ApplyServiceChange.Mode.Reload)
                                     }
                                 }
                             },
@@ -716,8 +717,8 @@ fun PrivilegeSettingsScreen(navController: NavController, serviceStatus: Status 
                                         messageDialogTitle = context.getString(R.string.error_title)
                                         messageDialogMessage = failure.message ?: failure.toString()
                                         showMessageDialog = true
-                                    } else if (serviceStatus == Status.Started) {
-                                        GlobalEventBus.tryEmit(UiEvent.RestartToTakeEffect)
+                                    } else {
+                                        notifyApplyChange(UiEvent.ApplyServiceChange.Mode.Reload)
                                     }
                                 }
                             },

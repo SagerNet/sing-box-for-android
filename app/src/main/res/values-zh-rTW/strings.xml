@@ -424,6 +424,37 @@
     <string name="content_description_collapse_search">收合搜尋</string>
     <string name="content_description_search_logs">搜尋日誌</string>
 
+    <!-- Tools -->
+    <string name="title_tools">工具</string>
+
+    <!-- Shared Report -->
+    <string name="report_empty">空</string>
+    <string name="report_section_reports">報告</string>
+    <string name="report_section_files">檔案</string>
+    <string name="report_delete_all">全部刪除</string>
+    <string name="report_delete">刪除</string>
+    <string name="report_share">分享</string>
+    <string name="report_share_with_config">附帶配置分享</string>
+    <string name="report_metadata">元數據</string>
+    <string name="report_configuration">配置</string>
+    <string name="report_origin_local">本地</string>
+    <string name="service_not_started">服務未啟動</string>
+
+    <!-- Crash Report -->
+    <string name="crash_report">當機報告</string>
+    <string name="crash_report_go_log">Go Crash Log</string>
+    <string name="crash_report_jvm_log">JVM Crash Log</string>
+
+    <!-- OOM Report -->
+    <string name="oom_report">記憶體不足報告</string>
+    <string name="oom_report_description">啟用記憶體限制後，當服務記憶體超出限制時，您將會收到報告。您也可以手動觸發收集報告。</string>
+    <string name="oom_report_fetch">取得記憶體報告</string>
+    <string name="oom_report_enable_memory_limit">啟用記憶體限制</string>
+    <string name="oom_report_enable_memory_limit_description">為服務提供軟記憶體限制。服務將執行多個程序以嘗試保持在此記憶體限制範圍內。</string>
+    <string name="oom_report_memory_limit">記憶體限制</string>
+    <string name="oom_report_kill_connections">終止連線</string>
+    <string name="oom_report_kill_connections_description">當服務記憶體超出限制時，終止所有連線以釋放記憶體。</string>
+
     <!-- Xposed Module -->
     <string name="xposed_description">sing-box 的特權強化</string>
     <!-- Privileged Enhancement -->

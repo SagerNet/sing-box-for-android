@@ -31,6 +31,11 @@ object SettingsKey {
     const val PRIVILEGE_SETTINGS_INTERFACE_RENAME_ENABLED = "hide_settings_interface_rename_enabled"
     const val PRIVILEGE_SETTINGS_INTERFACE_PREFIX = "hide_settings_interface_prefix"
 
+    // OOM killer
+    const val OOM_KILLER_ENABLED = "oom_killer_enabled"
+    const val OOM_KILLER_DISABLED = "oom_killer_disabled"
+    const val OOM_MEMORY_LIMIT_MB = "oom_memory_limit_mb"
+
     // dashboard
     const val DASHBOARD_ITEM_ORDER = "dashboard_item_order"
     const val DASHBOARD_DISABLED_ITEMS = "dashboard_disabled_items"
