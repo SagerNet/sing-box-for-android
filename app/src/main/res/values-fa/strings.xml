@@ -23,6 +23,8 @@
     <string name="action">اقدام</string>
     <string name="action_start">شروع</string>
     <string name="action_deselect">لغو انتخاب</string>
+    <string name="action_reload">بارگذاری مجدد</string>
+    <string name="action_restart">راه‌اندازی مجدد</string>
     <string name="expand">باز کردن</string>
     <string name="collapse">جمع کردن</string>
     <string name="expand_all">باز کردن همه</string>
@@ -200,6 +202,8 @@
     <string name="working_directory">پوشه کاری</string>
     <string name="beta_settings">تنظیمات بتا</string>
     <string name="disable_deprecated_warnings">غیرفعال‌کردن هشدارهای منسوخ</string>
+    <string name="cache_size">اندازه حافظه پنهان</string>
+    <string name="clear_cache">پاک‌سازی حافظه پنهان</string>
     <string name="notification_settings">اعلان‌ها</string>
     <string name="enable_notification">فعال‌کردن اعلان</string>
     <string name="dynamic_notification">نمایش سرعت بلادرنگ در اعلان</string>
@@ -279,6 +283,22 @@
     <string name="new_version_available">نسخه جدید موجود است: %s</string>
     <string name="auto_update">به‌روزرسانی خودکار</string>
     <string name="auto_update_description">دانلود و نصب خودکار به‌روزرسانی‌ها در پس‌زمینه</string>
+    <string name="update_source">منبع به‌روزرسانی</string>
+    <string name="update_source_github">GitHub</string>
+    <string name="update_source_fdroid">F-Droid</string>
+    <string name="fdroid_mirror">آینه F-Droid</string>
+    <string name="fdroid_mirror_test_all">انتخاب خودکار بر اساس تأخیر</string>
+    <string name="fdroid_mirror_testing">در حال تست…</string>
+    <string name="fdroid_mirror_latency">%d ms</string>
+    <string name="fdroid_mirror_failed">ناموفق</string>
+    <string name="fdroid_mirror_untested">—</string>
+    <string name="fdroid_mirror_add">افزودن آینه</string>
+    <string name="fdroid_mirror_name_hint">نام</string>
+    <string name="fdroid_mirror_url_hint">URL</string>
+    <string name="fdroid_mirror_custom">سفارشی</string>
+    <string name="fdroid_mirror_invalid_url">URL نامعتبر</string>
+    <string name="fdroid_mirror_add_action">افزودن</string>
+    <string name="fdroid_mirror_delete">حذف</string>
 
     <!-- Silent Install -->
     <string name="silent_install">نصب بی‌صدا</string>
@@ -408,6 +428,60 @@
 
     <!-- Tools -->
     <string name="title_tools">ابزارها</string>
+    <string name="title_network">شبکه</string>
+    <string name="network_quality">کیفیت شبکه</string>
+    <string name="network_quality_url">URL</string>
+    <string name="network_quality_serial">ترتیبی</string>
+    <string name="network_quality_http3">HTTP/3</string>
+    <string name="network_quality_max_runtime">حداکثر زمان اجرا</string>
+    <string name="network_quality_max_runtime_30s">30s</string>
+    <string name="network_quality_max_runtime_60s">60s</string>
+    <string name="network_quality_start">شروع تست</string>
+    <string name="network_quality_cancel">لغو تست</string>
+    <string name="network_quality_idle_latency">تأخیر بیکاری</string>
+    <string name="network_quality_download">دانلود</string>
+    <string name="network_quality_upload">آپلود</string>
+    <string name="network_quality_download_rpm">RPM دانلود</string>
+    <string name="network_quality_upload_rpm">RPM آپلود</string>
+    <string name="network_quality_confidence_high">اطمینان بالا</string>
+    <string name="network_quality_confidence_medium">اطمینان متوسط</string>
+    <string name="network_quality_confidence_low">اطمینان پایین</string>
+    <string name="network_quality_metered_title">اتصال محدود</string>
+    <string name="network_quality_metered_message">شما از اتصال محدود استفاده می‌کنید. این تست حجم قابل توجهی داده مصرف خواهد کرد.</string>
+    <string name="network_quality_metered_continue">ادامه</string>
+    <string name="tool_configuration">پیکربندی</string>
+    <string name="tool_results">نتایج</string>
+    <string name="tool_outbound">خروجی</string>
+    <string name="tool_default_outbound">پیش‌فرض</string>
+
+    <!-- STUN Test -->
+    <!-- Tailscale -->
+    <string name="tailscale_endpoints">نقاط اتصال</string>
+
+    <string name="tailscale_status">وضعیت</string>
+    <string name="tailscale_state">وضعیت</string>
+    <string name="tailscale_network">شبکه</string>
+    <string name="tailscale_open_auth_url">باز کردن لینک احراز هویت</string>
+    <string name="tailscale_open_auth_url_qr_code">نمایش QR کد لینک احراز هویت</string>
+    <string name="tailscale_this_device">این دستگاه</string>
+    <string name="tailscale_connected">متصل</string>
+    <string name="tailscale_not_connected">متصل نیست</string>
+    <string name="tailscale_addresses">آدرس‌های Tailscale</string>
+    <string name="tailscale_details">جزئیات</string>
+    <string name="tailscale_key_expiry">انقضای کلید</string>
+    <string name="tailscale_exit_node">گره خروجی</string>
+    <string name="tailscale_active">فعال</string>
+
+    <string name="stun_test">تست STUN</string>
+    <string name="stun_server">سرور</string>
+    <string name="stun_start">شروع تست</string>
+    <string name="stun_cancel">لغو تست</string>
+    <string name="stun_external_address">آدرس خارجی</string>
+    <string name="stun_latency">تأخیر</string>
+    <string name="stun_nat_mapping">نگاشت NAT</string>
+    <string name="stun_nat_filtering">فیلتر NAT</string>
+    <string name="stun_nat_type_detection">تشخیص نوع NAT</string>
+    <string name="stun_nat_not_supported">پشتیبانی نمی‌شود توسط سرور</string>
 
     <!-- Shared Report -->
     <string name="report_empty">خالی</string>
@@ -421,11 +495,14 @@
     <string name="report_configuration">پیکربندی</string>
     <string name="report_origin_local">محلی</string>
     <string name="service_not_started">سرویس شروع نشده است</string>
+    <string name="service_reload_required">برای اعمال تغییرات، بارگذاری مجدد سرویس لازم است</string>
+    <string name="service_restart_required">برای اعمال تغییرات، راه‌اندازی مجدد سرویس لازم است</string>
 
     <!-- Crash Report -->
     <string name="crash_report">گزارش خرابی</string>
     <string name="crash_report_go_log">Go Crash Log</string>
     <string name="crash_report_jvm_log">JVM Crash Log</string>
+    <string name="crash_report_description">هنگام بروز خرابی گزارشی دریافت خواهید کرد.</string>
 
     <!-- OOM Report -->
     <string name="oom_report">گزارش کمبود حافظه</string>
