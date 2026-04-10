@@ -113,10 +113,12 @@ import io.nekohasekai.sfa.compose.screen.dashboard.DashboardViewModel
 import io.nekohasekai.sfa.compose.screen.dashboard.GroupsCard
 import io.nekohasekai.sfa.compose.screen.dashboard.groups.GroupsViewModel
 import io.nekohasekai.sfa.compose.screen.log.LogViewModel
+import io.nekohasekai.sfa.compose.screen.tools.TailscaleStatusViewModel
 import io.nekohasekai.sfa.compose.theme.SFATheme
 import io.nekohasekai.sfa.compose.topbar.LocalTopBarController
 import io.nekohasekai.sfa.compose.topbar.TopBarController
 import io.nekohasekai.sfa.compose.topbar.TopBarEntry
+import io.nekohasekai.sfa.constant.Action
 import io.nekohasekai.sfa.constant.Alert
 import io.nekohasekai.sfa.constant.ServiceMode
 import io.nekohasekai.sfa.constant.Status
@@ -230,6 +232,10 @@ class MainActivity :
             pendingNavigationRoute.value = "settings/privilege"
         }
         val uri = intent.data ?: return
+        if (intent.action == Action.OPEN_URL) {
+            launchCustomTab(uri.toString())
+            return
+        }
         if (uri.scheme == "sing-box" && uri.host == "import-remote-profile") {
             try {
                 val profile = Libbox.parseRemoteProfileImportLink(uri.toString())
@@ -863,6 +869,7 @@ class MainActivity :
                     logViewModel = logViewModel,
                     groupsViewModel = groupsViewModel,
                     connectionsViewModel = connectionsViewModel,
+                    tailscaleStatusViewModel = tailscaleStatusViewModel,
                     modifier = Modifier.fillMaxSize(),
                 )
                 if (!useNavigationRail) {
