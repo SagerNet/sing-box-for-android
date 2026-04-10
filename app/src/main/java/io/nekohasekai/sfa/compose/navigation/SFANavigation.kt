@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -37,10 +38,16 @@ import io.nekohasekai.sfa.compose.screen.tools.CrashReportDetailScreen
 import io.nekohasekai.sfa.compose.screen.tools.CrashReportFileContentScreen
 import io.nekohasekai.sfa.compose.screen.tools.CrashReportListScreen
 import io.nekohasekai.sfa.compose.screen.tools.CrashReportMetadataScreen
+import io.nekohasekai.sfa.compose.screen.tools.NetworkQualityScreen
 import io.nekohasekai.sfa.compose.screen.tools.OOMReportDetailScreen
 import io.nekohasekai.sfa.compose.screen.tools.OOMReportFileContentScreen
 import io.nekohasekai.sfa.compose.screen.tools.OOMReportListScreen
 import io.nekohasekai.sfa.compose.screen.tools.OOMReportMetadataScreen
+import io.nekohasekai.sfa.compose.screen.tools.OutboundPickerScreen
+import io.nekohasekai.sfa.compose.screen.tools.STUNTestScreen
+import io.nekohasekai.sfa.compose.screen.tools.TailscaleEndpointScreen
+import io.nekohasekai.sfa.compose.screen.tools.TailscalePeerScreen
+import io.nekohasekai.sfa.compose.screen.tools.TailscaleStatusViewModel
 import io.nekohasekai.sfa.compose.screen.tools.ToolsScreen
 import io.nekohasekai.sfa.constant.Status
 
@@ -73,6 +80,7 @@ fun SFANavHost(
     logViewModel: LogViewModel? = null,
     groupsViewModel: GroupsViewModel? = null,
     connectionsViewModel: ConnectionsViewModel? = null,
+    tailscaleStatusViewModel: TailscaleStatusViewModel? = null,
     modifier: Modifier = Modifier,
 ) {
     NavHost(
@@ -220,10 +228,73 @@ fun SFANavHost(
         }
 
         composable(Screen.Tools.route) {
-            ToolsScreen(navController = navController)
+            val tailscaleViewModel: TailscaleStatusViewModel = tailscaleStatusViewModel ?: viewModel()
+            ToolsScreen(navController = navController, serviceStatus = serviceStatus, tailscaleViewModel = tailscaleViewModel)
         }
 
         // Tools subscreens with slide animations
+        composable(
+            route = "tools/network_quality",
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) {
+            NetworkQualityScreen(navController = navController, serviceStatus = serviceStatus)
+        }
+
+        composable(
+            route = "tools/stun_test",
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) {
+            STUNTestScreen(navController = navController, serviceStatus = serviceStatus)
+        }
+
+        composable(
+            route = "tools/outbound_picker/{selectedOutbound}",
+            arguments = listOf(navArgument("selectedOutbound") { type = NavType.StringType }),
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) { backStackEntry ->
+            val selectedOutbound = Uri.decode(backStackEntry.arguments?.getString("selectedOutbound") ?: "")
+            OutboundPickerScreen(navController = navController, selectedOutbound = selectedOutbound)
+        }
+
+        composable(
+            route = "tools/tailscale/{endpointTag}",
+            arguments = listOf(navArgument("endpointTag") { type = NavType.StringType }),
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) { backStackEntry ->
+            val endpointTag = Uri.decode(backStackEntry.arguments?.getString("endpointTag") ?: return@composable)
+            val tailscaleViewModel: TailscaleStatusViewModel = tailscaleStatusViewModel ?: viewModel()
+            TailscaleEndpointScreen(navController = navController, viewModel = tailscaleViewModel, endpointTag = endpointTag)
+        }
+
+        composable(
+            route = "tools/tailscale/{endpointTag}/peer/{peerId}",
+            arguments = listOf(
+                navArgument("endpointTag") { type = NavType.StringType },
+                navArgument("peerId") { type = NavType.StringType },
+            ),
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) { backStackEntry ->
+            val endpointTag = Uri.decode(backStackEntry.arguments?.getString("endpointTag") ?: return@composable)
+            val peerId = Uri.decode(backStackEntry.arguments?.getString("peerId") ?: return@composable)
+            val tailscaleViewModel: TailscaleStatusViewModel = tailscaleStatusViewModel ?: viewModel()
+            TailscalePeerScreen(navController = navController, viewModel = tailscaleViewModel, endpointTag = endpointTag, peerId = peerId)
+        }
+
         composable(
             route = "tools/crash_report",
             enterTransition = slideInFromRight,
