@@ -412,6 +412,37 @@
     <string name="content_description_collapse_search">Свернуть поиск</string>
     <string name="content_description_search_logs">Поиск в логе</string>
     
+    <!-- Tools -->
+    <string name="title_tools">Инструменты</string>
+
+    <!-- Shared Report -->
+    <string name="report_empty">Пусто</string>
+    <string name="report_section_reports">Отчёты</string>
+    <string name="report_section_files">Файлы</string>
+    <string name="report_delete_all">Удалить все</string>
+    <string name="report_delete">Удалить</string>
+    <string name="report_share">Поделиться</string>
+    <string name="report_share_with_config">Поделиться с конфигурацией</string>
+    <string name="report_metadata">Метаданные</string>
+    <string name="report_configuration">Конфигурация</string>
+    <string name="report_origin_local">Локальный</string>
+    <string name="service_not_started">Служба не запущена</string>
+
+    <!-- Crash Report -->
+    <string name="crash_report">Отчёт о сбое</string>
+    <string name="crash_report_go_log">Go Crash Log</string>
+    <string name="crash_report_jvm_log">JVM Crash Log</string>
+
+    <!-- OOM Report -->
+    <string name="oom_report">Отчёт о нехватке памяти</string>
+    <string name="oom_report_description">При включённом ограничении памяти вы получите отчёт, если память сервиса превысит лимит. Вы также можете вручную запросить сбор отчёта.</string>
+    <string name="oom_report_fetch">Получить отчёт о памяти</string>
+    <string name="oom_report_enable_memory_limit">Включить ограничение памяти</string>
+    <string name="oom_report_enable_memory_limit_description">Задайте мягкое ограничение памяти для сервиса. Сервис будет выполнять различные процессы, чтобы оставаться в пределах этого ограничения.</string>
+    <string name="oom_report_memory_limit">Ограничение памяти</string>
+    <string name="oom_report_kill_connections">Завершить соединения</string>
+    <string name="oom_report_kill_connections_description">Завершить все соединения для освобождения памяти при превышении лимита памяти сервиса.</string>
+
     <!-- Xposed Module -->
     <string name="xposed_description">Привилегированное расширение для sing-box</string>
 

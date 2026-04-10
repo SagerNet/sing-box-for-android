@@ -23,6 +23,8 @@
     <string name="action">操作</string>
     <string name="action_start">启动</string>
     <string name="action_deselect">取消选择</string>
+    <string name="action_reload">重载</string>
+    <string name="action_restart">重启</string>
     <string name="expand">展开</string>
     <string name="collapse">收起</string>
     <string name="expand_all">全部展开</string>
@@ -420,6 +422,40 @@
     <string name="content_description_pause_logs">暂停日志</string>
     <string name="content_description_collapse_search">折叠搜索</string>
     <string name="content_description_search_logs">搜索日志</string>
+
+    <!-- Tools -->
+    <string name="title_tools">工具</string>
+
+    <!-- Shared Report -->
+    <string name="report_empty">空</string>
+    <string name="report_section_reports">报告</string>
+    <string name="report_section_files">文件</string>
+    <string name="report_delete_all">全部删除</string>
+    <string name="report_delete">删除</string>
+    <string name="report_share">分享</string>
+    <string name="report_share_with_config">附带配置分享</string>
+    <string name="report_metadata">元数据</string>
+    <string name="report_configuration">配置</string>
+    <string name="report_origin_local">本地</string>
+    <string name="service_not_started">服务未启动</string>
+    <string name="service_reload_required">需要重载服务以应用更改</string>
+    <string name="service_restart_required">需要重启服务以应用更改</string>
+
+    <!-- Crash Report -->
+    <string name="crash_report">崩溃报告</string>
+    <string name="crash_report_go_log">Go Crash Log</string>
+    <string name="crash_report_jvm_log">JVM Crash Log</string>
+    <string name="crash_report_description">当遇到崩溃时，您将会收到报告。</string>
+
+    <!-- OOM Report -->
+    <string name="oom_report">内存不足报告</string>
+    <string name="oom_report_description">启用内存限制后，当服务内存超出限制时，您将会收到报告。您也可以手动触发收集报告。</string>
+    <string name="oom_report_fetch">获取内存报告</string>
+    <string name="oom_report_enable_memory_limit">启用内存限制</string>
+    <string name="oom_report_enable_memory_limit_description">为服务提供软内存限制。服务将执行多个进程以尝试保持在此内存限制范围内。</string>
+    <string name="oom_report_memory_limit">内存限制</string>
+    <string name="oom_report_kill_connections">终止连接</string>
+    <string name="oom_report_kill_connections_description">当服务内存超出限制时，终止所有连接以释放内存。</string>
 
     <!-- Xposed Module -->
     <string name="xposed_description">sing-box 的特权增强</string>

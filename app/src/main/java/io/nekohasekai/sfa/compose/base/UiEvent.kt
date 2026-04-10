@@ -19,7 +19,12 @@ sealed class UiEvent {
 
     object RequestReconnectService : UiEvent()
 
-    object RestartToTakeEffect : UiEvent()
+    data class ApplyServiceChange(val mode: Mode) : UiEvent() {
+        enum class Mode {
+            Reload,
+            Restart,
+        }
+    }
 }
 
 /**
