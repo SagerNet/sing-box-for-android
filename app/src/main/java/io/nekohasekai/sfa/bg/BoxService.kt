@@ -417,6 +417,13 @@ class BoxService(private val service: Service, private val platformInterface: Pl
         }
     }
 
+    override fun triggerNativeCrash() {
+        Thread {
+            Thread.sleep(200)
+            throw RuntimeException("debug native crash")
+        }.start()
+    }
+
     override fun writeDebugMessage(message: String?) {
         Log.d("sing-box", message!!)
     }
