@@ -87,8 +87,11 @@ import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.BuildConfig
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.compose.base.UiEvent
+import io.nekohasekai.sfa.compose.base.rememberApplyServiceChangeNotifier
 import io.nekohasekai.sfa.compose.component.UpdateAvailableDialog
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
+import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.ktx.clipboardText
 import io.nekohasekai.sfa.update.UpdateCheckException
@@ -109,7 +112,10 @@ import android.provider.Settings as AndroidSettings
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun AppSettingsScreen(navController: NavController) {
+fun AppSettingsScreen(
+    navController: NavController,
+    serviceStatus: Status = Status.Stopped,
+) {
     OverrideTopBar {
         TopAppBar(
             title = { Text(stringResource(R.string.title_app_settings)) },
@@ -155,6 +161,7 @@ fun AppSettingsScreen(navController: NavController) {
     var notificationEnabled by remember { mutableStateOf(true) }
     var dynamicNotification by remember { mutableStateOf(Settings.dynamicNotification) }
     var showDisableNotificationDialog by remember { mutableStateOf(false) }
+    val notifyApplyChange = rememberApplyServiceChangeNotifier(serviceStatus)
 
     var showLanguageDialog by remember { mutableStateOf(false) }
     val availableLocales = remember { getSupportedLocales(context) }
@@ -679,6 +686,9 @@ fun AppSettingsScreen(navController: NavController) {
                                 dynamicNotification = checked
                                 scope.launch(Dispatchers.IO) {
                                     Settings.dynamicNotification = checked
+                                    withContext(Dispatchers.Main) {
+                                        notifyApplyChange(UiEvent.ApplyServiceChange.Mode.Restart)
+                                    }
                                 }
                             },
                         )
