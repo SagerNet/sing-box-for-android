@@ -741,6 +741,14 @@ class MainActivity :
                 null
             }
 
+        val isToolsRoute = currentRootRoute == Screen.Tools.route
+        val tailscaleStatusViewModel: TailscaleStatusViewModel? =
+            if (isToolsRoute) {
+                viewModel()
+            } else {
+                null
+            }
+
         val showGroupsInNav = dashboardUiState.hasGroups
         val showConnectionsInNav =
             currentServiceStatus == Status.Started || currentServiceStatus == Status.Starting
