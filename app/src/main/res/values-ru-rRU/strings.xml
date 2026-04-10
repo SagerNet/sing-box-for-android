@@ -23,6 +23,8 @@
     <string name="action">Действие</string>
     <string name="action_start">Начать</string>
     <string name="action_deselect">Отменить выбор</string>
+    <string name="action_reload">Перезагрузить</string>
+    <string name="action_restart">Перезапустить</string>
     <string name="expand">Развернуть</string>
     <string name="collapse">Свернуть</string>
     <string name="expand_all">Развернуть все</string>
@@ -200,6 +202,8 @@
     <string name="working_directory">Рабочая директория</string>
     <string name="beta_settings">Бета-настройки</string>
     <string name="disable_deprecated_warnings">Отключить предупреждения об устаревании</string>
+    <string name="cache_size">Размер кэша</string>
+    <string name="clear_cache">Очистить кэш</string>
     <string name="notification_settings">Уведомления</string>
     <string name="enable_notification">Включить уведомления</string>
     <string name="dynamic_notification">Отображать скорость в реальном времени в уведомлении</string>
@@ -279,6 +283,22 @@
     <string name="new_version_available">Доступна новая версия: %s</string>
     <string name="auto_update">Автообновление</string>
     <string name="auto_update_description">Автоматически загружать и устанавливать обновления в фоне</string>
+    <string name="update_source">Источник обновлений</string>
+    <string name="update_source_github">GitHub</string>
+    <string name="update_source_fdroid">F-Droid</string>
+    <string name="fdroid_mirror">Зеркало F-Droid</string>
+    <string name="fdroid_mirror_test_all">Автовыбор по задержке</string>
+    <string name="fdroid_mirror_testing">Тестирование…</string>
+    <string name="fdroid_mirror_latency">%d мс</string>
+    <string name="fdroid_mirror_failed">Ошибка</string>
+    <string name="fdroid_mirror_untested">—</string>
+    <string name="fdroid_mirror_add">Добавить зеркало</string>
+    <string name="fdroid_mirror_name_hint">Имя</string>
+    <string name="fdroid_mirror_url_hint">URL</string>
+    <string name="fdroid_mirror_custom">Пользовательское</string>
+    <string name="fdroid_mirror_invalid_url">Недопустимый URL</string>
+    <string name="fdroid_mirror_add_action">Добавить</string>
+    <string name="fdroid_mirror_delete">Удалить</string>
 
     <!-- Silent Install -->
     <string name="silent_install">Тихая установка</string>
@@ -414,6 +434,60 @@
     
     <!-- Tools -->
     <string name="title_tools">Инструменты</string>
+    <string name="title_network">Сеть</string>
+    <string name="network_quality">Качество сети</string>
+    <string name="network_quality_url">URL</string>
+    <string name="network_quality_serial">Последовательно</string>
+    <string name="network_quality_http3">HTTP/3</string>
+    <string name="network_quality_max_runtime">Макс. время</string>
+    <string name="network_quality_max_runtime_30s">30s</string>
+    <string name="network_quality_max_runtime_60s">60s</string>
+    <string name="network_quality_start">Начать тест</string>
+    <string name="network_quality_cancel">Остановить тест</string>
+    <string name="network_quality_idle_latency">Задержка в простое</string>
+    <string name="network_quality_download">Загрузка</string>
+    <string name="network_quality_upload">Отправка</string>
+    <string name="network_quality_download_rpm">Загрузка RPM</string>
+    <string name="network_quality_upload_rpm">Отправка RPM</string>
+    <string name="network_quality_confidence_high">Высокая уверенность</string>
+    <string name="network_quality_confidence_medium">Средняя уверенность</string>
+    <string name="network_quality_confidence_low">Низкая уверенность</string>
+    <string name="network_quality_metered_title">Лимитное подключение</string>
+    <string name="network_quality_metered_message">Вы используете лимитное подключение. Этот тест потребует значительного объёма трафика.</string>
+    <string name="network_quality_metered_continue">Продолжить</string>
+    <string name="tool_configuration">Конфигурация</string>
+    <string name="tool_results">Результаты</string>
+    <string name="tool_outbound">Исходящий</string>
+    <string name="tool_default_outbound">По умолчанию</string>
+
+    <!-- STUN Test -->
+    <!-- Tailscale -->
+    <string name="tailscale_endpoints">Точки подключения</string>
+
+    <string name="tailscale_status">Статус</string>
+    <string name="tailscale_state">Состояние</string>
+    <string name="tailscale_network">Сеть</string>
+    <string name="tailscale_open_auth_url">Открыть URL авторизации</string>
+    <string name="tailscale_open_auth_url_qr_code">Показать QR-код авторизации</string>
+    <string name="tailscale_this_device">Это устройство</string>
+    <string name="tailscale_connected">Подключено</string>
+    <string name="tailscale_not_connected">Не подключено</string>
+    <string name="tailscale_addresses">Адреса Tailscale</string>
+    <string name="tailscale_details">Подробности</string>
+    <string name="tailscale_key_expiry">Срок действия ключа</string>
+    <string name="tailscale_exit_node">Выходной узел</string>
+    <string name="tailscale_active">Активен</string>
+
+    <string name="stun_test">STUN-тест</string>
+    <string name="stun_server">Сервер</string>
+    <string name="stun_start">Начать тест</string>
+    <string name="stun_cancel">Остановить тест</string>
+    <string name="stun_external_address">Внешний адрес</string>
+    <string name="stun_latency">Задержка</string>
+    <string name="stun_nat_mapping">NAT-отображение</string>
+    <string name="stun_nat_filtering">NAT-фильтрация</string>
+    <string name="stun_nat_type_detection">Определение типа NAT</string>
+    <string name="stun_nat_not_supported">Не поддерживается сервером</string>
 
     <!-- Shared Report -->
     <string name="report_empty">Пусто</string>
@@ -427,11 +501,14 @@
     <string name="report_configuration">Конфигурация</string>
     <string name="report_origin_local">Локальный</string>
     <string name="service_not_started">Служба не запущена</string>
+    <string name="service_reload_required">Для применения изменений необходимо перезагрузить сервис</string>
+    <string name="service_restart_required">Для применения изменений необходимо перезапустить сервис</string>
 
     <!-- Crash Report -->
     <string name="crash_report">Отчёт о сбое</string>
     <string name="crash_report_go_log">Go Crash Log</string>
     <string name="crash_report_jvm_log">JVM Crash Log</string>
+    <string name="crash_report_description">Вы получите отчёт при возникновении сбоя.</string>
 
     <!-- OOM Report -->
     <string name="oom_report">Отчёт о нехватке памяти</string>
