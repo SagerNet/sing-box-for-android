@@ -21,6 +21,11 @@ class BootReceiver : BroadcastReceiver() {
         }
         GlobalScope.launch(Dispatchers.IO) {
             if (Settings.startedByUser) {
+                CrashReportManager.refresh()
+                if (CrashReportManager.unreadCount.value > 0) {
+                    Settings.startedByUser = false
+                    return@launch
+                }
                 withContext(Dispatchers.Main) {
                     BoxService.start()
                 }
