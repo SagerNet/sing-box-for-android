@@ -200,7 +200,7 @@ class DashboardViewModel :
 
     private fun checkDeprecatedNotes() {
         viewModelScope.launch(Dispatchers.IO) {
-            try {
+            runCatching {
                 // Check if deprecated warnings are disabled
                 if (Settings.disableDeprecatedWarnings) {
                     return@launch
@@ -227,8 +227,6 @@ class DashboardViewModel :
                         }
                     }
                 }
-            } catch (e: Exception) {
-                sendError(e)
             }
         }
     }
