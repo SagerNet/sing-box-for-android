@@ -9,6 +9,7 @@ import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.net.wifi.WifiManager
 import android.os.PowerManager
+import android.util.Log
 import androidx.core.content.getSystemService
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.SetupOptions
@@ -41,7 +42,11 @@ class Application : Application() {
         AppLifecycleObserver.register(this)
 
 //        Seq.setContext(this)
-        Libbox.setLocale(Locale.getDefault().toLanguageTag().replace("-", "_"))
+        runCatching {
+            Libbox.setLocale(Locale.getDefault().toLanguageTag().replace("-", "_"))
+        }.onFailure {
+            Log.d("Application", "set locale: ${it.message}")
+        }
         HookStatusClient.register(this)
         PrivilegeSettingsClient.register(this)
 
