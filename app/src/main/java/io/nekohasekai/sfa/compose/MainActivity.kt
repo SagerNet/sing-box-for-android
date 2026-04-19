@@ -8,6 +8,7 @@ import android.net.Uri
 import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -1105,6 +1106,10 @@ class MainActivity :
                 onDispose {
                     connectionsViewModel.setVisible(false)
                 }
+            }
+
+            BackHandler(enabled = selectedConnectionId != null) {
+                selectedConnectionId = null
             }
 
             ModalBottomSheet(
