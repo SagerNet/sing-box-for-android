@@ -9,11 +9,16 @@ import androidx.annotation.NonNull;
 @SuppressWarnings("unused")
 public abstract class XposedModule extends XposedInterfaceWrapper implements XposedModuleInterface {
     /**
-     * Instantiates a new Xposed module.<br/>
-     * When the module is loaded into the target process, the constructor will be called.
-     *
-     * @param base  The implementation interface provided by the framework, should not be used by the module
-     * @param param Information about the process in which the module is loaded
+     * No-arg constructor for API 101 contract: the framework instantiates the module via
+     * {@code Class.getDeclaredConstructor()}, then calls {@link #attachFramework}.
+     */
+    public XposedModule() {
+        super();
+    }
+
+    /**
+     * Two-arg constructor for API 100 contract: the framework instantiates the module via
+     * {@code (XposedInterface, ModuleLoadedParam)} and attaches the framework base inline.
      */
     public XposedModule(@NonNull XposedInterface base, @NonNull ModuleLoadedParam param) {
         super(base);

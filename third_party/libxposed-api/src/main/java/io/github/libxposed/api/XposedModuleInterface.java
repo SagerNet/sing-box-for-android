@@ -1,5 +1,6 @@
 package io.github.libxposed.api;
 
+import android.app.AppComponentFactory;
 import android.content.pm.ApplicationInfo;
 import android.os.Build;
 
@@ -32,7 +33,7 @@ public interface XposedModuleInterface {
     }
 
     /**
-     * Wraps information about system server.
+     * Wraps information about system server. API 100 flavor.
      */
     interface SystemServerLoadedParam {
         /**
@@ -42,6 +43,26 @@ public interface XposedModuleInterface {
          */
         @NonNull
         ClassLoader getClassLoader();
+    }
+
+    /**
+     * Wraps information about system server. API 101 flavor.
+     */
+    interface SystemServerStartingParam {
+        @NonNull
+        ClassLoader getClassLoader();
+    }
+
+    /**
+     * Wraps information about a package whose classloader is ready. API 101.
+     */
+    interface PackageReadyParam extends PackageLoadedParam {
+        @NonNull
+        ClassLoader getClassLoader();
+
+        @RequiresApi(Build.VERSION_CODES.P)
+        @NonNull
+        AppComponentFactory getAppComponentFactory();
     }
 
     /**
@@ -99,10 +120,28 @@ public interface XposedModuleInterface {
     }
 
     /**
-     * Gets notified when the system server is loaded.
+     * Gets notified when the system server is loaded. API 100.
      *
      * @param param Information about system server
      */
     default void onSystemServerLoaded(@NonNull SystemServerLoadedParam param) {
+    }
+
+    /**
+     * API 101: invoked once per process after the module instance is attached.
+     */
+    default void onModuleLoaded(@NonNull ModuleLoadedParam param) {
+    }
+
+    /**
+     * API 101: invoked when a package's classloader is ready.
+     */
+    default void onPackageReady(@NonNull PackageReadyParam param) {
+    }
+
+    /**
+     * API 101: replaces {@link #onSystemServerLoaded(SystemServerLoadedParam)}.
+     */
+    default void onSystemServerStarting(@NonNull SystemServerStartingParam param) {
     }
 }
