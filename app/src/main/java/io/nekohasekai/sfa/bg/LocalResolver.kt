@@ -23,8 +23,8 @@ object LocalResolver : LocalDNSTransport {
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun exchange(ctx: ExchangeContext, message: ByteArray) {
+        val defaultNetwork = DefaultNetworkMonitor.defaultNetwork ?: error("missing default interface")
         return runBlocking {
-            val defaultNetwork = DefaultNetworkMonitor.require()
             suspendCoroutine { continuation ->
                 val signal = CancellationSignal()
                 ctx.onCancel(signal::cancel)
@@ -63,8 +63,8 @@ object LocalResolver : LocalDNSTransport {
     }
 
     override fun lookup(ctx: ExchangeContext, network: String, domain: String) {
+        val defaultNetwork = DefaultNetworkMonitor.defaultNetwork ?: error("missing default interface")
         return runBlocking {
-            val defaultNetwork = DefaultNetworkMonitor.require()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 suspendCoroutine { continuation ->
                     val signal = CancellationSignal()
