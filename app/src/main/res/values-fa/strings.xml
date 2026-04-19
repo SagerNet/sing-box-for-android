@@ -198,6 +198,7 @@
     <string name="source_code">کد منبع</string>
     <string name="sponsor">حامی مالی</string>
     <string name="working_directory">پوشه کاری</string>
+    <string name="beta_settings">تنظیمات بتا</string>
     <string name="disable_deprecated_warnings">غیرفعال‌کردن هشدارهای منسوخ</string>
     <string name="notification_settings">اعلان‌ها</string>
     <string name="enable_notification">فعال‌کردن اعلان</string>

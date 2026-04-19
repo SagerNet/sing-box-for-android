@@ -198,6 +198,7 @@
     <string name="source_code">原始碼</string>
     <string name="sponsor">贊助</string>
     <string name="working_directory">工作目錄</string>
+    <string name="beta_settings">Beta 版設定</string>
     <string name="disable_deprecated_warnings">停用過時警告</string>
     <string name="cache_size">快取大小</string>
     <string name="clear_cache">清除快取</string>
@@ -271,7 +272,7 @@
     <string name="check_update_prompt_github">是否啟用從 **GitHub** 自動檢查更新？</string>
     <string name="update_track">更新通道</string>
     <string name="update_track_stable">穩定版</string>
-    <string name="update_track_beta">測試版</string>
+    <string name="update_track_beta">Beta 版</string>
     <string name="update_track_not_supported">目前通道尚不支援檢查更新</string>
     <string name="view_release">查看發布</string>
     <string name="downloading">下載中…</string>

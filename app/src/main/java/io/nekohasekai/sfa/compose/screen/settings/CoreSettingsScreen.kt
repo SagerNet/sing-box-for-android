@@ -222,57 +222,58 @@ fun CoreSettingsScreen(navController: NavController) {
             }
         }
 
-        // Options Section
-        Spacer(modifier = Modifier.height(16.dp))
+        if (version.contains("-")) {
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Text(
-            text = stringResource(R.string.options),
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(horizontal = 32.dp, vertical = 8.dp),
-        )
-
-        Card(
-            modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            colors =
-            CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-            ),
-        ) {
-            ListItem(
-                headlineContent = {
-                    Text(
-                        stringResource(R.string.disable_deprecated_warnings),
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
-                },
-                leadingContent = {
-                    Icon(
-                        imageVector = Icons.Outlined.WarningAmber,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                    )
-                },
-                trailingContent = {
-                    Switch(
-                        checked = disableDeprecatedWarnings,
-                        onCheckedChange = { checked ->
-                            disableDeprecatedWarnings = checked
-                            scope.launch(Dispatchers.IO) {
-                                Settings.disableDeprecatedWarnings = checked
-                            }
-                        },
-                    )
-                },
-                modifier = Modifier.clip(RoundedCornerShape(12.dp)),
-                colors =
-                ListItemDefaults.colors(
-                    containerColor = Color.Transparent,
-                ),
+            Text(
+                text = stringResource(R.string.beta_settings),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(horizontal = 32.dp, vertical = 8.dp),
             )
+
+            Card(
+                modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                colors =
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                ),
+            ) {
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            stringResource(R.string.disable_deprecated_warnings),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    },
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Outlined.WarningAmber,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    },
+                    trailingContent = {
+                        Switch(
+                            checked = disableDeprecatedWarnings,
+                            onCheckedChange = { checked ->
+                                disableDeprecatedWarnings = checked
+                                scope.launch(Dispatchers.IO) {
+                                    Settings.disableDeprecatedWarnings = checked
+                                }
+                            },
+                        )
+                    },
+                    modifier = Modifier.clip(RoundedCornerShape(12.dp)),
+                    colors =
+                    ListItemDefaults.colors(
+                        containerColor = Color.Transparent,
+                    ),
+                )
+            }
         }
 
         // Working Directory Section
