@@ -8,6 +8,7 @@ import android.net.Uri
 import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -86,6 +87,9 @@ import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.BuildConfig
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.bg.BoxService
+import io.nekohasekai.sfa.bg.CrashReportManager
+import io.nekohasekai.sfa.bg.OOMReportManager
 import io.nekohasekai.sfa.bg.ServiceConnection
 import io.nekohasekai.sfa.bg.ServiceNotification
 import io.nekohasekai.sfa.compat.WindowSizeClassCompat
@@ -110,10 +114,12 @@ import io.nekohasekai.sfa.compose.screen.dashboard.DashboardViewModel
 import io.nekohasekai.sfa.compose.screen.dashboard.GroupsCard
 import io.nekohasekai.sfa.compose.screen.dashboard.groups.GroupsViewModel
 import io.nekohasekai.sfa.compose.screen.log.LogViewModel
+import io.nekohasekai.sfa.compose.screen.tools.TailscaleStatusViewModel
 import io.nekohasekai.sfa.compose.theme.SFATheme
 import io.nekohasekai.sfa.compose.topbar.LocalTopBarController
 import io.nekohasekai.sfa.compose.topbar.TopBarController
 import io.nekohasekai.sfa.compose.topbar.TopBarEntry
+import io.nekohasekai.sfa.constant.Action
 import io.nekohasekai.sfa.constant.Alert
 import io.nekohasekai.sfa.constant.ServiceMode
 import io.nekohasekai.sfa.constant.Status
@@ -124,6 +130,7 @@ import io.nekohasekai.sfa.update.UpdateState
 import io.nekohasekai.sfa.vendor.Vendor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -226,6 +233,10 @@ class MainActivity :
             pendingNavigationRoute.value = "settings/privilege"
         }
         val uri = intent.data ?: return
+        if (intent.action == Action.OPEN_URL) {
+            launchCustomTab(uri.toString())
+            return
+        }
         if (uri.scheme == "sing-box" && uri.host == "import-remote-profile") {
             try {
                 val profile = Libbox.parseRemoteProfileImportLink(uri.toString())
@@ -321,6 +332,89 @@ class MainActivity :
 
         // Snackbar state
         val snackbarHostState = remember { SnackbarHostState() }
+        // Error dialog state for UiEvent.ShowError
+        var showErrorDialog by remember { mutableStateOf(false) }
+        var errorMessage by remember { mutableStateOf("") }
+        var pendingApplyServiceChangeMode by remember { mutableStateOf<UiEvent.ApplyServiceChange.Mode?>(null) }
+        var activeApplyServiceChangeMode by remember { mutableStateOf<UiEvent.ApplyServiceChange.Mode?>(null) }
+        var applyServiceChangeJob by remember { mutableStateOf<Job?>(null) }
+
+        fun mergeApplyServiceChangeMode(
+            current: UiEvent.ApplyServiceChange.Mode?,
+            incoming: UiEvent.ApplyServiceChange.Mode,
+        ): UiEvent.ApplyServiceChange.Mode = when {
+            current == UiEvent.ApplyServiceChange.Mode.Restart ||
+                incoming == UiEvent.ApplyServiceChange.Mode.Restart -> {
+                UiEvent.ApplyServiceChange.Mode.Restart
+            }
+
+            else -> incoming
+        }
+
+        fun enqueueApplyServiceChange(mode: UiEvent.ApplyServiceChange.Mode) {
+            if (currentServiceStatus != Status.Started) {
+                return
+            }
+
+            pendingApplyServiceChangeMode = mergeApplyServiceChangeMode(pendingApplyServiceChangeMode, mode)
+
+            val activeMode = activeApplyServiceChangeMode
+            if (activeMode != null &&
+                mergeApplyServiceChangeMode(activeMode, mode) != activeMode
+            ) {
+                snackbarHostState.currentSnackbarData?.dismiss()
+            }
+
+            if (applyServiceChangeJob?.isActive == true) {
+                return
+            }
+
+            applyServiceChangeJob =
+                scope.launch {
+                    while (true) {
+                        val modeToShow = pendingApplyServiceChangeMode ?: break
+                        pendingApplyServiceChangeMode = null
+                        activeApplyServiceChangeMode = modeToShow
+                        val (message, actionLabel) =
+                            when (modeToShow) {
+                                UiEvent.ApplyServiceChange.Mode.Reload -> {
+                                    getString(R.string.service_reload_required) to
+                                        getString(R.string.action_reload)
+                                }
+
+                                UiEvent.ApplyServiceChange.Mode.Restart -> {
+                                    getString(R.string.service_restart_required) to
+                                        getString(R.string.action_restart)
+                                }
+                            }
+                        val result =
+                            snackbarHostState.showSnackbar(
+                                message = message,
+                                actionLabel = actionLabel,
+                                duration = androidx.compose.material3.SnackbarDuration.Short,
+                            )
+                        activeApplyServiceChangeMode = null
+                        if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
+                            try {
+                                when (modeToShow) {
+                                    UiEvent.ApplyServiceChange.Mode.Reload -> {
+                                        withContext(Dispatchers.IO) {
+                                            Libbox.newStandaloneCommandClient().serviceReload()
+                                        }
+                                    }
+
+                                    UiEvent.ApplyServiceChange.Mode.Restart -> {
+                                        restartServiceForApplyChange()
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                errorMessage = e.message ?: e.toString()
+                                showErrorDialog = true
+                            }
+                        }
+                    }
+                }
+        }
 
         // Groups Sheet state
         var showGroupsSheet by remember { mutableStateOf(false) }
@@ -329,8 +423,6 @@ class MainActivity :
         var showConnectionsSheet by remember { mutableStateOf(false) }
 
         // Error dialog state for UiEvent.ShowError
-        var showErrorDialog by remember { mutableStateOf(false) }
-        var errorMessage by remember { mutableStateOf("") }
         val pendingIntentError = pendingIntentErrorMessage
         LaunchedEffect(pendingIntentError) {
             if (pendingIntentError != null) {
@@ -610,11 +702,13 @@ class MainActivity :
         val dashboardUiState by dashboardViewModel.uiState.collectAsState()
 
         val isSettingsSubScreen = currentRoute?.startsWith("settings/") == true
+        val isToolsSubScreen = currentRoute?.startsWith("tools/") == true
         val isConnectionsDetail = currentRoute?.startsWith("connections/detail") == true
         val isProfileRoute = currentRoute?.startsWith("profile/") == true
         val currentRootRoute =
             when {
                 isSettingsSubScreen -> Screen.Settings.route
+                isToolsSubScreen -> Screen.Tools.route
                 currentRoute?.startsWith(Screen.Connections.route) == true -> Screen.Connections.route
                 currentRoute?.startsWith(Screen.Log.route) == true -> Screen.Log.route
                 isProfileRoute -> Screen.Dashboard.route
@@ -624,7 +718,7 @@ class MainActivity :
         val isGroupsRoute = currentRootRoute == Screen.Groups.route
         val isLogRoute = currentRootRoute == Screen.Log.route
 
-        val isSubScreen = isSettingsSubScreen || isConnectionsDetail || isProfileRoute
+        val isSubScreen = isSettingsSubScreen || isToolsSubScreen || isConnectionsDetail || isProfileRoute
         // Get LogViewModel instance if we're on the Log screen
         val logViewModel: LogViewModel? =
             if (isLogRoute) {
@@ -654,6 +748,14 @@ class MainActivity :
                 null
             }
 
+        val isToolsRoute = currentRootRoute == Screen.Tools.route
+        val tailscaleStatusViewModel: TailscaleStatusViewModel? =
+            if (isToolsRoute) {
+                viewModel()
+            } else {
+                null
+            }
+
         val showGroupsInNav = dashboardUiState.hasGroups
         val showConnectionsInNav =
             currentServiceStatus == Status.Started || currentServiceStatus == Status.Starting
@@ -668,6 +770,7 @@ class MainActivity :
                     add(Screen.Connections)
                 }
                 add(Screen.Log)
+                add(Screen.Tools)
                 add(Screen.Settings)
             }
 
@@ -675,6 +778,7 @@ class MainActivity :
             buildSet {
                 add(Screen.Dashboard.route)
                 add(Screen.Log.route)
+                add(Screen.Tools.route)
                 add(Screen.Settings.route)
                 if (useNavigationRail && showGroupsInNav) {
                     add(Screen.Groups.route)
@@ -733,24 +837,7 @@ class MainActivity :
                         }
                     }
 
-                    is UiEvent.RestartToTakeEffect -> {
-                        if (currentServiceStatus == Status.Started) {
-                            scope.launch {
-                                snackbarHostState.currentSnackbarData?.dismiss()
-                                val result =
-                                    snackbarHostState.showSnackbar(
-                                        message = "Restart to take effect",
-                                        actionLabel = "Restart",
-                                        duration = androidx.compose.material3.SnackbarDuration.Short,
-                                    )
-                                if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
-                                    withContext(Dispatchers.IO) {
-                                        Libbox.newStandaloneCommandClient().serviceReload()
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    is UiEvent.ApplyServiceChange -> enqueueApplyServiceChange(event.mode)
                 }
             }
         }
@@ -783,6 +870,7 @@ class MainActivity :
                     logViewModel = logViewModel,
                     groupsViewModel = groupsViewModel,
                     connectionsViewModel = connectionsViewModel,
+                    tailscaleStatusViewModel = tailscaleStatusViewModel,
                     modifier = Modifier.fillMaxSize(),
                 )
                 if (!useNavigationRail) {
@@ -913,6 +1001,17 @@ class MainActivity :
             }
         }
 
+        val crashReportUnreadCount by CrashReportManager.unreadCount.collectAsState()
+        val oomReportUnreadCount by OOMReportManager.unreadCount.collectAsState()
+        val toolsUnreadCount = crashReportUnreadCount + oomReportUnreadCount
+
+        LaunchedEffect(Unit) {
+            withContext(Dispatchers.IO) {
+                CrashReportManager.refresh()
+                OOMReportManager.refresh()
+            }
+        }
+
         CompositionLocalProvider(LocalTopBarController provides topBarController) {
             if (useNavigationRail) {
                 Row(modifier = Modifier.fillMaxSize()) {
@@ -928,6 +1027,10 @@ class MainActivity :
                                     icon = {
                                         if (screen == Screen.Settings && hasUpdate) {
                                             BadgedBox(badge = { Badge(containerColor = MaterialTheme.colorScheme.primary) }) {
+                                                Icon(screen.icon, contentDescription = null)
+                                            }
+                                        } else if (screen == Screen.Tools && toolsUnreadCount > 0) {
+                                            BadgedBox(badge = { Badge(containerColor = MaterialTheme.colorScheme.error) { Text("$toolsUnreadCount") } }) {
                                                 Icon(screen.icon, contentDescription = null)
                                             }
                                         } else {
@@ -972,6 +1075,10 @@ class MainActivity :
                                         icon = {
                                             if (screen == Screen.Settings && hasUpdate) {
                                                 BadgedBox(badge = { Badge(containerColor = MaterialTheme.colorScheme.primary) }) {
+                                                    Icon(screen.icon, contentDescription = null)
+                                                }
+                                            } else if (screen == Screen.Tools && toolsUnreadCount > 0) {
+                                                BadgedBox(badge = { Badge(containerColor = MaterialTheme.colorScheme.error) { Text("$toolsUnreadCount") } }) {
                                                     Icon(screen.icon, contentDescription = null)
                                                 }
                                             } else {
@@ -1102,6 +1209,10 @@ class MainActivity :
                 }
             }
 
+            BackHandler(enabled = selectedConnectionId != null) {
+                selectedConnectionId = null
+            }
+
             ModalBottomSheet(
                 onDismissRequest = {
                     showConnectionsSheet = false
@@ -1180,6 +1291,30 @@ class MainActivity :
     private fun requestBackgroundLocationPermission() {
         // Show background location permission dialog in Compose UI
         showBackgroundLocationDialog = true
+    }
+
+    private suspend fun restartServiceForApplyChange() {
+        if (currentServiceStatus != Status.Started) {
+            return
+        }
+
+        BoxService.stop()
+        while (true) {
+            when (currentServiceStatus) {
+                Status.Stopped -> {
+                    startService()
+                    return
+                }
+
+                Status.Starting -> {
+                    return
+                }
+
+                Status.Started, Status.Stopping -> {
+                    delay(100L)
+                }
+            }
+        }
     }
 
     override fun onDestroy() {

@@ -21,9 +21,19 @@ import io.github.libxposed.api.utils.DexParser;
  */
 public class XposedInterfaceWrapper implements XposedInterface {
 
-    private final XposedInterface mBase;
+    private volatile XposedInterface mBase;
 
-    XposedInterfaceWrapper(@NonNull XposedInterface base) {
+    public XposedInterfaceWrapper() {
+    }
+
+    public XposedInterfaceWrapper(@NonNull XposedInterface base) {
+        mBase = base;
+    }
+
+    public final void attachFramework(@NonNull XposedInterface base) {
+        if (mBase != null) {
+            throw new IllegalStateException("Framework already attached");
+        }
         mBase = base;
     }
 

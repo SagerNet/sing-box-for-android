@@ -23,6 +23,8 @@
     <string name="action">操作</string>
     <string name="action_start">啟動</string>
     <string name="action_deselect">取消選擇</string>
+    <string name="action_reload">重新載入</string>
+    <string name="action_restart">重新啟動</string>
     <string name="expand">展開</string>
     <string name="collapse">收合</string>
     <string name="expand_all">全部展開</string>
@@ -45,7 +47,7 @@
     <string name="default_text">預設</string>
 
     <!-- Navigation Titles -->
-    <string name="title_dashboard">儀表板</string>
+    <string name="title_dashboard">儀表</string>
     <string name="title_configuration">設定檔</string>
     <string name="title_log">日誌</string>
     <string name="title_settings">設定</string>
@@ -66,7 +68,7 @@
     <string name="status_started">已啟動</string>
 
     <!-- Dashboard -->
-    <string name="dashboard_items">儀表板項目</string>
+    <string name="dashboard_items">儀表項</string>
     <string name="memory">記憶體</string>
     <string name="goroutines">協程</string>
     <string name="upload">上傳</string>
@@ -86,7 +88,7 @@
     <string name="search_connections">搜尋連線…</string>
     <string name="close_connections_confirm">關閉所有連線？</string>
     <string name="connection_state_all">全部</string>
-    <string name="connection_state_active">活躍</string>
+    <string name="connection_state_active">活動</string>
     <string name="connection_state_closed">已關閉</string>
     <string name="connection_sort_date">日期</string>
     <string name="connection_sort_traffic">流量</string>
@@ -198,6 +200,7 @@
     <string name="source_code">原始碼</string>
     <string name="sponsor">贊助</string>
     <string name="working_directory">工作目錄</string>
+    <string name="beta_settings">Beta 版設定</string>
     <string name="disable_deprecated_warnings">停用過時警告</string>
     <string name="cache_size">快取大小</string>
     <string name="clear_cache">清除快取</string>
@@ -271,7 +274,7 @@
     <string name="check_update_prompt_github">是否啟用從 **GitHub** 自動檢查更新？</string>
     <string name="update_track">更新通道</string>
     <string name="update_track_stable">穩定版</string>
-    <string name="update_track_beta">測試版</string>
+    <string name="update_track_beta">Beta 版</string>
     <string name="update_track_not_supported">目前通道尚不支援檢查更新</string>
     <string name="view_release">查看發布</string>
     <string name="downloading">下載中…</string>
@@ -422,6 +425,94 @@
     <string name="content_description_pause_logs">暫停日誌</string>
     <string name="content_description_collapse_search">收合搜尋</string>
     <string name="content_description_search_logs">搜尋日誌</string>
+
+    <!-- Tools -->
+    <string name="title_tools">工具</string>
+    <string name="title_network">網路</string>
+    <string name="network_quality">網路品質</string>
+    <string name="network_quality_url">URL</string>
+    <string name="network_quality_serial">序列</string>
+    <string name="network_quality_http3">HTTP/3</string>
+    <string name="network_quality_max_runtime">最大執行時間</string>
+    <string name="network_quality_max_runtime_30s">30s</string>
+    <string name="network_quality_max_runtime_60s">60s</string>
+    <string name="network_quality_start">開始測試</string>
+    <string name="network_quality_cancel">取消測試</string>
+    <string name="network_quality_idle_latency">閒置延遲</string>
+    <string name="network_quality_download">下載</string>
+    <string name="network_quality_upload">上傳</string>
+    <string name="network_quality_download_rpm">下載 RPM</string>
+    <string name="network_quality_upload_rpm">上傳 RPM</string>
+    <string name="network_quality_confidence_high">置信度高</string>
+    <string name="network_quality_confidence_medium">置信度中</string>
+    <string name="network_quality_confidence_low">置信度低</string>
+    <string name="network_quality_metered_title">按流量計費連線</string>
+    <string name="network_quality_metered_message">您正在使用按流量計費的連線。此測試將消耗大量數據。</string>
+    <string name="network_quality_metered_continue">繼續</string>
+    <string name="tool_configuration">配置</string>
+    <string name="tool_results">結果</string>
+    <string name="tool_outbound">出站</string>
+    <string name="tool_default_outbound">默認</string>
+
+    <!-- STUN Test -->
+    <!-- Tailscale -->
+    <string name="tailscale_endpoints">端點</string>
+
+    <string name="tailscale_status">狀態</string>
+    <string name="tailscale_state">狀態</string>
+    <string name="tailscale_network">網路</string>
+    <string name="tailscale_open_auth_url">開啟認證連結</string>
+    <string name="tailscale_open_auth_url_qr_code">顯示認證連結 QR 碼</string>
+    <string name="tailscale_this_device">此裝置</string>
+    <string name="tailscale_connected">已連線</string>
+    <string name="tailscale_not_connected">未連線</string>
+    <string name="tailscale_addresses">Tailscale 位址</string>
+    <string name="tailscale_details">詳情</string>
+    <string name="tailscale_key_expiry">金鑰到期</string>
+    <string name="tailscale_exit_node">出口節點</string>
+    <string name="tailscale_active">活躍</string>
+
+    <string name="stun_test">STUN 測試</string>
+    <string name="stun_server">伺服器</string>
+    <string name="stun_start">開始測試</string>
+    <string name="stun_cancel">取消測試</string>
+    <string name="stun_external_address">外部地址</string>
+    <string name="stun_latency">延遲</string>
+    <string name="stun_nat_mapping">NAT 映射</string>
+    <string name="stun_nat_filtering">NAT 過濾</string>
+    <string name="stun_nat_type_detection">NAT 類型偵測</string>
+    <string name="stun_nat_not_supported">伺服器不支援</string>
+
+    <!-- Shared Report -->
+    <string name="report_empty">空</string>
+    <string name="report_section_reports">報告</string>
+    <string name="report_section_files">檔案</string>
+    <string name="report_delete_all">全部刪除</string>
+    <string name="report_delete">刪除</string>
+    <string name="report_share">分享</string>
+    <string name="report_share_with_config">附帶配置分享</string>
+    <string name="report_metadata">元數據</string>
+    <string name="report_configuration">配置</string>
+    <string name="report_origin_local">本地</string>
+    <string name="service_not_started">服務未啟動</string>
+    <string name="service_reload_required">需要重新載入服務以套用變更</string>
+    <string name="service_restart_required">需要重新啟動服務以套用變更</string>
+
+    <!-- Crash Report -->
+    <string name="crash_report">當機報告</string>
+    <string name="crash_report_go_log">Go Crash Log</string>
+    <string name="crash_report_jvm_log">JVM Crash Log</string>
+    <string name="crash_report_description">當發生當機時，您將會收到報告。</string>
+
+    <!-- OOM Report -->
+    <string name="oom_report">記憶體不足報告</string>
+    <string name="oom_report_description">啟用記憶體限制後，當服務記憶體超出限制時，您將會收到報告。您也可以手動觸發收集報告。</string>
+    <string name="oom_report_fetch">取得記憶體報告</string>
+    <string name="oom_report_enable_memory_limit">啟用記憶體限制</string>
+    <string name="oom_report_enable_memory_limit_description">為服務提供軟記憶體限制。服務將執行多個程序以嘗試保持在此記憶體限制範圍內。</string>
+    <string name="oom_report_memory_limit">記憶體限制</string>
+    <string name="oom_report_kill_connections">終止連線</string>
+    <string name="oom_report_kill_connections_description">當服務記憶體超出限制時，終止所有連線以釋放記憶體。</string>
 
     <!-- Xposed Module -->
     <string name="xposed_description">sing-box 的特權強化</string>

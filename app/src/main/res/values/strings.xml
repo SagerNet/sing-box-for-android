@@ -23,6 +23,8 @@
     <string name="action">Action</string>
     <string name="action_start">Start</string>
     <string name="action_deselect">Deselect</string>
+    <string name="action_reload">Reload</string>
+    <string name="action_restart">Restart</string>
     <string name="expand">Expand</string>
     <string name="collapse">Collapse</string>
     <string name="expand_all">Expand All</string>
@@ -198,6 +200,7 @@
     <string name="source_code">Source Code</string>
     <string name="sponsor">Sponsor</string>
     <string name="working_directory">Working Directory</string>
+    <string name="beta_settings">Beta Settings</string>
     <string name="disable_deprecated_warnings">Disable Deprecated Warnings</string>
     <string name="cache_size">Cache Size</string>
     <string name="clear_cache">Clear Cache</string>
@@ -422,6 +425,105 @@
     <string name="content_description_pause_logs">Pause logs</string>
     <string name="content_description_collapse_search">Collapse search</string>
     <string name="content_description_search_logs">Search logs</string>
+
+    <!-- Tools -->
+    <string name="title_tools">Tools</string>
+    <string name="title_network">Network</string>
+    <string name="network_quality">Network Quality</string>
+    <string name="network_quality_url">URL</string>
+    <string name="network_quality_serial">Serial</string>
+    <string name="network_quality_http3">HTTP/3</string>
+    <string name="network_quality_max_runtime">Max Runtime</string>
+    <string name="network_quality_max_runtime_30s">30s</string>
+    <string name="network_quality_max_runtime_60s">60s</string>
+    <string name="network_quality_start">Start Test</string>
+    <string name="network_quality_cancel">Cancel Test</string>
+    <string name="network_quality_idle_latency">Idle Latency</string>
+    <string name="network_quality_download">Download</string>
+    <string name="network_quality_upload">Upload</string>
+    <string name="network_quality_download_rpm">Download RPM</string>
+    <string name="network_quality_upload_rpm">Upload RPM</string>
+    <string name="network_quality_confidence_high">Confidence High</string>
+    <string name="network_quality_confidence_medium">Confidence Medium</string>
+    <string name="network_quality_confidence_low">Confidence Low</string>
+    <string name="network_quality_metered_title">Metered Connection</string>
+    <string name="network_quality_metered_message">You\'re on a metered connection. This test will use a significant amount of data.</string>
+    <string name="network_quality_metered_continue">Continue</string>
+    <string name="tool_configuration">Configuration</string>
+    <string name="tool_results">Results</string>
+    <string name="tool_outbound">Outbound</string>
+    <string name="tool_default_outbound">Default</string>
+
+    <!-- Tailscale -->
+    <string name="tailscale" translatable="false">Tailscale</string>
+    <string name="tailscale_with_tag" translatable="false">Tailscale: %s</string>
+    <string name="tailscale_endpoints">Endpoints</string>
+
+    <string name="tailscale_status">Status</string>
+    <string name="tailscale_state">State</string>
+    <string name="tailscale_network">Network</string>
+    <string name="tailscale_magic_dns" translatable="false">MagicDNS</string>
+    <string name="tailscale_open_auth_url">Open Auth URL</string>
+    <string name="tailscale_open_auth_url_qr_code">Show Auth URL QR Code</string>
+    <string name="tailscale_this_device">This Device</string>
+    <string name="tailscale_connected">Connected</string>
+    <string name="tailscale_not_connected">Not Connected</string>
+    <string name="tailscale_addresses">Tailscale Addresses</string>
+    <string name="tailscale_details">Details</string>
+    <string name="tailscale_key_expiry">Key Expiry</string>
+    <string name="tailscale_os" translatable="false">OS</string>
+    <string name="tailscale_exit_node">Exit Node</string>
+    <string name="tailscale_active">Active</string>
+    <string name="tailscale_ipv4" translatable="false">IPv4</string>
+    <string name="tailscale_ipv6" translatable="false">IPv6</string>
+    <string name="tailscale_ping">Ping</string>
+    <string name="tailscale_ping_start">Start</string>
+    <string name="tailscale_ping_stop">Stop</string>
+    <string name="tailscale_ping_direct">Direct connection</string>
+    <string name="tailscale_ping_derp">DERP-relayed connection</string>
+
+    <!-- STUN Test -->
+    <string name="stun_test">STUN Test</string>
+    <string name="stun_server">Server</string>
+    <string name="stun_start">Start Test</string>
+    <string name="stun_cancel">Cancel Test</string>
+    <string name="stun_external_address">External Address</string>
+    <string name="stun_latency">Latency</string>
+    <string name="stun_nat_mapping">NAT Mapping</string>
+    <string name="stun_nat_filtering">NAT Filtering</string>
+    <string name="stun_nat_type_detection">NAT Type Detection</string>
+    <string name="stun_nat_not_supported">Not supported by server</string>
+
+    <!-- Shared Report -->
+    <string name="report_empty">Empty</string>
+    <string name="report_section_reports">Reports</string>
+    <string name="report_section_files">Files</string>
+    <string name="report_delete_all">Delete All</string>
+    <string name="report_delete">Delete</string>
+    <string name="report_share">Share</string>
+    <string name="report_share_with_config">Share With Configuration</string>
+    <string name="report_metadata">Metadata</string>
+    <string name="report_configuration">Configuration</string>
+    <string name="report_origin_local">Local</string>
+    <string name="service_not_started">Service not started</string>
+    <string name="service_reload_required">Reload service to apply changes</string>
+    <string name="service_restart_required">Restart service to apply changes</string>
+
+    <!-- Crash Report -->
+    <string name="crash_report">Crash Report</string>
+    <string name="crash_report_go_log">Go Crash Log</string>
+    <string name="crash_report_jvm_log">JVM Crash Log</string>
+    <string name="crash_report_description">You will receive a report when a crash occurs.</string>
+
+    <!-- OOM Report -->
+    <string name="oom_report">OOM Report</string>
+    <string name="oom_report_description">When memory limit is enabled, you will receive a report if the service memory exceeds the limit. You can also manually trigger report collection.</string>
+    <string name="oom_report_fetch">Fetch Memory Report</string>
+    <string name="oom_report_enable_memory_limit">Enable Memory Limit</string>
+    <string name="oom_report_enable_memory_limit_description">Provide a soft memory limit for the service. The service will perform multiple processes to try to stay within this memory limit.</string>
+    <string name="oom_report_memory_limit">Memory Limit</string>
+    <string name="oom_report_kill_connections">Kill Connections</string>
+    <string name="oom_report_kill_connections_description">Kill all connections to free memory when the service memory exceeds the limit.</string>
 
     <!-- Xposed Module -->
     <string name="xposed_description">Privileged Enhancement for sing-box</string>
