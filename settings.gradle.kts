@@ -16,5 +16,3 @@ dependencyResolutionManagement {
 }
 rootProject.name = "sing-box"
 include(":app")
-include(":libxposed-api")
-project(":libxposed-api").projectDir = file("third_party/libxposed-api")

@@ -323,7 +323,7 @@ dependencies {
 
     // Xposed API for self-hooking VPN hide module
     compileOnly("de.robv.android.xposed:api:82")
-    compileOnly(project(":libxposed-api"))
+    compileOnly("io.github.libxposed:api:101.0.1")
 }
 
 val playCredentialsJSON = rootProject.file("service-account-credentials.json")

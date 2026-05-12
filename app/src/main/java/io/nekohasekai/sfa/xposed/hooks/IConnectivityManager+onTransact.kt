@@ -1,6 +1,5 @@
 package io.nekohasekai.sfa.xposed.hooks
 
-import android.content.Context
 import android.content.pm.PackageInfo
 import android.os.Binder
 import android.os.Parcel
@@ -12,8 +11,9 @@ import io.nekohasekai.sfa.xposed.HookErrorStore
 import io.nekohasekai.sfa.xposed.HookStatusKeys
 import io.nekohasekai.sfa.xposed.HookStatusStore
 import io.nekohasekai.sfa.xposed.PrivilegeSettingsStore
+import io.nekohasekai.sfa.xposed.VpnAppStore
 
-class HookIConnectivityManagerOnTransact(private val classLoader: ClassLoader, private val context: Context?) : XHook {
+class HookIConnectivityManagerOnTransact(private val classLoader: ClassLoader) : XHook {
     private companion object {
         private const val SOURCE = "HookIConnectivityManagerOnTransact"
     }
@@ -109,17 +109,8 @@ class HookIConnectivityManagerOnTransact(private val classLoader: ClassLoader, p
     private fun isCallerAllowed(): Boolean {
         val uid = Binder.getCallingUid()
         if (uid == 0) return true
-        val pm = context?.packageManager
-        if (pm == null) {
-            HookErrorStore.e(SOURCE, "isCallerAllowed: context or packageManager is null, uid=$uid")
-            return false
-        }
         return try {
-            val packages = pm.getPackagesForUid(uid)
-            if (packages == null) {
-                HookErrorStore.w(SOURCE, "isCallerAllowed: getPackagesForUid returned null for uid=$uid")
-                return false
-            }
+            val packages = VpnAppStore.getPackagesForUid(uid)
             packages.any { it == BuildConfig.APPLICATION_ID }
         } catch (e: Throwable) {
             HookErrorStore.e(SOURCE, "isCallerAllowed failed for uid=$uid", e)
