@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!--
+      Xposed/LSPosed code runs inside processes injected by the Xposed framework
+      (LSPosed requires Android 8.1+), not in the sfa app main process. Lint's
+      NewApi check based on the app's minSdk does not apply here.
+    -->
+    <issue id="NewApi">
+        <ignore path="src/main/java/io/nekohasekai/sfa/xposed" />
+        <ignore path="src/main/java/io/github/libxposed/service" />
+    </issue>
+</lint>

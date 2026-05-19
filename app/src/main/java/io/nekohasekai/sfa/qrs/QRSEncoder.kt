@@ -1,7 +1,7 @@
 package io.nekohasekai.sfa.qrs
 
+import android.util.Base64
 import java.io.ByteArrayOutputStream
-import java.util.Base64
 import java.util.zip.Deflater
 
 class QRSEncoder(private val sliceSize: Int = QRSConstants.DEFAULT_SLICE_SIZE) {
@@ -57,7 +57,7 @@ class QRSEncoder(private val sliceSize: Int = QRSConstants.DEFAULT_SLICE_SIZE) {
 
         return codec.encode(data, compressed, compressed.size).mapIndexed { index, block ->
             val payload = buildPayload(block)
-            val base64 = Base64.getEncoder().encodeToString(payload)
+            val base64 = Base64.encodeToString(payload, Base64.NO_WRAP)
             QRSFrame("$urlPrefix$base64", index, block.totalBlocks)
         }
     }

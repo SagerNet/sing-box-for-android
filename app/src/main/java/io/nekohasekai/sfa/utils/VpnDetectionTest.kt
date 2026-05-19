@@ -2,8 +2,10 @@ package io.nekohasekai.sfa.utils
 
 import android.content.Context
 import android.net.ConnectivityManager
+import android.net.LinkProperties
 import android.net.Network
 import android.net.NetworkCapabilities
+import android.os.Build
 import java.net.NetworkInterface
 import java.util.Collections
 
@@ -67,7 +69,7 @@ object VpnDetectionTest {
         }
 
         // Check activeLinkProperties interface
-        val activeLinkProperties = runCatching { cm.getLinkProperties(cm.activeNetwork) }.getOrNull()
+        val activeLinkProperties = readActiveLinkProperties(cm)
         if (isVpnInterface(activeLinkProperties?.interfaceName)) {
             activeLinkProperties?.interfaceName?.let(frameworkInterfaces::add)
             frameworkDetected += "LinkProperties"
@@ -117,7 +119,7 @@ object VpnDetectionTest {
         } catch (_: Throwable) {
             null
         }
-        val activeLinkProperties = runCatching { cm.getLinkProperties(cm.activeNetwork) }.getOrNull()
+        val activeLinkProperties = readActiveLinkProperties(cm)
         val networks = cm.allNetworks ?: emptyArray()
         val proxies = buildList {
             add(formatProxyInfo(defaultProxy))
@@ -129,7 +131,12 @@ object VpnDetectionTest {
         return proxies.firstOrNull { !it.isNullOrEmpty() }
     }
 
-    private fun readProxyFromLinkProperties(lp: android.net.LinkProperties?): android.net.ProxyInfo? {
+    private fun readActiveLinkProperties(cm: ConnectivityManager): LinkProperties? {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return null
+        return runCatching { cm.getLinkProperties(cm.activeNetwork) }.getOrNull()
+    }
+
+    private fun readProxyFromLinkProperties(lp: LinkProperties?): android.net.ProxyInfo? {
         if (lp == null) return null
         return try {
             val method = lp.javaClass.getMethod("getHttpProxy")

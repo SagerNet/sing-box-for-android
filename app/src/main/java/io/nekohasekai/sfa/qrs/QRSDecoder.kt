@@ -1,7 +1,7 @@
 package io.nekohasekai.sfa.qrs
 
+import android.util.Base64
 import java.io.ByteArrayOutputStream
-import java.util.Base64
 import java.util.zip.Inflater
 
 class QRSDecoder {
@@ -44,7 +44,7 @@ class QRSDecoder {
     @Synchronized
     fun processFrame(base64Content: String): DecodeProgress? {
         val payload = try {
-            Base64.getDecoder().decode(base64Content)
+            Base64.decode(base64Content, Base64.NO_WRAP)
         } catch (e: Exception) {
             return null
         }

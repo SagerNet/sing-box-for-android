@@ -79,6 +79,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
@@ -195,7 +196,7 @@ fun AppSettingsScreen(navController: NavController) {
             val channel = Application.notification.getNotificationChannel("service")
             notificationEnabled = channel?.importance != NotificationManager.IMPORTANCE_NONE
         } else {
-            notificationEnabled = Application.notification.areNotificationsEnabled()
+            notificationEnabled = NotificationManagerCompat.from(context).areNotificationsEnabled()
         }
         if (silentInstallEnabled) {
             scope.launch {
