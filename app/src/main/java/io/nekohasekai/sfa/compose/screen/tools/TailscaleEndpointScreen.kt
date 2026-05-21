@@ -2,6 +2,7 @@ package io.nekohasekai.sfa.compose.screen.tools
 
 import android.content.Intent
 import android.net.Uri
+import android.text.format.DateUtils
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -93,6 +94,7 @@ fun TailscaleEndpointScreen(
     ) {
         val hasNetwork = endpoint.networkName.isNotEmpty()
         val hasMagicDNS = endpoint.magicDNSSuffix.isNotEmpty()
+        val hasExitNode = endpoint.backendState == "Running" && endpoint.hasExitNodeCandidates
         val hasAuth = endpoint.authURL.isNotEmpty()
 
         // Status section
@@ -106,7 +108,7 @@ fun TailscaleEndpointScreen(
             ),
         ) {
             Column {
-                val stateIsLast = !hasNetwork && !hasMagicDNS && !hasAuth
+                val stateIsLast = !hasNetwork && !hasMagicDNS && !hasExitNode && !hasAuth
                 ListItem(
                     headlineContent = {
                         Text(
@@ -142,7 +144,7 @@ fun TailscaleEndpointScreen(
                     colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                 )
                 if (hasNetwork) {
-                    val networkIsLast = !hasMagicDNS && !hasAuth
+                    val networkIsLast = !hasMagicDNS && !hasExitNode && !hasAuth
                     ListItem(
                         headlineContent = {
                             Text(
@@ -166,7 +168,7 @@ fun TailscaleEndpointScreen(
                     )
                 }
                 if (hasMagicDNS) {
-                    val magicDNSIsLast = !hasAuth
+                    val magicDNSIsLast = !hasExitNode && !hasAuth
                     ListItem(
                         headlineContent = {
                             Text(
@@ -186,6 +188,39 @@ fun TailscaleEndpointScreen(
                         } else {
                             Modifier
                         },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                    )
+                }
+                if (hasExitNode) {
+                    val exitNodeIsLast = !hasAuth
+                    ListItem(
+                        headlineContent = {
+                            Text(
+                                stringResource(R.string.tailscale_exit_node),
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                        },
+                        supportingContent = {
+                            Text(
+                                endpoint.exitNode?.hostName ?: stringResource(R.string.disabled),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                            )
+                        },
+                        modifier = Modifier
+                            .clip(
+                                if (exitNodeIsLast) {
+                                    RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)
+                                } else {
+                                    RoundedCornerShape(0.dp)
+                                },
+                            )
+                            .clickable {
+                                navController.navigate(
+                                    "tools/tailscale/${Uri.encode(endpointTag)}/exit_node",
+                                )
+                            },
                         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                     )
                 }
@@ -323,34 +358,97 @@ private fun PeerItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    ListItem(
-        headlineContent = {
+    val badges = peerBadges(peer)
+    val firstIP = peer.tailscaleIPs.firstOrNull()
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            modifier = Modifier
+                .size(8.dp)
+                .clip(CircleShape)
+                .background(if (peer.online) Color(0xFF4CAF50) else Color.Gray),
+        )
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
             Text(
                 peer.hostName,
                 style = MaterialTheme.typography.bodyLarge,
             )
-        },
-        supportingContent = if (peer.tailscaleIPs.isNotEmpty()) {
-            {
+            if (firstIP != null) {
                 Text(
-                    peer.tailscaleIPs.first(),
+                    firstIP,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-        } else {
-            null
-        },
-        leadingContent = {
-            Box(
-                modifier = Modifier
-                    .size(8.dp)
-                    .clip(CircleShape)
-                    .background(if (peer.online) Color(0xFF4CAF50) else Color.Gray),
-            )
-        },
-        modifier = modifier.clickable(onClick = onClick),
-        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+            if (badges.isNotEmpty()) {
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    for (badge in badges) {
+                        PeerBadgeView(badge)
+                    }
+                }
+            }
+        }
+    }
+}
+
+private data class PeerBadge(val text: String, val color: Color)
+
+@Composable
+private fun peerBadges(peer: TailscalePeerData): List<PeerBadge> {
+    val badges = mutableListOf<PeerBadge>()
+    if (peer.shareeNode) {
+        badges += PeerBadge(stringResource(R.string.tailscale_shared_in), Color(0xFFF44336))
+    }
+    if (peer.exitNodeOption) {
+        badges += PeerBadge(stringResource(R.string.tailscale_exit_node), Color(0xFF2196F3))
+    }
+    when {
+        peer.expired -> {
+            badges += PeerBadge(stringResource(R.string.tailscale_expired), Color(0xFFF44336))
+        }
+        peer.keyExpiry > 0 -> {
+            val expiryMs = peer.keyExpiry * 1000
+            val now = System.currentTimeMillis()
+            val oneMonthMs = 30L * 24 * 60 * 60 * 1000
+            if (expiryMs - now <= oneMonthMs) {
+                val rel = DateUtils.getRelativeTimeSpanString(
+                    expiryMs,
+                    now,
+                    DateUtils.MINUTE_IN_MILLIS,
+                    DateUtils.FORMAT_ABBREV_RELATIVE,
+                ).toString()
+                badges += PeerBadge(stringResource(R.string.tailscale_expires_relative, rel), Color.Gray)
+            }
+        }
+        else -> {
+            badges += PeerBadge(stringResource(R.string.tailscale_key_expiry_disabled), Color.Gray)
+        }
+    }
+    if (peer.sshHostKeys.isNotEmpty()) {
+        badges += PeerBadge(stringResource(R.string.tailscale_ssh), Color(0xFF4CAF50))
+    }
+    return badges
+}
+
+@Composable
+private fun PeerBadgeView(badge: PeerBadge) {
+    Text(
+        text = badge.text,
+        style = MaterialTheme.typography.labelSmall,
+        color = Color.White,
+        modifier = Modifier
+            .clip(RoundedCornerShape(50))
+            .background(badge.color)
+            .padding(horizontal = 6.dp, vertical = 2.dp),
     )
 }
 
