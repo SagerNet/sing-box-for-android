@@ -46,6 +46,7 @@ import io.nekohasekai.sfa.compose.screen.tools.OOMReportMetadataScreen
 import io.nekohasekai.sfa.compose.screen.tools.OutboundPickerScreen
 import io.nekohasekai.sfa.compose.screen.tools.STUNTestScreen
 import io.nekohasekai.sfa.compose.screen.tools.TailscaleEndpointScreen
+import io.nekohasekai.sfa.compose.screen.tools.TailscaleExitNodePickerScreen
 import io.nekohasekai.sfa.compose.screen.tools.TailscalePeerScreen
 import io.nekohasekai.sfa.compose.screen.tools.TailscaleStatusViewModel
 import io.nekohasekai.sfa.compose.screen.tools.ToolsScreen
@@ -276,6 +277,19 @@ fun SFANavHost(
             val endpointTag = Uri.decode(backStackEntry.arguments?.getString("endpointTag") ?: return@composable)
             val tailscaleViewModel: TailscaleStatusViewModel = tailscaleStatusViewModel ?: viewModel()
             TailscaleEndpointScreen(navController = navController, viewModel = tailscaleViewModel, endpointTag = endpointTag)
+        }
+
+        composable(
+            route = "tools/tailscale/{endpointTag}/exit_node",
+            arguments = listOf(navArgument("endpointTag") { type = NavType.StringType }),
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) { backStackEntry ->
+            val endpointTag = Uri.decode(backStackEntry.arguments?.getString("endpointTag") ?: return@composable)
+            val tailscaleViewModel: TailscaleStatusViewModel = tailscaleStatusViewModel ?: viewModel()
+            TailscaleExitNodePickerScreen(navController = navController, viewModel = tailscaleViewModel, endpointTag = endpointTag)
         }
 
         composable(
