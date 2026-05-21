@@ -481,6 +481,14 @@
     <string name="tailscale_ping_stop">Stop</string>
     <string name="tailscale_ping_direct">Direct connection</string>
     <string name="tailscale_ping_derp">DERP-relayed connection</string>
+    <string name="tailscale_shared_in">Shared in</string>
+    <string name="tailscale_expired">Expired</string>
+    <string name="tailscale_expires_relative">Expires %1$s</string>
+    <string name="tailscale_key_expiry_disabled">Key expiry disabled</string>
+    <string name="tailscale_last_seen">Last Seen</string>
+    <string name="tailscale_ssh" translatable="false">SSH</string>
+    <string name="tailscale_available">Available</string>
+    <string name="tailscale_yes">Yes</string>
 
     <!-- STUN Test -->
     <string name="stun_test">STUN Test</string>

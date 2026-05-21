@@ -477,6 +477,13 @@
     <string name="tailscale_key_expiry">Срок действия ключа</string>
     <string name="tailscale_exit_node">Выходной узел</string>
     <string name="tailscale_active">Активен</string>
+    <string name="tailscale_shared_in">Поделено</string>
+    <string name="tailscale_expired">Истёк</string>
+    <string name="tailscale_expires_relative">Истекает %1$s</string>
+    <string name="tailscale_key_expiry_disabled">Срок действия ключа отключён</string>
+    <string name="tailscale_last_seen">Был(а) в сети</string>
+    <string name="tailscale_available">Доступно</string>
+    <string name="tailscale_yes">Да</string>
 
     <string name="stun_test">STUN-тест</string>
     <string name="stun_server">Сервер</string>
