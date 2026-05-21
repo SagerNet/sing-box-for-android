@@ -46,7 +46,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -329,46 +328,88 @@ fun TailscalePeerScreen(
         }
 
         // Details section
-        val showDetails = peer.keyExpiry > 0 || peer.os.isNotEmpty() || peer.exitNode
-        if (showDetails) {
-            Spacer(modifier = Modifier.height(16.dp))
-            SectionHeader(stringResource(R.string.tailscale_details))
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                ),
+        Spacer(modifier = Modifier.height(16.dp))
+        SectionHeader(stringResource(R.string.tailscale_details))
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+            ),
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                val context = LocalContext.current
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    if (peer.keyExpiry > 0) {
+                when {
+                    peer.expired -> {
+                        DetailRow(
+                            label = stringResource(R.string.tailscale_key_expiry),
+                            value = stringResource(R.string.tailscale_expired),
+                            valueColor = MaterialTheme.colorScheme.error,
+                        )
+                    }
+                    peer.keyExpiry > 0 -> {
                         val expiryText = DateUtils.getRelativeTimeSpanString(
                             peer.keyExpiry * 1000,
                             System.currentTimeMillis(),
                             DateUtils.MINUTE_IN_MILLIS,
+                            0,
                         ).toString()
                         DetailRow(
                             label = stringResource(R.string.tailscale_key_expiry),
                             value = expiryText,
                         )
                     }
-                    if (peer.os.isNotEmpty()) {
+                    else -> {
                         DetailRow(
-                            label = stringResource(R.string.tailscale_os),
-                            value = peer.os,
+                            label = stringResource(R.string.tailscale_key_expiry),
+                            value = stringResource(R.string.disabled),
+                            valueColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
-                    if (peer.exitNode) {
-                        DetailRow(
-                            label = stringResource(R.string.tailscale_exit_node),
-                            value = stringResource(R.string.tailscale_active),
-                        )
-                    }
+                }
+                if (peer.os.isNotEmpty()) {
+                    DetailRow(
+                        label = stringResource(R.string.tailscale_os),
+                        value = peer.os,
+                    )
+                }
+                if (!peer.online && peer.lastSeen > 0) {
+                    val lastSeenText = DateUtils.getRelativeTimeSpanString(
+                        peer.lastSeen * 1000,
+                        System.currentTimeMillis(),
+                        DateUtils.MINUTE_IN_MILLIS,
+                        0,
+                    ).toString()
+                    DetailRow(
+                        label = stringResource(R.string.tailscale_last_seen),
+                        value = lastSeenText,
+                    )
+                }
+                if (peer.exitNode) {
+                    DetailRow(
+                        label = stringResource(R.string.tailscale_exit_node),
+                        value = stringResource(R.string.tailscale_active),
+                    )
+                } else if (peer.exitNodeOption) {
+                    DetailRow(
+                        label = stringResource(R.string.tailscale_exit_node),
+                        value = stringResource(R.string.tailscale_available),
+                    )
+                }
+                if (peer.shareeNode) {
+                    DetailRow(
+                        label = stringResource(R.string.tailscale_shared_in),
+                        value = stringResource(R.string.tailscale_yes),
+                    )
+                }
+                if (peer.sshHostKeys.isNotEmpty()) {
+                    DetailRow(
+                        label = stringResource(R.string.tailscale_ssh),
+                        value = stringResource(R.string.tailscale_available),
+                    )
                 }
             }
         }
@@ -395,7 +436,7 @@ private fun SectionHeader(title: String) {
 }
 
 @Composable
-private fun DetailRow(label: String, value: String) {
+private fun DetailRow(label: String, value: String, valueColor: Color? = null) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -410,7 +451,7 @@ private fun DetailRow(label: String, value: String) {
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace),
-            color = MaterialTheme.colorScheme.onSurface,
+            color = valueColor ?: MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.End,
         )
     }

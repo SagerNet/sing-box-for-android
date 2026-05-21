@@ -471,6 +471,13 @@
     <string name="tailscale_key_expiry">انقضای کلید</string>
     <string name="tailscale_exit_node">گره خروجی</string>
     <string name="tailscale_active">فعال</string>
+    <string name="tailscale_shared_in">به اشتراک گذاشته شده</string>
+    <string name="tailscale_expired">منقضی شده</string>
+    <string name="tailscale_expires_relative">انقضا %1$s</string>
+    <string name="tailscale_key_expiry_disabled">انقضای کلید غیرفعال است</string>
+    <string name="tailscale_last_seen">آخرین بازدید</string>
+    <string name="tailscale_available">در دسترس</string>
+    <string name="tailscale_yes">بله</string>
 
     <string name="stun_test">تست STUN</string>
     <string name="stun_server">سرور</string>

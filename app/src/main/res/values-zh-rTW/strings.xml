@@ -471,6 +471,13 @@
     <string name="tailscale_key_expiry">金鑰到期</string>
     <string name="tailscale_exit_node">出口節點</string>
     <string name="tailscale_active">活躍</string>
+    <string name="tailscale_shared_in">共享至此</string>
+    <string name="tailscale_expired">已過期</string>
+    <string name="tailscale_expires_relative">%1$s過期</string>
+    <string name="tailscale_key_expiry_disabled">金鑰到期已停用</string>
+    <string name="tailscale_last_seen">最後上線</string>
+    <string name="tailscale_available">可用</string>
+    <string name="tailscale_yes">是</string>
 
     <string name="stun_test">STUN 測試</string>
     <string name="stun_server">伺服器</string>
