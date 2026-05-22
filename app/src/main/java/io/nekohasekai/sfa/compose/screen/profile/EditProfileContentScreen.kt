@@ -51,6 +51,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -449,19 +450,22 @@ fun EditProfileContentScreen(
                         setBackgroundColor(
                             androidx.core.content.ContextCompat.getColor(context, android.R.color.transparent),
                         )
-                        // Set up the editor with read-only state - this handles all configuration
-                        viewModel.setEditor(this, uiState.isReadOnly)
+                        viewModel.attachEditor(this)
                     }
-                },
-                update = { textProcessor ->
-                    // Re-apply configuration when read-only state changes
-                    viewModel.setEditor(textProcessor, uiState.isReadOnly)
                 },
                 modifier =
                 Modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background),
             )
+
+            LaunchedEffect(uiState.isReadOnly) {
+                viewModel.setReadOnly(uiState.isReadOnly)
+            }
+
+            DisposableEffect(Unit) {
+                onDispose { viewModel.detachEditor() }
+            }
 
             // Simple loading indicator at the top
             if (uiState.isLoading) {
