@@ -1,5 +1,6 @@
 package io.nekohasekai.sfa.compose.screen.profile
 
+import android.text.TextWatcher
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -21,7 +22,6 @@ import java.io.File
 
 data class EditProfileContentUiState(
     val isLoading: Boolean = false,
-    val content: String = "",
     val originalContent: String = "",
     val hasUnsavedChanges: Boolean = false,
     val canUndo: Boolean = false,
@@ -49,107 +49,103 @@ class EditProfileContentViewModel(private val profileId: Long, initialIsReadOnly
 
     private var profile: Profile? = null
     private var editor: ManualScrollTextProcessor? = null
+    private var textWatcher: TextWatcher? = null
     private var configCheckJob: Job? = null
 
-    fun setEditor(textProcessor: ManualScrollTextProcessor, isReadOnly: Boolean = false) {
-        val isNewEditor = editor != textProcessor
+    private val readOnlyKeyListener = android.view.View.OnKeyListener { _, _, _ -> true }
+
+    private val readOnlySelectionCallback =
+        object : android.view.ActionMode.Callback {
+            override fun onCreateActionMode(mode: android.view.ActionMode?, menu: android.view.Menu?): Boolean = true
+
+            override fun onPrepareActionMode(mode: android.view.ActionMode?, menu: android.view.Menu?): Boolean {
+                menu?.let { m ->
+                    m.removeItem(android.R.id.cut)
+                    m.removeItem(android.R.id.paste)
+                    m.removeItem(android.R.id.pasteAsPlainText)
+                    m.removeItem(android.R.id.replaceText)
+                    m.removeItem(android.R.id.undo)
+                    m.removeItem(android.R.id.redo)
+                    m.removeItem(android.R.id.autofill)
+                    m.removeItem(android.R.id.textAssist)
+                }
+                return true
+            }
+
+            override fun onActionItemClicked(mode: android.view.ActionMode?, item: android.view.MenuItem?): Boolean = false
+
+            override fun onDestroyActionMode(mode: android.view.ActionMode?) {}
+        }
+
+    fun attachEditor(textProcessor: ManualScrollTextProcessor) {
         editor = textProcessor
         textProcessor.resumeAutoScroll()
 
-        // Always keep these for scrolling, focus, and selection
         textProcessor.isEnabled = true
         textProcessor.isFocusable = true
         textProcessor.isFocusableInTouchMode = true
-
-        // Allow text selection for copying
         textProcessor.setTextIsSelectable(true)
-
-        // Multi-line configuration
         textProcessor.setSingleLine(false)
         textProcessor.maxLines = Integer.MAX_VALUE
         textProcessor.inputType = android.text.InputType.TYPE_CLASS_TEXT or
             android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE or
             android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
         textProcessor.isCursorVisible = true
+        textProcessor.isLongClickable = true
 
-        if (isReadOnly) {
-            // Use a custom OnKeyListener that blocks all key input
-            textProcessor.setOnKeyListener { _, _, _ -> true } // Return true to consume all key events
-            // Enable long click for selection
-            textProcessor.isLongClickable = true
-
-            // Customize text selection to remove Cut and Paste options
-            textProcessor.customSelectionActionModeCallback =
-                object : android.view.ActionMode.Callback {
-                    override fun onCreateActionMode(mode: android.view.ActionMode?, menu: android.view.Menu?): Boolean {
-                        // Allow the action mode to be created
-                        return true
-                    }
-
-                    override fun onPrepareActionMode(mode: android.view.ActionMode?, menu: android.view.Menu?): Boolean {
-                        // Remove editing-related menu items, keep only Copy and Select All
-                        menu?.let { m ->
-                            // Remove all editing-related items
-                            m.removeItem(android.R.id.cut)
-                            m.removeItem(android.R.id.paste)
-                            m.removeItem(android.R.id.pasteAsPlainText)
-                            m.removeItem(android.R.id.replaceText)
-                            m.removeItem(android.R.id.undo)
-                            m.removeItem(android.R.id.redo)
-                            m.removeItem(android.R.id.autofill)
-                            m.removeItem(android.R.id.textAssist)
-                        }
-                        return true
-                    }
-
-                    override fun onActionItemClicked(mode: android.view.ActionMode?, item: android.view.MenuItem?): Boolean {
-                        // Let the default implementation handle allowed actions (copy, select all)
-                        return false
-                    }
-
-                    override fun onDestroyActionMode(mode: android.view.ActionMode?) {
-                        // No special cleanup needed
-                    }
-                }
-        } else {
-            // For editable mode, remove the blocking listener
-            textProcessor.setOnKeyListener(null)
-            // Remove the custom selection callback to allow all text operations
-            textProcessor.customSelectionActionModeCallback = null
-
-            // Only add text change listener for new editors in editable mode
-            if (isNewEditor) {
-                textProcessor.addTextChangedListener { editable ->
-                    val currentText = editable?.toString() ?: ""
-                    _uiState.update { state ->
-                        state.copy(
-                            content = currentText,
-                            canUndo = textProcessor.canUndo(),
-                            canRedo = textProcessor.canRedo(),
-                            hasUnsavedChanges = currentText != state.originalContent,
-                        )
-                    }
-
-                    // Schedule background configuration check
-                    scheduleConfigurationCheck(currentText)
-                }
+        textWatcher = textProcessor.addTextChangedListener { editable ->
+            val length = editable?.length ?: 0
+            val original = _uiState.value.originalContent
+            val hasUnsavedChanges = when {
+                length != original.length -> true
+                editable == null -> original.isNotEmpty()
+                else -> editable.toString() != original
             }
+            _uiState.update { state ->
+                state.copy(
+                    canUndo = textProcessor.canUndo(),
+                    canRedo = textProcessor.canRedo(),
+                    hasUnsavedChanges = hasUnsavedChanges,
+                )
+            }
+            scheduleConfigurationCheck()
         }
     }
 
-    private fun scheduleConfigurationCheck(content: String) {
-        // Cancel previous check
+    fun setReadOnly(isReadOnly: Boolean) {
+        val textProcessor = editor ?: return
+        if (isReadOnly) {
+            textProcessor.setOnKeyListener(readOnlyKeyListener)
+            textProcessor.customSelectionActionModeCallback = readOnlySelectionCallback
+        } else {
+            textProcessor.setOnKeyListener(null)
+            textProcessor.customSelectionActionModeCallback = null
+        }
+    }
+
+    fun detachEditor() {
+        val textProcessor = editor ?: return
+        textWatcher?.let { textProcessor.removeTextChangedListener(it) }
+        textWatcher = null
+        editor = null
+        configCheckJob?.cancel()
+        configCheckJob = null
+    }
+
+    private fun scheduleConfigurationCheck() {
         configCheckJob?.cancel()
 
-        // Clear error immediately when user is typing
-        _uiState.update { it.copy(configurationError = null) }
+        if (_uiState.value.configurationError != null) {
+            _uiState.update { it.copy(configurationError = null) }
+        }
 
-        // Schedule new check after 2 seconds of inactivity
         configCheckJob =
             viewModelScope.launch {
-                delay(2000) // Wait 2 seconds
-
-                // Check configuration in background
+                delay(2000)
+                val content =
+                    withContext(Dispatchers.Main) {
+                        editor?.text?.toString().orEmpty()
+                    }
                 checkConfigurationInBackground(content)
             }
     }
@@ -206,7 +202,6 @@ class EditProfileContentViewModel(private val profileId: Long, initialIsReadOnly
                     }
                     _uiState.update {
                         it.copy(
-                            content = content,
                             originalContent = content,
                             hasUnsavedChanges = false,
                             isLoading = false,
@@ -480,21 +475,28 @@ class EditProfileContentViewModel(private val profileId: Long, initialIsReadOnly
 
     fun insertSymbol(symbol: String) {
         editor?.let { textProcessor ->
-            val start = textProcessor.selectionStart
-            val end = textProcessor.selectionEnd
-            val text = textProcessor.text
-
-            if (text != null) {
-                val newText =
-                    StringBuilder(text)
-                        .replace(start, end, symbol)
-                        .toString()
-
-                textProcessor.resumeAutoScroll()
-                textProcessor.setTextContent(newText)
-                // Place cursor after the inserted symbol
-                textProcessor.setSelection(start + symbol.length)
+            val text = textProcessor.text ?: return@let
+            val rawStart = textProcessor.selectionStart
+            val rawEnd = textProcessor.selectionEnd
+            // selectionStart/End can be reversed (backward drag-selection) or -1 (no cursor)
+            val start: Int
+            val end: Int
+            if (rawStart < 0 || rawEnd < 0) {
+                start = text.length
+                end = text.length
+            } else {
+                start = minOf(rawStart, rawEnd).coerceIn(0, text.length)
+                end = maxOf(rawStart, rawEnd).coerceIn(0, text.length)
             }
+
+            val newText =
+                StringBuilder(text)
+                    .replace(start, end, symbol)
+                    .toString()
+
+            textProcessor.resumeAutoScroll()
+            textProcessor.setTextContent(newText)
+            textProcessor.setSelection(start + symbol.length)
         }
     }
 
