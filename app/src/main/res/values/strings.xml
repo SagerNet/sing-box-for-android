@@ -490,6 +490,32 @@
     <string name="tailscale_available">Available</string>
     <string name="tailscale_yes">Yes</string>
 
+    <!-- Tailscale SSH -->
+    <string name="tailscale_ssh_connect">Connect via SSH</string>
+    <string name="tailscale_ssh_options">SSH Options</string>
+    <string name="tailscale_ssh_username">Username</string>
+    <string name="tailscale_ssh_remember_options">Remember SSH Options</string>
+    <string name="tailscale_ssh_quick_connect">Quick Connect</string>
+    <string name="tailscale_ssh_terminal_hint">You can customize the terminal appearance in Settings → Termux Configuration.</string>
+    <string name="tailscale_ssh_connect_button">Connect</string>
+    <string name="tailscale_ssh_connecting">Connecting…</string>
+    <string name="tailscale_ssh_no_sessions">No active sessions</string>
+    <string name="tailscale_ssh_new_session">New session</string>
+
+    <!-- Terminal Configuration -->
+    <string name="tailscale_terminal_config">Termux Configuration</string>
+    <string name="tailscale_terminal_color_theme">Color Theme</string>
+    <string name="tailscale_terminal_light_theme">Light Theme</string>
+    <string name="tailscale_terminal_dark_theme">Dark Theme</string>
+    <string name="tailscale_terminal_font_config">Font</string>
+    <string name="tailscale_terminal_font">Font Family</string>
+    <string name="tailscale_terminal_font_size">Font Size</string>
+    <string name="tailscale_terminal_font_default">Default</string>
+    <string name="tailscale_terminal_font_system">System Fonts</string>
+    <string name="tailscale_terminal_font_imported">Imported Fonts</string>
+    <string name="tailscale_terminal_import_font">Import from File</string>
+    <string name="tailscale_terminal_search_themes">Search themes</string>
+
     <!-- STUN Test -->
     <string name="stun_test">STUN Test</string>
     <string name="stun_server">Server</string>
