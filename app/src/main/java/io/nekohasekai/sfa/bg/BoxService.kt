@@ -427,4 +427,6 @@ class BoxService(private val service: Service, private val platformInterface: Pl
     override fun writeDebugMessage(message: String?) {
         Log.d("sing-box", message!!)
     }
+
+    override fun connectSSHAgent(): Int = -1
 }

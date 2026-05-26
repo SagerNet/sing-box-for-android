@@ -40,6 +40,15 @@ object SettingsKey {
     const val DASHBOARD_ITEM_ORDER = "dashboard_item_order"
     const val DASHBOARD_DISABLED_ITEMS = "dashboard_disabled_items"
 
+    // Tailscale SSH
+    const val TAILSCALE_SSH_REMEMBERED_USERNAMES = "tailscale_ssh_remembered_usernames"
+    const val TAILSCALE_SSH_QUICK_CONNECT_PEERS = "tailscale_ssh_quick_connect_peers"
+    const val TAILSCALE_SSH_LIGHT_THEME = "tailscale_ssh_light_theme"
+    const val TAILSCALE_SSH_DARK_THEME = "tailscale_ssh_dark_theme"
+    const val TAILSCALE_SSH_FONT_FAMILY = "tailscale_ssh_font_family"
+    const val TAILSCALE_SSH_FONT_SIZE = "tailscale_ssh_font_size"
+    const val TAILSCALE_SSH_CUSTOM_FONT_PATH = "tailscale_ssh_custom_font_path"
+
     // cache
     const val STARTED_BY_USER = "started_by_user"
     const val CACHED_UPDATE_INFO = "cached_update_info"

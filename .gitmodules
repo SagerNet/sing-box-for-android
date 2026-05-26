@@ -1,0 +1,3 @@
+[submodule "third_party/termux-app"]
+	path = third_party/termux-app
+	url = https://github.com/SagerNet/termux-app.git

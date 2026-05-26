@@ -34,6 +34,9 @@ import io.nekohasekai.sfa.compose.screen.settings.PrivilegeSettingsScreen
 import io.nekohasekai.sfa.compose.screen.settings.ProfileOverrideScreen
 import io.nekohasekai.sfa.compose.screen.settings.ServiceSettingsScreen
 import io.nekohasekai.sfa.compose.screen.settings.SettingsScreen
+import io.nekohasekai.sfa.compose.screen.settings.TailscaleFontPickerScreen
+import io.nekohasekai.sfa.compose.screen.settings.TailscaleTerminalConfigScreen
+import io.nekohasekai.sfa.compose.screen.settings.TailscaleThemePickerScreen
 import io.nekohasekai.sfa.compose.screen.tools.CrashReportDetailScreen
 import io.nekohasekai.sfa.compose.screen.tools.CrashReportFileContentScreen
 import io.nekohasekai.sfa.compose.screen.tools.CrashReportListScreen
@@ -48,6 +51,9 @@ import io.nekohasekai.sfa.compose.screen.tools.STUNTestScreen
 import io.nekohasekai.sfa.compose.screen.tools.TailscaleEndpointScreen
 import io.nekohasekai.sfa.compose.screen.tools.TailscaleExitNodePickerScreen
 import io.nekohasekai.sfa.compose.screen.tools.TailscalePeerScreen
+import io.nekohasekai.sfa.compose.screen.tools.TailscaleSSHPromptScreen
+import io.nekohasekai.sfa.compose.screen.tools.TailscaleSSHSharedViewModel
+import io.nekohasekai.sfa.compose.screen.tools.TailscaleSSHTerminalScreen
 import io.nekohasekai.sfa.compose.screen.tools.TailscaleStatusViewModel
 import io.nekohasekai.sfa.compose.screen.tools.ToolsScreen
 import io.nekohasekai.sfa.constant.Status
@@ -82,6 +88,7 @@ fun SFANavHost(
     groupsViewModel: GroupsViewModel? = null,
     connectionsViewModel: ConnectionsViewModel? = null,
     tailscaleStatusViewModel: TailscaleStatusViewModel? = null,
+    tailscaleSSHSharedViewModel: TailscaleSSHSharedViewModel? = null,
     modifier: Modifier = Modifier,
 ) {
     NavHost(
@@ -230,7 +237,8 @@ fun SFANavHost(
 
         composable(Screen.Tools.route) {
             val tailscaleViewModel: TailscaleStatusViewModel = tailscaleStatusViewModel ?: viewModel()
-            ToolsScreen(navController = navController, serviceStatus = serviceStatus, tailscaleViewModel = tailscaleViewModel)
+            val sshSharedViewModel: TailscaleSSHSharedViewModel = tailscaleSSHSharedViewModel ?: viewModel()
+            ToolsScreen(navController = navController, serviceStatus = serviceStatus, tailscaleViewModel = tailscaleViewModel, sshSharedViewModel = sshSharedViewModel)
         }
 
         // Tools subscreens with slide animations
@@ -276,7 +284,8 @@ fun SFANavHost(
         ) { backStackEntry ->
             val endpointTag = Uri.decode(backStackEntry.arguments?.getString("endpointTag") ?: return@composable)
             val tailscaleViewModel: TailscaleStatusViewModel = tailscaleStatusViewModel ?: viewModel()
-            TailscaleEndpointScreen(navController = navController, viewModel = tailscaleViewModel, endpointTag = endpointTag)
+            val sshSharedViewModel: TailscaleSSHSharedViewModel = tailscaleSSHSharedViewModel ?: viewModel()
+            TailscaleEndpointScreen(navController = navController, viewModel = tailscaleViewModel, sshSharedViewModel = sshSharedViewModel, endpointTag = endpointTag)
         }
 
         composable(
@@ -307,6 +316,50 @@ fun SFANavHost(
             val peerId = Uri.decode(backStackEntry.arguments?.getString("peerId") ?: return@composable)
             val tailscaleViewModel: TailscaleStatusViewModel = tailscaleStatusViewModel ?: viewModel()
             TailscalePeerScreen(navController = navController, viewModel = tailscaleViewModel, endpointTag = endpointTag, peerId = peerId)
+        }
+
+        composable(
+            route = "tools/tailscale/{endpointTag}/peer/{peerId}/ssh",
+            arguments = listOf(
+                navArgument("endpointTag") { type = NavType.StringType },
+                navArgument("peerId") { type = NavType.StringType },
+            ),
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) { backStackEntry ->
+            val endpointTag = Uri.decode(backStackEntry.arguments?.getString("endpointTag") ?: return@composable)
+            val peerId = Uri.decode(backStackEntry.arguments?.getString("peerId") ?: return@composable)
+            val tailscaleViewModel: TailscaleStatusViewModel = tailscaleStatusViewModel ?: viewModel()
+            val sshSharedViewModel: TailscaleSSHSharedViewModel = tailscaleSSHSharedViewModel ?: viewModel()
+            TailscaleSSHPromptScreen(
+                navController = navController,
+                sharedViewModel = sshSharedViewModel,
+                viewModel = tailscaleViewModel,
+                endpointTag = endpointTag,
+                peerId = peerId,
+            )
+        }
+
+        composable(
+            route = "tools/tailscale/{endpointTag}/peer/{peerId}/terminal",
+            arguments = listOf(
+                navArgument("endpointTag") { type = NavType.StringType },
+                navArgument("peerId") { type = NavType.StringType },
+            ),
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) { backStackEntry ->
+            val sshSharedViewModel: TailscaleSSHSharedViewModel = tailscaleSSHSharedViewModel ?: viewModel()
+            val tailscaleViewModel: TailscaleStatusViewModel = tailscaleStatusViewModel ?: viewModel()
+            TailscaleSSHTerminalScreen(
+                navController = navController,
+                sharedViewModel = sshSharedViewModel,
+                tailscaleViewModel = tailscaleViewModel,
+            )
         }
 
         composable(
@@ -492,6 +545,38 @@ fun SFANavHost(
             popExitTransition = slideOutToRight,
         ) {
             PrivilegeSettingsManageScreen(onBack = { navController.navigateUp() }, serviceStatus = serviceStatus)
+        }
+
+        composable(
+            route = "settings/tailscale/terminal_config",
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) {
+            TailscaleTerminalConfigScreen(navController = navController)
+        }
+
+        composable(
+            route = "settings/tailscale/theme_picker/{isDark}",
+            arguments = listOf(navArgument("isDark") { type = NavType.StringType }),
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) { backStackEntry ->
+            val isDarkStr = backStackEntry.arguments?.getString("isDark") ?: "false"
+            TailscaleThemePickerScreen(navController = navController, isDark = isDarkStr == "true")
+        }
+
+        composable(
+            route = "settings/tailscale/font_picker",
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) {
+            TailscaleFontPickerScreen(navController = navController)
         }
 
         composable(

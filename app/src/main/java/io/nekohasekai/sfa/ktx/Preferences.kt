@@ -1,6 +1,7 @@
 package io.nekohasekai.sfa.ktx
 
 import androidx.preference.PreferenceDataStore
+import kotlinx.serialization.json.Json
 import kotlin.reflect.KProperty
 
 fun PreferenceDataStore.string(name: String, defaultValue: () -> String = { "" }) = PreferenceProxy(name, defaultValue, ::getString, ::putString)
@@ -30,6 +31,24 @@ fun PreferenceDataStore.stringToLong(name: String, defaultValue: () -> Long = { 
 }, { key, value -> putString(key, "$value") })
 
 fun PreferenceDataStore.stringSet(name: String, defaultValue: () -> Set<String> = { emptySet() }) = PreferenceProxy(name, defaultValue, ::getStringSet, ::putStringSet)
+
+fun PreferenceDataStore.map(name: String, defaultValue: () -> Map<String, String> = { emptyMap() }) = PreferenceProxy(
+    name,
+    defaultValue,
+    { key, default ->
+        val json = getString(key, null)
+        if (json.isNullOrBlank()) {
+            default
+        } else {
+            try {
+                Json.decodeFromString<Map<String, String>>(json)
+            } catch (_: Exception) {
+                default
+            }
+        }
+    },
+    { key, value -> putString(key, Json.encodeToString(value)) },
+)
 
 class PreferenceProxy<T>(
     val name: String,

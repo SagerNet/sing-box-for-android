@@ -31,6 +31,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.material.icons.outlined.AdminPanelSettings
 import androidx.compose.material.icons.outlined.Autorenew
 import androidx.compose.material.icons.outlined.DeleteForever
@@ -615,6 +616,50 @@ fun AppSettingsScreen(
                     )
                 }
             }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = stringResource(R.string.tailscale),
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(horizontal = 32.dp, vertical = 8.dp),
+        )
+
+        Card(
+            modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            ),
+        ) {
+            ListItem(
+                headlineContent = {
+                    Text(
+                        stringResource(R.string.tailscale_terminal_config),
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                },
+                leadingContent = {
+                    Icon(
+                        imageVector = Icons.Default.Terminal,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                },
+                modifier =
+                Modifier
+                    .clip(RoundedCornerShape(12.dp))
+                    .clickable { navController.navigate("settings/tailscale/terminal_config") },
+                colors =
+                ListItemDefaults.colors(
+                    containerColor = Color.Transparent,
+                ),
+            )
         }
 
         Spacer(modifier = Modifier.height(8.dp))
