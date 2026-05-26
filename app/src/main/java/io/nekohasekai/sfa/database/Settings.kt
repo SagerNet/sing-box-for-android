@@ -14,6 +14,7 @@ import io.nekohasekai.sfa.database.preference.RoomPreferenceDataStore
 import io.nekohasekai.sfa.ktx.boolean
 import io.nekohasekai.sfa.ktx.int
 import io.nekohasekai.sfa.ktx.long
+import io.nekohasekai.sfa.ktx.map
 import io.nekohasekai.sfa.ktx.string
 import io.nekohasekai.sfa.ktx.stringSet
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -112,6 +113,15 @@ object Settings {
 
     var dashboardItemOrder by dataStore.string(SettingsKey.DASHBOARD_ITEM_ORDER) { "" }
     var dashboardDisabledItems by dataStore.stringSet(SettingsKey.DASHBOARD_DISABLED_ITEMS) { emptySet() }
+
+    // Tailscale SSH
+    var tailscaleSSHRememberedUsernames by dataStore.map(SettingsKey.TAILSCALE_SSH_REMEMBERED_USERNAMES)
+    var tailscaleSSHQuickConnectPeers by dataStore.stringSet(SettingsKey.TAILSCALE_SSH_QUICK_CONNECT_PEERS)
+    var tailscaleSSHLightTheme by dataStore.string(SettingsKey.TAILSCALE_SSH_LIGHT_THEME) { "base16-3024-light" }
+    var tailscaleSSHDarkTheme by dataStore.string(SettingsKey.TAILSCALE_SSH_DARK_THEME) { "argonaut" }
+    var tailscaleSSHFontFamily by dataStore.string(SettingsKey.TAILSCALE_SSH_FONT_FAMILY)
+    var tailscaleSSHFontSize by dataStore.int(SettingsKey.TAILSCALE_SSH_FONT_SIZE) { 14 }
+    var tailscaleSSHCustomFontPath by dataStore.string(SettingsKey.TAILSCALE_SSH_CUSTOM_FONT_PATH)
 
     var cachedUpdateInfo by dataStore.string(SettingsKey.CACHED_UPDATE_INFO) { "" }
     var cachedApkPath by dataStore.string(SettingsKey.CACHED_APK_PATH) { "" }
