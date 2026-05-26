@@ -5,9 +5,9 @@ import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.STUNTestHandler
 import io.nekohasekai.libbox.STUNTestProgress
 import io.nekohasekai.libbox.STUNTestResult
+import io.nekohasekai.libbox.STUNTestSession
 import io.nekohasekai.sfa.compose.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -25,7 +25,7 @@ data class STUNTestState(
 
 class STUNTestViewModel : BaseViewModel<STUNTestState, Nothing>() {
     private var standaloneTest: io.nekohasekai.libbox.STUNTest? = null
-    private var grpcJob: Job? = null
+    private var stunSession: STUNTestSession? = null
 
     override fun createInitialState() = STUNTestState()
 
@@ -60,15 +60,16 @@ class STUNTestViewModel : BaseViewModel<STUNTestState, Nothing>() {
         val handler = createHandler()
 
         if (vpnRunning) {
-            grpcJob = viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch(Dispatchers.IO) {
                 try {
-                    Libbox.newStandaloneCommandClient()
-                        .startSTUNTest(server, outboundTag, handler)
+                    stunSession =
+                        Libbox.newStandaloneCommandClient()
+                            .startSTUNTest(server, outboundTag, handler)
                 } catch (e: Exception) {
                     withContext(Dispatchers.Main) {
                         if (!currentState.isRunning) return@withContext
                         updateState { copy(isRunning = false) }
-                        grpcJob = null
+                        stunSession = null
                         sendError(e)
                     }
                 }
@@ -85,11 +86,19 @@ class STUNTestViewModel : BaseViewModel<STUNTestState, Nothing>() {
     }
 
     fun cancelTest() {
-        grpcJob?.cancel()
-        grpcJob = null
+        try {
+            stunSession?.close()
+        } catch (_: Exception) {
+        }
+        stunSession = null
         standaloneTest?.cancel()
         standaloneTest = null
         updateState { copy(isRunning = false) }
+    }
+
+    override fun onCleared() {
+        cancelTest()
+        super.onCleared()
     }
 
     private fun createHandler(): STUNTestHandler {
@@ -126,7 +135,7 @@ class STUNTestViewModel : BaseViewModel<STUNTestState, Nothing>() {
                         )
                     }
                     standaloneTest = null
-                    grpcJob = null
+                    stunSession = null
                 }
             }
 
@@ -135,7 +144,7 @@ class STUNTestViewModel : BaseViewModel<STUNTestState, Nothing>() {
                     if (!currentState.isRunning) return@launch
                     updateState { copy(isRunning = false) }
                     standaloneTest = null
-                    grpcJob = null
+                    stunSession = null
                     if (message != null) {
                         sendErrorMessage(message)
                     }

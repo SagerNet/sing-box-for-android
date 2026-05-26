@@ -7,10 +7,10 @@ import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.NetworkQualityProgress
 import io.nekohasekai.libbox.NetworkQualityResult
 import io.nekohasekai.libbox.NetworkQualityTestHandler
+import io.nekohasekai.libbox.NetworkQualityTestSession
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -41,7 +41,7 @@ data class NetworkQualityState(
 
 class NetworkQualityViewModel : BaseViewModel<NetworkQualityState, Nothing>() {
     private var standaloneTest: io.nekohasekai.libbox.NetworkQualityTest? = null
-    private var grpcJob: Job? = null
+    private var nqSession: NetworkQualityTestSession? = null
 
     override fun createInitialState() = NetworkQualityState()
 
@@ -114,22 +114,23 @@ class NetworkQualityViewModel : BaseViewModel<NetworkQualityState, Nothing>() {
         val handler = createHandler()
 
         if (vpnRunning) {
-            grpcJob = viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch(Dispatchers.IO) {
                 try {
-                    Libbox.newStandaloneCommandClient()
-                        .startNetworkQualityTest(
-                            configURL,
-                            outboundTag,
-                            serial,
-                            maxRuntimeSeconds,
-                            http3,
-                            handler,
-                        )
+                    nqSession =
+                        Libbox.newStandaloneCommandClient()
+                            .startNetworkQualityTest(
+                                configURL,
+                                outboundTag,
+                                serial,
+                                maxRuntimeSeconds,
+                                http3,
+                                handler,
+                            )
                 } catch (e: Exception) {
                     withContext(Dispatchers.Main) {
                         if (!currentState.isRunning) return@withContext
                         updateState { copy(isRunning = false) }
-                        grpcJob = null
+                        nqSession = null
                         sendError(e)
                     }
                 }
@@ -146,11 +147,19 @@ class NetworkQualityViewModel : BaseViewModel<NetworkQualityState, Nothing>() {
     }
 
     fun cancelTest() {
-        grpcJob?.cancel()
-        grpcJob = null
+        try {
+            nqSession?.close()
+        } catch (_: Exception) {
+        }
+        nqSession = null
         standaloneTest?.cancel()
         standaloneTest = null
         updateState { copy(isRunning = false) }
+    }
+
+    override fun onCleared() {
+        cancelTest()
+        super.onCleared()
     }
 
     private fun createHandler(): NetworkQualityTestHandler {
@@ -196,7 +205,7 @@ class NetworkQualityViewModel : BaseViewModel<NetworkQualityState, Nothing>() {
                         )
                     }
                     standaloneTest = null
-                    grpcJob = null
+                    nqSession = null
                 }
             }
 
@@ -205,7 +214,7 @@ class NetworkQualityViewModel : BaseViewModel<NetworkQualityState, Nothing>() {
                     if (!currentState.isRunning) return@launch
                     updateState { copy(isRunning = false) }
                     standaloneTest = null
-                    grpcJob = null
+                    nqSession = null
                     if (message != null) {
                         sendErrorMessage(message)
                     }
