@@ -2,6 +2,7 @@ package io.nekohasekai.sfa.compose.screen.tools
 
 import android.text.format.DateUtils
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,15 +21,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -406,11 +411,57 @@ fun TailscalePeerScreen(
                     )
                 }
                 if (peer.sshHostKeys.isNotEmpty()) {
-                    DetailRow(
-                        label = stringResource(R.string.tailscale_ssh),
-                        value = stringResource(R.string.tailscale_available),
-                    )
+                    if (!peer.online || isSelf || peer.tailscaleIPs.isEmpty()) {
+                        DetailRow(
+                            label = stringResource(R.string.tailscale_ssh),
+                            value = stringResource(R.string.tailscale_available),
+                        )
+                    }
                 }
+            }
+        }
+
+        if (peer.sshHostKeys.isNotEmpty() && peer.online && !isSelf && peer.tailscaleIPs.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                ),
+            ) {
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            stringResource(R.string.tailscale_ssh_connect),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    },
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Default.Terminal,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    },
+                    trailingContent = {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(16.dp),
+                        )
+                    },
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(12.dp))
+                        .clickable {
+                            navController.navigate(
+                                "tools/tailscale/${android.net.Uri.encode(endpointTag)}/peer/${android.net.Uri.encode(peerId)}/ssh",
+                            )
+                        },
+                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                )
             }
         }
 

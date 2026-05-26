@@ -479,6 +479,33 @@
     <string name="tailscale_available">در دسترس</string>
     <string name="tailscale_yes">بله</string>
 
+    <!-- Tailscale SSH -->
+    <string name="tailscale_ssh_connect">اتصال از طریق SSH</string>
+    <string name="tailscale_ssh_options">گزینه‌های SSH</string>
+    <string name="tailscale_ssh_username">نام کاربری</string>
+    <string name="tailscale_ssh_remember_options">به خاطر سپردن گزینه‌های SSH</string>
+    <string name="tailscale_ssh_quick_connect">اتصال سریع</string>
+    <string name="tailscale_ssh_quick_connect_description">در صورت فعال بودن، می‌توانید از طریق منوی زمینه (فشار طولانی) روی ورودی Tailscale در ابزارها و ورودی‌های همتا در لیست همتاها به سرعت به این همتا متصل شوید.\n\nاین همتا همچنین در منوی جلسه جدید هنگام اتصال به همتاهای دیگر از طریق SSH ظاهر خواهد شد.</string>
+    <string name="tailscale_ssh_terminal_hint">می‌توانید ظاهر ترمینال را در تنظیمات ← پیکربندی Termux سفارشی کنید.</string>
+    <string name="tailscale_ssh_connect_button">اتصال</string>
+    <string name="tailscale_ssh_connecting">در حال اتصال…</string>
+    <string name="tailscale_ssh_no_sessions">جلسه فعالی وجود ندارد</string>
+    <string name="tailscale_ssh_new_session">جلسه جدید</string>
+
+    <!-- Terminal Configuration -->
+    <string name="tailscale_terminal_config">پیکربندی Termux</string>
+    <string name="tailscale_terminal_color_theme">تم رنگ</string>
+    <string name="tailscale_terminal_light_theme">تم روشن</string>
+    <string name="tailscale_terminal_dark_theme">تم تیره</string>
+    <string name="tailscale_terminal_font_config">فونت</string>
+    <string name="tailscale_terminal_font">خانواده فونت</string>
+    <string name="tailscale_terminal_font_size">اندازه فونت</string>
+    <string name="tailscale_terminal_font_default">پیش‌فرض</string>
+    <string name="tailscale_terminal_font_system">فونت‌های سیستم</string>
+    <string name="tailscale_terminal_font_imported">فونت‌های وارد شده</string>
+    <string name="tailscale_terminal_import_font">وارد کردن از فایل</string>
+    <string name="tailscale_terminal_search_themes">جستجوی تم‌ها</string>
+
     <string name="stun_test">تست STUN</string>
     <string name="stun_server">سرور</string>
     <string name="stun_start">شروع تست</string>

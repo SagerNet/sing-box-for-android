@@ -328,6 +328,10 @@ dependencies {
     implementation("com.github.jeziellago:compose-markdown:0.5.8")
     implementation("org.kodein.emoji:emoji-kt:2.3.0")
 
+    // Terminal emulator
+    implementation(project(":terminal-emulator"))
+    implementation(project(":terminal-view"))
+
     // Xposed API for self-hooking VPN hide module
     compileOnly("de.robv.android.xposed:api:82")
     compileOnly(project(":libxposed-api"))

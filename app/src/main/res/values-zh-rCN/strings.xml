@@ -476,6 +476,33 @@
     <string name="tailscale_available">可用</string>
     <string name="tailscale_yes">是</string>
 
+    <!-- Tailscale SSH -->
+    <string name="tailscale_ssh_connect">通过 SSH 连接</string>
+    <string name="tailscale_ssh_options">SSH 选项</string>
+    <string name="tailscale_ssh_username">用户名</string>
+    <string name="tailscale_ssh_remember_options">记住 SSH 选项</string>
+    <string name="tailscale_ssh_quick_connect">快速连接</string>
+    <string name="tailscale_ssh_quick_connect_description">启用后，你可以通过工具中 Tailscale 条目和节点列表中节点条目的上下文菜单（长按）快速连接到此节点。\n\n当通过 SSH 连接到其他节点时，此节点也会出现在新建会话菜单中。</string>
+    <string name="tailscale_ssh_terminal_hint">你可以在设置 → Termux 配置中自定义终端外观。</string>
+    <string name="tailscale_ssh_connect_button">连接</string>
+    <string name="tailscale_ssh_connecting">连接中…</string>
+    <string name="tailscale_ssh_no_sessions">无活动会话</string>
+    <string name="tailscale_ssh_new_session">新建会话</string>
+
+    <!-- Terminal Configuration -->
+    <string name="tailscale_terminal_config">Termux 配置</string>
+    <string name="tailscale_terminal_color_theme">颜色主题</string>
+    <string name="tailscale_terminal_light_theme">浅色主题</string>
+    <string name="tailscale_terminal_dark_theme">深色主题</string>
+    <string name="tailscale_terminal_font_config">字体</string>
+    <string name="tailscale_terminal_font">字体</string>
+    <string name="tailscale_terminal_font_size">字号</string>
+    <string name="tailscale_terminal_font_default">默认</string>
+    <string name="tailscale_terminal_font_system">系统字体</string>
+    <string name="tailscale_terminal_font_imported">已导入的字体</string>
+    <string name="tailscale_terminal_import_font">从文件导入</string>
+    <string name="tailscale_terminal_search_themes">搜索主题</string>
+
     <string name="stun_test">STUN 测试</string>
     <string name="stun_server">服务器</string>
     <string name="stun_start">开始测试</string>
