@@ -3,10 +3,10 @@ package io.nekohasekai.sfa.compose.screen.tools
 import androidx.lifecycle.viewModelScope
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.TailscaleStatusHandler
+import io.nekohasekai.libbox.TailscaleStatusSubscription
 import io.nekohasekai.libbox.TailscaleStatusUpdate
 import io.nekohasekai.sfa.compose.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 data class TailscalePeerData(
@@ -63,7 +63,7 @@ data class TailscaleStatusState(
 )
 
 class TailscaleStatusViewModel : BaseViewModel<TailscaleStatusState, Nothing>() {
-    private var grpcJob: Job? = null
+    private var statusSubscription: TailscaleStatusSubscription? = null
 
     override fun createInitialState() = TailscaleStatusState()
 
@@ -71,39 +71,43 @@ class TailscaleStatusViewModel : BaseViewModel<TailscaleStatusState, Nothing>() 
         if (currentState.isSubscribed) return
         updateState { copy(isSubscribed = true) }
 
-        grpcJob = viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
-                Libbox.newStandaloneCommandClient()
-                    .subscribeTailscaleStatus(object : TailscaleStatusHandler {
-                        override fun onStatusUpdate(status: TailscaleStatusUpdate) {
-                            val endpoints = convertUpdate(status)
-                            viewModelScope.launch {
-                                if (!currentState.isSubscribed) return@launch
-                                updateState { copy(endpoints = endpoints) }
+                statusSubscription =
+                    Libbox.newStandaloneCommandClient()
+                        .subscribeTailscaleStatus(object : TailscaleStatusHandler {
+                            override fun onStatusUpdate(status: TailscaleStatusUpdate) {
+                                val endpoints = convertUpdate(status)
+                                viewModelScope.launch {
+                                    if (!currentState.isSubscribed) return@launch
+                                    updateState { copy(endpoints = endpoints) }
+                                }
                             }
-                        }
 
-                        override fun onError(message: String) {
-                            viewModelScope.launch {
-                                if (!currentState.isSubscribed) return@launch
-                                updateState { copy(endpoints = emptyList(), isSubscribed = false) }
-                                grpcJob = null
-                                sendErrorMessage(message)
+                            override fun onError(message: String) {
+                                viewModelScope.launch {
+                                    if (!currentState.isSubscribed) return@launch
+                                    updateState { copy(endpoints = emptyList(), isSubscribed = false) }
+                                    statusSubscription = null
+                                    sendErrorMessage(message)
+                                }
                             }
-                        }
-                    })
+                        })
             } catch (_: Exception) {
                 viewModelScope.launch {
                     updateState { copy(endpoints = emptyList(), isSubscribed = false) }
-                    grpcJob = null
+                    statusSubscription = null
                 }
             }
         }
     }
 
     fun cancel() {
-        grpcJob?.cancel()
-        grpcJob = null
+        try {
+            statusSubscription?.close()
+        } catch (_: Exception) {
+        }
+        statusSubscription = null
         updateState { copy(endpoints = emptyList(), isSubscribed = false) }
     }
 
