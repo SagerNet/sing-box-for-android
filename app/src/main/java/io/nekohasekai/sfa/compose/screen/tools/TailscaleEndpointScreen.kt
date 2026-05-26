@@ -3,8 +3,10 @@ package io.nekohasekai.sfa.compose.screen.tools
 import android.content.Intent
 import android.net.Uri
 import android.text.format.DateUtils
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,8 +25,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material.icons.filled.QrCode2
+import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -59,6 +64,7 @@ import io.nekohasekai.sfa.compose.util.QRCodeGenerator
 fun TailscaleEndpointScreen(
     navController: NavController,
     viewModel: TailscaleStatusViewModel,
+    sshSharedViewModel: TailscaleSSHSharedViewModel,
     endpointTag: String,
 ) {
     OverrideTopBar {
@@ -311,20 +317,50 @@ fun TailscaleEndpointScreen(
                                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
                             )
                         }
-                        PeerItem(
-                            peer = peer,
-                            onClick = {
-                                navController.navigate(
-                                    "tools/tailscale/${Uri.encode(endpointTag)}/peer/${Uri.encode(peer.id)}",
+                        val canSSH = peer.online && peer.sshHostKeys.isNotEmpty() &&
+                            peer.tailscaleIPs.isNotEmpty() && peer.id != endpoint.selfPeer?.id
+                        var showSSHMenu by remember { mutableStateOf(false) }
+                        Box {
+                            PeerItem(
+                                peer = peer,
+                                onClick = {
+                                    navController.navigate(
+                                        "tools/tailscale/${Uri.encode(endpointTag)}/peer/${Uri.encode(peer.id)}",
+                                    )
+                                },
+                                onLongClick = if (canSSH) {
+                                    { showSSHMenu = true }
+                                } else {
+                                    null
+                                },
+                                modifier = when {
+                                    group.peers.size == 1 -> Modifier.clip(RoundedCornerShape(12.dp))
+                                    index == 0 -> Modifier.clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+                                    index == group.peers.lastIndex -> Modifier.clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
+                                    else -> Modifier
+                                },
+                            )
+                            DropdownMenu(
+                                expanded = showSSHMenu,
+                                onDismissRequest = { showSSHMenu = false },
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.tailscale_ssh_connect)) },
+                                    leadingIcon = {
+                                        Icon(Icons.Default.Terminal, contentDescription = null)
+                                    },
+                                    onClick = {
+                                        showSSHMenu = false
+                                        handleSSHNavigation(
+                                            navController,
+                                            sshSharedViewModel,
+                                            peer,
+                                            endpointTag,
+                                        )
+                                    },
                                 )
-                            },
-                            modifier = when {
-                                group.peers.size == 1 -> Modifier.clip(RoundedCornerShape(12.dp))
-                                index == 0 -> Modifier.clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
-                                index == group.peers.lastIndex -> Modifier.clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
-                                else -> Modifier
-                            },
-                        )
+                            }
+                        }
                     }
                 }
             }
@@ -352,10 +388,12 @@ private fun SectionHeader(title: String) {
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun PeerItem(
     peer: TailscalePeerData,
     onClick: () -> Unit,
+    onLongClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     val badges = peerBadges(peer)
@@ -363,7 +401,10 @@ private fun PeerItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick,
+            )
             .padding(horizontal = 16.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,

@@ -485,6 +485,33 @@
     <string name="tailscale_available">Доступно</string>
     <string name="tailscale_yes">Да</string>
 
+    <!-- Tailscale SSH -->
+    <string name="tailscale_ssh_connect">Подключение по SSH</string>
+    <string name="tailscale_ssh_options">Параметры SSH</string>
+    <string name="tailscale_ssh_username">Имя пользователя</string>
+    <string name="tailscale_ssh_remember_options">Запомнить параметры SSH</string>
+    <string name="tailscale_ssh_quick_connect">Быстрое подключение</string>
+    <string name="tailscale_ssh_quick_connect_description">Если включено, вы можете быстро подключиться к этому узлу через контекстное меню (долгое нажатие) записи Tailscale в инструментах и записей узлов в списке узлов.\n\nЭтот узел также появится в меню «Новая сессия» при подключении к другим узлам по SSH.</string>
+    <string name="tailscale_ssh_terminal_hint">Вы можете настроить внешний вид терминала в разделе Параметры → Конфигурация Termux.</string>
+    <string name="tailscale_ssh_connect_button">Подключение</string>
+    <string name="tailscale_ssh_connecting">Подключение…</string>
+    <string name="tailscale_ssh_no_sessions">Нет активных сессий</string>
+    <string name="tailscale_ssh_new_session">Новая сессия</string>
+
+    <!-- Terminal Configuration -->
+    <string name="tailscale_terminal_config">Конфигурация Termux</string>
+    <string name="tailscale_terminal_color_theme">Цветовая тема</string>
+    <string name="tailscale_terminal_light_theme">Светлая тема</string>
+    <string name="tailscale_terminal_dark_theme">Тёмная тема</string>
+    <string name="tailscale_terminal_font_config">Шрифт</string>
+    <string name="tailscale_terminal_font">Семейство шрифтов</string>
+    <string name="tailscale_terminal_font_size">Размер шрифта</string>
+    <string name="tailscale_terminal_font_default">По умолчанию</string>
+    <string name="tailscale_terminal_font_system">Системные шрифты</string>
+    <string name="tailscale_terminal_font_imported">Импортированные шрифты</string>
+    <string name="tailscale_terminal_import_font">Импорт из файла</string>
+    <string name="tailscale_terminal_search_themes">Поиск тем</string>
+
     <string name="stun_test">STUN-тест</string>
     <string name="stun_server">Сервер</string>
     <string name="stun_start">Начать тест</string>
