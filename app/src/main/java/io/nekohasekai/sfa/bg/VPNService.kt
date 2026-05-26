@@ -10,9 +10,11 @@ import android.util.Log
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.Notification
 import io.nekohasekai.libbox.TunOptions
+import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.ktx.toIpPrefix
 import io.nekohasekai.sfa.ktx.toList
+import io.nekohasekai.sfa.vendor.Vendor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -137,30 +139,16 @@ class VPNService :
                 }
             }
 
-            val includePackage = options.includePackage
-            if (includePackage.hasNext()) {
-                while (includePackage.hasNext()) {
-                    try {
-                        val nextPackage = includePackage.next()
-                        builder.addAllowedApplication(nextPackage)
-                        Log.d("VPNService", "addAllowedApplication: $nextPackage")
-                    } catch (e: NameNotFoundException) {
-                        Log.e("VPNService", "addAllowedApplication failed", e)
-                    }
+            if (Vendor.isPerAppProxyAvailable() && Settings.perAppProxyEnabled) {
+                val appList = Settings.getEffectivePerAppProxyList()
+                if (Settings.getEffectivePerAppProxyMode() == Settings.PER_APP_PROXY_INCLUDE) {
+                    builder.addApplications(appList + Application.application.packageName, allow = true)
+                } else {
+                    builder.addApplications(appList - Application.application.packageName, allow = false)
                 }
-            }
-
-            val excludePackage = options.excludePackage
-            if (excludePackage.hasNext()) {
-                while (excludePackage.hasNext()) {
-                    try {
-                        val nextPackage = excludePackage.next()
-                        builder.addDisallowedApplication(nextPackage)
-                        Log.d("VPNService", "addDisallowedApplication: $nextPackage")
-                    } catch (e: NameNotFoundException) {
-                        Log.e("VPNService", "addDisallowedApplication failed", e)
-                    }
-                }
+            } else {
+                builder.addApplications(options.includePackage.toList(), allow = true)
+                builder.addApplications(options.excludePackage.toList(), allow = false)
             }
         }
 
@@ -185,6 +173,22 @@ class VPNService :
             builder.establish() ?: error("android: the application is not prepared or is revoked")
         service.fileDescriptor = pfd
         return pfd.fd
+    }
+
+    private fun Builder.addApplications(packages: Iterable<String>, allow: Boolean) {
+        for (nextPackage in packages.filter { it.isNotBlank() }.distinct()) {
+            try {
+                if (allow) {
+                    addAllowedApplication(nextPackage)
+                    Log.d(TAG, "addAllowedApplication: $nextPackage")
+                } else {
+                    addDisallowedApplication(nextPackage)
+                    Log.d(TAG, "addDisallowedApplication: $nextPackage")
+                }
+            } catch (e: NameNotFoundException) {
+                Log.e(TAG, "addApplication failed: $nextPackage", e)
+            }
+        }
     }
 
     override fun sendNotification(notification: Notification) = service.sendNotification(notification)
