@@ -354,6 +354,12 @@ private fun createSessionClient(viewModel: TailscaleSSHTerminalViewModel, viewRe
         if (state.sessions.size > 1) {
             val managed = state.sessions.firstOrNull { it.terminalSession === finishedSession }
             if (managed != null) {
+                if (managed.id == state.activeSessionId) {
+                    val sshSession = finishedSession as TailscaleSSHTerminalSession
+                    if (sshSession.getSSHExitCode() != 0) {
+                        return
+                    }
+                }
                 viewModel.removeSession(managed.id)
             }
         }

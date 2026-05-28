@@ -144,6 +144,31 @@ object RootClient {
         }
     }
 
+    suspend fun lookupSFTPServer(): String {
+        val svc = bindService()
+        try {
+            return svc.lookupSFTPServer()
+        } catch (e: RemoteException) {
+            throw e.rethrowAsRuntime()
+        }
+    }
+
+    suspend fun openShellSession(
+        user: String,
+        command: String?,
+        env: Array<String>,
+        term: String?,
+        rows: Int,
+        cols: Int,
+    ): IRootShellSession {
+        val svc = bindService()
+        try {
+            return svc.openShellSession(user, command, env, term, rows, cols)
+        } catch (e: RemoteException) {
+            throw e.rethrowAsRuntime()
+        }
+    }
+
     suspend fun unregisterNeighborTableCallback(callback: INeighborTableCallback) {
         try {
             service?.unregisterNeighborTableCallback(callback)
