@@ -2,6 +2,7 @@ package io.nekohasekai.sfa.bg;
 
 import android.os.ParcelFileDescriptor;
 import io.nekohasekai.sfa.bg.INeighborTableCallback;
+import io.nekohasekai.sfa.bg.IRootShellSession;
 import io.nekohasekai.sfa.bg.ParceledListSlice;
 
 interface IRootService {
@@ -16,4 +17,8 @@ interface IRootService {
     void registerNeighborTableCallback(in INeighborTableCallback callback) = 4;
 
     oneway void unregisterNeighborTableCallback(in INeighborTableCallback callback) = 5;
+
+    IRootShellSession openShellSession(String user, String command, in String[] env, String term, int rows, int cols) = 6;
+
+    String lookupSFTPServer() = 7;
 }
