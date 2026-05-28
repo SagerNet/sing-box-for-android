@@ -2,6 +2,7 @@ package io.nekohasekai.sfa.bg
 
 import android.content.Intent
 import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
@@ -12,8 +13,11 @@ import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.NeighborEntryIterator
 import io.nekohasekai.libbox.NeighborSubscription
 import io.nekohasekai.libbox.NeighborUpdateListener
+import io.nekohasekai.libbox.ShellSession
 import io.nekohasekai.sfa.BuildConfig
+import io.nekohasekai.sfa.ktx.toStringIterator
 import io.nekohasekai.sfa.vendor.PrivilegedServiceUtils
+import java.io.File
 import java.io.IOException
 import java.lang.reflect.Proxy
 import java.util.concurrent.ConcurrentHashMap
@@ -90,6 +94,149 @@ class RootServer : RootService() {
                     stopTetheringMonitor()
                 }
             }
+        }
+
+        override fun openShellSession(
+            user: String?,
+            command: String?,
+            env: Array<out String>?,
+            term: String?,
+            rows: Int,
+            cols: Int,
+        ): IRootShellSession {
+            val resolved = UserResolver.resolve(packageManager, user!!)
+            val shell: String
+            val shellEnv: Array<String>
+            val cwd: String
+            if (resolved.packageName == UserResolver.TERMUX_PACKAGE) {
+                val termuxPrefix = File(UserResolver.TERMUX_PREFIX)
+                val actualShell = UserResolver.findTermuxShell(termuxPrefix, resolved.homeDir)
+                cwd = resolved.homeDir
+                shellEnv =
+                    buildTermuxEnvironment(env, actualShell, cwd, termuxPrefix.absolutePath, term)
+                shell = if (command.isNullOrEmpty()) {
+                    val loginBin = File(termuxPrefix, "bin/login")
+                    if (loginBin.canExecute()) loginBin.absolutePath else actualShell
+                } else {
+                    actualShell
+                }
+            } else if (resolved.uid == 0) {
+                val termuxPrefix = File(UserResolver.TERMUX_PREFIX)
+                val termuxAvailable = File(termuxPrefix, "bin").isDirectory
+                if (termuxAvailable) {
+                    shell = UserResolver.findTermuxShell(termuxPrefix, UserResolver.TERMUX_HOME)
+                    cwd = UserResolver.TERMUX_HOME
+                    shellEnv = buildTermuxEnvironment(
+                        env,
+                        shell,
+                        cwd,
+                        termuxPrefix.absolutePath,
+                        term,
+                    )
+                } else {
+                    shell = "/system/bin/sh"
+                    cwd = "/data/local"
+                    shellEnv = buildBasicEnvironment(env, shell, cwd, term)
+                }
+            } else {
+                shell = UserResolver.findShell(resolved)
+                cwd = resolved.homeDir
+                shellEnv = buildBasicEnvironment(env, shell, cwd, term)
+            }
+            val args: Array<String>
+            if (command.isNullOrEmpty()) {
+                args = arrayOf("-" + File(shell).name)
+            } else {
+                args = arrayOf(File(shell).name, "-c", command)
+            }
+            val supplementaryGids = if (resolved.packageName == "root" || resolved.packageName == "shell") {
+                intArrayOf()
+            } else {
+                packageManager.getPackageGids(resolved.packageName)
+            }
+            val argsIter = args.asIterable().toStringIterator()
+            val envIter = shellEnv.asIterable().toStringIterator()
+            val groupsIter = IntArrayIterator(supplementaryGids)
+            val isPipe = term.isNullOrEmpty()
+            val session = if (isPipe) {
+                Libbox.openNativePipeSession(
+                    shell,
+                    cwd,
+                    argsIter,
+                    envIter,
+                    resolved.uid,
+                    resolved.gid,
+                    groupsIter,
+                )
+            } else {
+                Libbox.openNativeShellSession(
+                    shell, cwd, argsIter, envIter,
+                    term, rows, cols,
+                    resolved.uid, resolved.gid, groupsIter,
+                )
+            }
+            return RootShellSession(session)
+        }
+
+        override fun lookupSFTPServer(): String {
+            val termuxPrefix = File(UserResolver.TERMUX_PREFIX)
+            for (name in arrayOf("libexec/sftp-server", "lib/openssh/sftp-server")) {
+                val candidate = File(termuxPrefix, name)
+                if (candidate.canExecute()) return candidate.absolutePath
+            }
+            throw IOException("sftp-server not found, install openssh in Termux")
+        }
+    }
+
+    private fun buildTermuxEnvironment(
+        sshEnv: Array<out String>?,
+        shell: String,
+        home: String,
+        prefix: String,
+        term: String?,
+    ): Array<String> {
+        val env = parseEnvArray(sshEnv)
+        env["HOME"] = home
+        env["PREFIX"] = prefix
+        env["PATH"] = "$prefix/bin"
+        env["TMPDIR"] = "$prefix/tmp"
+        env["SHELL"] = shell
+        env["LANG"] = "en_US.UTF-8"
+        env["COLORTERM"] = "truecolor"
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            env["LD_LIBRARY_PATH"] = "$prefix/lib"
+        } else {
+            env.remove("LD_LIBRARY_PATH")
+        }
+        val termuxExec = File("$prefix/lib/libtermux-exec.so")
+        if (termuxExec.exists()) {
+            env["LD_PRELOAD"] = termuxExec.absolutePath
+        }
+        if (!term.isNullOrEmpty()) {
+            env["TERM"] = term
+        }
+        addAndroidSystemEnvironment(env)
+        return env.map { (k, v) -> "$k=$v" }.toTypedArray()
+    }
+
+    private class RootShellSession(
+        private val session: ShellSession,
+    ) : IRootShellSession.Stub() {
+
+        override fun getMasterFD(): ParcelFileDescriptor = ParcelFileDescriptor.fromFd(session.masterFD())
+
+        override fun resize(rows: Int, cols: Int) {
+            session.resize(rows, cols)
+        }
+
+        override fun signal(sig: Int) {
+            session.signal(sig)
+        }
+
+        override fun waitFor(): Int = session.waitExit()
+
+        override fun close() {
+            session.close()
         }
     }
 
@@ -221,5 +368,48 @@ class RootServer : RootService() {
         neighborSubscription = null
         neighborCallbacks.kill()
         super.onDestroy()
+    }
+}
+
+internal fun parseEnvArray(sshEnv: Array<out String>?): MutableMap<String, String> {
+    val env = mutableMapOf<String, String>()
+    sshEnv?.forEach { entry ->
+        val idx = entry.indexOf('=')
+        if (idx > 0) env[entry.substring(0, idx)] = entry.substring(idx + 1)
+    }
+    return env
+}
+
+internal fun buildBasicEnvironment(
+    sshEnv: Array<out String>?,
+    shell: String,
+    home: String,
+    term: String?,
+): Array<String> {
+    val env = parseEnvArray(sshEnv)
+    env["HOME"] = home
+    env["PATH"] = "/system/bin:/system/xbin:/vendor/bin"
+    env["SHELL"] = shell
+    env["TMPDIR"] = "/data/local/tmp"
+    if (!term.isNullOrEmpty()) {
+        env["TERM"] = term
+    }
+    addAndroidSystemEnvironment(env)
+    return env.map { (k, v) -> "$k=$v" }.toTypedArray()
+}
+
+internal fun addAndroidSystemEnvironment(env: MutableMap<String, String>) {
+    val androidVars = arrayOf(
+        "ANDROID_ASSETS", "ANDROID_DATA", "ANDROID_ROOT", "ANDROID_STORAGE",
+        "EXTERNAL_STORAGE", "ASEC_MOUNTPOINT", "LOOP_MOUNTPOINT",
+        "ANDROID_RUNTIME_ROOT", "ANDROID_ART_ROOT",
+        "ANDROID_I18N_ROOT", "ANDROID_TZDATA_ROOT",
+        "BOOTCLASSPATH", "DEX2OATBOOTCLASSPATH", "SYSTEMSERVERCLASSPATH",
+    )
+    for (name in androidVars) {
+        val value = System.getenv(name)
+        if (value != null) {
+            env[name] = value
+        }
     }
 }
