@@ -463,9 +463,11 @@
     <string name="tailscale_state">State</string>
     <string name="tailscale_network">Network</string>
     <string name="tailscale_magic_dns" translatable="false">MagicDNS</string>
+    <string name="tailscale_hostname">Hostname</string>
     <string name="tailscale_open_auth_url">Open Auth URL</string>
     <string name="tailscale_open_auth_url_qr_code">Show Auth URL QR Code</string>
     <string name="tailscale_this_device">This Device</string>
+    <string name="tailscale_logout">Log out</string>
     <string name="tailscale_connected">Connected</string>
     <string name="tailscale_not_connected">Not Connected</string>
     <string name="tailscale_addresses">Tailscale Addresses</string>

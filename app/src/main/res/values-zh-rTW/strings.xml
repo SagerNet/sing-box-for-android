@@ -461,6 +461,7 @@
     <string name="tailscale_status">狀態</string>
     <string name="tailscale_state">狀態</string>
     <string name="tailscale_network">網路</string>
+    <string name="tailscale_hostname">主機名</string>
     <string name="tailscale_open_auth_url">開啟認證連結</string>
     <string name="tailscale_open_auth_url_qr_code">顯示認證連結 QR 碼</string>
     <string name="tailscale_this_device">此裝置</string>

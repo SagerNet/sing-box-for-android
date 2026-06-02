@@ -458,6 +458,7 @@
     <string name="tailscale_status">状态</string>
     <string name="tailscale_state">状态</string>
     <string name="tailscale_network">网络</string>
+    <string name="tailscale_hostname">主机名</string>
     <string name="tailscale_open_auth_url">打开认证链接</string>
     <string name="tailscale_open_auth_url_qr_code">显示认证链接二维码</string>
     <string name="tailscale_this_device">此设备</string>
