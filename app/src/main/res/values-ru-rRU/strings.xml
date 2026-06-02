@@ -467,6 +467,7 @@
     <string name="tailscale_status">Статус</string>
     <string name="tailscale_state">Состояние</string>
     <string name="tailscale_network">Сеть</string>
+    <string name="tailscale_hostname">Имя хоста</string>
     <string name="tailscale_open_auth_url">Открыть URL авторизации</string>
     <string name="tailscale_open_auth_url_qr_code">Показать QR-код авторизации</string>
     <string name="tailscale_this_device">Это устройство</string>
