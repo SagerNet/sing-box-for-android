@@ -27,7 +27,9 @@ data class TailscalePeerData(
     val txBytes: Long,
     val keyExpiry: Long,
     val lastSeen: Long,
-)
+) {
+    val displayName: String get() = dnsName.substringBefore(".").ifEmpty { hostName }
+}
 
 data class TailscaleUserGroupData(
     val id: Long,
@@ -46,6 +48,7 @@ data class TailscaleEndpointData(
     val selfPeer: TailscalePeerData?,
     val exitNode: TailscalePeerData?,
     val userGroups: List<TailscaleUserGroupData>,
+    val keyAuth: Boolean,
 ) {
     val hasExitNodeCandidates: Boolean
         get() {
@@ -121,6 +124,16 @@ class TailscaleStatusViewModel : BaseViewModel<TailscaleStatusState, Nothing>() 
         }
     }
 
+    fun logout(endpointTag: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                Libbox.newStandaloneCommandClient().tailscaleLogout(endpointTag)
+            } catch (e: Exception) {
+                sendErrorMessage(e.message ?: "logout failed")
+            }
+        }
+    }
+
     fun endpoint(tag: String): TailscaleEndpointData? = currentState.endpoints.firstOrNull { it.endpointTag == tag }
 
     fun peer(endpointTag: String, peerId: String): TailscalePeerData? {
@@ -166,6 +179,7 @@ class TailscaleStatusViewModel : BaseViewModel<TailscaleStatusState, Nothing>() 
             selfPeer = if (self != null) convertPeer(self) else null,
             exitNode = if (exitNode != null) convertPeer(exitNode) else null,
             userGroups = userGroups,
+            keyAuth = endpoint.keyAuth,
         )
     }
 
