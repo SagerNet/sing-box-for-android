@@ -5,6 +5,7 @@ import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.os.Process
+import android.provider.Settings
 import android.system.OsConstants
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -281,18 +282,19 @@ interface PlatformInterfaceWrapper : PlatformInterface {
         return RootShellSessionWrapper(rootSession)
     }
 
-    override fun readSystemSSHHostKey(): io.nekohasekai.libbox.StringBox {
+    override fun readSystemSSHHostKey(): String {
         error("not supported")
     }
 
-    override fun lookupSFTPServer(): io.nekohasekai.libbox.StringBox {
-        val path = runBlocking(Dispatchers.IO) {
-            RootClient.lookupSFTPServer()
-        }
-        val result = io.nekohasekai.libbox.StringBox()
-        result.value = path
-        return result
+    override fun lookupSFTPServer(): String = runBlocking(Dispatchers.IO) {
+        RootClient.lookupSFTPServer()
     }
+
+    override fun tailscaleHostname(): String = Settings.Global.getString(
+        Application.application.contentResolver,
+        Settings.Global.DEVICE_NAME,
+    )?.takeIf { it.isNotBlank() }
+        ?: "${Build.MANUFACTURER} ${Build.MODEL}"
 
     override fun lookupUser(username: String?): io.nekohasekai.libbox.PlatformUser {
         val resolved = UserResolver.resolve(Application.packageManager, username!!)

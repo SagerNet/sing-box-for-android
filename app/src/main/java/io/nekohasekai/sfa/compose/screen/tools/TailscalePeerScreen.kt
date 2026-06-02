@@ -22,6 +22,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Stop
@@ -75,7 +76,8 @@ fun TailscalePeerScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     val peer = viewModel.peer(endpointTag, peerId)
-    val isSelf = viewModel.endpoint(endpointTag)?.selfPeer?.id == peerId
+    val endpoint = viewModel.endpoint(endpointTag)
+    val isSelf = endpoint?.selfPeer?.id == peerId
     val pingViewModel: TailscalePingViewModel = viewModel()
     val pingState by pingViewModel.uiState.collectAsState()
 
@@ -92,7 +94,7 @@ fun TailscalePeerScreen(
             title = {
                 Column {
                     Text(
-                        peer?.hostName ?: "",
+                        peer?.displayName ?: "",
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Row(
@@ -143,6 +145,60 @@ fun TailscalePeerScreen(
             .verticalScroll(rememberScrollState())
             .padding(vertical = 8.dp),
     ) {
+        // Network section (self peer only): network name + logout
+        val networkName = endpoint?.networkName
+        val showLogout = isSelf && endpoint?.backendState == "Running" && endpoint?.keyAuth == false
+        if (isSelf && (!networkName.isNullOrEmpty() || showLogout)) {
+            SectionHeader(stringResource(R.string.tailscale_network))
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                ),
+            ) {
+                Column {
+                    if (!networkName.isNullOrEmpty()) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            AddressRow(
+                                address = networkName,
+                                label = stringResource(R.string.tailscale_network),
+                                copied = copiedAddress,
+                                onCopy = { copiedAddress = it },
+                            )
+                        }
+                    }
+                    if (showLogout) {
+                        ListItem(
+                            headlineContent = {
+                                Text(
+                                    stringResource(R.string.tailscale_logout),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.error,
+                                )
+                            },
+                            leadingContent = {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.Logout,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.error,
+                                )
+                            },
+                            modifier = Modifier.clickable {
+                                viewModel.logout(endpointTag)
+                            },
+                            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
         // Tailscale Addresses section
         SectionHeader(stringResource(R.string.tailscale_addresses))
         Card(
@@ -161,6 +217,14 @@ fun TailscalePeerScreen(
                     AddressRow(
                         address = Libbox.formatFQDN(peer.dnsName),
                         label = stringResource(R.string.tailscale_magic_dns),
+                        copied = copiedAddress,
+                        onCopy = { copiedAddress = it },
+                    )
+                }
+                if (peer.hostName.isNotEmpty()) {
+                    AddressRow(
+                        address = peer.hostName,
+                        label = stringResource(R.string.tailscale_hostname),
                         copied = copiedAddress,
                         onCopy = { copiedAddress = it },
                     )

@@ -461,6 +461,7 @@
     <string name="tailscale_status">وضعیت</string>
     <string name="tailscale_state">وضعیت</string>
     <string name="tailscale_network">شبکه</string>
+    <string name="tailscale_hostname">نام میزبان</string>
     <string name="tailscale_open_auth_url">باز کردن لینک احراز هویت</string>
     <string name="tailscale_open_auth_url_qr_code">نمایش QR کد لینک احراز هویت</string>
     <string name="tailscale_this_device">این دستگاه</string>

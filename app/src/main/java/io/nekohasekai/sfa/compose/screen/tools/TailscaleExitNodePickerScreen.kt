@@ -80,7 +80,7 @@ fun TailscaleExitNodePickerScreen(
     val candidates = endpoint.userGroups
         .flatMap { it.peers }
         .filter { it.exitNodeOption && it.stableID != selfStableID }
-        .filter { searchText.isEmpty() || it.hostName.contains(searchText, ignoreCase = true) }
+        .filter { searchText.isEmpty() || it.displayName.contains(searchText, ignoreCase = true) || it.hostName.contains(searchText, ignoreCase = true) }
 
     Column(modifier = Modifier.fillMaxSize()) {
         OutlinedTextField(
@@ -174,7 +174,7 @@ private fun PeerRow(
         )
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = peer.hostName,
+                text = peer.displayName,
                 style = MaterialTheme.typography.bodyLarge,
             )
             val firstIP = peer.tailscaleIPs.firstOrNull()
