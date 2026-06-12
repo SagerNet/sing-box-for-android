@@ -15,6 +15,8 @@ sealed class UiEvent {
 
     data class EditProfile(val profileId: Long) : UiEvent()
 
+    data class Navigate(val route: String) : UiEvent()
+
     object RequestStartService : UiEvent()
 
     object RequestReconnectService : UiEvent()

@@ -591,4 +591,20 @@
     <string name="privilege_module_restart_notification_title">Требуется перезагрузка</string>
     <string name="privilege_module_restart_notification_message">Модуль LSPosed обновлён. Перезагрузите устройство, чтобы применить изменения.</string>
     <string name="privilege_module_restart_channel">Модуль LSPosed</string>
+
+    <!-- Remote Control -->
+    <string name="remote_control">Удаленное управление</string>
+    <string name="remote_servers">Серверы</string>
+    <string name="remote_no_servers">Нет серверов</string>
+    <string name="remote_new_server">Новый сервер</string>
+    <string name="remote_edit_server">Изменить сервер</string>
+    <string name="remote_local_device">Локальное устройство</string>
+    <string name="remote_manage_servers">Управление серверами…</string>
+    <string name="remote_secret">Секрет</string>
+    <string name="remote_optional">Необязательно</string>
+    <string name="remote_connecting">Подключение…</string>
+    <string name="remote_disconnect">Отключить</string>
+    <string name="remote_invalid_url">Неверный URL сервера: %1$s, ожидается host:port, http://host:port или https://host:port</string>
+    <string name="remote_connect_failed">Не удалось подключиться к удаленному серверу %1$s</string>
+    <string name="remote_disconnected_from">Отключено от удаленного сервера %1$s</string>
 </resources>

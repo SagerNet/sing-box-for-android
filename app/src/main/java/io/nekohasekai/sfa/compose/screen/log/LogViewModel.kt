@@ -1,13 +1,17 @@
 package io.nekohasekai.sfa.compose.screen.log
 
 import androidx.lifecycle.viewModelScope
-import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.LogEntry
 import io.nekohasekai.sfa.compose.util.AnsiColorUtils
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.utils.AppLifecycleObserver
 import io.nekohasekai.sfa.utils.CommandClient
+import io.nekohasekai.sfa.utils.CommandTarget
+import io.nekohasekai.sfa.utils.RemoteControlManager
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -28,12 +32,23 @@ class LogViewModel :
             handler = this,
         )
     private var lastServiceStatus: Status = Status.Stopped
+    private val serviceStatusFlow = MutableStateFlow(Status.Stopped)
 
     init {
         viewModelScope.launch {
-            AppLifecycleObserver.isForeground.collect { foreground ->
-                if (lastServiceStatus != Status.Started) return@collect
-                if (foreground) {
+            combine(
+                AppLifecycleObserver.isForeground,
+                RemoteControlManager.remoteServer,
+                RemoteControlManager.isConnected,
+                serviceStatusFlow,
+            ) { foreground, remoteServer, remoteConnected, status ->
+                SessionTarget(
+                    connect = foreground &&
+                        if (remoteServer != null) remoteConnected else status == Status.Started,
+                    remoteServerId = remoteServer?.id,
+                )
+            }.distinctUntilChanged().collect { target ->
+                if (target.connect) {
                     commandClient.connect()
                 } else {
                     commandClient.disconnect()
@@ -41,6 +56,8 @@ class LogViewModel :
             }
         }
     }
+
+    private data class SessionTarget(val connect: Boolean, val remoteServerId: Long?)
 
     private fun processLogEntry(entry: LogEntry): ProcessedLogEntry {
         val level = LogLevel.entries.find { it.priority == entry.level } ?: LogLevel.Default
@@ -53,17 +70,14 @@ class LogViewModel :
 
     override fun updateServiceStatus(status: Status) {
         lastServiceStatus = status
+        serviceStatusFlow.value = status
         _uiState.update { it.copy(serviceStatus = status) }
 
+        if (RemoteControlManager.remoteServer.value != null) {
+            return
+        }
         when (status) {
-            Status.Started -> {
-                if (AppLifecycleObserver.isForeground.value) {
-                    commandClient.connect()
-                }
-            }
-
             Status.Stopped, Status.Stopping -> {
-                commandClient.disconnect()
                 _uiState.update { it.copy(isConnected = false) }
             }
 
@@ -100,7 +114,7 @@ class LogViewModel :
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 runCatching {
-                    Libbox.newStandaloneCommandClient().clearLogs()
+                    CommandTarget.standaloneClient().clearLogs()
                 }
             }
         }

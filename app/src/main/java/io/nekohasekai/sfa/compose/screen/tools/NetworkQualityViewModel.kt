@@ -10,6 +10,7 @@ import io.nekohasekai.libbox.NetworkQualityTestHandler
 import io.nekohasekai.libbox.NetworkQualityTestSession
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.base.BaseViewModel
+import io.nekohasekai.sfa.utils.CommandTarget
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -117,7 +118,7 @@ class NetworkQualityViewModel : BaseViewModel<NetworkQualityState, Nothing>() {
             viewModelScope.launch(Dispatchers.IO) {
                 try {
                     nqSession =
-                        Libbox.newStandaloneCommandClient()
+                        CommandTarget.standaloneClient()
                             .startNetworkQualityTest(
                                 configURL,
                                 outboundTag,

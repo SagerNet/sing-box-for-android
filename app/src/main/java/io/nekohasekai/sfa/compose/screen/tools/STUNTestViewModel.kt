@@ -7,6 +7,7 @@ import io.nekohasekai.libbox.STUNTestProgress
 import io.nekohasekai.libbox.STUNTestResult
 import io.nekohasekai.libbox.STUNTestSession
 import io.nekohasekai.sfa.compose.base.BaseViewModel
+import io.nekohasekai.sfa.utils.CommandTarget
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -63,7 +64,7 @@ class STUNTestViewModel : BaseViewModel<STUNTestState, Nothing>() {
             viewModelScope.launch(Dispatchers.IO) {
                 try {
                     stunSession =
-                        Libbox.newStandaloneCommandClient()
+                        CommandTarget.standaloneClient()
                             .startSTUNTest(server, outboundTag, handler)
                 } catch (e: Exception) {
                     withContext(Dispatchers.Main) {
