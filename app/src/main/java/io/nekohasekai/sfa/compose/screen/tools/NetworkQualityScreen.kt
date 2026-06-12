@@ -53,6 +53,7 @@ import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.constant.Status
+import io.nekohasekai.sfa.utils.RemoteControlManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,7 +63,11 @@ fun NetworkQualityScreen(
     viewModel: NetworkQualityViewModel = viewModel(),
 ) {
     val state by viewModel.uiState.collectAsState()
-    val vpnRunning = serviceStatus == Status.Started
+    val remoteServer by RemoteControlManager.remoteServer.collectAsState()
+    val remoteConnected by RemoteControlManager.isConnected.collectAsState()
+    val serviceAvailable = remoteServer != null || serviceStatus == Status.Started
+    val vpnRunning =
+        if (remoteServer != null) remoteConnected else serviceStatus == Status.Started
     val context = LocalContext.current
 
     var showConfigURLDialog by remember { mutableStateOf(false) }
@@ -107,7 +112,7 @@ fun NetworkQualityScreen(
             title = { Text(stringResource(R.string.network_quality_metered_title)) },
             text = { Text(stringResource(R.string.network_quality_metered_message)) },
             confirmButton = {
-                TextButton(onClick = { viewModel.confirmMeteredStart(vpnRunning) }) {
+                TextButton(onClick = { viewModel.confirmMeteredStart(serviceAvailable) }) {
                     Text(stringResource(R.string.network_quality_metered_continue))
                 }
             },
@@ -299,7 +304,7 @@ fun NetworkQualityScreen(
             }
         } else {
             Button(
-                onClick = { viewModel.requestStartTest(context, vpnRunning) },
+                onClick = { viewModel.requestStartTest(context, serviceAvailable) },
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(stringResource(R.string.network_quality_start))

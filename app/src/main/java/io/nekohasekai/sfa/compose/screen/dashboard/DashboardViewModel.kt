@@ -14,12 +14,16 @@ import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.database.TypedProfile
 import io.nekohasekai.sfa.utils.AppLifecycleObserver
 import io.nekohasekai.sfa.utils.CommandClient
+import io.nekohasekai.sfa.utils.CommandTarget
 import io.nekohasekai.sfa.utils.HTTPClient
+import io.nekohasekai.sfa.utils.RemoteControlManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
@@ -156,9 +160,19 @@ class DashboardViewModel :
         ProfileManager.registerCallback(::onProfilesChanged)
 
         viewModelScope.launch {
-            AppLifecycleObserver.isForeground.collect { foreground ->
-                if (_serviceStatus.value != Status.Started) return@collect
-                if (foreground) {
+            combine(
+                AppLifecycleObserver.isForeground,
+                RemoteControlManager.remoteServer,
+                RemoteControlManager.isConnected,
+                _serviceStatus,
+            ) { foreground, remoteServer, remoteConnected, status ->
+                SessionTarget(
+                    connect = foreground &&
+                        if (remoteServer != null) remoteConnected else status == Status.Started,
+                    remoteServerId = remoteServer?.id,
+                )
+            }.distinctUntilChanged().collect { target ->
+                if (target.connect) {
                     commandClient.connect()
                 } else {
                     commandClient.disconnect()
@@ -166,6 +180,8 @@ class DashboardViewModel :
             }
         }
     }
+
+    private data class SessionTarget(val connect: Boolean, val remoteServerId: Long?)
 
     override fun onCleared() {
         super.onCleared()
@@ -439,7 +455,12 @@ class DashboardViewModel :
             updateState {
                 copy(
                     serviceStatus = status,
-                    isStatusVisible = status == Status.Starting || status == Status.Started,
+                    isStatusVisible =
+                    if (RemoteControlManager.remoteServer.value != null) {
+                        isStatusVisible
+                    } else {
+                        status == Status.Starting || status == Status.Started
+                    },
                 )
             }
             handleServiceStatusChange(status)
@@ -447,18 +468,21 @@ class DashboardViewModel :
     }
 
     private fun handleServiceStatusChange(status: Status) {
+        val isRemote = RemoteControlManager.remoteServer.value != null
         when (status) {
             Status.Started -> {
                 checkDeprecatedNotes()
-                if (AppLifecycleObserver.isForeground.value) {
-                    commandClient.connect()
+                if (isRemote) {
+                    return
                 }
                 reloadSystemProxyStatus()
                 reloadStartedAt()
             }
 
             Status.Stopped -> {
-                commandClient.disconnect()
+                if (isRemote) {
+                    return
+                }
                 updateState {
                     copy(
                         hasGroups = false,
@@ -545,7 +569,7 @@ class DashboardViewModel :
     fun selectClashMode(mode: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                Libbox.newStandaloneCommandClient().setClashMode(mode)
+                CommandTarget.standaloneClient().setClashMode(mode)
                 // Update UI state directly without reconnecting
                 withContext(Dispatchers.Main) {
                     updateState {
@@ -562,6 +586,12 @@ class DashboardViewModel :
     override fun onConnected() {
         viewModelScope.launch(Dispatchers.Main) {
             updateState { copy(isStatusVisible = true) }
+            // Returning from remote control skipped the local reloads that
+            // normally run when the service starts.
+            if (RemoteControlManager.remoteServer.value == null && _serviceStatus.value == Status.Started) {
+                reloadSystemProxyStatus()
+                reloadStartedAt()
+            }
         }
     }
 

@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.termux.terminal.TerminalSession
 import com.termux.terminal.TerminalSessionClient
-import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.StringIterator
 import io.nekohasekai.libbox.TailscaleSSHHandler
 import io.nekohasekai.libbox.TailscaleSSHOptions
@@ -12,7 +11,10 @@ import io.nekohasekai.sfa.compose.base.BaseViewModel
 import io.nekohasekai.sfa.terminal.ManagedSession
 import io.nekohasekai.sfa.terminal.TailscaleSSHPresentedSession
 import io.nekohasekai.sfa.terminal.TailscaleSSHTerminalSession
+import io.nekohasekai.sfa.utils.CommandTarget
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 data class TailscaleSSHTerminalState(
@@ -59,6 +61,7 @@ class TailscaleSSHTerminalViewModel : BaseViewModel<TailscaleSSHTerminalState, N
     fun removeSession(id: String) {
         val session = currentState.sessions.firstOrNull { it.id == id } ?: return
         session.terminalSession.close()
+        disconnectClient(session)
         val remaining = currentState.sessions.filter { it.id != id }
         val newActiveId = if (currentState.activeSessionId == id) {
             remaining.lastOrNull()?.id
@@ -102,7 +105,8 @@ class TailscaleSSHTerminalViewModel : BaseViewModel<TailscaleSSHTerminalState, N
                     forwardAgent = false
                 }
 
-                val commandClient = Libbox.newStandaloneCommandClient()
+                val commandClient = CommandTarget.ownedStandaloneClient()
+                managed.commandClient = commandClient
                 val sshSession = commandClient.startTailscaleSSHSession(
                     options,
                     object : TailscaleSSHHandler {
@@ -134,9 +138,21 @@ class TailscaleSSHTerminalViewModel : BaseViewModel<TailscaleSSHTerminalState, N
         }
     }
 
+    private fun disconnectClient(session: ManagedSession) {
+        val commandClient = session.commandClient ?: return
+        session.commandClient = null
+        @OptIn(DelicateCoroutinesApi::class)
+        GlobalScope.launch(Dispatchers.IO) {
+            runCatching {
+                commandClient.disconnect()
+            }
+        }
+    }
+
     override fun onCleared() {
         for (session in currentState.sessions) {
             session.terminalSession.close()
+            disconnectClient(session)
         }
         super.onCleared()
     }
