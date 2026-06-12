@@ -29,9 +29,11 @@ import io.nekohasekai.sfa.compose.screen.profile.EditProfileRoute
 import io.nekohasekai.sfa.compose.screen.profileoverride.PerAppProxyScreen
 import io.nekohasekai.sfa.compose.screen.settings.AppSettingsScreen
 import io.nekohasekai.sfa.compose.screen.settings.CoreSettingsScreen
+import io.nekohasekai.sfa.compose.screen.settings.EditRemoteServerScreen
 import io.nekohasekai.sfa.compose.screen.settings.FDroidMirrorScreen
 import io.nekohasekai.sfa.compose.screen.settings.PrivilegeSettingsScreen
 import io.nekohasekai.sfa.compose.screen.settings.ProfileOverrideScreen
+import io.nekohasekai.sfa.compose.screen.settings.RemoteControlScreen
 import io.nekohasekai.sfa.compose.screen.settings.ServiceSettingsScreen
 import io.nekohasekai.sfa.compose.screen.settings.SettingsScreen
 import io.nekohasekai.sfa.compose.screen.settings.TailscaleFontPickerScreen
@@ -525,6 +527,38 @@ fun SFANavHost(
             popExitTransition = slideOutToRight,
         ) {
             PerAppProxyScreen(onBack = { navController.navigateUp() }, serviceStatus = serviceStatus)
+        }
+
+        composable(
+            route = "settings/remote_control",
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) {
+            RemoteControlScreen(navController = navController)
+        }
+
+        composable(
+            route = "settings/remote_control/new",
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) {
+            EditRemoteServerScreen(navController = navController)
+        }
+
+        composable(
+            route = "settings/remote_control/edit/{serverId}",
+            arguments = listOf(navArgument("serverId") { type = NavType.LongType }),
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) { backStackEntry ->
+            val serverId = backStackEntry.arguments?.getLong("serverId") ?: -1L
+            EditRemoteServerScreen(navController = navController, serverId = serverId)
         }
 
         composable(

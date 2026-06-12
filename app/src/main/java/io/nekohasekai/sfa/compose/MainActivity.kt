@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LinkOff
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.UnfoldLess
@@ -97,6 +98,7 @@ import io.nekohasekai.sfa.compat.isWidthAtLeastBreakpointCompat
 import io.nekohasekai.sfa.compose.base.GlobalEventBus
 import io.nekohasekai.sfa.compose.base.SelectableMessageDialog
 import io.nekohasekai.sfa.compose.base.UiEvent
+import io.nekohasekai.sfa.compose.component.RemoteStatusBar
 import io.nekohasekai.sfa.compose.component.ServiceStatusBar
 import io.nekohasekai.sfa.compose.component.UpdateAvailableDialog
 import io.nekohasekai.sfa.compose.component.UptimeText
@@ -128,6 +130,7 @@ import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.ktx.hasPermission
 import io.nekohasekai.sfa.ktx.launchCustomTab
 import io.nekohasekai.sfa.update.UpdateState
+import io.nekohasekai.sfa.utils.RemoteControlManager
 import io.nekohasekai.sfa.vendor.Vendor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -199,6 +202,7 @@ class MainActivity :
         enableEdgeToEdge()
 
         connection.reconnect()
+        RemoteControlManager.restore()
 
         UpdateState.loadFromCache()
         if (Settings.checkUpdateEnabled) {
@@ -695,6 +699,11 @@ class MainActivity :
             )
         }
 
+        val remoteServer by RemoteControlManager.remoteServer.collectAsState()
+        val remoteConnected by RemoteControlManager.isConnected.collectAsState()
+        val remoteStartedAt by RemoteControlManager.startedAt.collectAsState()
+        val isRemote = remoteServer != null
+
         // Initialize the dashboard view model and store reference
         val dashboardViewModel: DashboardViewModel = viewModel()
         if (!::dashboardViewModel.isInitialized) {
@@ -761,7 +770,11 @@ class MainActivity :
 
         val showGroupsInNav = dashboardUiState.hasGroups
         val showConnectionsInNav =
-            currentServiceStatus == Status.Started || currentServiceStatus == Status.Starting
+            if (isRemote) {
+                remoteConnected
+            } else {
+                currentServiceStatus == Status.Started || currentServiceStatus == Status.Starting
+            }
 
         val railScreens =
             buildList {
@@ -840,6 +853,12 @@ class MainActivity :
                         }
                     }
 
+                    is UiEvent.Navigate -> {
+                        navController.navigate(event.route) {
+                            launchSingleTop = true
+                        }
+                    }
+
                     is UiEvent.ApplyServiceChange -> enqueueApplyServiceChange(event.mode)
                 }
             }
@@ -855,11 +874,12 @@ class MainActivity :
                     .fillMaxSize()
                     .padding(paddingValues),
             ) {
-                // Service Status Bar (shown when service is running or stopping)
+                // Service Status Bar (shown when service is running or stopping);
+                // remote control replaces it with the remote session bar.
                 val serviceRunning =
                     currentServiceStatus == Status.Started || currentServiceStatus == Status.Starting
-                val showStatusBar = serviceRunning || currentServiceStatus == Status.Stopping
-                val showStartFab = !serviceRunning && dashboardUiState.selectedProfileId != -1L
+                val showStatusBar = isRemote || serviceRunning || currentServiceStatus == Status.Stopping
+                val showStartFab = !isRemote && !serviceRunning && dashboardUiState.selectedProfileId != -1L
 
                 SFANavHost(
                     navController = navController,
@@ -878,18 +898,34 @@ class MainActivity :
                     modifier = Modifier.fillMaxSize(),
                 )
                 if (!useNavigationRail) {
-                    ServiceStatusBar(
-                        visible = showStatusBar && !isSubScreen,
-                        serviceStatus = currentServiceStatus,
-                        startTime = dashboardUiState.serviceStartTime,
-                        groupsCount = dashboardUiState.groupsCount,
-                        hasGroups = dashboardUiState.hasGroups,
-                        onGroupsClick = { showGroupsSheet = true },
-                        connectionsCount = dashboardUiState.connectionsCount,
-                        onConnectionsClick = { showConnectionsSheet = true },
-                        onStopClick = { dashboardViewModel.toggleService() },
-                        modifier = Modifier.align(Alignment.BottomCenter),
-                    )
+                    if (isRemote) {
+                        RemoteStatusBar(
+                            visible = !isSubScreen,
+                            serverName = remoteServer?.displayName ?: "",
+                            isConnected = remoteConnected,
+                            startTime = remoteStartedAt,
+                            groupsCount = dashboardUiState.groupsCount,
+                            hasGroups = dashboardUiState.hasGroups,
+                            onGroupsClick = { showGroupsSheet = true },
+                            connectionsCount = dashboardUiState.connectionsCount,
+                            onConnectionsClick = { showConnectionsSheet = true },
+                            onDisconnectClick = { RemoteControlManager.exitRemoteControl() },
+                            modifier = Modifier.align(Alignment.BottomCenter),
+                        )
+                    } else {
+                        ServiceStatusBar(
+                            visible = showStatusBar && !isSubScreen,
+                            serviceStatus = currentServiceStatus,
+                            startTime = dashboardUiState.serviceStartTime,
+                            groupsCount = dashboardUiState.groupsCount,
+                            hasGroups = dashboardUiState.hasGroups,
+                            onGroupsClick = { showGroupsSheet = true },
+                            connectionsCount = dashboardUiState.connectionsCount,
+                            onConnectionsClick = { showConnectionsSheet = true },
+                            onStopClick = { dashboardViewModel.toggleService() },
+                            modifier = Modifier.align(Alignment.BottomCenter),
+                        )
+                    }
                 }
 
                 val showPadFab = useNavigationRail && !isSubScreen && (showStartFab || showStatusBar)
@@ -905,7 +941,35 @@ class MainActivity :
                         val isRunning =
                             currentServiceStatus == Status.Started || currentServiceStatus == Status.Starting
                         val isStopping = currentServiceStatus == Status.Stopping
-                        if (currentServiceStatus == Status.Stopped) {
+                        if (isRemote) {
+                            ExtendedFloatingActionButton(
+                                onClick = { RemoteControlManager.exitRemoteControl() },
+                                icon = {
+                                    Icon(
+                                        imageVector = Icons.Default.LinkOff,
+                                        contentDescription = stringResource(R.string.remote_disconnect),
+                                    )
+                                },
+                                text = {
+                                    if (remoteConnected && remoteStartedAt != null) {
+                                        UptimeText(startTime = remoteStartedAt!!)
+                                    } else {
+                                        Text(
+                                            text =
+                                            if (remoteConnected) {
+                                                remoteServer?.displayName ?: ""
+                                            } else {
+                                                stringResource(R.string.remote_connecting)
+                                            },
+                                            style = MaterialTheme.typography.labelLarge,
+                                        )
+                                    }
+                                },
+                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                modifier = Modifier.height(64.dp),
+                            )
+                        } else if (currentServiceStatus == Status.Stopped) {
                             FloatingActionButton(
                                 onClick = { startService() },
                                 containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -981,7 +1045,8 @@ class MainActivity :
                 } else {
                     // Start FAB (shown when service is stopped and a profile is selected)
                     androidx.compose.animation.AnimatedVisibility(
-                        visible = currentServiceStatus == Status.Stopped &&
+                        visible = !isRemote &&
+                            currentServiceStatus == Status.Stopped &&
                             dashboardUiState.selectedProfileId != -1L &&
                             !isSubScreen,
                         enter = scaleIn(),
@@ -1007,7 +1072,8 @@ class MainActivity :
 
         val crashReportUnreadCount by CrashReportManager.unreadCount.collectAsState()
         val oomReportUnreadCount by OOMReportManager.unreadCount.collectAsState()
-        val toolsUnreadCount = crashReportUnreadCount + oomReportUnreadCount
+        // The crash/OOM report entries are hidden in remote control mode.
+        val toolsUnreadCount = if (isRemote) 0 else crashReportUnreadCount + oomReportUnreadCount
 
         LaunchedEffect(Unit) {
             withContext(Dispatchers.IO) {

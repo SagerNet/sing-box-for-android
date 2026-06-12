@@ -14,11 +14,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.material.icons.outlined.BugReport
 import androidx.compose.material.icons.outlined.Hub
 import androidx.compose.material.icons.outlined.Memory
 import androidx.compose.material.icons.outlined.NetworkCheck
+import androidx.compose.material.icons.outlined.SwapHoriz
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -26,6 +28,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -48,10 +51,13 @@ import androidx.navigation.NavController
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.bg.CrashReportManager
 import io.nekohasekai.sfa.bg.OOMReportManager
+import io.nekohasekai.sfa.compose.component.RemoteControlMenuItems
+import io.nekohasekai.sfa.compose.component.rememberRemoteServers
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.terminal.TailscaleSSHPresentedSession
+import io.nekohasekai.sfa.utils.RemoteControlManager
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -61,17 +67,57 @@ fun ToolsScreen(
     tailscaleViewModel: TailscaleStatusViewModel,
     sshSharedViewModel: TailscaleSSHSharedViewModel,
 ) {
+    val remoteServers by rememberRemoteServers()
+
     OverrideTopBar {
         TopAppBar(
             title = { Text(stringResource(R.string.title_tools)) },
+            actions = {
+                if (remoteServers.isNotEmpty()) {
+                    Box {
+                        var showOthersMenu by remember { mutableStateOf(false) }
+                        IconButton(onClick = { showOthersMenu = true }) {
+                            Icon(
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = stringResource(R.string.title_others),
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = showOthersMenu,
+                            onDismissRequest = { showOthersMenu = false },
+                        ) {
+                            RemoteControlMenuItems(
+                                servers = remoteServers,
+                                onAction = { showOthersMenu = false },
+                                leadingDivider = false,
+                            )
+                        }
+                    }
+                }
+            },
         )
     }
 
     val crashUnreadCount by CrashReportManager.unreadCount.collectAsState()
     val oomUnreadCount by OOMReportManager.unreadCount.collectAsState()
     val tailscaleState by tailscaleViewModel.uiState.collectAsState()
+    val remoteServer by RemoteControlManager.remoteServer.collectAsState()
+
+    LaunchedEffect(remoteServer?.id) {
+        // Drop the previous target's subscription when switching between the
+        // local service and a remote server, or between two servers: a server
+        // without tailscale leaves no active stream to error out, so the
+        // subscription would stay stale without an explicit cancel.
+        tailscaleViewModel.cancel()
+        if (remoteServer != null || serviceStatus == Status.Started) {
+            tailscaleViewModel.subscribe()
+        }
+    }
 
     LaunchedEffect(serviceStatus) {
+        if (remoteServer != null) {
+            return@LaunchedEffect
+        }
         if (serviceStatus == Status.Started) {
             tailscaleViewModel.subscribe()
         } else {
@@ -243,7 +289,7 @@ fun ToolsScreen(
                 },
                 leadingContent = {
                     Icon(
-                        imageVector = Icons.Outlined.NetworkCheck,
+                        imageVector = Icons.Outlined.SwapHoriz,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
                     )
@@ -255,73 +301,77 @@ fun ToolsScreen(
             )
         }
 
-        Text(
-            text = stringResource(R.string.title_debug),
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(horizontal = 32.dp, vertical = 8.dp),
-        )
+        // Crash/OOM reports read local files, which the remote control API
+        // does not reach.
+        if (remoteServer == null) {
+            Text(
+                text = stringResource(R.string.title_debug),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(horizontal = 32.dp, vertical = 8.dp),
+            )
 
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-            ),
-        ) {
-            ListItem(
-                headlineContent = {
-                    Text(
-                        stringResource(R.string.crash_report),
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
-                },
-                leadingContent = {
-                    Icon(
-                        imageVector = Icons.Outlined.BugReport,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                    )
-                },
-                trailingContent = {
-                    if (crashUnreadCount > 0) {
-                        Badge(containerColor = MaterialTheme.colorScheme.primary) {
-                            Text("$crashUnreadCount")
-                        }
-                    }
-                },
+            Card(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
-                    .clickable { navController.navigate("tools/crash_report") },
-                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-            )
-            ListItem(
-                headlineContent = {
-                    Text(
-                        stringResource(R.string.oom_report),
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
-                },
-                leadingContent = {
-                    Icon(
-                        imageVector = Icons.Outlined.Memory,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                    )
-                },
-                trailingContent = {
-                    if (oomUnreadCount > 0) {
-                        Badge(containerColor = MaterialTheme.colorScheme.primary) {
-                            Text("$oomUnreadCount")
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                ),
+            ) {
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            stringResource(R.string.crash_report),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    },
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Outlined.BugReport,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    },
+                    trailingContent = {
+                        if (crashUnreadCount > 0) {
+                            Badge(containerColor = MaterialTheme.colorScheme.primary) {
+                                Text("$crashUnreadCount")
+                            }
                         }
-                    }
-                },
-                modifier = Modifier
-                    .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
-                    .clickable { navController.navigate("tools/oom_report") },
-                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-            )
+                    },
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+                        .clickable { navController.navigate("tools/crash_report") },
+                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                )
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            stringResource(R.string.oom_report),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    },
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Outlined.Memory,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    },
+                    trailingContent = {
+                        if (oomUnreadCount > 0) {
+                            Badge(containerColor = MaterialTheme.colorScheme.primary) {
+                                Text("$oomUnreadCount")
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
+                        .clickable { navController.navigate("tools/oom_report") },
+                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                )
+            }
         }
     }
 }

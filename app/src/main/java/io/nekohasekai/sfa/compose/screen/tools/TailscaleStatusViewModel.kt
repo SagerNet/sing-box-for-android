@@ -1,11 +1,11 @@
 package io.nekohasekai.sfa.compose.screen.tools
 
 import androidx.lifecycle.viewModelScope
-import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.TailscaleStatusHandler
 import io.nekohasekai.libbox.TailscaleStatusSubscription
 import io.nekohasekai.libbox.TailscaleStatusUpdate
 import io.nekohasekai.sfa.compose.base.BaseViewModel
+import io.nekohasekai.sfa.utils.CommandTarget
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -77,7 +77,7 @@ class TailscaleStatusViewModel : BaseViewModel<TailscaleStatusState, Nothing>() 
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 statusSubscription =
-                    Libbox.newStandaloneCommandClient()
+                    CommandTarget.standaloneClient()
                         .subscribeTailscaleStatus(object : TailscaleStatusHandler {
                             override fun onStatusUpdate(status: TailscaleStatusUpdate) {
                                 val endpoints = convertUpdate(status)
@@ -117,7 +117,7 @@ class TailscaleStatusViewModel : BaseViewModel<TailscaleStatusState, Nothing>() 
     fun setExitNode(endpointTag: String, stableID: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                Libbox.newStandaloneCommandClient().setTailscaleExitNode(endpointTag, stableID)
+                CommandTarget.standaloneClient().setTailscaleExitNode(endpointTag, stableID)
             } catch (e: Exception) {
                 sendErrorMessage(e.message ?: "set exit node failed")
             }
@@ -127,7 +127,7 @@ class TailscaleStatusViewModel : BaseViewModel<TailscaleStatusState, Nothing>() 
     fun logout(endpointTag: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                Libbox.newStandaloneCommandClient().tailscaleLogout(endpointTag)
+                CommandTarget.standaloneClient().tailscaleLogout(endpointTag)
             } catch (e: Exception) {
                 sendErrorMessage(e.message ?: "logout failed")
             }

@@ -1,7 +1,6 @@
 package io.nekohasekai.sfa.compose.screen.dashboard.groups
 
 import androidx.lifecycle.viewModelScope
-import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.OutboundGroup
 import io.nekohasekai.sfa.compose.base.BaseViewModel
 import io.nekohasekai.sfa.compose.base.ScreenEvent
@@ -11,9 +10,13 @@ import io.nekohasekai.sfa.compose.model.toList
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.utils.AppLifecycleObserver
 import io.nekohasekai.sfa.utils.CommandClient
+import io.nekohasekai.sfa.utils.CommandTarget
+import io.nekohasekai.sfa.utils.RemoteControlManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -54,9 +57,19 @@ class GroupsViewModel(private val sharedCommandClient: CommandClient? = null) :
         }
 
         viewModelScope.launch {
-            AppLifecycleObserver.isForeground.collect { foreground ->
-                if (lastServiceStatus != Status.Started) return@collect
-                if (foreground) {
+            combine(
+                AppLifecycleObserver.isForeground,
+                RemoteControlManager.remoteServer,
+                RemoteControlManager.isConnected,
+                _serviceStatus,
+            ) { foreground, remoteServer, remoteConnected, status ->
+                SessionTarget(
+                    connect = foreground &&
+                        if (remoteServer != null) remoteConnected else status == Status.Started,
+                    remoteServerId = remoteServer?.id,
+                )
+            }.distinctUntilChanged().collect { target ->
+                if (target.connect) {
                     if (isUsingSharedClient) {
                         commandClient.addHandler(this@GroupsViewModel)
                     } else {
@@ -74,6 +87,8 @@ class GroupsViewModel(private val sharedCommandClient: CommandClient? = null) :
         }
     }
 
+    private data class SessionTarget(val connect: Boolean, val remoteServerId: Long?)
+
     override fun createInitialState() = GroupsUiState()
 
     override fun onCleared() {
@@ -86,15 +101,10 @@ class GroupsViewModel(private val sharedCommandClient: CommandClient? = null) :
     }
 
     private fun handleServiceStatusChange(status: Status) {
-        if (status == Status.Started) {
-            if (!isUsingSharedClient && AppLifecycleObserver.isForeground.value) {
-                updateState { copy(isLoading = true) }
-                commandClient.connect()
-            }
-        } else {
-            if (!isUsingSharedClient) {
-                commandClient.disconnect()
-            }
+        if (RemoteControlManager.remoteServer.value != null) {
+            return
+        }
+        if (status != Status.Started) {
             updateState {
                 copy(
                     groups = emptyList(),
@@ -127,7 +137,7 @@ class GroupsViewModel(private val sharedCommandClient: CommandClient? = null) :
         }
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                Libbox.newStandaloneCommandClient().setGroupExpand(groupTag, newExpanded)
+                CommandTarget.standaloneClient().setGroupExpand(groupTag, newExpanded)
             }
         }
     }
@@ -148,7 +158,7 @@ class GroupsViewModel(private val sharedCommandClient: CommandClient? = null) :
         viewModelScope.launch(Dispatchers.IO) {
             groups.forEach { group ->
                 runCatching {
-                    Libbox.newStandaloneCommandClient().setGroupExpand(group.tag, newExpanded)
+                    CommandTarget.standaloneClient().setGroupExpand(group.tag, newExpanded)
                 }
             }
         }
@@ -165,7 +175,7 @@ class GroupsViewModel(private val sharedCommandClient: CommandClient? = null) :
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 // Select the new outbound immediately
-                Libbox.newStandaloneCommandClient().selectOutbound(groupTag, itemTag)
+                CommandTarget.standaloneClient().selectOutbound(groupTag, itemTag)
 
                 // Update local state and show snackbar
                 withContext(Dispatchers.Main) {
@@ -193,7 +203,7 @@ class GroupsViewModel(private val sharedCommandClient: CommandClient? = null) :
     fun closeConnections() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                Libbox.newStandaloneCommandClient().closeConnections()
+                CommandTarget.standaloneClient().closeConnections()
                 withContext(Dispatchers.Main) {
                     dismissCloseConnectionsSnackbar()
                 }
@@ -215,7 +225,7 @@ class GroupsViewModel(private val sharedCommandClient: CommandClient? = null) :
     fun urlTest(groupTag: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                Libbox.newStandaloneCommandClient().urlTest(groupTag)
+                CommandTarget.standaloneClient().urlTest(groupTag)
             } catch (e: Exception) {
                 sendError(e)
             }
