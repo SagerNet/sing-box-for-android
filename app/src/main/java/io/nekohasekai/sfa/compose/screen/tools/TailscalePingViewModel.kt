@@ -1,11 +1,11 @@
 package io.nekohasekai.sfa.compose.screen.tools
 
 import androidx.lifecycle.viewModelScope
-import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.TailscalePingHandler
 import io.nekohasekai.libbox.TailscalePingResult
 import io.nekohasekai.libbox.TailscalePingSession
 import io.nekohasekai.sfa.compose.base.BaseViewModel
+import io.nekohasekai.sfa.utils.CommandTarget
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -38,7 +38,7 @@ class TailscalePingViewModel : BaseViewModel<TailscalePingState, Nothing>() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 pingSession =
-                    Libbox.newStandaloneCommandClient()
+                    CommandTarget.standaloneClient()
                         .startTailscalePing(
                             endpointTag,
                             peerIP,

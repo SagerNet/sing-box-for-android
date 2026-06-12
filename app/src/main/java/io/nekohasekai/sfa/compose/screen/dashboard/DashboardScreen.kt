@@ -10,11 +10,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -23,7 +28,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -31,9 +40,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.base.UiEvent
+import io.nekohasekai.sfa.compose.component.RemoteControlMenuItems
+import io.nekohasekai.sfa.compose.component.rememberRemoteServers
 import io.nekohasekai.sfa.compose.navigation.NewProfileArgs
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.constant.Status
+import io.nekohasekai.sfa.utils.RemoteControlManager
 import kotlinx.coroutines.launch
 
 data class CardRenderItem(val cards: List<CardGroup>, val isRow: Boolean)
@@ -48,16 +60,46 @@ fun DashboardScreen(
     viewModel: DashboardViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val remoteServer by RemoteControlManager.remoteServer.collectAsState()
+    val remoteConnected by RemoteControlManager.isConnected.collectAsState()
+    val isRemote = remoteServer != null
+    val remoteServers by rememberRemoteServers()
+    var showOthersMenu by remember { mutableStateOf(false) }
 
     OverrideTopBar {
         TopAppBar(
             title = { Text(stringResource(R.string.title_dashboard)) },
             actions = {
-                IconButton(onClick = { viewModel.toggleCardSettingsDialog() }) {
-                    Icon(
-                        imageVector = Icons.Default.MoreVert,
-                        contentDescription = stringResource(R.string.title_others),
-                    )
+                Box {
+                    IconButton(onClick = { showOthersMenu = true }) {
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = stringResource(R.string.title_others),
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = showOthersMenu,
+                        onDismissRequest = { showOthersMenu = false },
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.dashboard_items)) },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.GridView,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                )
+                            },
+                            onClick = {
+                                showOthersMenu = false
+                                viewModel.toggleCardSettingsDialog()
+                            },
+                        )
+                        RemoteControlMenuItems(
+                            servers = remoteServers,
+                            onAction = { showOthersMenu = false },
+                        )
+                    }
                 }
             },
         )
@@ -120,6 +162,16 @@ fun DashboardScreen(
         )
     }
 
+    if (isRemote && !remoteConnected) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            CircularProgressIndicator()
+        }
+        return
+    }
+
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
@@ -143,8 +195,17 @@ fun DashboardScreen(
             // Filter cards based on availability
             val actuallyVisibleCards =
                 uiState.visibleCards.filter { cardGroup ->
-                    when (cardGroup) {
-                        CardGroup.Profiles -> true // Profiles card is always available
+                    when {
+                        // The remote dashboard only renders cards backed by the
+                        // command protocol: profiles and system proxy are
+                        // operations on the local device.
+                        isRemote ->
+                            cardGroup != CardGroup.Profiles &&
+                                cardGroup != CardGroup.SystemProxy &&
+                                serviceRunning &&
+                                isCardAvailableWhenServiceRunning(cardGroup, uiState)
+
+                        cardGroup == CardGroup.Profiles -> true // Profiles card is always available
                         else -> serviceRunning && isCardAvailableWhenServiceRunning(cardGroup, uiState)
                     }
                 }.toSet()

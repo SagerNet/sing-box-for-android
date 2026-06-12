@@ -585,4 +585,20 @@
     <string name="privilege_module_restart_notification_title">نیاز به راه‌اندازی مجدد</string>
     <string name="privilege_module_restart_notification_message">ماژول LSPosed به‌روزرسانی شد. برای اعمال تغییرات دستگاه را راه‌اندازی مجدد کنید.</string>
     <string name="privilege_module_restart_channel">ماژول LSPosed</string>
+
+    <!-- Remote Control -->
+    <string name="remote_control">کنترل از راه دور</string>
+    <string name="remote_servers">سرورها</string>
+    <string name="remote_no_servers">بدون سرور</string>
+    <string name="remote_new_server">سرور جدید</string>
+    <string name="remote_edit_server">ویرایش سرور</string>
+    <string name="remote_local_device">دستگاه محلی</string>
+    <string name="remote_manage_servers">مدیریت سرورها…</string>
+    <string name="remote_secret">رمز</string>
+    <string name="remote_optional">اختیاری</string>
+    <string name="remote_connecting">در حال اتصال…</string>
+    <string name="remote_disconnect">قطع اتصال</string>
+    <string name="remote_invalid_url">نشانی سرور نامعتبر است: %1$s، قالب مورد انتظار host:port، http://host:port یا https://host:port است</string>
+    <string name="remote_connect_failed">اتصال به سرور راه دور %1$s ناموفق بود</string>
+    <string name="remote_disconnected_from">اتصال با سرور راه دور %1$s قطع شد</string>
 </resources>

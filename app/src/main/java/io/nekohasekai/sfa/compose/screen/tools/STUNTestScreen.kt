@@ -50,6 +50,7 @@ import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.constant.Status
+import io.nekohasekai.sfa.utils.RemoteControlManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,7 +60,11 @@ fun STUNTestScreen(
     viewModel: STUNTestViewModel = viewModel(),
 ) {
     val state by viewModel.uiState.collectAsState()
-    val vpnRunning = serviceStatus == Status.Started
+    val remoteServer by RemoteControlManager.remoteServer.collectAsState()
+    val remoteConnected by RemoteControlManager.isConnected.collectAsState()
+    val serviceAvailable = remoteServer != null || serviceStatus == Status.Started
+    val vpnRunning =
+        if (remoteServer != null) remoteConnected else serviceStatus == Status.Started
 
     var showServerDialog by remember { mutableStateOf(false) }
 
@@ -191,7 +196,7 @@ fun STUNTestScreen(
             }
         } else {
             Button(
-                onClick = { viewModel.startTest(vpnRunning) },
+                onClick = { viewModel.startTest(serviceAvailable) },
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(stringResource(R.string.stun_start))
