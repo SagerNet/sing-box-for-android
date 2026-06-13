@@ -465,6 +465,7 @@
     <string name="tailscale_open_auth_url">開啟認證連結</string>
     <string name="tailscale_open_auth_url_qr_code">顯示認證連結 QR 碼</string>
     <string name="tailscale_this_device">此裝置</string>
+    <string name="tailscale_logout">登出</string>
     <string name="tailscale_connected">已連線</string>
     <string name="tailscale_not_connected">未連線</string>
     <string name="tailscale_addresses">Tailscale 位址</string>
@@ -472,6 +473,15 @@
     <string name="tailscale_key_expiry">金鑰到期</string>
     <string name="tailscale_exit_node">出口節點</string>
     <string name="tailscale_active">活躍</string>
+    <string name="tailscale_ping">Ping</string>
+    <string name="tailscale_ping_start">啟動</string>
+    <string name="tailscale_ping_stop">停止</string>
+    <string name="tailscale_ping_direct">直接連線</string>
+    <string name="tailscale_ping_derp">DERP 中繼連線</string>
+    <string name="tailscale_ping_endpoint">端點</string>
+    <string name="tailscale_ping_derp_region">DERP 區域</string>
+    <string name="tailscale_ping_connecting">連線中…</string>
+    <string name="tailscale_ping_no_data">無資料</string>
     <string name="tailscale_shared_in">共享至此</string>
     <string name="tailscale_expired">已過期</string>
     <string name="tailscale_expires_relative">%1$s過期</string>

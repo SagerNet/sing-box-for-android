@@ -465,6 +465,7 @@
     <string name="tailscale_open_auth_url">باز کردن لینک احراز هویت</string>
     <string name="tailscale_open_auth_url_qr_code">نمایش QR کد لینک احراز هویت</string>
     <string name="tailscale_this_device">این دستگاه</string>
+    <string name="tailscale_logout">خروج از حساب</string>
     <string name="tailscale_connected">متصل</string>
     <string name="tailscale_not_connected">متصل نیست</string>
     <string name="tailscale_addresses">آدرس‌های Tailscale</string>
@@ -472,6 +473,15 @@
     <string name="tailscale_key_expiry">انقضای کلید</string>
     <string name="tailscale_exit_node">گره خروجی</string>
     <string name="tailscale_active">فعال</string>
+    <string name="tailscale_ping">پینگ</string>
+    <string name="tailscale_ping_start">شروع</string>
+    <string name="tailscale_ping_stop">توقف</string>
+    <string name="tailscale_ping_direct">اتصال مستقیم</string>
+    <string name="tailscale_ping_derp">اتصال از طریق DERP</string>
+    <string name="tailscale_ping_endpoint">نقطه پایانی</string>
+    <string name="tailscale_ping_derp_region">منطقه DERP</string>
+    <string name="tailscale_ping_connecting">در حال اتصال…</string>
+    <string name="tailscale_ping_no_data">بدون داده</string>
     <string name="tailscale_shared_in">به اشتراک گذاشته شده</string>
     <string name="tailscale_expired">منقضی شده</string>
     <string name="tailscale_expires_relative">انقضا %1$s</string>

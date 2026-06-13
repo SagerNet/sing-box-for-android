@@ -471,6 +471,7 @@
     <string name="tailscale_open_auth_url">Открыть URL авторизации</string>
     <string name="tailscale_open_auth_url_qr_code">Показать QR-код авторизации</string>
     <string name="tailscale_this_device">Это устройство</string>
+    <string name="tailscale_logout">Выйти</string>
     <string name="tailscale_connected">Подключено</string>
     <string name="tailscale_not_connected">Не подключено</string>
     <string name="tailscale_addresses">Адреса Tailscale</string>
@@ -478,6 +479,15 @@
     <string name="tailscale_key_expiry">Срок действия ключа</string>
     <string name="tailscale_exit_node">Выходной узел</string>
     <string name="tailscale_active">Активен</string>
+    <string name="tailscale_ping">Пинг</string>
+    <string name="tailscale_ping_start">Начать</string>
+    <string name="tailscale_ping_stop">Остановить</string>
+    <string name="tailscale_ping_direct">Прямое соединение</string>
+    <string name="tailscale_ping_derp">Соединение через DERP</string>
+    <string name="tailscale_ping_endpoint">Конечная точка</string>
+    <string name="tailscale_ping_derp_region">Регион DERP</string>
+    <string name="tailscale_ping_connecting">Подключение…</string>
+    <string name="tailscale_ping_no_data">Нет данных</string>
     <string name="tailscale_shared_in">Поделено</string>
     <string name="tailscale_expired">Истёк</string>
     <string name="tailscale_expires_relative">Истекает %1$s</string>
