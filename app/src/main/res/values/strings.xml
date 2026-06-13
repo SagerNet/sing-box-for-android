@@ -483,6 +483,10 @@
     <string name="tailscale_ping_stop">Stop</string>
     <string name="tailscale_ping_direct">Direct connection</string>
     <string name="tailscale_ping_derp">DERP-relayed connection</string>
+    <string name="tailscale_ping_endpoint">Endpoint</string>
+    <string name="tailscale_ping_derp_region">DERP region</string>
+    <string name="tailscale_ping_connecting">Connecting…</string>
+    <string name="tailscale_ping_no_data">No data</string>
     <string name="tailscale_shared_in">Shared in</string>
     <string name="tailscale_expired">Expired</string>
     <string name="tailscale_expires_relative">Expires %1$s</string>

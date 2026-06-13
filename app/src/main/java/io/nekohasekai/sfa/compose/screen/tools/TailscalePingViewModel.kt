@@ -17,6 +17,7 @@ data class TailscalePingState(
     val isDirect: Boolean = false,
     val derpRegionCode: String = "",
     val endpoint: String = "",
+    val error: String = "",
     val latencyHistory: List<Float> = emptyList(),
 )
 
@@ -31,6 +32,7 @@ class TailscalePingViewModel : BaseViewModel<TailscalePingState, Nothing>() {
             copy(
                 isRunning = true,
                 hasResult = false,
+                error = "",
                 latencyHistory = emptyList(),
             )
         }
@@ -47,7 +49,10 @@ class TailscalePingViewModel : BaseViewModel<TailscalePingState, Nothing>() {
                                     result ?: return
                                     viewModelScope.launch {
                                         if (!currentState.isRunning) return@launch
-                                        if (result.error.isNotEmpty()) return@launch
+                                        if (result.error.isNotEmpty()) {
+                                            updateState { copy(error = result.error) }
+                                            return@launch
+                                        }
                                         val newHistory = currentState.latencyHistory.toMutableList()
                                         newHistory.add(result.latencyMs.toFloat())
                                         if (newHistory.size > maxHistorySize) {
@@ -60,6 +65,7 @@ class TailscalePingViewModel : BaseViewModel<TailscalePingState, Nothing>() {
                                                 isDirect = result.isDirect,
                                                 derpRegionCode = result.derpRegionCode,
                                                 endpoint = result.endpoint,
+                                                error = "",
                                                 latencyHistory = newHistory,
                                             )
                                         }

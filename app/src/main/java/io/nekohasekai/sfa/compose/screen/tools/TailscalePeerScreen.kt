@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -337,6 +338,20 @@ fun TailscalePeerScreen(
                                 fontWeight = FontWeight.Bold,
                             )
                         }
+                        if (pingState.isDirect && pingState.endpoint.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            DetailRow(
+                                label = stringResource(R.string.tailscale_ping_endpoint),
+                                value = pingState.endpoint,
+                            )
+                        }
+                        if (!pingState.isDirect && pingState.derpRegionCode.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            DetailRow(
+                                label = stringResource(R.string.tailscale_ping_derp_region),
+                                value = pingState.derpRegionCode,
+                            )
+                        }
                         if (pingState.isRunning && pingState.latencyHistory.size > 1) {
                             Spacer(modifier = Modifier.height(8.dp))
                             Row(
@@ -386,9 +401,32 @@ fun TailscalePeerScreen(
                                 }
                             }
                         }
-                    } else {
+                    }
+                    if (pingState.error.isNotEmpty()) {
+                        if (pingState.hasResult) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
                         Text(
-                            text = "No data",
+                            text = pingState.error,
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    } else if (pingState.isRunning && !pingState.hasResult) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(16.dp),
+                                strokeWidth = 2.dp,
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = stringResource(R.string.tailscale_ping_connecting),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    } else if (!pingState.hasResult) {
+                        Text(
+                            text = stringResource(R.string.tailscale_ping_no_data),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
