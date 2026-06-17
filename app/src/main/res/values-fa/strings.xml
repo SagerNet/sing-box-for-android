@@ -457,6 +457,7 @@
     <!-- STUN Test -->
     <!-- Tailscale -->
     <string name="tailscale_endpoints">نقاط اتصال</string>
+    <string name="title_services">سرویس‌ها</string>
 
     <string name="tailscale_status">وضعیت</string>
     <string name="tailscale_state">وضعیت</string>
@@ -611,4 +612,7 @@
     <string name="remote_invalid_url">نشانی سرور نامعتبر است: %1$s، قالب مورد انتظار host:port، http://host:port یا https://host:port است</string>
     <string name="remote_connect_failed">اتصال به سرور راه دور %1$s ناموفق بود</string>
     <string name="remote_disconnected_from">اتصال با سرور راه دور %1$s قطع شد</string>
+    <string name="remote_checking">در حال بررسی…</string>
+    <string name="remote_available">در دسترس</string>
+    <string name="remote_unavailable">در دسترس نیست</string>
 </resources>

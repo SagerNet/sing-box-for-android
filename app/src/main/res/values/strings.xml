@@ -618,4 +618,40 @@
     <string name="remote_invalid_url">Invalid server URL: %1$s, expected host:port, http://host:port or https://host:port</string>
     <string name="remote_connect_failed">Failed to connect to remote server %1$s</string>
     <string name="remote_disconnected_from">Disconnected from remote server %1$s</string>
+    <string name="remote_checking">Checking…</string>
+    <string name="remote_available">Available</string>
+    <string name="remote_unavailable">Unavailable</string>
+
+    <string name="title_services">Services</string>
+    <string name="title_usbip">USB/IP</string>
+    <string name="usbip_with_tag">USB/IP: %1$s</string>
+    <string name="usbip_no_server">No usbip-server found</string>
+    <string name="usbip_no_devices">Pick a USB device to share it through this usbip-server.</string>
+    <string name="usbip_no_usb_devices">No USB devices connected</string>
+    <string name="usbip_connect_device">Connect USB device</string>
+    <string name="usbip_detach">Detach</string>
+    <string name="usbip_state_attaching">Attaching…</string>
+    <string name="usbip_state_ready">Ready</string>
+    <string name="usbip_state_error">Error</string>
+    <string name="usbip_state_idle">Idle</string>
+    <string name="usbip_state_attached">Attached</string>
+    <string name="usbip_state_unavailable">Unavailable</string>
+    <string name="usbip_identity">Identity</string>
+    <string name="usbip_connection">Connection</string>
+    <string name="usbip_class_interfaces">Class &amp; Interfaces</string>
+    <string name="usbip_product">Product</string>
+    <string name="usbip_serial">Serial number</string>
+    <string name="usbip_version">Version</string>
+    <string name="usbip_bus_id">Bus ID</string>
+    <string name="usbip_backend">Backend</string>
+    <string name="usbip_speed">Speed</string>
+    <string name="usbip_bus_device">Bus / Device</string>
+    <string name="usbip_device_class">Device class</string>
+    <string name="usbip_configuration">Configuration</string>
+    <string name="usbip_interface">Interface %1$d</string>
+    <string name="usbip_notification_title">USB/IP sharing</string>
+    <plurals name="usbip_notification_text">
+        <item quantity="one">Sharing %1$d USB device</item>
+        <item quantity="other">Sharing %1$d USB devices</item>
+    </plurals>
 </resources>

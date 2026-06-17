@@ -34,7 +34,7 @@ object CommandTarget {
 
     fun libboxOptions(server: RemoteServer): RemoteConnectionOptions {
         val options = RemoteConnectionOptions()
-        options.setURL(server.url)
+        options.setURL(RemoteServer.connectURL(server.url))
         options.secret = server.secret
         return options
     }

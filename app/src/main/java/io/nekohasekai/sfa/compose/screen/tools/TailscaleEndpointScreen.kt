@@ -73,9 +73,20 @@ fun TailscaleEndpointScreen(
     sshSharedViewModel: TailscaleSSHSharedViewModel,
     endpointTag: String,
 ) {
+    val state by viewModel.uiState.collectAsState()
+    val endpoint = state.endpoints.firstOrNull { it.endpointTag == endpointTag }
+
     OverrideTopBar {
         TopAppBar(
-            title = { Text(endpointTag) },
+            title = {
+                Text(
+                    if (state.endpoints.size <= 1) {
+                        stringResource(R.string.tailscale)
+                    } else {
+                        stringResource(R.string.tailscale_with_tag, endpointTag)
+                    },
+                )
+            },
             navigationIcon = {
                 IconButton(onClick = { navController.navigateUp() }) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.content_description_back))
@@ -83,9 +94,6 @@ fun TailscaleEndpointScreen(
             },
         )
     }
-
-    val state by viewModel.uiState.collectAsState()
-    val endpoint = state.endpoints.firstOrNull { it.endpointTag == endpointTag }
 
     if (endpoint == null) {
         LaunchedEffect(Unit) {
