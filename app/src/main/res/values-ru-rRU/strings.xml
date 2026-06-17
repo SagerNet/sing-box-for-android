@@ -463,6 +463,7 @@
     <!-- STUN Test -->
     <!-- Tailscale -->
     <string name="tailscale_endpoints">Точки подключения</string>
+    <string name="title_services">Службы</string>
 
     <string name="tailscale_status">Статус</string>
     <string name="tailscale_state">Состояние</string>
@@ -617,4 +618,7 @@
     <string name="remote_invalid_url">Неверный URL сервера: %1$s, ожидается host:port, http://host:port или https://host:port</string>
     <string name="remote_connect_failed">Не удалось подключиться к удаленному серверу %1$s</string>
     <string name="remote_disconnected_from">Отключено от удаленного сервера %1$s</string>
+    <string name="remote_checking">Проверка…</string>
+    <string name="remote_available">Доступно</string>
+    <string name="remote_unavailable">Недоступно</string>
 </resources>
