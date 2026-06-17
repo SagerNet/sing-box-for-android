@@ -5,9 +5,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -16,7 +19,9 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Dns
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.SettingsRemote
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -43,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import io.nekohasekai.sfa.R
@@ -98,6 +104,34 @@ fun RemoteControlScreen(navController: NavController) {
         }
     }
 
+    if (servers.isEmpty()) {
+        Box(
+            modifier =
+            Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(32.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Icon(
+                    imageVector = Icons.Outlined.SettingsRemote,
+                    contentDescription = null,
+                    modifier = Modifier.size(48.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = stringResource(R.string.remote_no_servers),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
+            }
+        }
+        return
+    }
+
     Column(
         modifier =
         Modifier
@@ -106,134 +140,125 @@ fun RemoteControlScreen(navController: NavController) {
             .verticalScroll(rememberScrollState())
             .padding(vertical = 8.dp),
     ) {
-        Text(
-            text = stringResource(R.string.remote_servers),
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(horizontal = 32.dp, vertical = 8.dp),
-        )
+        Card(
+            modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            ),
+        ) {
+            Column {
+                servers.forEachIndexed { index, server ->
+                    val shape =
+                        when {
+                            servers.size == 1 -> RoundedCornerShape(12.dp)
+                            index == 0 -> RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
+                            index == servers.size - 1 ->
+                                RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)
 
-        if (servers.isEmpty()) {
-            Text(
-                text = stringResource(R.string.remote_no_servers),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 32.dp, vertical = 16.dp),
-            )
-        } else {
-            Card(
-                modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                colors =
-                CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                ),
-            ) {
-                Column {
-                    servers.forEachIndexed { index, server ->
-                        val shape =
-                            when {
-                                servers.size == 1 -> RoundedCornerShape(12.dp)
-                                index == 0 -> RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
-                                index == servers.size - 1 ->
-                                    RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)
-
-                                else -> RoundedCornerShape(0.dp)
-                            }
-                        var showMenu by remember { mutableStateOf(false) }
-                        Box {
-                            ListItem(
-                                headlineContent = {
+                            else -> RoundedCornerShape(0.dp)
+                        }
+                    var showMenu by remember { mutableStateOf(false) }
+                    Box {
+                        ListItem(
+                            headlineContent = {
+                                Text(
+                                    server.displayName,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                )
+                            },
+                            supportingContent =
+                            if (server.name.isNotEmpty()) {
+                                {
                                     Text(
-                                        server.displayName,
-                                        style = MaterialTheme.typography.bodyLarge,
+                                        server.url,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
-                                },
-                                supportingContent =
-                                if (server.name.isNotEmpty()) {
-                                    {
-                                        Text(
-                                            server.url,
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        )
-                                    }
-                                } else {
-                                    null
-                                },
-                                trailingContent =
-                                if (activeRemoteServer?.id == server.id) {
-                                    {
-                                        Icon(
-                                            imageVector = Icons.Default.CheckCircle,
-                                            contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.primary,
-                                        )
-                                    }
-                                } else {
-                                    null
-                                },
-                                modifier =
-                                Modifier
-                                    .clip(shape)
-                                    .combinedClickable(
-                                        onClick = {
-                                            navController.navigate(
-                                                "settings/remote_control/edit/${server.id}",
-                                            )
-                                        },
-                                        onLongClick = { showMenu = true },
-                                    ),
-                                colors =
-                                ListItemDefaults.colors(
-                                    containerColor = Color.Transparent,
-                                ),
-                            )
-                            DropdownMenu(
-                                expanded = showMenu,
-                                onDismissRequest = { showMenu = false },
-                            ) {
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.edit)) },
-                                    leadingIcon = {
-                                        Icon(Icons.Outlined.Edit, contentDescription = null)
-                                    },
+                                }
+                            } else {
+                                null
+                            },
+                            leadingContent = {
+                                Icon(
+                                    imageVector = Icons.Outlined.Dns,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                )
+                            },
+                            trailingContent =
+                            if (activeRemoteServer?.id == server.id) {
+                                {
+                                    Icon(
+                                        imageVector = Icons.Default.CheckCircle,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                    )
+                                }
+                            } else {
+                                null
+                            },
+                            modifier =
+                            Modifier
+                                .clip(shape)
+                                .combinedClickable(
                                     onClick = {
-                                        showMenu = false
                                         navController.navigate(
                                             "settings/remote_control/edit/${server.id}",
                                         )
                                     },
-                                )
-                                DropdownMenuItem(
-                                    text = {
-                                        Text(
-                                            stringResource(R.string.menu_delete),
-                                            color = MaterialTheme.colorScheme.error,
-                                        )
-                                    },
-                                    leadingIcon = {
-                                        Icon(
-                                            Icons.Outlined.Delete,
-                                            contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.error,
-                                        )
-                                    },
-                                    onClick = {
-                                        showMenu = false
-                                        scope.launch(Dispatchers.IO) {
-                                            if (RemoteControlManager.remoteServer.value?.id == server.id) {
-                                                withContext(Dispatchers.Main) {
-                                                    RemoteControlManager.exitRemoteControl()
-                                                }
+                                    onLongClick = { showMenu = true },
+                                ),
+                            colors =
+                            ListItemDefaults.colors(
+                                containerColor = Color.Transparent,
+                            ),
+                        )
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false },
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.edit)) },
+                                leadingIcon = {
+                                    Icon(Icons.Outlined.Edit, contentDescription = null)
+                                },
+                                onClick = {
+                                    showMenu = false
+                                    navController.navigate(
+                                        "settings/remote_control/edit/${server.id}",
+                                    )
+                                },
+                            )
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        stringResource(R.string.menu_delete),
+                                        color = MaterialTheme.colorScheme.error,
+                                    )
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Outlined.Delete,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.error,
+                                    )
+                                },
+                                onClick = {
+                                    showMenu = false
+                                    scope.launch(Dispatchers.IO) {
+                                        if (RemoteControlManager.remoteServer.value?.id == server.id) {
+                                            withContext(Dispatchers.Main) {
+                                                RemoteControlManager.exitRemoteControl()
                                             }
-                                            RemoteServerManager.delete(server)
                                         }
-                                    },
-                                )
-                            }
+                                        RemoteServerManager.delete(server)
+                                    }
+                                },
+                            )
                         }
                     }
                 }

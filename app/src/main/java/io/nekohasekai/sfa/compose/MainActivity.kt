@@ -119,6 +119,7 @@ import io.nekohasekai.sfa.compose.screen.dashboard.groups.GroupsViewModel
 import io.nekohasekai.sfa.compose.screen.log.LogViewModel
 import io.nekohasekai.sfa.compose.screen.tools.TailscaleSSHSharedViewModel
 import io.nekohasekai.sfa.compose.screen.tools.TailscaleStatusViewModel
+import io.nekohasekai.sfa.compose.screen.usbip.USBIPStatusViewModel
 import io.nekohasekai.sfa.compose.theme.SFATheme
 import io.nekohasekai.sfa.compose.topbar.LocalTopBarController
 import io.nekohasekai.sfa.compose.topbar.TopBarController
@@ -802,6 +803,13 @@ class MainActivity :
                 null
             }
 
+        val usbIPStatusViewModel: USBIPStatusViewModel? =
+            if (isToolsRoute) {
+                viewModel()
+            } else {
+                null
+            }
+
         val showGroupsInNav = dashboardUiState.hasGroups
         val showConnectionsInNav =
             if (isRemote) {
@@ -929,6 +937,7 @@ class MainActivity :
                     connectionsViewModel = connectionsViewModel,
                     tailscaleStatusViewModel = tailscaleStatusViewModel,
                     tailscaleSSHSharedViewModel = tailscaleSSHSharedViewModel,
+                    usbIPStatusViewModel = usbIPStatusViewModel,
                     modifier = Modifier.fillMaxSize(),
                 )
                 if (!useNavigationRail) {
