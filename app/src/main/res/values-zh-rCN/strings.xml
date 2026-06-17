@@ -454,6 +454,7 @@
     <!-- STUN Test -->
     <!-- Tailscale -->
     <string name="tailscale_endpoints">端点</string>
+    <string name="title_services">服务</string>
 
     <string name="tailscale_status">状态</string>
     <string name="tailscale_state">状态</string>
@@ -607,4 +608,7 @@
     <string name="remote_invalid_url">无效的服务器 URL: %1$s, 应为 host:port、http://host:port 或 https://host:port</string>
     <string name="remote_connect_failed">无法连接到远程服务器 %1$s</string>
     <string name="remote_disconnected_from">已断开与远程服务器 %1$s 的连接</string>
+    <string name="remote_checking">检查中…</string>
+    <string name="remote_available">可用</string>
+    <string name="remote_unavailable">不可用</string>
 </resources>

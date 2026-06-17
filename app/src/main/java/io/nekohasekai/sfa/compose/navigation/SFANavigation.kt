@@ -58,6 +58,9 @@ import io.nekohasekai.sfa.compose.screen.tools.TailscaleSSHSharedViewModel
 import io.nekohasekai.sfa.compose.screen.tools.TailscaleSSHTerminalScreen
 import io.nekohasekai.sfa.compose.screen.tools.TailscaleStatusViewModel
 import io.nekohasekai.sfa.compose.screen.tools.ToolsScreen
+import io.nekohasekai.sfa.compose.screen.usbip.USBIPDeviceDetailScreen
+import io.nekohasekai.sfa.compose.screen.usbip.USBIPServerScreen
+import io.nekohasekai.sfa.compose.screen.usbip.USBIPStatusViewModel
 import io.nekohasekai.sfa.constant.Status
 
 private val slideInFromRight: AnimatedContentTransitionScope<*>.() -> androidx.compose.animation.EnterTransition = {
@@ -91,6 +94,7 @@ fun SFANavHost(
     connectionsViewModel: ConnectionsViewModel? = null,
     tailscaleStatusViewModel: TailscaleStatusViewModel? = null,
     tailscaleSSHSharedViewModel: TailscaleSSHSharedViewModel? = null,
+    usbIPStatusViewModel: USBIPStatusViewModel? = null,
     modifier: Modifier = Modifier,
 ) {
     NavHost(
@@ -240,7 +244,8 @@ fun SFANavHost(
         composable(Screen.Tools.route) {
             val tailscaleViewModel: TailscaleStatusViewModel = tailscaleStatusViewModel ?: viewModel()
             val sshSharedViewModel: TailscaleSSHSharedViewModel = tailscaleSSHSharedViewModel ?: viewModel()
-            ToolsScreen(navController = navController, serviceStatus = serviceStatus, tailscaleViewModel = tailscaleViewModel, sshSharedViewModel = sshSharedViewModel)
+            val usbIPViewModel: USBIPStatusViewModel = usbIPStatusViewModel ?: viewModel()
+            ToolsScreen(navController = navController, serviceStatus = serviceStatus, tailscaleViewModel = tailscaleViewModel, sshSharedViewModel = sshSharedViewModel, usbIPViewModel = usbIPViewModel)
         }
 
         // Tools subscreens with slide animations
@@ -262,6 +267,36 @@ fun SFANavHost(
             popExitTransition = slideOutToRight,
         ) {
             STUNTestScreen(navController = navController, serviceStatus = serviceStatus)
+        }
+
+        composable(
+            route = "tools/usbip/{serverTag}",
+            arguments = listOf(navArgument("serverTag") { type = NavType.StringType }),
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) { backStackEntry ->
+            val serverTag = Uri.decode(backStackEntry.arguments?.getString("serverTag") ?: return@composable)
+            val usbIPViewModel: USBIPStatusViewModel = usbIPStatusViewModel ?: viewModel()
+            USBIPServerScreen(navController = navController, viewModel = usbIPViewModel, serverTag = serverTag)
+        }
+
+        composable(
+            route = "tools/usbip/{serverTag}/device/{deviceKey}",
+            arguments = listOf(
+                navArgument("serverTag") { type = NavType.StringType },
+                navArgument("deviceKey") { type = NavType.StringType },
+            ),
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) { backStackEntry ->
+            val serverTag = Uri.decode(backStackEntry.arguments?.getString("serverTag") ?: return@composable)
+            val deviceKey = Uri.decode(backStackEntry.arguments?.getString("deviceKey") ?: return@composable)
+            val usbIPViewModel: USBIPStatusViewModel = usbIPStatusViewModel ?: viewModel()
+            USBIPDeviceDetailScreen(navController = navController, viewModel = usbIPViewModel, serverTag = serverTag, deviceKey = deviceKey)
         }
 
         composable(

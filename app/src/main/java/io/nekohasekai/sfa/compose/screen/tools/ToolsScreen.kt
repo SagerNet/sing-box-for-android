@@ -16,6 +16,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Terminal
+import androidx.compose.material.icons.filled.Usb
 import androidx.compose.material.icons.outlined.BugReport
 import androidx.compose.material.icons.outlined.Hub
 import androidx.compose.material.icons.outlined.Memory
@@ -53,6 +54,7 @@ import io.nekohasekai.sfa.bg.CrashReportManager
 import io.nekohasekai.sfa.bg.OOMReportManager
 import io.nekohasekai.sfa.compose.component.RemoteControlMenuItems
 import io.nekohasekai.sfa.compose.component.rememberRemoteServers
+import io.nekohasekai.sfa.compose.screen.usbip.USBIPStatusViewModel
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.database.Settings
@@ -66,6 +68,7 @@ fun ToolsScreen(
     serviceStatus: Status = Status.Stopped,
     tailscaleViewModel: TailscaleStatusViewModel,
     sshSharedViewModel: TailscaleSSHSharedViewModel,
+    usbIPViewModel: USBIPStatusViewModel,
 ) {
     val remoteServers by rememberRemoteServers()
 
@@ -101,6 +104,7 @@ fun ToolsScreen(
     val crashUnreadCount by CrashReportManager.unreadCount.collectAsState()
     val oomUnreadCount by OOMReportManager.unreadCount.collectAsState()
     val tailscaleState by tailscaleViewModel.uiState.collectAsState()
+    val usbIPState by usbIPViewModel.uiState.collectAsState()
     val remoteServer by RemoteControlManager.remoteServer.collectAsState()
 
     LaunchedEffect(remoteServer?.id) {
@@ -109,8 +113,10 @@ fun ToolsScreen(
         // without tailscale leaves no active stream to error out, so the
         // subscription would stay stale without an explicit cancel.
         tailscaleViewModel.cancel()
+        usbIPViewModel.cancel()
         if (remoteServer != null || serviceStatus == Status.Started) {
             tailscaleViewModel.subscribe()
+            usbIPViewModel.subscribe()
         }
     }
 
@@ -120,8 +126,10 @@ fun ToolsScreen(
         }
         if (serviceStatus == Status.Started) {
             tailscaleViewModel.subscribe()
+            usbIPViewModel.subscribe()
         } else {
             tailscaleViewModel.cancel()
+            usbIPViewModel.cancel()
         }
     }
 
@@ -242,6 +250,59 @@ fun ToolsScreen(
                             }
                         }
                     }
+                }
+            }
+        }
+
+        if (usbIPState.servers.isNotEmpty()) {
+            Text(
+                text = stringResource(R.string.title_services),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(horizontal = 32.dp, vertical = 8.dp),
+            )
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                ),
+            ) {
+                val servers = usbIPState.servers
+                servers.forEachIndexed { index, server ->
+                    val shape = when {
+                        servers.size == 1 -> RoundedCornerShape(12.dp)
+                        index == 0 -> RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
+                        index == servers.size - 1 -> RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)
+                        else -> RoundedCornerShape(0.dp)
+                    }
+                    ListItem(
+                        headlineContent = {
+                            Text(
+                                if (servers.size == 1) {
+                                    stringResource(R.string.title_usbip)
+                                } else {
+                                    stringResource(R.string.usbip_with_tag, server.serverTag)
+                                },
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                        },
+                        leadingContent = {
+                            Icon(
+                                imageVector = Icons.Default.Usb,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                        },
+                        modifier = Modifier
+                            .clip(shape)
+                            .clickable {
+                                navController.navigate("tools/usbip/${Uri.encode(server.serverTag)}")
+                            },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                    )
                 }
             }
         }
