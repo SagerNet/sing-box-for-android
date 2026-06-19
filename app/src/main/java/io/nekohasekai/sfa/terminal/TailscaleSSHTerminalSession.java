@@ -26,6 +26,7 @@ public class TailscaleSSHTerminalSession extends TerminalSession {
   private TailscaleSSHSession sshSession;
   private PhaseCallback phaseCallback;
   private volatile Phase phase = Phase.CONNECTING;
+  private volatile String authBanner;
   private int exitCode;
   private String exitSignal;
   private String exitErrorMessage;
@@ -54,6 +55,10 @@ public class TailscaleSSHTerminalSession extends TerminalSession {
 
   public Phase getPhase() {
     return phase;
+  }
+
+  public String getAuthBanner() {
+    return authBanner;
   }
 
   public int getSSHExitCode() {
@@ -125,6 +130,7 @@ public class TailscaleSSHTerminalSession extends TerminalSession {
 
   public void onReady() {
     phase = Phase.RUNNING;
+    authBanner = null;
     mainHandler.post(
         () -> {
           if (phaseCallback != null) {
@@ -134,6 +140,7 @@ public class TailscaleSSHTerminalSession extends TerminalSession {
   }
 
   public void onAuthBanner(String message) {
+    authBanner = message;
     mainHandler.post(
         () -> {
           if (phaseCallback != null) {
