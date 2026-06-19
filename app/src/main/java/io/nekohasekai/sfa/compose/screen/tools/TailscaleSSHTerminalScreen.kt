@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -27,6 +29,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -39,9 +42,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -298,6 +308,24 @@ fun TailscaleSSHTerminalScreen(
                                 color = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.padding(top = 16.dp),
                             )
+                            val banner = activeSession.terminalSession.authBanner
+                            if (!banner.isNullOrBlank()) {
+                                val linkColor = MaterialTheme.colorScheme.primary
+                                Surface(
+                                    color = MaterialTheme.colorScheme.surfaceVariant,
+                                    shape = RoundedCornerShape(10.dp),
+                                    modifier = Modifier
+                                        .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+                                        .widthIn(max = 480.dp),
+                                ) {
+                                    Text(
+                                        remember(banner, linkColor) { bannerAnnotatedString(banner, linkColor) },
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.padding(12.dp),
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -329,6 +357,30 @@ fun TailscaleSSHTerminalScreen(
 
 private class TerminalViewRef {
     var view: TerminalView? = null
+}
+
+private val bannerUrlRegex = Regex("""https?://\S+""")
+
+private fun bannerAnnotatedString(text: String, linkColor: Color) = buildAnnotatedString {
+    var lastIndex = 0
+    for (match in bannerUrlRegex.findAll(text)) {
+        if (match.range.first > lastIndex) {
+            append(text.substring(lastIndex, match.range.first))
+        }
+        val url = match.value
+        withLink(
+            LinkAnnotation.Url(
+                url,
+                TextLinkStyles(SpanStyle(color = linkColor, textDecoration = TextDecoration.Underline)),
+            ),
+        ) {
+            append(url)
+        }
+        lastIndex = match.range.last + 1
+    }
+    if (lastIndex < text.length) {
+        append(text.substring(lastIndex))
+    }
 }
 
 private fun resolveTypeface(fontFamily: String, customFontPath: String): Typeface? {
