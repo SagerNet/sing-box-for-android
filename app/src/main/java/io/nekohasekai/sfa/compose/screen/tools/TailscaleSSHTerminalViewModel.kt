@@ -45,6 +45,7 @@ class TailscaleSSHTerminalViewModel : BaseViewModel<TailscaleSSHTerminalState, N
             }
 
             override fun onAuthBanner(message: String) {
+                updateState { copy(sessions = sessions.toList(), version = version + 1) }
             }
         })
 
