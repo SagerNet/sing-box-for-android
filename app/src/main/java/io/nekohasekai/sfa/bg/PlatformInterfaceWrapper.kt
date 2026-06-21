@@ -169,23 +169,6 @@ interface PlatformInterfaceWrapper : PlatformInterface {
 
     override fun localDNSTransport(): LocalDNSTransport? = LocalResolver
 
-    @OptIn(ExperimentalEncodingApi::class)
-    override fun systemCertificates(): StringIterator {
-        val certificates = mutableListOf<String>()
-        val keyStore = KeyStore.getInstance("AndroidCAStore")
-        if (keyStore != null) {
-            keyStore.load(null, null)
-            val aliases = keyStore.aliases()
-            while (aliases.hasMoreElements()) {
-                val cert = keyStore.getCertificate(aliases.nextElement())
-                certificates.add(
-                    "-----BEGIN CERTIFICATE-----\n" + Base64.encode(cert.encoded) + "\n-----END CERTIFICATE-----",
-                )
-            }
-        }
-        return StringArray(certificates.iterator())
-    }
-
     override fun startNeighborMonitor(listener: NeighborUpdateListener?) {
         if (listener == null) return
         val callback = object : INeighborTableCallback.Stub() {
