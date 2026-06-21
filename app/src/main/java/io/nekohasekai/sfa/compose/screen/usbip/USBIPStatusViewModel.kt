@@ -52,6 +52,10 @@ data class USBIPStatusState(
 )
 
 class USBIPStatusViewModel : BaseViewModel<USBIPStatusState, Nothing>() {
+    companion object {
+        private const val MIN_API_VERSION_USBIP = 2
+    }
+
     private var subscription: USBIPServerStatusSubscription? = null
 
     override fun createInitialState() = USBIPStatusState()
@@ -62,8 +66,16 @@ class USBIPStatusViewModel : BaseViewModel<USBIPStatusState, Nothing>() {
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                val client = CommandTarget.standaloneClient()
+                if (client.getAPIVersion() < MIN_API_VERSION_USBIP) {
+                    viewModelScope.launch {
+                        updateState { copy(servers = emptyList(), isSubscribed = false) }
+                        subscription = null
+                    }
+                    return@launch
+                }
                 subscription =
-                    CommandTarget.standaloneClient().subscribeUSBIPServerStatus(
+                    client.subscribeUSBIPServerStatus(
                         object : USBIPServerStatusHandler {
                             override fun onStatusUpdate(status: USBIPServerStatusUpdate) {
                                 val servers = convertUpdate(status)
