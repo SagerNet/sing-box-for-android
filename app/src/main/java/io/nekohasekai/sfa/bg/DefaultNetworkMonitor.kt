@@ -1,6 +1,7 @@
 package io.nekohasekai.sfa.bg
 
 import android.net.Network
+import android.net.NetworkCapabilities
 import android.os.Build
 import io.nekohasekai.libbox.InterfaceUpdateListener
 import io.nekohasekai.sfa.Application
@@ -17,7 +18,13 @@ object DefaultNetworkMonitor {
             checkDefaultInterfaceUpdate(it)
         }
         defaultNetwork = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Application.connectivity.activeNetwork
+            // getActiveNetwork() returns the per-app default, which may be the VPN
+            // that applies to this app. If the tun is already up when start() runs,
+            // seeding defaultNetwork with our own VPN makes LocalResolver query DNS
+            // back through the tun (auto_route) and loop. The NetworkRequest carries
+            // NET_CAPABILITY_NOT_VPN, but that does not apply to this direct getter,
+            // so filter the VPN transport out explicitly.
+            Application.connectivity.activeNetwork?.takeUnless(::isVpn)
         } else {
             DefaultNetworkListener.get()
         }
@@ -39,6 +46,10 @@ object DefaultNetworkMonitor {
         this.listener = listener
         checkDefaultInterfaceUpdate(defaultNetwork)
     }
+
+    private fun isVpn(network: Network): Boolean =
+        Application.connectivity.getNetworkCapabilities(network)
+            ?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) == true
 
     private fun checkDefaultInterfaceUpdate(newNetwork: Network?) {
         val listener = listener ?: return
