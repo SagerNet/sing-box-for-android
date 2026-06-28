@@ -1,6 +1,8 @@
 package io.nekohasekai.sfa.compose.screen.tools
 
 import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -23,8 +25,6 @@ import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -61,6 +61,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import java.io.File
 import java.text.DateFormat
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,9 +71,26 @@ fun CrashReportDetailScreen(navController: NavController, reportId: String) {
     val report = reports.find { it.id == reportId }
     var files by remember { mutableStateOf<List<CrashReportFile>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
-    var shareMenuExpanded by remember { mutableStateOf(false) }
+    var showShareDialog by remember { mutableStateOf(false) }
+    var pendingZipFile by remember { mutableStateOf<File?>(null) }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+
+    val saveLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/zip"),
+    ) { uri ->
+        val zipFile = pendingZipFile
+        pendingZipFile = null
+        if (uri != null && zipFile != null) {
+            scope.launch(Dispatchers.IO) {
+                runCatching {
+                    context.contentResolver.openOutputStream(uri)?.use { output ->
+                        zipFile.inputStream().use { input -> input.copyTo(output) }
+                    }
+                }
+            }
+        }
+    }
 
     LaunchedEffect(report) {
         if (report != null) {
@@ -92,13 +110,13 @@ fun CrashReportDetailScreen(navController: NavController, reportId: String) {
 
     val hasConfig = report != null && CrashReportManager.hasConfigFile(report)
 
-    fun shareReport(includeConfig: Boolean) {
+    fun shareReport(includeConfig: Boolean, includeLog: Boolean, useAgeEncryption: Boolean) {
         val currentReport = report ?: return
         scope.launch {
-            val zipFile = CrashReportManager.createZipArchive(currentReport, includeConfig)
+            val zipFile = CrashReportManager.createZipArchive(currentReport, includeConfig, includeLog, useAgeEncryption)
             val uri = FileProvider.getUriForFile(context, "${context.packageName}.cache", zipFile)
             val intent = Intent(Intent.ACTION_SEND).apply {
-                type = "application/zip"
+                type = if (useAgeEncryption) "application/octet-stream" else "application/zip"
                 putExtra(Intent.EXTRA_STREAM, uri)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
@@ -116,33 +134,8 @@ fun CrashReportDetailScreen(navController: NavController, reportId: String) {
             },
             actions = {
                 if (!isLoading && files.isNotEmpty()) {
-                    if (hasConfig) {
-                        IconButton(onClick = { shareMenuExpanded = true }) {
-                            Icon(Icons.Default.Share, contentDescription = null)
-                        }
-                        DropdownMenu(
-                            expanded = shareMenuExpanded,
-                            onDismissRequest = { shareMenuExpanded = false },
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.report_share)) },
-                                onClick = {
-                                    shareMenuExpanded = false
-                                    shareReport(includeConfig = false)
-                                },
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.report_share_with_config)) },
-                                onClick = {
-                                    shareMenuExpanded = false
-                                    shareReport(includeConfig = true)
-                                },
-                            )
-                        }
-                    } else {
-                        IconButton(onClick = { shareReport(includeConfig = false) }) {
-                            Icon(Icons.Default.Share, contentDescription = null)
-                        }
+                    IconButton(onClick = { showShareDialog = true }) {
+                        Icon(Icons.Default.Share, contentDescription = null)
                     }
                     IconButton(onClick = {
                         scope.launch {
@@ -252,6 +245,25 @@ fun CrashReportDetailScreen(navController: NavController, reportId: String) {
                 }
             }
         }
+    }
+
+    if (showShareDialog && report != null) {
+        ReportShareDialog(
+            hasConfig = hasConfig,
+            hasLog = false,
+            onSave = { includeConfig, includeLog, useAgeEncryption ->
+                showShareDialog = false
+                scope.launch {
+                    pendingZipFile = CrashReportManager.createZipArchive(report, includeConfig, includeLog, useAgeEncryption)
+                    saveLauncher.launch(if (useAgeEncryption) "${report.id}.zip.age" else "${report.id}.zip")
+                }
+            },
+            onShare = { includeConfig, includeLog, useAgeEncryption ->
+                showShareDialog = false
+                shareReport(includeConfig, includeLog, useAgeEncryption)
+            },
+            onDismiss = { showShareDialog = false },
+        )
     }
 }
 

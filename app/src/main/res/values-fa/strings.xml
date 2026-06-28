@@ -537,6 +537,12 @@
     <string name="report_delete">حذف</string>
     <string name="report_share">اشتراک‌گذاری</string>
     <string name="report_share_with_config">اشتراک‌گذاری با پیکربندی</string>
+    <string name="report_with_config">همراه با پیکربندی</string>
+    <string name="report_with_log">همراه با گزارش</string>
+    <string name="report_share_privacy_warning">فایل‌های گزارش و پیکربندی ممکن است حاوی محتوای خصوصی باشند و نباید عمومی شوند.</string>
+    <string name="report_share_privacy_warning_config">فایل‌های پیکربندی ممکن است حاوی محتوای خصوصی باشند و نباید عمومی شوند.</string>
+    <string name="report_with_age_encryption">رمزگذاری با age برای Project S</string>
+    <string name="report_age_encryption_description">[age](https://github.com/filosottile/age) یک ابزار رمزگذاری نامتقارن مدرن و امن است. با فعال‌سازی، فایل zip با کلید عمومی این پروژه رمزگذاری می‌شود تا بتوان آن را به‌صورت عمومی، مثلاً در GitHub issues، منتشر کرد.</string>
     <string name="report_metadata">فراداده</string>
     <string name="report_configuration">پیکربندی</string>
     <string name="report_origin_local">محلی</string>

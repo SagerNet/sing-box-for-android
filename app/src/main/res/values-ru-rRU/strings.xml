@@ -543,6 +543,12 @@
     <string name="report_delete">Удалить</string>
     <string name="report_share">Поделиться</string>
     <string name="report_share_with_config">Поделиться с конфигурацией</string>
+    <string name="report_with_config">С конфигурацией</string>
+    <string name="report_with_log">С журналом</string>
+    <string name="report_share_privacy_warning">Журналы и файлы конфигурации могут содержать личные данные и не должны публиковаться.</string>
+    <string name="report_share_privacy_warning_config">Файлы конфигурации могут содержать личные данные и не должны публиковаться.</string>
+    <string name="report_with_age_encryption">Зашифровать с помощью age для Project S</string>
+    <string name="report_age_encryption_description">[age](https://github.com/filosottile/age) — современный и безопасный инструмент асимметричного шифрования. При включении ZIP-файл шифруется открытым ключом этого проекта, поэтому его можно публиковать в открытом доступе, например в GitHub issues.</string>
     <string name="report_metadata">Метаданные</string>
     <string name="report_configuration">Конфигурация</string>
     <string name="report_origin_local">Локальный</string>

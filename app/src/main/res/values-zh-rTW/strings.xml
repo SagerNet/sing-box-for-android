@@ -537,6 +537,12 @@
     <string name="report_delete">刪除</string>
     <string name="report_share">分享</string>
     <string name="report_share_with_config">附帶配置分享</string>
+    <string name="report_with_config">附帶配置</string>
+    <string name="report_with_log">附帶日誌</string>
+    <string name="report_share_privacy_warning">日誌和配置檔案可能包含隱私內容，不應該被公開發佈。</string>
+    <string name="report_share_privacy_warning_config">配置檔案可能包含隱私內容，不應該被公開發佈。</string>
+    <string name="report_with_age_encryption">使用 age 加密給 Project S</string>
+    <string name="report_age_encryption_description">[age](https://github.com/filosottile/age) 是一個現代且安全的非對稱加密工具。啟用後，zip 檔案將透過本專案的公鑰加密，以便在 GitHub issues 等公開場合發佈。</string>
     <string name="report_metadata">元數據</string>
     <string name="report_configuration">配置</string>
     <string name="report_origin_local">本地</string>
