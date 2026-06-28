@@ -29,6 +29,7 @@ data class OOMReportFile(
     enum class Kind {
         METADATA,
         CONFIG,
+        GO_LOG,
         PROFILE,
     }
 }
@@ -36,6 +37,7 @@ data class OOMReportFile(
 object OOMReportManager {
     private const val METADATA_FILE_NAME = "metadata.json"
     private const val CONFIG_FILE_NAME = "configuration.json"
+    private const val GO_LOG_FILE_NAME = "go.log"
     private const val CMDLINE_FILE_NAME = "cmdline"
     private const val READ_MARKER_FILE_NAME = ".read"
     private const val OOM_REPORTS_DIR_NAME = "oom_reports"
@@ -86,10 +88,15 @@ object OOMReportManager {
         if (configFile.exists()) {
             files.add(OOMReportFile(OOMReportFile.Kind.CONFIG, "Configuration", configFile))
         }
+        val goLogFile = File(report.directory, GO_LOG_FILE_NAME)
+        if (goLogFile.exists()) {
+            files.add(OOMReportFile(OOMReportFile.Kind.GO_LOG, "Log", goLogFile))
+        }
         report.directory.listFiles()?.filter { file ->
             file.isFile &&
                 file.name != METADATA_FILE_NAME &&
                 file.name != CONFIG_FILE_NAME &&
+                file.name != GO_LOG_FILE_NAME &&
                 file.name != CMDLINE_FILE_NAME &&
                 file.name != READ_MARKER_FILE_NAME
         }?.sortedBy { it.name }?.forEach { file ->
@@ -133,10 +140,12 @@ object OOMReportManager {
 
     fun hasConfigFile(report: OOMReport): Boolean = File(report.directory, CONFIG_FILE_NAME).exists()
 
-    suspend fun createZipArchive(report: OOMReport, includeConfig: Boolean): File = withContext(Dispatchers.IO) {
+    fun hasLogFile(report: OOMReport): Boolean = File(report.directory, GO_LOG_FILE_NAME).exists()
+
+    suspend fun createZipArchive(report: OOMReport, includeConfig: Boolean, includeLog: Boolean, useAgeEncryption: Boolean): File = withContext(Dispatchers.IO) {
         val cacheDir = File(Application.application.cacheDir, OOM_REPORTS_DIR_NAME)
         cacheDir.mkdirs()
-        val zipFile = File(cacheDir, "${report.id}.zip")
+        val zipFile = File(cacheDir, if (useAgeEncryption) "${report.id}.zip.age" else "${report.id}.zip")
         zipFile.delete()
         val strippedDir = File(cacheDir, report.id)
         strippedDir.deleteRecursively()
@@ -145,7 +154,10 @@ object OOMReportManager {
         if (!includeConfig) {
             File(strippedDir, CONFIG_FILE_NAME).delete()
         }
-        Libbox.createZipArchive(strippedDir.path, zipFile.path)
+        if (!includeLog) {
+            File(strippedDir, GO_LOG_FILE_NAME).delete()
+        }
+        Libbox.createZipArchive(strippedDir.path, zipFile.path, useAgeEncryption)
         zipFile
     }
 

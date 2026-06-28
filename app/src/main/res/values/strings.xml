@@ -543,6 +543,12 @@
     <string name="report_delete">Delete</string>
     <string name="report_share">Share</string>
     <string name="report_share_with_config">Share With Configuration</string>
+    <string name="report_with_config">With Configuration</string>
+    <string name="report_with_log">With Log</string>
+    <string name="report_share_privacy_warning">Logs and configuration files may contain private content and should not be made public.</string>
+    <string name="report_share_privacy_warning_config">Configuration files may contain private content and should not be made public.</string>
+    <string name="report_with_age_encryption">Encrypt with age for Project S</string>
+    <string name="report_age_encryption_description">[age](https://github.com/filosottile/age) is a modern and secure asymmetric encryption tool. When enabled, the zip file is encrypted with this project\'s public key so it can be posted publicly, e.g. in GitHub issues.</string>
     <string name="report_metadata">Metadata</string>
     <string name="report_configuration">Configuration</string>
     <string name="report_origin_local">Local</string>
