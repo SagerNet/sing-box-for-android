@@ -665,16 +665,17 @@ class MainActivity :
                             )
                         } else {
                             val progress by UpdateState.downloadProgress
+                            val progressValue = progress
                             Column {
-                                if (progress != null) {
-                                    Text("${stringResource(R.string.downloading)} ${(progress!! * 100).toInt()}%")
+                                if (progressValue != null) {
+                                    Text("${stringResource(R.string.downloading)} ${(progressValue * 100).toInt()}%")
                                 } else {
                                     Text(stringResource(R.string.downloading))
                                 }
                                 Spacer(modifier = Modifier.height(8.dp))
-                                if (progress != null) {
+                                if (progressValue != null) {
                                     LinearProgressIndicator(
-                                        progress = { progress!! },
+                                        progress = { progressValue },
                                         modifier = Modifier.fillMaxWidth(),
                                     )
                                 } else {
