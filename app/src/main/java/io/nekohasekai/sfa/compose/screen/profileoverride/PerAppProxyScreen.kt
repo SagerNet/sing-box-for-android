@@ -232,14 +232,10 @@ fun PerAppProxyScreen(
         isLoading = true
         val packageManagerFlags =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                PackageManager.GET_PERMISSIONS or PackageManager.MATCH_UNINSTALLED_PACKAGES or
-                    PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES or
-                    PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS
+                PackageManager.GET_PERMISSIONS or PackageManager.MATCH_UNINSTALLED_PACKAGES
             } else {
                 @Suppress("DEPRECATION")
-                PackageManager.GET_PERMISSIONS or PackageManager.GET_UNINSTALLED_PACKAGES or
-                    PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES or
-                    PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS
+                PackageManager.GET_PERMISSIONS or PackageManager.GET_UNINSTALLED_PACKAGES
             }
         val retryFlags =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

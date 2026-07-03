@@ -65,7 +65,7 @@ class PackageCache(
     val updateTime: Long get() = packageInfo.lastUpdateTime
     val isSystem: Boolean get() = appInfo.flags and ApplicationInfo.FLAG_SYSTEM == 1
     val isOffline: Boolean
-        get() = packageInfo.requestedPermissions?.contains(Manifest.permission.INTERNET) != true
+        get() = packageInfo.requestedPermissions?.let { it.contains(Manifest.permission.INTERNET) == false } ?: false
     val isDisabled: Boolean get() = appInfo.flags and ApplicationInfo.FLAG_INSTALLED == 0
 
     val applicationIcon by lazy {
