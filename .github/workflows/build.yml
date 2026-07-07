@@ -1,0 +1,48 @@
+name: Build Patched SFA
+on:
+  workflow_dispatch: # 允许手动点击运行
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+          fetch-depth: 0
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Patch AnyTLS Version
+        run: |
+          # 强制下载 anytls 依赖库到本地缓存
+          go mod download github.com/anytls/sing-anytls
+          # 【核心步骤】在本地编译环境的缓存中寻找 version.go，并把 "sing-box" 替换成 "anytls"
+          # 这样编译出来的 APK 就会自称是 anytls 客户端，绕过机场屏蔽
+          find ~/go/pkg/mod/github.com/anytls/ -name "version.go" -exec sed -i 's/"sing-box"/"anytls"/g' {} +
+          echo "Success: AnyTLS version string has been patched."
+
+      - name: Build APK
+        run: |
+          chmod +x gradlew
+          # 编译 Debug 版本，这个版本直接支持 Xposed 和 Root 权限
+          ./gradlew assembleDebug --stacktrace
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sfa-patched-apk
+          path: app/build/outputs/apk/debug/*.apk
