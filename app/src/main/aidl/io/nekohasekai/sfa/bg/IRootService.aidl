@@ -1,6 +1,7 @@
 package io.nekohasekai.sfa.bg;
 
 import android.os.ParcelFileDescriptor;
+import io.nekohasekai.sfa.bg.IBridgeSession;
 import io.nekohasekai.sfa.bg.INeighborTableCallback;
 import io.nekohasekai.sfa.bg.IRootShellSession;
 import io.nekohasekai.sfa.bg.ParceledListSlice;
@@ -21,4 +22,6 @@ interface IRootService {
     IRootShellSession openShellSession(String user, String command, in String[] env, String term, int rows, int cols) = 6;
 
     String lookupSFTPServer() = 7;
+
+    IBridgeSession openBridge(String bridgeName, int mtu, String inet4Port, String inet6Port, int ruleIndex, int routeTable) = 8;
 }
