@@ -9,6 +9,8 @@ import android.provider.Settings
 import android.system.OsConstants
 import android.util.Log
 import androidx.annotation.RequiresApi
+import io.nekohasekai.libbox.BridgeOptions
+import io.nekohasekai.libbox.BridgeSession
 import io.nekohasekai.libbox.ConnectionOwner
 import io.nekohasekai.libbox.InterfaceUpdateListener
 import io.nekohasekai.libbox.Libbox
@@ -279,6 +281,25 @@ interface PlatformInterfaceWrapper : PlatformInterface {
     )?.takeIf { it.isNotBlank() }
         ?: "${Build.MANUFACTURER} ${Build.MODEL}"
 
+    override fun usePlatformBridge(): Boolean = RootClient.rootAvailable.value ?: runBlocking(Dispatchers.IO) {
+        RootClient.checkRootAvailable()
+    }
+
+    override fun createBridge(options: BridgeOptions?): BridgeSession {
+        options!!
+        val session = runBlocking(Dispatchers.IO) {
+            RootClient.openBridge(
+                options.bridgeName,
+                options.mtu,
+                options.inet4Port,
+                options.inet6Port,
+                options.ruleIndex,
+                options.routeTable,
+            )
+        }
+        return RootBridgeSessionWrapper(session)
+    }
+
     override fun lookupUser(username: String?): io.nekohasekai.libbox.PlatformUser {
         val resolved = UserResolver.resolve(Application.packageManager, username!!)
         val platformUser = io.nekohasekai.libbox.PlatformUser()
@@ -297,6 +318,24 @@ interface PlatformInterfaceWrapper : PlatformInterface {
         neighborCallback = null
         runBlocking(Dispatchers.IO) {
             RootClient.unregisterNeighborTableCallback(callback)
+        }
+    }
+
+    private class RootBridgeSessionWrapper(
+        private val session: IBridgeSession,
+    ) : BridgeSession {
+        override fun fileDescriptor(): Int = session.fileDescriptor.detachFd()
+
+        override fun name(): String = session.name
+
+        override fun inet6Active(): Boolean = session.isInet6Active
+
+        override fun setEgress(interfaceName: String?) {
+            session.setEgress(interfaceName ?: "")
+        }
+
+        override fun close() {
+            session.close()
         }
     }
 

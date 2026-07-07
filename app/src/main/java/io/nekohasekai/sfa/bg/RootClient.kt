@@ -169,6 +169,22 @@ object RootClient {
         }
     }
 
+    suspend fun openBridge(
+        bridgeName: String,
+        mtu: Int,
+        inet4Port: String,
+        inet6Port: String,
+        ruleIndex: Int,
+        routeTable: Int,
+    ): IBridgeSession {
+        val svc = bindService()
+        try {
+            return svc.openBridge(bridgeName, mtu, inet4Port, inet6Port, ruleIndex, routeTable)
+        } catch (e: RemoteException) {
+            throw e.rethrowAsRuntime()
+        }
+    }
+
     suspend fun unregisterNeighborTableCallback(callback: INeighborTableCallback) {
         try {
             service?.unregisterNeighborTableCallback(callback)

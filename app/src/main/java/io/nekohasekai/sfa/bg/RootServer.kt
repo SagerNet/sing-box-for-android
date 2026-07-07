@@ -9,6 +9,8 @@ import android.os.ParcelFileDescriptor
 import android.os.RemoteCallbackList
 import android.util.Log
 import com.topjohnwu.superuser.ipc.RootService
+import io.nekohasekai.libbox.BridgeOptions
+import io.nekohasekai.libbox.BridgeSession
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.NeighborEntryIterator
 import io.nekohasekai.libbox.NeighborSubscription
@@ -35,6 +37,8 @@ class RootServer : RootService() {
 
     private var tetheringCallback: Any? = null
     private var tetheringManager: Any? = null
+
+    private val bridgeSessions = mutableSetOf<BridgeSessionBinder>()
 
     private val binder = object : IRootService.Stub() {
         override fun destroy() {
@@ -178,6 +182,29 @@ class RootServer : RootService() {
             return RootShellSession(session)
         }
 
+        override fun openBridge(
+            bridgeName: String?,
+            mtu: Int,
+            inet4Port: String?,
+            inet6Port: String?,
+            ruleIndex: Int,
+            routeTable: Int,
+        ): IBridgeSession {
+            val options = BridgeOptions()
+            options.bridgeName = bridgeName ?: ""
+            options.mtu = mtu
+            options.inet4Port = inet4Port ?: ""
+            options.inet6Port = inet6Port ?: ""
+            options.ruleIndex = ruleIndex
+            options.routeTable = routeTable
+            val session = Libbox.newBridgeService(options)
+            val binder = BridgeSessionBinder(session)
+            synchronized(bridgeSessions) {
+                bridgeSessions.add(binder)
+            }
+            return binder
+        }
+
         override fun lookupSFTPServer(): String {
             val termuxPrefix = File(UserResolver.TERMUX_PREFIX)
             for (name in arrayOf("libexec/sftp-server", "lib/openssh/sftp-server")) {
@@ -217,6 +244,28 @@ class RootServer : RootService() {
         }
         addAndroidSystemEnvironment(env)
         return env.map { (k, v) -> "$k=$v" }.toTypedArray()
+    }
+
+    private inner class BridgeSessionBinder(
+        private val session: BridgeSession,
+    ) : IBridgeSession.Stub() {
+
+        override fun getFileDescriptor(): ParcelFileDescriptor = ParcelFileDescriptor.fromFd(session.fileDescriptor())
+
+        override fun getName(): String = session.name()
+
+        override fun isInet6Active(): Boolean = session.inet6Active()
+
+        override fun setEgress(interfaceName: String?) {
+            session.setEgress(interfaceName ?: "")
+        }
+
+        override fun close() {
+            synchronized(bridgeSessions) {
+                bridgeSessions.remove(this)
+            }
+            session.close()
+        }
     }
 
     private class RootShellSession(
@@ -363,6 +412,17 @@ class RootServer : RootService() {
     override fun onBind(intent: Intent): IBinder = binder
 
     override fun onDestroy() {
+        val sessions = synchronized(bridgeSessions) {
+            val copied = bridgeSessions.toList()
+            bridgeSessions.clear()
+            copied
+        }
+        for (session in sessions) {
+            try {
+                session.close()
+            } catch (_: Exception) {
+            }
+        }
         stopTetheringMonitor()
         neighborSubscription?.close()
         neighborSubscription = null
