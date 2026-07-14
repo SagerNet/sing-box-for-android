@@ -275,6 +275,8 @@
     <string name="update_source">Update Source</string>
     <string name="update_source_github">GitHub</string>
     <string name="update_source_fdroid">F-Droid</string>
+    <string name="github_token">GitHub Token</string>
+    <string name="github_token_description">Get higher GitHub API rate limits</string>
     <string name="update_track">Update Track</string>
     <string name="update_track_stable">Stable</string>
     <string name="update_track_beta">Beta</string>

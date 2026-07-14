@@ -25,8 +25,8 @@ class GitHubUpdateChecker : Closeable {
 
     private val json = Json { ignoreUnknownKeys = true }
 
-    fun checkUpdate(track: UpdateTrack): UpdateInfo? {
-        val releases = getReleases()
+    fun checkUpdate(track: UpdateTrack, githubToken: String): UpdateInfo? {
+        val releases = getReleases(githubToken)
         var selected: ReleaseCandidate? = null
 
         for (release in releases) {
@@ -64,10 +64,14 @@ class GitHubUpdateChecker : Closeable {
         )
     }
 
-    private fun getReleases(): List<GitHubRelease> {
+    private fun getReleases(githubToken: String): List<GitHubRelease> {
         val request = client.newRequest()
         request.setURL(RELEASES_URL)
         request.setHeader("Accept", "application/vnd.github.v3+json")
+        val token = githubToken.trim()
+        if (token.isNotEmpty()) {
+            request.setHeader("Authorization", "Bearer $token")
+        }
         request.setUserAgent(HTTPClient.userAgent)
 
         val response = request.execute()

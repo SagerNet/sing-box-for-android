@@ -98,7 +98,7 @@ object Vendor : VendorInterface {
     override fun checkUpdateAsync(): UpdateInfo? {
         val track = UpdateTrack.fromString(Settings.updateTrack)
         return GitHubUpdateChecker().use { checker ->
-            checker.checkUpdate(track)
+            checker.checkUpdate(track, Settings.githubToken)
         }
     }
 

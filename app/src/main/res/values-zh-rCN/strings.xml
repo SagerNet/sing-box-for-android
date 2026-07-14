@@ -286,6 +286,8 @@
     <string name="update_source">更新来源</string>
     <string name="update_source_github">GitHub</string>
     <string name="update_source_fdroid">F-Droid</string>
+    <string name="github_token">GitHub Token</string>
+    <string name="github_token_description">获取更高的 GitHub API 速率限制</string>
     <string name="fdroid_mirror">F-Droid 镜像</string>
     <string name="fdroid_mirror_test_all">根据延迟自动选择</string>
     <string name="fdroid_mirror_testing">测试中…</string>

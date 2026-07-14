@@ -65,7 +65,7 @@ class UpdateWorker(private val appContext: Context, params: WorkerParameters) : 
                 UpdateSource.FDROID -> checkFDroidUpdate(appContext)
                 UpdateSource.GITHUB -> {
                     val track = UpdateTrack.fromString(Settings.updateTrack)
-                    GitHubUpdateChecker().use { it.checkUpdate(track) }
+                    GitHubUpdateChecker().use { it.checkUpdate(track, Settings.githubToken) }
                 }
             }
 
