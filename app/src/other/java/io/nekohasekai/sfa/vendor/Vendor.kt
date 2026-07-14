@@ -104,7 +104,7 @@ object Vendor : VendorInterface {
         UpdateSource.GITHUB -> {
             val track = UpdateTrack.fromString(Settings.updateTrack)
             GitHubUpdateChecker().use { checker ->
-                checker.checkUpdate(track)
+                checker.checkUpdate(track, Settings.githubToken)
             }
         }
     }

@@ -56,6 +56,7 @@ object Settings {
             "stable"
         }
     }
+    var githubToken by dataStore.string(SettingsKey.GITHUB_TOKEN) { "" }
     var silentInstallEnabled by dataStore.boolean(SettingsKey.SILENT_INSTALL_ENABLED) { false }
     var silentInstallMethod by dataStore.string(SettingsKey.SILENT_INSTALL_METHOD) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {

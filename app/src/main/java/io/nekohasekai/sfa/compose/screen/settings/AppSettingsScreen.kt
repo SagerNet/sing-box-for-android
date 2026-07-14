@@ -27,17 +27,21 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Terminal
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.AdminPanelSettings
 import androidx.compose.material.icons.outlined.Autorenew
 import androidx.compose.material.icons.outlined.DeleteForever
 import androidx.compose.material.icons.outlined.DeleteSweep
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Key
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.NewReleases
 import androidx.compose.material.icons.outlined.Notifications
@@ -59,6 +63,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -79,6 +84,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.os.LocaleListCompat
@@ -141,6 +149,8 @@ fun AppSettingsScreen(
     var currentSource by remember { mutableStateOf(Settings.updateSource) }
     var showTrackDialog by remember { mutableStateOf(false) }
     var currentTrack by remember { mutableStateOf(Settings.updateTrack) }
+    var showGitHubTokenDialog by remember { mutableStateOf(false) }
+    var githubToken by remember { mutableStateOf(Settings.githubToken) }
     var checkUpdateEnabled by remember { mutableStateOf(Settings.checkUpdateEnabled) }
     var showErrorDialog by remember { mutableStateOf<String?>(null) }
 
@@ -252,6 +262,20 @@ fun AppSettingsScreen(
                 showTrackDialog = false
             },
             onDismiss = { showTrackDialog = false },
+        )
+    }
+
+    if (showGitHubTokenDialog) {
+        GitHubTokenDialog(
+            currentToken = githubToken,
+            onSave = { token ->
+                githubToken = token
+                scope.launch(Dispatchers.IO) {
+                    Settings.githubToken = token
+                }
+                showGitHubTokenDialog = false
+            },
+            onDismiss = { showGitHubTokenDialog = false },
         )
     }
 
@@ -781,6 +805,9 @@ fun AppSettingsScreen(
                         if (Vendor.hasCustomUpdate) {
                             count += 1
                         }
+                        if (Vendor.hasCustomUpdate && !isFDroid) {
+                            count += 1
+                        }
                         if (isFDroid) {
                             count += 1
                         }
@@ -877,6 +904,38 @@ fun AppSettingsScreen(
                         updateItemModifier().let {
                             if (isFDroid) it.alpha(0.38f) else it.clickable { showTrackDialog = true }
                         },
+                        colors =
+                        ListItemDefaults.colors(
+                            containerColor = Color.Transparent,
+                        ),
+                    )
+                }
+
+                if (Vendor.hasCustomUpdate && !isFDroid) {
+                    ListItem(
+                        headlineContent = {
+                            Text(
+                                stringResource(R.string.github_token),
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                        },
+                        supportingContent = {
+                            Text(
+                                stringResource(R.string.github_token_description),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        },
+                        leadingContent = {
+                            Icon(
+                                imageVector = Icons.Outlined.Key,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                        },
+                        modifier =
+                        updateItemModifier()
+                            .clickable { showGitHubTokenDialog = true },
                         colors =
                         ListItemDefaults.colors(
                             containerColor = Color.Transparent,
@@ -1403,6 +1462,49 @@ private fun UpdateTrackDialog(
         confirmButton = {
             TextButton(onClick = onDismiss) {
                 Text(stringResource(android.R.string.cancel))
+            }
+        },
+    )
+}
+
+@Composable
+private fun GitHubTokenDialog(
+    currentToken: String,
+    onSave: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var token by remember(currentToken) { mutableStateOf(currentToken) }
+    var tokenVisible by remember { mutableStateOf(false) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.github_token)) },
+        text = {
+            OutlinedTextField(
+                value = token,
+                onValueChange = { token = it },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                visualTransformation = if (tokenVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    IconButton(onClick = { tokenVisible = !tokenVisible }) {
+                        Icon(
+                            imageVector = if (tokenVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                            contentDescription = null,
+                        )
+                    }
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = { onSave(token.trim()) }) {
+                Text(stringResource(R.string.save))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel))
             }
         },
     )

@@ -286,6 +286,8 @@
     <string name="update_source">منبع به‌روزرسانی</string>
     <string name="update_source_github">GitHub</string>
     <string name="update_source_fdroid">F-Droid</string>
+    <string name="github_token">توکن GitHub</string>
+    <string name="github_token_description">دریافت محدودیت نرخ بالاتر برای API گیت‌هاب</string>
     <string name="fdroid_mirror">آینه F-Droid</string>
     <string name="fdroid_mirror_test_all">انتخاب خودکار بر اساس تأخیر</string>
     <string name="fdroid_mirror_testing">در حال تست…</string>
