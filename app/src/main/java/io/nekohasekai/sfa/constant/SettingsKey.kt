@@ -7,6 +7,7 @@ object SettingsKey {
     const val UPDATE_CHECK_PROMPTED = "update_check_prompted"
     const val UPDATE_SOURCE = "update_source"
     const val UPDATE_TRACK = "update_track"
+    const val GITHUB_TOKEN = "github_token"
     const val FDROID_MIRROR_URL = "fdroid_mirror_url"
     const val FDROID_CUSTOM_MIRRORS = "fdroid_custom_mirrors"
     const val SILENT_INSTALL_ENABLED = "silent_install_enabled"
