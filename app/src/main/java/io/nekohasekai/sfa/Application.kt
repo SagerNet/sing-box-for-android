@@ -43,7 +43,7 @@ class Application : Application() {
 
 //        Seq.setContext(this)
         runCatching {
-            Libbox.setLocale(Locale.getDefault().toLanguageTag().replace("-", "_"))
+            Libbox.setLocale(Locale.getDefault().toLanguageTag())
         }.onFailure {
             Log.d("Application", "set locale: ${it.message}")
         }
