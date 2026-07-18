@@ -1,15 +1,11 @@
 package io.nekohasekai.sfa.compose.screen.tools
 
-import android.content.Intent
-import android.net.Uri
 import android.text.format.DateUtils
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,7 +31,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -52,7 +47,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -63,12 +57,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.base.UiEvent
-import io.nekohasekai.sfa.compose.component.qr.QRCodeDialog
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
-import io.nekohasekai.sfa.compose.util.QRCodeGenerator
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OpenConnectEndpointScreen(
     navController: NavController,
@@ -104,16 +96,22 @@ fun OpenConnectEndpointScreen(
         return
     }
 
+    var browserChallengeID by remember { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
+    val authChallenge = if (endpoint.state == "auth-pending") endpoint.authChallenge else null
+    val browserRequest = authChallenge?.browser
+
     LaunchedEffect(endpoint.error) {
         if (endpoint.error.isNotEmpty()) {
             viewModel.sendGlobalEvent(UiEvent.ErrorMessage(endpoint.error))
         }
     }
-
-    val context = LocalContext.current
-    var showAuthQRCode by remember { mutableStateOf(false) }
-    val authForm = if (endpoint.state == "auth-pending") endpoint.authForm else null
-    val authURL = authForm?.url.orEmpty()
+    LaunchedEffect(authChallenge?.id, authChallenge?.error) {
+        val challengeError = authChallenge?.error
+        if (!challengeError.isNullOrEmpty()) {
+            viewModel.sendGlobalEvent(UiEvent.ErrorMessage(challengeError))
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -172,7 +170,7 @@ fun OpenConnectEndpointScreen(
             }
         }
 
-        if (authForm != null) {
+        if (authChallenge != null) {
             Spacer(modifier = Modifier.height(16.dp))
             SectionHeader(stringResource(R.string.endpoint_authentication))
             Card(
@@ -187,22 +185,32 @@ fun OpenConnectEndpointScreen(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    if (authURL.isNotEmpty()) {
-                        FlowRow(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
+                    if (authChallenge.banner.isNotEmpty()) {
+                        Text(
+                            authChallenge.banner,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    if (authChallenge.message.isNotEmpty()) {
+                        Text(authChallenge.message, style = MaterialTheme.typography.bodyMedium)
+                    }
+                    when {
+                        browserRequest != null && browserRequest.headerNames.isNotEmpty() -> Text(
+                            stringResource(R.string.endpoint_globalprotect_sso_unsupported_android),
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                        browserRequest != null && (browserRequest.finalURL.isEmpty() || browserRequest.cookieNames.isEmpty()) -> Text(
+                            stringResource(R.string.endpoint_browser_cookie_missing),
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                        browserRequest != null -> Button(
+                            onClick = { browserChallengeID = authChallenge.id },
+                            modifier = Modifier.align(Alignment.End),
                         ) {
-                            OutlinedButton(onClick = {
-                                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(authURL)))
-                            }) {
-                                Text(stringResource(R.string.endpoint_open_auth_url))
-                            }
-                            OutlinedButton(onClick = { showAuthQRCode = true }) {
-                                Text(stringResource(R.string.endpoint_open_auth_url_qr_code))
-                            }
+                            Text(stringResource(R.string.endpoint_continue))
                         }
-                    } else {
-                        AuthFormContent(viewModel, endpointTag, authForm)
+                        authChallenge.form != null -> AuthFormContent(viewModel, endpointTag, authChallenge, authChallenge.form)
                     }
                 }
             }
@@ -211,11 +219,26 @@ fun OpenConnectEndpointScreen(
         Spacer(modifier = Modifier.height(24.dp))
     }
 
-    if (showAuthQRCode && authURL.isNotEmpty()) {
-        val qrBitmap = QRCodeGenerator.rememberBitmap(authURL)
-        QRCodeDialog(
-            bitmap = qrBitmap,
-            onDismiss = { showAuthQRCode = false },
+    val activeBrowserChallenge = authChallenge?.takeIf { browserChallengeID == it.id && it.browser != null }
+    val activeBrowserRequest = activeBrowserChallenge?.browser
+    if (activeBrowserChallenge != null && activeBrowserRequest != null) {
+        OpenConnectBrowserDialog(
+            challengeID = activeBrowserChallenge.id,
+            request = activeBrowserRequest,
+            onDismiss = { browserChallengeID = null },
+            onResult = { result ->
+                browserChallengeID = null
+                scope.launch {
+                    val message = viewModel.submitBrowserResponse(endpointTag, activeBrowserChallenge.id, result)
+                    if (message != null) {
+                        viewModel.sendGlobalEvent(UiEvent.ErrorMessage(message))
+                    }
+                }
+            },
+            onError = { message ->
+                browserChallengeID = null
+                viewModel.sendGlobalEvent(UiEvent.ErrorMessage(message))
+            },
         )
     }
 }
@@ -224,22 +247,17 @@ fun OpenConnectEndpointScreen(
 private fun ColumnScope.AuthFormContent(
     viewModel: OpenConnectStatusViewModel,
     endpointTag: String,
+    challenge: OpenConnectAuthChallengeData,
     form: OpenConnectAuthFormData,
 ) {
     val scope = rememberCoroutineScope()
-    var submitting by remember(form.id) { mutableStateOf(false) }
-    var submitted by remember(form.id) { mutableStateOf(false) }
-    val values = remember(form.id) {
+    var submitting by remember(challenge.id) { mutableStateOf(false) }
+    var submitted by remember(challenge.id) { mutableStateOf(false) }
+    val values = remember(challenge.id) {
         mutableStateMapOf<String, String>().apply {
             for (field in form.fields) {
                 put(field.submissionKey, initialFieldValue(field))
             }
-        }
-    }
-
-    LaunchedEffect(form.id) {
-        if (form.error.isNotEmpty()) {
-            viewModel.sendGlobalEvent(UiEvent.ErrorMessage(form.error))
         }
     }
 
@@ -257,16 +275,6 @@ private fun ColumnScope.AuthFormContent(
         return
     }
 
-    if (form.banner.isNotEmpty()) {
-        Text(
-            form.banner,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-    }
-    if (form.message.isNotEmpty()) {
-        Text(form.message, style = MaterialTheme.typography.bodyMedium)
-    }
     for (field in form.fields) {
         AuthFormFieldInput(
             field = field,
@@ -279,7 +287,7 @@ private fun ColumnScope.AuthFormContent(
         onClick = {
             scope.launch {
                 submitting = true
-                val message = viewModel.submitAuthForm(endpointTag, form.id, values.toMap())
+                val message = viewModel.submitAuthFormResponse(endpointTag, challenge.id, values.toMap())
                 submitting = false
                 if (message != null) {
                     viewModel.sendGlobalEvent(UiEvent.ErrorMessage(message))

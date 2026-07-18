@@ -688,4 +688,6 @@
     <string name="endpoint_submit">Submit</string>
     <string name="endpoint_continue">Continue</string>
     <string name="endpoint_verifying">Verifying</string>
+    <string name="endpoint_globalprotect_sso_unsupported_android">GlobalProtect SAML browser authentication is not supported on Android.</string>
+    <string name="endpoint_browser_cookie_missing">Browser authentication completed without the required VPN cookie.</string>
 </resources>
