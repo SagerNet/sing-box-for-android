@@ -21,6 +21,7 @@ import androidx.compose.material.icons.outlined.BugReport
 import androidx.compose.material.icons.outlined.Hub
 import androidx.compose.material.icons.outlined.Memory
 import androidx.compose.material.icons.outlined.NetworkCheck
+import androidx.compose.material.icons.outlined.Route
 import androidx.compose.material.icons.outlined.SwapHoriz
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Card
@@ -69,6 +70,8 @@ fun ToolsScreen(
     tailscaleViewModel: TailscaleStatusViewModel,
     sshSharedViewModel: TailscaleSSHSharedViewModel,
     usbIPViewModel: USBIPStatusViewModel,
+    openConnectViewModel: OpenConnectStatusViewModel,
+    openVPNViewModel: OpenVPNStatusViewModel,
 ) {
     val remoteServers by rememberRemoteServers()
 
@@ -105,6 +108,8 @@ fun ToolsScreen(
     val oomUnreadCount by OOMReportManager.unreadCount.collectAsState()
     val tailscaleState by tailscaleViewModel.uiState.collectAsState()
     val usbIPState by usbIPViewModel.uiState.collectAsState()
+    val openConnectState by openConnectViewModel.uiState.collectAsState()
+    val openVPNState by openVPNViewModel.uiState.collectAsState()
     val remoteServer by RemoteControlManager.remoteServer.collectAsState()
 
     LaunchedEffect(remoteServer?.id) {
@@ -114,9 +119,13 @@ fun ToolsScreen(
         // subscription would stay stale without an explicit cancel.
         tailscaleViewModel.cancel()
         usbIPViewModel.cancel()
+        openConnectViewModel.cancel()
+        openVPNViewModel.cancel()
         if (remoteServer != null || serviceStatus == Status.Started) {
             tailscaleViewModel.subscribe()
             usbIPViewModel.subscribe()
+            openConnectViewModel.subscribe()
+            openVPNViewModel.subscribe()
         }
     }
 
@@ -127,9 +136,13 @@ fun ToolsScreen(
         if (serviceStatus == Status.Started) {
             tailscaleViewModel.subscribe()
             usbIPViewModel.subscribe()
+            openConnectViewModel.subscribe()
+            openVPNViewModel.subscribe()
         } else {
             tailscaleViewModel.cancel()
             usbIPViewModel.cancel()
+            openConnectViewModel.cancel()
+            openVPNViewModel.cancel()
         }
     }
 
@@ -140,7 +153,11 @@ fun ToolsScreen(
             .verticalScroll(rememberScrollState())
             .padding(vertical = 8.dp),
     ) {
-        if (tailscaleState.endpoints.isNotEmpty()) {
+        val tailscaleEndpoints = tailscaleState.endpoints
+        val openConnectEndpoints = openConnectState.endpoints
+        val openVPNEndpoints = openVPNState.endpoints
+        val endpointRowCount = tailscaleEndpoints.size + openConnectEndpoints.size + openVPNEndpoints.size
+        if (endpointRowCount > 0) {
             Text(
                 text = stringResource(R.string.tailscale_endpoints),
                 style = MaterialTheme.typography.labelLarge,
@@ -156,14 +173,9 @@ fun ToolsScreen(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer,
                 ),
             ) {
-                val endpoints = tailscaleState.endpoints
+                val endpoints = tailscaleEndpoints
                 endpoints.forEachIndexed { index, endpoint ->
-                    val shape = when {
-                        endpoints.size == 1 -> RoundedCornerShape(12.dp)
-                        index == 0 -> RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
-                        index == endpoints.size - 1 -> RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)
-                        else -> RoundedCornerShape(0.dp)
-                    }
+                    val shape = endpointRowShape(index, endpointRowCount)
                     var showSSHMenu by remember { mutableStateOf(false) }
                     val sshPeers = remember(endpoint) {
                         endpoint.userGroups.flatMap { it.peers }.filter { peer ->
@@ -250,6 +262,65 @@ fun ToolsScreen(
                             }
                         }
                     }
+                }
+                openConnectEndpoints.forEachIndexed { index, endpoint ->
+                    ListItem(
+                        headlineContent = {
+                            Text(
+                                if (openConnectEndpoints.size == 1) {
+                                    stringResource(R.string.openconnect)
+                                } else {
+                                    stringResource(R.string.openconnect_with_tag, endpoint.endpointTag)
+                                },
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                        },
+                        leadingContent = {
+                            Icon(
+                                imageVector = Icons.Outlined.Route,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                        },
+                        modifier = Modifier
+                            .clip(endpointRowShape(tailscaleEndpoints.size + index, endpointRowCount))
+                            .clickable {
+                                navController.navigate("tools/openconnect/${Uri.encode(endpoint.endpointTag)}")
+                            },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                    )
+                }
+                openVPNEndpoints.forEachIndexed { index, endpoint ->
+                    ListItem(
+                        headlineContent = {
+                            Text(
+                                if (openVPNEndpoints.size == 1) {
+                                    stringResource(R.string.openvpn)
+                                } else {
+                                    stringResource(R.string.openvpn_with_tag, endpoint.endpointTag)
+                                },
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                        },
+                        leadingContent = {
+                            Icon(
+                                imageVector = Icons.Outlined.Route,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                        },
+                        modifier = Modifier
+                            .clip(
+                                endpointRowShape(
+                                    tailscaleEndpoints.size + openConnectEndpoints.size + index,
+                                    endpointRowCount,
+                                ),
+                            )
+                            .clickable {
+                                navController.navigate("tools/openvpn/${Uri.encode(endpoint.endpointTag)}")
+                            },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                    )
                 }
             }
         }
@@ -435,6 +506,13 @@ fun ToolsScreen(
             }
         }
     }
+}
+
+private fun endpointRowShape(index: Int, count: Int): RoundedCornerShape = when {
+    count == 1 -> RoundedCornerShape(12.dp)
+    index == 0 -> RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
+    index == count - 1 -> RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)
+    else -> RoundedCornerShape(0.dp)
 }
 
 internal fun handleSSHNavigation(
