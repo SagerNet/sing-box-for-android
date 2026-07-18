@@ -42,6 +42,7 @@ data class TailscaleUserGroupData(
 data class TailscaleEndpointData(
     val endpointTag: String,
     val backendState: String,
+    val stateText: String,
     val authURL: String,
     val networkName: String,
     val magicDNSSuffix: String,
@@ -173,6 +174,7 @@ class TailscaleStatusViewModel : BaseViewModel<TailscaleStatusState, Nothing>() 
         return TailscaleEndpointData(
             endpointTag = endpoint.endpointTag,
             backendState = endpoint.backendState,
+            stateText = endpoint.stateText,
             authURL = endpoint.authURL,
             networkName = endpoint.networkName,
             magicDNSSuffix = endpoint.magicDNSSuffix,

@@ -48,6 +48,10 @@ import io.nekohasekai.sfa.compose.screen.tools.OOMReportDetailScreen
 import io.nekohasekai.sfa.compose.screen.tools.OOMReportFileContentScreen
 import io.nekohasekai.sfa.compose.screen.tools.OOMReportListScreen
 import io.nekohasekai.sfa.compose.screen.tools.OOMReportMetadataScreen
+import io.nekohasekai.sfa.compose.screen.tools.OpenConnectEndpointScreen
+import io.nekohasekai.sfa.compose.screen.tools.OpenConnectStatusViewModel
+import io.nekohasekai.sfa.compose.screen.tools.OpenVPNEndpointScreen
+import io.nekohasekai.sfa.compose.screen.tools.OpenVPNStatusViewModel
 import io.nekohasekai.sfa.compose.screen.tools.OutboundPickerScreen
 import io.nekohasekai.sfa.compose.screen.tools.STUNTestScreen
 import io.nekohasekai.sfa.compose.screen.tools.TailscaleEndpointScreen
@@ -95,6 +99,8 @@ fun SFANavHost(
     tailscaleStatusViewModel: TailscaleStatusViewModel? = null,
     tailscaleSSHSharedViewModel: TailscaleSSHSharedViewModel? = null,
     usbIPStatusViewModel: USBIPStatusViewModel? = null,
+    openConnectStatusViewModel: OpenConnectStatusViewModel? = null,
+    openVPNStatusViewModel: OpenVPNStatusViewModel? = null,
     modifier: Modifier = Modifier,
 ) {
     NavHost(
@@ -245,7 +251,9 @@ fun SFANavHost(
             val tailscaleViewModel: TailscaleStatusViewModel = tailscaleStatusViewModel ?: viewModel()
             val sshSharedViewModel: TailscaleSSHSharedViewModel = tailscaleSSHSharedViewModel ?: viewModel()
             val usbIPViewModel: USBIPStatusViewModel = usbIPStatusViewModel ?: viewModel()
-            ToolsScreen(navController = navController, serviceStatus = serviceStatus, tailscaleViewModel = tailscaleViewModel, sshSharedViewModel = sshSharedViewModel, usbIPViewModel = usbIPViewModel)
+            val openConnectViewModel: OpenConnectStatusViewModel = openConnectStatusViewModel ?: viewModel()
+            val openVPNViewModel: OpenVPNStatusViewModel = openVPNStatusViewModel ?: viewModel()
+            ToolsScreen(navController = navController, serviceStatus = serviceStatus, tailscaleViewModel = tailscaleViewModel, sshSharedViewModel = sshSharedViewModel, usbIPViewModel = usbIPViewModel, openConnectViewModel = openConnectViewModel, openVPNViewModel = openVPNViewModel)
         }
 
         // Tools subscreens with slide animations
@@ -309,6 +317,32 @@ fun SFANavHost(
         ) { backStackEntry ->
             val selectedOutbound = Uri.decode(backStackEntry.arguments?.getString("selectedOutbound") ?: "")
             OutboundPickerScreen(navController = navController, selectedOutbound = selectedOutbound)
+        }
+
+        composable(
+            route = "tools/openconnect/{endpointTag}",
+            arguments = listOf(navArgument("endpointTag") { type = NavType.StringType }),
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) { backStackEntry ->
+            val endpointTag = Uri.decode(backStackEntry.arguments?.getString("endpointTag") ?: return@composable)
+            val openConnectViewModel: OpenConnectStatusViewModel = openConnectStatusViewModel ?: viewModel()
+            OpenConnectEndpointScreen(navController = navController, viewModel = openConnectViewModel, endpointTag = endpointTag)
+        }
+
+        composable(
+            route = "tools/openvpn/{endpointTag}",
+            arguments = listOf(navArgument("endpointTag") { type = NavType.StringType }),
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) { backStackEntry ->
+            val endpointTag = Uri.decode(backStackEntry.arguments?.getString("endpointTag") ?: return@composable)
+            val openVPNViewModel: OpenVPNStatusViewModel = openVPNStatusViewModel ?: viewModel()
+            OpenVPNEndpointScreen(navController = navController, viewModel = openVPNViewModel, endpointTag = endpointTag)
         }
 
         composable(
