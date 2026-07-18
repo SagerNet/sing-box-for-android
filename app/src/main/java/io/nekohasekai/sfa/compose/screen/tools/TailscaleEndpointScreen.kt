@@ -154,7 +154,7 @@ fun TailscaleEndpointScreen(
                                     .background(stateColor(endpoint.backendState)),
                             )
                             Text(
-                                endpoint.backendState,
+                                endpoint.stateText,
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = stateColor(endpoint.backendState),
                             )

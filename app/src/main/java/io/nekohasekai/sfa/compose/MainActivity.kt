@@ -116,6 +116,8 @@ import io.nekohasekai.sfa.compose.screen.dashboard.DashboardViewModel
 import io.nekohasekai.sfa.compose.screen.dashboard.GroupsCard
 import io.nekohasekai.sfa.compose.screen.dashboard.groups.GroupsViewModel
 import io.nekohasekai.sfa.compose.screen.log.LogViewModel
+import io.nekohasekai.sfa.compose.screen.tools.OpenConnectStatusViewModel
+import io.nekohasekai.sfa.compose.screen.tools.OpenVPNStatusViewModel
 import io.nekohasekai.sfa.compose.screen.tools.TailscaleSSHSharedViewModel
 import io.nekohasekai.sfa.compose.screen.tools.TailscaleStatusViewModel
 import io.nekohasekai.sfa.compose.screen.usbip.USBIPStatusViewModel
@@ -777,6 +779,20 @@ class MainActivity :
                 null
             }
 
+        val openConnectStatusViewModel: OpenConnectStatusViewModel? =
+            if (isToolsRoute) {
+                viewModel()
+            } else {
+                null
+            }
+
+        val openVPNStatusViewModel: OpenVPNStatusViewModel? =
+            if (isToolsRoute) {
+                viewModel()
+            } else {
+                null
+            }
+
         val showGroupsInNav = dashboardUiState.hasGroups
         val showConnectionsInNav =
             if (isRemote) {
@@ -905,6 +921,8 @@ class MainActivity :
                     tailscaleStatusViewModel = tailscaleStatusViewModel,
                     tailscaleSSHSharedViewModel = tailscaleSSHSharedViewModel,
                     usbIPStatusViewModel = usbIPStatusViewModel,
+                    openConnectStatusViewModel = openConnectStatusViewModel,
+                    openVPNStatusViewModel = openVPNStatusViewModel,
                     modifier = Modifier.fillMaxSize(),
                 )
                 if (!useNavigationRail) {
