@@ -623,4 +623,6 @@
     <string name="remote_checking">در حال بررسی…</string>
     <string name="remote_available">در دسترس</string>
     <string name="remote_unavailable">در دسترس نیست</string>
+    <string name="endpoint_globalprotect_sso_unsupported_android">احراز هویت مرورگر SAML در GlobalProtect در Android پشتیبانی نمی‌شود.</string>
+    <string name="endpoint_browser_cookie_missing">احراز هویت مرورگر تکمیل شد، اما کوکی VPN موردنیاز دریافت نشد.</string>
 </resources>

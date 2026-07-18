@@ -622,4 +622,6 @@
     <string name="remote_checking">檢查中…</string>
     <string name="remote_available">可用</string>
     <string name="remote_unavailable">不可用</string>
+    <string name="endpoint_globalprotect_sso_unsupported_android">Android 不支援 GlobalProtect SAML 瀏覽器驗證。</string>
+    <string name="endpoint_browser_cookie_missing">瀏覽器驗證已完成，但未取得所需的 VPN Cookie。</string>
 </resources>
