@@ -97,7 +97,7 @@ private class OpenConnectWebViewBrowser(
             fail(unsupportedMessage)
             return
         }
-        if (request.finalURL.isEmpty() || request.cookieNames.isEmpty()) {
+        if (request.cookieNames.isEmpty()) {
             fail(missingCookieMessage)
             return
         }
@@ -116,7 +116,7 @@ private class OpenConnectWebViewBrowser(
         view.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView, url: String) {
                 super.onPageFinished(view, url)
-                if (url == request.finalURL) {
+                if (request.finalURL.isEmpty() || url == request.finalURL) {
                     completeWhenCookiesAvailable(view, url, 0)
                 }
             }
