@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -21,11 +20,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,7 +36,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.nekohasekai.sfa.R
-import io.nekohasekai.sfa.compose.base.UiEvent
 import io.nekohasekai.sfa.compose.component.RemoteControlMenuItems
 import io.nekohasekai.sfa.compose.component.rememberRemoteServers
 import io.nekohasekai.sfa.compose.navigation.NewProfileArgs
@@ -101,41 +97,6 @@ fun DashboardScreen(
                         )
                     }
                 }
-            },
-        )
-    }
-
-    // Update service status in ViewModel
-    LaunchedEffect(serviceStatus) {
-        viewModel.updateServiceStatus(serviceStatus)
-    }
-
-    // Events are now handled globally in ComposeActivity via GlobalEventBus
-
-    // Show deprecated notes dialog
-    if (uiState.showDeprecatedDialog && uiState.deprecatedNotes.isNotEmpty()) {
-        val note = uiState.deprecatedNotes.first()
-        AlertDialog(
-            onDismissRequest = { },
-            title = { Text(stringResource(R.string.error_deprecated_warning)) },
-            text = { Text(note.message) },
-            confirmButton = {
-                TextButton(onClick = { viewModel.dismissDeprecatedNote() }) {
-                    Text(stringResource(R.string.ok))
-                }
-            },
-            dismissButton =
-            if (!note.migrationLink.isNullOrBlank()) {
-                {
-                    TextButton(onClick = {
-                        viewModel.sendGlobalEvent(UiEvent.OpenUrl(note.migrationLink))
-                        viewModel.dismissDeprecatedNote()
-                    }) {
-                        Text(stringResource(R.string.error_deprecated_documentation))
-                    }
-                }
-            } else {
-                null
             },
         )
     }
