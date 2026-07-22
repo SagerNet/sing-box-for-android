@@ -239,11 +239,8 @@ fun EditProfileContentScreen(
                         }
                         // Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y - Redo
                         (
-                            modifierPressed &&
-                                event.isShiftPressed &&
-                                event.key == Key.Z ||
-                                modifierPressed &&
-                                event.key == Key.Y
+                            (modifierPressed && event.isShiftPressed && event.key == Key.Z) ||
+                                (modifierPressed && event.key == Key.Y)
                             ) &&
                             !uiState.isReadOnly -> {
                             viewModel.redo()

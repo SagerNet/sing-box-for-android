@@ -55,7 +55,8 @@ fun getVersionProps(propName: String): String {
 
 android {
     namespace = "io.nekohasekai.sfa"
-    compileSdk = 36
+    compileSdk = 37
+    compileSdkMinor = 1
 
     ndkVersion = "28.0.13004108"
 
@@ -68,7 +69,7 @@ android {
 
     defaultConfig {
         applicationId = "io.nekohasekai.sfa"
-        minSdk = 21
+        minSdk = 24
         targetSdk = 35
         versionCode = getVersionProps("VERSION_CODE").toInt()
         versionName = getVersionProps("VERSION_NAME")
@@ -104,12 +105,8 @@ android {
 
     flavorDimensions += "vendor"
     productFlavors {
-        create("play") {
-            minSdk = 23
-        }
-        create("other") {
-            minSdk = 23
-        }
+        create("play")
+        create("other")
         create("otherLegacy") {
             minSdk = 21
         }
@@ -117,16 +114,16 @@ android {
 
     sourceSets {
         getByName("play") {
-            java.directories.add("src/minApi23/java")
-            aidl.directories.add("src/minApi23/aidl")
+            java.directories.add("src/minApi24/java")
+            aidl.directories.add("src/minApi24/aidl")
         }
         getByName("other") {
-            java.directories.addAll(listOf("src/minApi23/java", "src/github/java"))
-            aidl.directories.add("src/minApi23/aidl")
+            java.directories.addAll(listOf("src/minApi24/java", "src/github/java"))
+            aidl.directories.add("src/minApi24/aidl")
         }
         getByName("otherLegacy") {
             java.directories.addAll(listOf("src/minApi21/java", "src/github/java"))
-            aidl.directories.add("src/minApi23/aidl")
+            aidl.directories.add("src/minApi24/aidl")
         }
     }
 
@@ -185,60 +182,70 @@ dependencies {
     "otherLegacyImplementation"(files("libs/libbox-legacy.aar"))
 
     // API level specific versions
-    val lifecycleVersion23 = "2.10.0"
-    val roomVersion23 = "2.8.4"
-    val workVersion23 = "2.11.1"
-    val cameraVersion23 = "1.5.3"
-    val browserVersion23 = "1.9.0"
+    val lifecycleVersion24 = "2.11.0"
+    val roomVersion24 = "2.8.4"
+    val workVersion24 = "2.11.2"
+    val cameraVersion24 = "1.6.1"
+    val browserVersion24 = "1.10.0"
+    val webkitVersion24 = "1.16.0"
+    val coreVersion24 = "1.19.0"
+    val materialVersion24 = "1.14.0"
 
     val lifecycleVersion21 = "2.9.4"
     val roomVersion21 = "2.7.2"
     val workVersion21 = "2.10.5"
     val cameraVersion21 = "1.4.2"
     val browserVersion21 = "1.9.0"
+    val webkitVersion21 = "1.14.0"
+    val coreVersion21 = "1.17.0"
+    val materialVersion21 = "1.13.0"
 
     // Common dependencies (no API level difference)
-    implementation("androidx.core:core-ktx:1.17.0")
     implementation("androidx.appcompat:appcompat:1.7.1")
-    implementation("com.google.android.material:material:1.13.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.9.7")
-    implementation("androidx.navigation:navigation-ui-ktx:2.9.7")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.9.8")
+    implementation("androidx.navigation:navigation-ui-ktx:2.9.8")
     implementation("com.google.zxing:core:3.5.4")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.3.0")
     implementation("androidx.preference:preference-ktx:1.2.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.10.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
     implementation("com.blacksquircle.ui:editorkit:2.2.0")
     implementation("com.blacksquircle.ui:language-json:2.2.0")
     implementation("com.android.tools.smali:smali-dexlib2:3.0.9") {
         exclude(group = "com.google.guava", module = "guava")
     }
-    implementation("com.google.guava:guava:33.5.0-android")
+    implementation("com.google.guava:guava:33.6.0-android")
 
-    // API 23+ dependencies (play/other)
-    "playImplementation"("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion23")
-    "playImplementation"("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion23")
-    "playImplementation"("androidx.lifecycle:lifecycle-process:$lifecycleVersion23")
-    "playImplementation"("androidx.room:room-runtime:$roomVersion23")
-    "playImplementation"("androidx.work:work-runtime-ktx:$workVersion23")
-    "playImplementation"("androidx.camera:camera-view:$cameraVersion23")
-    "playImplementation"("androidx.camera:camera-lifecycle:$cameraVersion23")
-    "playImplementation"("androidx.camera:camera-camera2:$cameraVersion23")
-    "playImplementation"("androidx.browser:browser:$browserVersion23")
-    "playAnnotationProcessor"("androidx.room:room-compiler:$roomVersion23")
-    "kspPlay"("androidx.room:room-compiler:$roomVersion23")
+    // API 24+ dependencies (play/other)
+    "playImplementation"("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion24")
+    "playImplementation"("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion24")
+    "playImplementation"("androidx.lifecycle:lifecycle-process:$lifecycleVersion24")
+    "playImplementation"("androidx.room:room-runtime:$roomVersion24")
+    "playImplementation"("androidx.work:work-runtime-ktx:$workVersion24")
+    "playImplementation"("androidx.camera:camera-view:$cameraVersion24")
+    "playImplementation"("androidx.camera:camera-lifecycle:$cameraVersion24")
+    "playImplementation"("androidx.camera:camera-camera2:$cameraVersion24")
+    "playImplementation"("androidx.browser:browser:$browserVersion24")
+    "playImplementation"("androidx.webkit:webkit:$webkitVersion24")
+    "playImplementation"("androidx.core:core-ktx:$coreVersion24")
+    "playImplementation"("com.google.android.material:material:$materialVersion24")
+    "playAnnotationProcessor"("androidx.room:room-compiler:$roomVersion24")
+    "kspPlay"("androidx.room:room-compiler:$roomVersion24")
 
-    "otherImplementation"("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion23")
-    "otherImplementation"("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion23")
-    "otherImplementation"("androidx.lifecycle:lifecycle-process:$lifecycleVersion23")
-    "otherImplementation"("androidx.room:room-runtime:$roomVersion23")
-    "otherImplementation"("androidx.work:work-runtime-ktx:$workVersion23")
-    "otherImplementation"("androidx.camera:camera-view:$cameraVersion23")
-    "otherImplementation"("androidx.camera:camera-lifecycle:$cameraVersion23")
-    "otherImplementation"("androidx.camera:camera-camera2:$cameraVersion23")
-    "otherImplementation"("androidx.browser:browser:$browserVersion23")
-    "kspOther"("androidx.room:room-compiler:$roomVersion23")
+    "otherImplementation"("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion24")
+    "otherImplementation"("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion24")
+    "otherImplementation"("androidx.lifecycle:lifecycle-process:$lifecycleVersion24")
+    "otherImplementation"("androidx.room:room-runtime:$roomVersion24")
+    "otherImplementation"("androidx.work:work-runtime-ktx:$workVersion24")
+    "otherImplementation"("androidx.camera:camera-view:$cameraVersion24")
+    "otherImplementation"("androidx.camera:camera-lifecycle:$cameraVersion24")
+    "otherImplementation"("androidx.camera:camera-camera2:$cameraVersion24")
+    "otherImplementation"("androidx.browser:browser:$browserVersion24")
+    "otherImplementation"("androidx.webkit:webkit:$webkitVersion24")
+    "otherImplementation"("androidx.core:core-ktx:$coreVersion24")
+    "otherImplementation"("com.google.android.material:material:$materialVersion24")
+    "kspOther"("androidx.room:room-compiler:$roomVersion24")
 
     // API 21 dependencies (otherLegacy)
     "otherLegacyImplementation"("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion21")
@@ -250,14 +257,17 @@ dependencies {
     "otherLegacyImplementation"("androidx.camera:camera-lifecycle:$cameraVersion21")
     "otherLegacyImplementation"("androidx.camera:camera-camera2:$cameraVersion21")
     "otherLegacyImplementation"("androidx.browser:browser:$browserVersion21")
+    "otherLegacyImplementation"("androidx.webkit:webkit:$webkitVersion21")
+    "otherLegacyImplementation"("androidx.core:core-ktx:$coreVersion21")
+    "otherLegacyImplementation"("com.google.android.material:material:$materialVersion21")
     "kspOtherLegacy"("androidx.room:room-compiler:$roomVersion21")
 
     // Play Store specific
     "playImplementation"("com.google.android.play:app-update-ktx:2.1.0")
     "playImplementation"("com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.1")
 
-    // Shizuku (play and other flavors, API 23+ only)
-    val shizukuVersion = "12.2.0"
+    // Shizuku (play and other flavors, API 24+ only)
+    val shizukuVersion = "13.1.5"
     "playImplementation"("dev.rikka.shizuku:api:$shizukuVersion")
     "playImplementation"("dev.rikka.shizuku:provider:$shizukuVersion")
     "otherImplementation"("dev.rikka.shizuku:api:$shizukuVersion")
@@ -272,31 +282,31 @@ dependencies {
     "otherLegacyImplementation"("com.github.topjohnwu.libsu:core:$libsuVersion")
     "otherLegacyImplementation"("com.github.topjohnwu.libsu:service:$libsuVersion")
 
-    // Compose dependencies - API 23+ (play/other)
-    val composeBom23 = platform("androidx.compose:compose-bom:2026.02.00")
-    val activityVersion23 = "1.12.4"
-    val lifecycleComposeVersion23 = "2.10.0"
+    // Compose dependencies - API 24+ (play/other)
+    val composeBom24 = platform("androidx.compose:compose-bom:2026.06.01")
+    val activityVersion24 = "1.13.0"
+    val lifecycleComposeVersion24 = "2.11.0"
 
-    "playImplementation"(composeBom23)
+    "playImplementation"(composeBom24)
     "playImplementation"("androidx.compose.material3:material3")
     "playImplementation"("androidx.compose.material3.adaptive:adaptive")
     "playImplementation"("androidx.compose.ui:ui")
     "playImplementation"("androidx.compose.ui:ui-tooling-preview")
     "playImplementation"("androidx.compose.material:material-icons-extended")
-    "playImplementation"("androidx.activity:activity-compose:$activityVersion23")
-    "playImplementation"("androidx.navigation:navigation-compose:2.9.7")
-    "playImplementation"("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleComposeVersion23")
+    "playImplementation"("androidx.activity:activity-compose:$activityVersion24")
+    "playImplementation"("androidx.navigation:navigation-compose:2.9.8")
+    "playImplementation"("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleComposeVersion24")
     "playImplementation"("androidx.compose.runtime:runtime-livedata")
 
-    "otherImplementation"(composeBom23)
+    "otherImplementation"(composeBom24)
     "otherImplementation"("androidx.compose.material3:material3")
     "otherImplementation"("androidx.compose.material3.adaptive:adaptive")
     "otherImplementation"("androidx.compose.ui:ui")
     "otherImplementation"("androidx.compose.ui:ui-tooling-preview")
     "otherImplementation"("androidx.compose.material:material-icons-extended")
-    "otherImplementation"("androidx.activity:activity-compose:$activityVersion23")
-    "otherImplementation"("androidx.navigation:navigation-compose:2.9.7")
-    "otherImplementation"("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleComposeVersion23")
+    "otherImplementation"("androidx.activity:activity-compose:$activityVersion24")
+    "otherImplementation"("androidx.navigation:navigation-compose:2.9.8")
+    "otherImplementation"("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleComposeVersion24")
     "otherImplementation"("androidx.compose.runtime:runtime-livedata")
 
     // Compose dependencies - API 21 (otherLegacy)
@@ -311,22 +321,22 @@ dependencies {
     "otherLegacyImplementation"("androidx.compose.ui:ui-tooling-preview")
     "otherLegacyImplementation"("androidx.compose.material:material-icons-extended")
     "otherLegacyImplementation"("androidx.activity:activity-compose:$activityVersion21")
-    "otherLegacyImplementation"("androidx.navigation:navigation-compose:2.9.7")
+    "otherLegacyImplementation"("androidx.navigation:navigation-compose:2.9.8")
     "otherLegacyImplementation"("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleComposeVersion21")
     "otherLegacyImplementation"("androidx.compose.runtime:runtime-livedata")
 
     // Debug/Test dependencies
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
-    "androidTestPlayImplementation"(composeBom23)
-    "androidTestOtherImplementation"(composeBom23)
+    "androidTestPlayImplementation"(composeBom24)
+    "androidTestOtherImplementation"(composeBom24)
     "androidTestOtherLegacyImplementation"(composeBom21)
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
 
     // Common Compose-related libraries
-    implementation("sh.calvin.reorderable:reorderable:3.0.0")
-    implementation("com.github.jeziellago:compose-markdown:0.5.8")
-    implementation("org.kodein.emoji:emoji-kt:2.3.0")
+    implementation("sh.calvin.reorderable:reorderable:3.1.0")
+    implementation("com.github.jeziellago:compose-markdown:0.7.2")
+    implementation("org.kodein.emoji:emoji-kt:2.5.0")
 
     // Terminal emulator
     implementation(project(":terminal-emulator"))
@@ -365,6 +375,8 @@ spotless {
         ktlint(libs.versions.ktlint.get())
             .editorConfigOverride(mapOf(
                 "ktlint_standard_backing-property-naming" to "disabled",
+                "ktlint_standard_blank-line-before-declaration" to "disabled",
+                "ktlint_standard_blank-line-between-when-conditions" to "disabled",
                 "ktlint_standard_filename" to "disabled",
                 "ktlint_standard_max-line-length" to "disabled",
                 "ktlint_standard_property-naming" to "disabled",

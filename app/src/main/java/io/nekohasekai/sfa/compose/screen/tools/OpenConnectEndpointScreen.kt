@@ -30,7 +30,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -56,6 +56,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.compat.menuAnchorCompat
 import io.nekohasekai.sfa.compose.base.UiEvent
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import kotlinx.coroutines.launch
@@ -97,7 +98,6 @@ fun OpenConnectEndpointScreen(
     }
 
     var browserChallengeID by remember { mutableStateOf<String?>(null) }
-    val scope = rememberCoroutineScope()
     val authChallenge = if (endpoint.state == "auth-pending") endpoint.authChallenge else null
     val browserRequest = authChallenge?.browser
 
@@ -112,7 +112,6 @@ fun OpenConnectEndpointScreen(
             viewModel.sendGlobalEvent(UiEvent.ErrorMessage(challengeError))
         }
     }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -196,21 +195,35 @@ fun OpenConnectEndpointScreen(
                         Text(authChallenge.message, style = MaterialTheme.typography.bodyMedium)
                     }
                     when {
-                        browserRequest != null && browserRequest.headerNames.isNotEmpty() -> Text(
+                        browserRequest?.completionMode == OpenConnectBrowserCompletionMode.HEADER -> Text(
                             stringResource(R.string.endpoint_globalprotect_sso_unsupported_android),
                             color = MaterialTheme.colorScheme.error,
                         )
-                        browserRequest != null && (browserRequest.finalURL.isEmpty() || browserRequest.cookieNames.isEmpty()) -> Text(
+
+                        browserRequest?.completionMode == OpenConnectBrowserCompletionMode.INVALID -> Text(
                             stringResource(R.string.endpoint_browser_cookie_missing),
                             color = MaterialTheme.colorScheme.error,
                         )
+
                         browserRequest != null -> Button(
                             onClick = { browserChallengeID = authChallenge.id },
                             modifier = Modifier.align(Alignment.End),
                         ) {
                             Text(stringResource(R.string.endpoint_continue))
                         }
+
                         authChallenge.form != null -> AuthFormContent(viewModel, endpointTag, authChallenge, authChallenge.form)
+                    }
+                    if (browserRequest != null) {
+                        OutlinedButton(
+                            onClick = {
+                                browserChallengeID = null
+                                viewModel.cancelAuthChallenge(endpointTag, authChallenge.id)
+                            },
+                            modifier = Modifier.align(Alignment.End),
+                        ) {
+                            Text(stringResource(R.string.cancel))
+                        }
                     }
                 }
             }
@@ -224,16 +237,12 @@ fun OpenConnectEndpointScreen(
     if (activeBrowserChallenge != null && activeBrowserRequest != null) {
         OpenConnectBrowserDialog(
             challengeID = activeBrowserChallenge.id,
+            endpointTag = endpointTag,
             request = activeBrowserRequest,
             onDismiss = { browserChallengeID = null },
             onResult = { result ->
                 browserChallengeID = null
-                scope.launch {
-                    val message = viewModel.submitBrowserResponse(endpointTag, activeBrowserChallenge.id, result)
-                    if (message != null) {
-                        viewModel.sendGlobalEvent(UiEvent.ErrorMessage(message))
-                    }
-                }
+                viewModel.submitBrowserResponse(endpointTag, activeBrowserChallenge.id, result)
             },
             onError = { message ->
                 browserChallengeID = null
@@ -331,7 +340,7 @@ private fun AuthFormFieldInput(
                     label = { Text(label) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     modifier = Modifier
-                        .menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled)
+                        .then(menuAnchorCompat(enabled))
                         .fillMaxWidth(),
                 )
                 ExposedDropdownMenu(

@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  *                                                                             *
  *  Copyright (C) 2019 by Max Lv <max.c.lv@gmail.com>                          *
  *  Copyright (C) 2019 by Mygod Studio <contact-shadowsocks-android@mygod.be>  *
