@@ -690,4 +690,7 @@
     <string name="endpoint_verifying">Verifying</string>
     <string name="endpoint_globalprotect_sso_unsupported_android">GlobalProtect SAML browser authentication is not supported on Android.</string>
     <string name="endpoint_browser_cookie_missing">Browser authentication completed without the required VPN cookie.</string>
+    <string name="endpoint_browser_navigation_failed">Browser navigation failed: %1$s</string>
+    <string name="endpoint_browser_too_many_windows">The authentication page opened too many browser windows.</string>
+    <string name="endpoint_browser_profile_unavailable">Browser authentication is unavailable on this device.</string>
 </resources>

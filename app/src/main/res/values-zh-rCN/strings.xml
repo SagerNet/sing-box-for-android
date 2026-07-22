@@ -621,4 +621,7 @@
     <string name="remote_unavailable">不可用</string>
     <string name="endpoint_globalprotect_sso_unsupported_android">Android 不支持 GlobalProtect SAML 浏览器认证。</string>
     <string name="endpoint_browser_cookie_missing">浏览器认证已完成，但未取得所需的 VPN Cookie。</string>
+    <string name="endpoint_browser_navigation_failed">浏览器导航失败：%1$s</string>
+    <string name="endpoint_browser_too_many_windows">认证页面打开了过多浏览器窗口。</string>
+    <string name="endpoint_browser_profile_unavailable">此设备无法使用浏览器认证。</string>
 </resources>
