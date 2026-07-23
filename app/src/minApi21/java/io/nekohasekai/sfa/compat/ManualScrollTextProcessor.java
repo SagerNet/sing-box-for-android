@@ -1,4 +1,4 @@
-package io.nekohasekai.sfa.compose.screen.profile;
+package io.nekohasekai.sfa.compat;
 
 import android.content.Context;
 import android.util.AttributeSet;
