@@ -139,6 +139,8 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        // Required by android-tree-sitter
+        isCoreLibraryDesugaringEnabled = true
     }
 
     androidResources {
@@ -176,6 +178,8 @@ android {
 }
 
 dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+
     // libbox
     "playImplementation"(files("libs/libbox.aar"))
     "otherImplementation"(files("libs/libbox.aar"))
@@ -210,8 +214,6 @@ dependencies {
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
-    implementation("com.blacksquircle.ui:editorkit:2.2.0")
-    implementation("com.blacksquircle.ui:language-json:2.2.0")
     implementation("com.android.tools.smali:smali-dexlib2:3.0.9") {
         exclude(group = "com.google.guava", module = "guava")
     }
@@ -261,6 +263,20 @@ dependencies {
     "otherLegacyImplementation"("androidx.core:core-ktx:$coreVersion21")
     "otherLegacyImplementation"("com.google.android.material:material:$materialVersion21")
     "kspOtherLegacy"("androidx.room:room-compiler:$roomVersion21")
+
+    // Configuration editor: sora-editor (tree-sitter) for API 24+, EditorKit kept for legacy
+    val soraVersion = "0.23.6"
+    val treeSitterVersion = "4.3.2"
+    "playImplementation"("io.github.Rosemoe.sora-editor:editor:$soraVersion")
+    "playImplementation"("io.github.Rosemoe.sora-editor:language-treesitter:$soraVersion")
+    "playImplementation"("com.itsaky.androidide.treesitter:android-tree-sitter:$treeSitterVersion")
+    "playImplementation"("com.itsaky.androidide.treesitter:tree-sitter-json:$treeSitterVersion")
+    "otherImplementation"("io.github.Rosemoe.sora-editor:editor:$soraVersion")
+    "otherImplementation"("io.github.Rosemoe.sora-editor:language-treesitter:$soraVersion")
+    "otherImplementation"("com.itsaky.androidide.treesitter:android-tree-sitter:$treeSitterVersion")
+    "otherImplementation"("com.itsaky.androidide.treesitter:tree-sitter-json:$treeSitterVersion")
+    "otherLegacyImplementation"("com.blacksquircle.ui:editorkit:2.2.0")
+    "otherLegacyImplementation"("com.blacksquircle.ui:language-json:2.2.0")
 
     // Play Store specific
     "playImplementation"("com.google.android.play:app-update-ktx:2.1.0")
