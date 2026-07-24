@@ -72,6 +72,9 @@ class EditProfileContentViewModel(private val profileId: Long, initialIsReadOnly
                 )
             }
         }
+        editor.onCompletionWindowClosed = {
+            scheduleConfigurationCheck()
+        }
     }
 
     fun setReadOnly(isReadOnly: Boolean) {
@@ -92,7 +95,7 @@ class EditProfileContentViewModel(private val profileId: Long, initialIsReadOnly
     private fun scheduleConfigurationCheck() {
         configCheckJob?.cancel()
 
-        if (_uiState.value.configurationError != null) {
+        if (editor?.isCompletionWindowShowing() != true && _uiState.value.configurationError != null) {
             _uiState.update { it.copy(configurationError = null) }
         }
 
@@ -101,8 +104,13 @@ class EditProfileContentViewModel(private val profileId: Long, initialIsReadOnly
                 delay(2000)
                 val content =
                     withContext(Dispatchers.Main) {
-                        editor?.getText().orEmpty()
-                    }
+                        val currentEditor = editor
+                        if (currentEditor == null || currentEditor.isCompletionWindowShowing()) {
+                            null
+                        } else {
+                            currentEditor.getText()
+                        }
+                    } ?: return@launch
                 checkConfigurationInBackground(content)
             }
     }
