@@ -6,13 +6,13 @@ import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.InsetDrawable
 import android.view.View
 import com.itsaky.androidide.treesitter.json.TSLanguageJson
-import io.github.rosemoe.sora.editor.ts.TsLanguage
 import io.github.rosemoe.sora.editor.ts.TsLanguageSpec
 import io.github.rosemoe.sora.event.ContentChangeEvent
 import io.github.rosemoe.sora.event.PublishSearchResultEvent
 import io.github.rosemoe.sora.lang.styling.TextStyle
 import io.github.rosemoe.sora.widget.CodeEditor
 import io.github.rosemoe.sora.widget.EditorSearcher
+import io.github.rosemoe.sora.widget.component.EditorAutoCompletion
 import io.github.rosemoe.sora.widget.schemes.EditorColorScheme
 
 class ProfileCodeEditor(context: Context) {
@@ -42,8 +42,13 @@ class ProfileCodeEditor(context: Context) {
         }
     }
 
+    init {
+        ConfigSchema.preload()
+    }
+
     var onTextChanged: (() -> Unit)? = null
     var onSearchResultChanged: ((count: Int, current: Int) -> Unit)? = null
+    var onCompletionWindowClosed: (() -> Unit)? = null
 
     // The scrollbar rect is a fixed 10dp wide; inset the thumb drawable to slim it down visually
     private val scrollbarThumb =
@@ -52,17 +57,18 @@ class ProfileCodeEditor(context: Context) {
         }
 
     private val editor =
-        CodeEditor(context).apply {
+        ConfigCodeEditor(context).apply {
             typefaceText = Typeface.MONOSPACE
             typefaceLineNumber = Typeface.MONOSPACE
             setTextSize(14f)
             isLineNumberEnabled = true
             isWordwrap = true
+            tabWidth = JSON_INDENT_WIDTH
             setVerticalScrollbarThumbDrawable(
                 InsetDrawable(scrollbarThumb, (6 * context.resources.displayMetrics.density).toInt(), 0, 0, 0),
             )
             setEditorLanguage(
-                TsLanguage(TsLanguageSpec(TSLanguageJson.getInstance(), JSON_HIGHLIGHTS, JSON_BLOCKS, JSON_BRACKETS)) {
+                ConfigJsonLanguage(TsLanguageSpec(TSLanguageJson.getInstance(), JSON_HIGHLIGHTS, JSON_BLOCKS, JSON_BRACKETS)) {
                     TextStyle.makeStyle(EditorColorScheme.LITERAL) applyTo "string"
                     TextStyle.makeStyle(EditorColorScheme.ATTRIBUTE_NAME) applyTo "string.special.key"
                     TextStyle.makeStyle(EditorColorScheme.ATTRIBUTE_VALUE) applyTo "number"
@@ -70,6 +76,9 @@ class ProfileCodeEditor(context: Context) {
                     TextStyle.makeStyle(EditorColorScheme.OPERATOR) applyTo "escape"
                 },
             )
+            getComponent(EditorAutoCompletion::class.java).popup.setOnDismissListener {
+                onCompletionWindowClosed?.invoke()
+            }
             subscribeEvent(ContentChangeEvent::class.java) { _, _ -> onTextChanged?.invoke() }
             subscribeEvent(PublishSearchResultEvent::class.java) { _, _ ->
                 if (searcher.hasQuery() && searcher.matchedPositionCount > 0 && !searcher.isMatchedPositionSelected) {
@@ -121,6 +130,8 @@ class ProfileCodeEditor(context: Context) {
         }
     }
 
+    fun isCompletionWindowShowing(): Boolean = editor.getComponent(EditorAutoCompletion::class.java).isShowing
+
     fun focus() {
         editor.requestFocus()
     }
@@ -171,11 +182,20 @@ class ProfileCodeEditor(context: Context) {
         scheme.setColor(EditorColorScheme.ATTRIBUTE_VALUE, colors.number)
         scheme.setColor(EditorColorScheme.KEYWORD, colors.literal)
         scheme.setColor(EditorColorScheme.OPERATOR, colors.string)
+        scheme.setColor(EditorColorScheme.HIGHLIGHTED_DELIMITERS_FOREGROUND, colors.cursor)
+        scheme.setColor(EditorColorScheme.HIGHLIGHTED_DELIMITERS_BACKGROUND, 0)
+        scheme.setColor(EditorColorScheme.HIGHLIGHTED_DELIMITERS_UNDERLINE, 0)
+        scheme.setColor(EditorColorScheme.COMPLETION_WND_BACKGROUND, colors.currentLineBackground)
+        scheme.setColor(EditorColorScheme.COMPLETION_WND_CORNER, colors.lineNumber and 0x00FFFFFF or 0x50000000)
+        scheme.setColor(EditorColorScheme.COMPLETION_WND_TEXT_PRIMARY, colors.foreground)
+        scheme.setColor(EditorColorScheme.COMPLETION_WND_TEXT_SECONDARY, colors.lineNumber)
+        scheme.setColor(EditorColorScheme.COMPLETION_WND_ITEM_CURRENT, colors.selectionBackground)
     }
 
     fun release() {
         onTextChanged = null
         onSearchResultChanged = null
+        onCompletionWindowClosed = null
         editor.release()
     }
 
@@ -184,5 +204,36 @@ class ProfileCodeEditor(context: Context) {
         val count = if (searcher.hasQuery()) searcher.matchedPositionCount else 0
         val current = if (count > 0) searcher.currentMatchedPositionIndex + 1 else 0
         onSearchResultChanged?.invoke(count, current)
+    }
+}
+
+private class ConfigCodeEditor(context: Context) : CodeEditor(context) {
+
+    override fun commitText(text: CharSequence, applyAutoIndent: Boolean, applySymbolCompletion: Boolean) {
+        val language = editorLanguage as? ConfigJsonLanguage
+        val newlineFromHandler = language?.consumeNewlineHandlerCommit() == true
+        val content = getText()
+        val commaIndex =
+            if (text.length == 1 && isEditable && !cursor.isSelected) {
+                siblingCommaInsertIndex(content, cursor.left().index, text[0])
+            } else {
+                -1
+            }
+        if (commaIndex < 0) {
+            super.commitText(text, applyAutoIndent, applySymbolCompletion)
+        } else {
+            content.beginBatchEdit()
+            try {
+                val position = content.indexer.getCharPosition(commaIndex)
+                content.insert(position.line, position.column, ",")
+                super.commitText(text, applyAutoIndent, applySymbolCompletion)
+            } finally {
+                content.endBatchEdit()
+            }
+        }
+        val newlineTyped = text.length == 1 && text[0] == '\n'
+        if (language != null && isEditable && (newlineFromHandler || newlineTyped)) {
+            language.autoShowCompletionAfterNewline(this)
+        }
     }
 }

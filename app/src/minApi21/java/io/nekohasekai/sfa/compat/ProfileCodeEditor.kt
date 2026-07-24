@@ -16,6 +16,7 @@ class ProfileCodeEditor(context: Context) {
 
     var onTextChanged: (() -> Unit)? = null
     var onSearchResultChanged: ((count: Int, current: Int) -> Unit)? = null
+    var onCompletionWindowClosed: (() -> Unit)? = null
 
     private val editor =
         ManualScrollTextProcessor(context).apply {
@@ -158,6 +159,8 @@ class ProfileCodeEditor(context: Context) {
         }
     }
 
+    fun isCompletionWindowShowing(): Boolean = false
+
     fun focus() {
         editor.isFocusable = true
         editor.isFocusableInTouchMode = true
@@ -245,6 +248,7 @@ class ProfileCodeEditor(context: Context) {
         editor.removeTextChangedListener(textWatcher)
         onTextChanged = null
         onSearchResultChanged = null
+        onCompletionWindowClosed = null
     }
 
     private fun matchIndexAt(text: String, matchStart: Int): Int {
