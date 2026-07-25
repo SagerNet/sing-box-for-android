@@ -9,6 +9,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +33,8 @@ import androidx.compose.material.icons.filled.UnfoldLess
 import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -47,10 +51,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -269,6 +276,7 @@ private fun GroupsCardContent(
                         onToggleExpanded = { onToggleExpanded(group.tag) },
                         onItemSelected = { itemTag -> onItemSelected(group.tag, itemTag) },
                         onUrlTest = { onUrlTest(group.tag) },
+                        onItemUrlTest = { itemTag -> onUrlTest(itemTag) },
                     )
                 }
             }
@@ -284,6 +292,7 @@ private fun ProxyGroupItem(
     onToggleExpanded: () -> Unit,
     onItemSelected: (String) -> Unit,
     onUrlTest: () -> Unit,
+    onItemUrlTest: (String) -> Unit,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -427,6 +436,7 @@ private fun ProxyGroupItem(
                         selectedTag = group.selected,
                         isSelectable = group.selectable,
                         onItemSelected = onItemSelected,
+                        onItemUrlTest = onItemUrlTest,
                     )
                 }
             }
@@ -435,7 +445,13 @@ private fun ProxyGroupItem(
 }
 
 @Composable
-private fun ProxyItemsList(items: List<GroupItem>, selectedTag: String, isSelectable: Boolean, onItemSelected: (String) -> Unit) {
+private fun ProxyItemsList(
+    items: List<GroupItem>,
+    selectedTag: String,
+    isSelectable: Boolean,
+    onItemSelected: (String) -> Unit,
+    onItemUrlTest: (String) -> Unit,
+) {
     val itemsPerRow = 2
     val chunkedItems =
         remember(items) {
@@ -464,6 +480,7 @@ private fun ProxyItemsList(items: List<GroupItem>, selectedTag: String, isSelect
                                 isSelected = item.tag == selectedTag,
                                 isSelectable = isSelectable,
                                 onClick = { onItemSelected(item.tag) },
+                                onUrlTest = { onItemUrlTest(item.tag) },
                                 modifier = Modifier.fillMaxWidth(),
                             )
                         }
@@ -477,9 +494,16 @@ private fun ProxyItemsList(items: List<GroupItem>, selectedTag: String, isSelect
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-private fun ProxyChip(item: GroupItem, isSelected: Boolean, isSelectable: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun ProxyChip(
+    item: GroupItem,
+    isSelected: Boolean,
+    isSelectable: Boolean,
+    onClick: () -> Unit,
+    onUrlTest: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     // Use simpler, faster animations
     val animatedElevation by animateFloatAsState(
         targetValue = if (isSelected) 6.dp.value else 1.dp.value,
@@ -487,7 +511,7 @@ private fun ProxyChip(item: GroupItem, isSelected: Boolean, isSelectable: Boolea
         label = "Elevation",
     )
 
-    val surfaceModifier = modifier
+    var showContextMenu by remember { mutableStateOf(false) }
     val surfaceShape = RoundedCornerShape(8.dp)
     val surfaceColor =
         when {
@@ -566,25 +590,40 @@ private fun ProxyChip(item: GroupItem, isSelected: Boolean, isSelectable: Boolea
         }
     }
 
-    if (isSelectable) {
+    Box(modifier = modifier) {
         Surface(
-            onClick = onClick,
-            modifier = surfaceModifier,
+            modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(surfaceShape)
+                .combinedClickable(
+                    onClick = { if (isSelectable) onClick() },
+                    onLongClick = { showContextMenu = true },
+                ),
             shape = surfaceShape,
             color = surfaceColor,
             tonalElevation = animatedElevation.dp,
             border = surfaceBorder,
             content = content,
         )
-    } else {
-        Surface(
-            modifier = surfaceModifier,
-            shape = surfaceShape,
-            color = surfaceColor,
-            tonalElevation = animatedElevation.dp,
-            border = surfaceBorder,
-            content = content,
-        )
+        DropdownMenu(
+            expanded = showContextMenu,
+            onDismissRequest = { showContextMenu = false },
+        ) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.url_test)) },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Speed,
+                        contentDescription = null,
+                    )
+                },
+                onClick = {
+                    showContextMenu = false
+                    onUrlTest()
+                },
+            )
+        }
     }
 }
 
