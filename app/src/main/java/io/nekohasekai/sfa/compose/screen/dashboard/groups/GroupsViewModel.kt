@@ -222,10 +222,10 @@ class GroupsViewModel(private val sharedCommandClient: CommandClient? = null) :
         }
     }
 
-    fun urlTest(groupTag: String) {
+    fun urlTest(outboundTag: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                CommandTarget.standaloneClient().urlTest(groupTag)
+                CommandTarget.standaloneClient().urlTest(outboundTag)
             } catch (e: Exception) {
                 sendError(e)
             }
