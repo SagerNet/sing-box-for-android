@@ -5,6 +5,7 @@ import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.InsetDrawable
 import android.view.View
+import androidx.core.graphics.ColorUtils
 import com.itsaky.androidide.treesitter.json.TSLanguageJson
 import io.github.rosemoe.sora.editor.ts.TsLanguageSpec
 import io.github.rosemoe.sora.event.ContentChangeEvent
@@ -161,7 +162,10 @@ class ProfileCodeEditor(context: Context) {
     fun paste() = editor.pasteText()
 
     fun applyColors(colors: ProfileEditorColors) {
-        val scheme = editor.colorScheme
+        // Unset entries fall back to the scheme's built-in defaults, which are chosen by its
+        // dark flag; build the scheme on the matching base so components this list misses
+        // (text action window, future additions) stay readable instead of defaulting to light
+        val scheme = object : EditorColorScheme(ColorUtils.calculateLuminance(colors.background) < 0.5) {}
         scheme.setColor(EditorColorScheme.WHOLE_BACKGROUND, colors.background)
         scheme.setColor(EditorColorScheme.TEXT_NORMAL, colors.foreground)
         scheme.setColor(EditorColorScheme.LINE_NUMBER, colors.lineNumber)
@@ -190,6 +194,9 @@ class ProfileCodeEditor(context: Context) {
         scheme.setColor(EditorColorScheme.COMPLETION_WND_TEXT_PRIMARY, colors.foreground)
         scheme.setColor(EditorColorScheme.COMPLETION_WND_TEXT_SECONDARY, colors.lineNumber)
         scheme.setColor(EditorColorScheme.COMPLETION_WND_ITEM_CURRENT, colors.selectionBackground)
+        scheme.setColor(EditorColorScheme.TEXT_ACTION_WINDOW_BACKGROUND, colors.currentLineBackground)
+        scheme.setColor(EditorColorScheme.TEXT_ACTION_WINDOW_ICON_COLOR, colors.foreground)
+        editor.colorScheme = scheme
     }
 
     fun release() {
