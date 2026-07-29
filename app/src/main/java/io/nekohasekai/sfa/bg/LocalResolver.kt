@@ -7,13 +7,14 @@ import android.system.ErrnoException
 import androidx.annotation.RequiresApi
 import io.nekohasekai.libbox.ExchangeContext
 import io.nekohasekai.libbox.LocalDNSTransport
+import io.nekohasekai.sfa.ktx.tryResume
 import io.nekohasekai.sfa.ktx.tryResumeWithException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.runBlocking
 import java.net.InetAddress
 import java.net.UnknownHostException
-import kotlin.coroutines.resume
+import java.util.concurrent.CancellationException
 import kotlin.coroutines.suspendCoroutine
 
 object LocalResolver : LocalDNSTransport {
@@ -27,7 +28,10 @@ object LocalResolver : LocalDNSTransport {
         return runBlocking {
             suspendCoroutine { continuation ->
                 val signal = CancellationSignal()
-                ctx.onCancel(signal::cancel)
+                ctx.onCancel {
+                    signal.cancel()
+                    continuation.tryResumeWithException(CancellationException())
+                }
                 val callback =
                     object : DnsResolver.Callback<ByteArray> {
                         override fun onAnswer(answer: ByteArray, rcode: Int) {
@@ -36,14 +40,14 @@ object LocalResolver : LocalDNSTransport {
                             } else {
                                 ctx.errorCode(rcode)
                             }
-                            continuation.resume(Unit)
+                            continuation.tryResume(Unit)
                         }
 
                         override fun onError(error: DnsResolver.DnsException) {
                             when (val cause = error.cause) {
                                 is ErrnoException -> {
                                     ctx.errnoCode(cause.errno)
-                                    continuation.resume(Unit)
+                                    continuation.tryResume(Unit)
                                     return
                                 }
                             }
@@ -68,7 +72,10 @@ object LocalResolver : LocalDNSTransport {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 suspendCoroutine { continuation ->
                     val signal = CancellationSignal()
-                    ctx.onCancel(signal::cancel)
+                    ctx.onCancel {
+                        signal.cancel()
+                        continuation.tryResumeWithException(CancellationException())
+                    }
                     val callback =
                         object : DnsResolver.Callback<Collection<InetAddress>> {
                             @Suppress("ThrowableNotThrown")
@@ -81,14 +88,14 @@ object LocalResolver : LocalDNSTransport {
                                 } else {
                                     ctx.errorCode(rcode)
                                 }
-                                continuation.resume(Unit)
+                                continuation.tryResume(Unit)
                             }
 
                             override fun onError(error: DnsResolver.DnsException) {
                                 when (val cause = error.cause) {
                                     is ErrnoException -> {
                                         ctx.errnoCode(cause.errno)
-                                        continuation.resume(Unit)
+                                        continuation.tryResume(Unit)
                                         return
                                     }
                                 }
