@@ -295,20 +295,25 @@ fun TailscaleSSHTerminalScreen(
                     modifier = Modifier.fillMaxSize(),
                 )
 
-                if (activeSession.terminalSession.phase == TailscaleSSHTerminalSession.Phase.CONNECTING) {
+                val terminalPhase = activeSession.terminalSession.phase
+                val banner = activeSession.terminalSession.authBanner
+                if (terminalPhase == TailscaleSSHTerminalSession.Phase.CONNECTING ||
+                    (terminalPhase == TailscaleSSHTerminalSession.Phase.FINISHED && !banner.isNullOrBlank())
+                ) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center,
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            CircularProgressIndicator()
-                            Text(
-                                stringResource(R.string.tailscale_ssh_connecting),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.padding(top = 16.dp),
-                            )
-                            val banner = activeSession.terminalSession.authBanner
+                            if (terminalPhase == TailscaleSSHTerminalSession.Phase.CONNECTING) {
+                                CircularProgressIndicator()
+                                Text(
+                                    stringResource(R.string.tailscale_ssh_connecting),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.padding(top = 16.dp),
+                                )
+                            }
                             if (!banner.isNullOrBlank()) {
                                 val linkColor = MaterialTheme.colorScheme.primary
                                 Surface(

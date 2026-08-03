@@ -140,11 +140,22 @@ public class TailscaleSSHTerminalSession extends TerminalSession {
   }
 
   public void onAuthBanner(String message) {
-    authBanner = message;
+    String banner = message == null ? "" : message.trim();
+    if (banner.isEmpty()) {
+      return;
+    }
+    String existingBanner = authBanner;
+    if (existingBanner == null || existingBanner.isEmpty()) {
+      authBanner = banner;
+    } else if (existingBanner.contains(banner)) {
+      return;
+    } else {
+      authBanner = existingBanner + "\n\n" + banner;
+    }
     mainHandler.post(
         () -> {
           if (phaseCallback != null) {
-            phaseCallback.onAuthBanner(message);
+            phaseCallback.onAuthBanner(banner);
           }
         });
   }
