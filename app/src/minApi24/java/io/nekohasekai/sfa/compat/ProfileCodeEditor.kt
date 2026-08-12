@@ -1,6 +1,7 @@
 package io.nekohasekai.sfa.compat
 
 import android.content.Context
+import android.graphics.Rect
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.InsetDrawable
@@ -10,6 +11,7 @@ import com.itsaky.androidide.treesitter.json.TSLanguageJson
 import io.github.rosemoe.sora.editor.ts.TsLanguageSpec
 import io.github.rosemoe.sora.event.ContentChangeEvent
 import io.github.rosemoe.sora.event.PublishSearchResultEvent
+import io.github.rosemoe.sora.event.SelectionChangeEvent
 import io.github.rosemoe.sora.lang.styling.TextStyle
 import io.github.rosemoe.sora.widget.CodeEditor
 import io.github.rosemoe.sora.widget.EditorSearcher
@@ -83,7 +85,16 @@ class ProfileCodeEditor(context: Context) {
             subscribeEvent(ContentChangeEvent::class.java) { _, _ -> onTextChanged?.invoke() }
             subscribeEvent(PublishSearchResultEvent::class.java) { _, _ ->
                 if (searcher.hasQuery() && searcher.matchedPositionCount > 0 && !searcher.isMatchedPositionSelected) {
-                    searcher.gotoNext()
+                    // CodeEditor.setSelectionRegion() requests focus for itself before scrolling to
+                    // the match, which takes the input target away from the search field and lets
+                    // the resulting window inset change abort the scroll it just started
+                    suppressFocusRequest = true
+                    try {
+                        searcher.gotoNext()
+                    } finally {
+                        suppressFocusRequest = false
+                    }
+                    revealCurrentMatch()
                 }
                 notifySearchResult()
             }
@@ -113,6 +124,10 @@ class ProfileCodeEditor(context: Context) {
             editor.searcher.stopSearch()
             onSearchResultChanged?.invoke(0, 0)
         } else {
+            // EditorSearcher.gotoNext() starts from the right side of the selection, so leaving the
+            // previous match selected makes every added character skip one occurrence forward
+            val anchor = editor.cursor.left()
+            editor.setSelection(anchor.line, anchor.column, false, SelectionChangeEvent.CAUSE_SEARCH)
             editor.searcher.search(query, EditorSearcher.SearchOptions(true, false))
         }
     }
@@ -120,6 +135,7 @@ class ProfileCodeEditor(context: Context) {
     fun findNext() {
         if (editor.searcher.hasQuery()) {
             editor.searcher.gotoNext()
+            revealCurrentMatch()
             notifySearchResult()
         }
     }
@@ -127,6 +143,7 @@ class ProfileCodeEditor(context: Context) {
     fun findPrevious() {
         if (editor.searcher.hasQuery()) {
             editor.searcher.gotoPrevious()
+            revealCurrentMatch()
             notifySearchResult()
         }
     }
@@ -206,6 +223,14 @@ class ProfileCodeEditor(context: Context) {
         editor.release()
     }
 
+    private fun revealCurrentMatch() {
+        // The searcher scrolls to the match with an animation, and CodeEditor.onSizeChanged() aborts
+        // a running scroll where it currently stands, so a keyboard or search bar transition arriving
+        // during the jump leaves the editor stranded between the two positions
+        val position = editor.cursor.right()
+        editor.ensurePositionVisible(position.line, position.column, true)
+    }
+
     private fun notifySearchResult() {
         val searcher = editor.searcher
         val count = if (searcher.hasQuery()) searcher.matchedPositionCount else 0
@@ -215,6 +240,15 @@ class ProfileCodeEditor(context: Context) {
 }
 
 private class ConfigCodeEditor(context: Context) : CodeEditor(context) {
+
+    var suppressFocusRequest = false
+
+    override fun requestFocus(direction: Int, previouslyFocusedRect: Rect?): Boolean {
+        if (suppressFocusRequest) {
+            return isFocused
+        }
+        return super.requestFocus(direction, previouslyFocusedRect)
+    }
 
     override fun commitText(text: CharSequence, applyAutoIndent: Boolean, applySymbolCompletion: Boolean) {
         val language = editorLanguage as? ConfigJsonLanguage
