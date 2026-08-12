@@ -3,6 +3,7 @@ package io.nekohasekai.sfa.xposed.hooks.hidevpn
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.os.Binder
+import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
 import io.nekohasekai.sfa.xposed.HookErrorStore
 import io.nekohasekai.sfa.xposed.VpnSanitizer
@@ -58,23 +59,28 @@ class HookConnectivityManagerGetNetworkCapabilities(private val helper: Connecti
             }
         }
 
-        // Hook createWithLocationInfoSanitizedIfNecessaryWhenParceled (API 31+)
+        // Hook createWithSensitiveInfoSanitizedIfNecessaryWhenParceled (API 31+)
         if (helper.sdkInt >= 31) {
             try {
-                hookCreateWithLocationInfoSanitized()
+                hookCreateWithSanitizedInfo()
             } catch (e: Throwable) {
-                HookErrorStore.w(SOURCE, "hookCreateWithLocationInfoSanitized failed: ${e.message}", e)
+                HookErrorStore.w(SOURCE, "hookCreateWithSanitizedInfo failed: ${e.message}", e)
             }
         }
     }
 
     private fun hookNetworkCapabilitiesRestricted() {
-        XposedHelpers.findAndHookMethod(
+        // Merged into createWithSensitiveInfoSanitizedIfNecessaryWhenParceled since the Android 16
+        // QPR2 connectivity module.
+        val method = XposedHelpers.findMethodExactIfExists(
             helper.cls,
             "networkCapabilitiesRestrictedForCallerPermissions",
             NetworkCapabilities::class.java,
             Int::class.javaPrimitiveType,
             Int::class.javaPrimitiveType,
+        ) ?: return
+        XposedBridge.hookMethod(
+            method,
             object : SafeMethodHook(SOURCE) {
                 override fun afterHook(param: MethodHookParam) {
                     val callerUid = param.args[2] as Int
@@ -137,8 +143,19 @@ class HookConnectivityManagerGetNetworkCapabilities(private val helper: Connecti
         param.result = VpnSanitizer.sanitizeNetworkCapabilities(nc)
     }
 
-    private fun hookCreateWithLocationInfoSanitized() {
-        XposedHelpers.findAndHookMethod(
+    private fun hookCreateWithSanitizedInfo() {
+        // Renamed from createWithLocationInfoSanitizedIfNecessaryWhenParceled in the Android 16
+        // QPR2 connectivity module.
+        val method = XposedHelpers.findMethodExactIfExists(
+            helper.cls,
+            "createWithSensitiveInfoSanitizedIfNecessaryWhenParceled",
+            NetworkCapabilities::class.java,
+            Boolean::class.javaPrimitiveType,
+            Int::class.javaPrimitiveType,
+            Int::class.javaPrimitiveType,
+            String::class.java,
+            String::class.java,
+        ) ?: XposedHelpers.findMethodExact(
             helper.cls,
             "createWithLocationInfoSanitizedIfNecessaryWhenParceled",
             NetworkCapabilities::class.java,
@@ -147,6 +164,9 @@ class HookConnectivityManagerGetNetworkCapabilities(private val helper: Connecti
             Int::class.javaPrimitiveType,
             String::class.java,
             String::class.java,
+        )
+        XposedBridge.hookMethod(
+            method,
             object : SafeMethodHook(SOURCE) {
                 override fun afterHook(param: MethodHookParam) {
                     val callerUid = param.args[3] as Int
