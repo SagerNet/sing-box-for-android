@@ -260,6 +260,8 @@
     <string name="location_permission_title">位置权限</string>
     <string name="location_permission_description">您的个人资料包含 &lt;strong&gt;&lt;tt&gt;wifi_ssid&lt;/tt&gt; 或 &lt;tt&gt;wifi_bssid&lt;/tt&gt; 路由规则&lt;/strong&gt;。为了使它们正常工作，sing-box 在&lt;strong&gt;后台&lt;/strong&gt;使用 &lt;strong&gt;位置&lt;/strong&gt; 权限来获取有关所连接 Wi-Fi 网络的信息。该信息将&lt;strong&gt;仅用于路由目的&lt;/strong&gt;。</string>
     <string name="location_permission_background_description">在 Android 10 及更高版本中，需要&lt;strong&gt;后台位置&lt;/strong&gt;权限。选择&lt;strong&gt;始终允许&lt;/strong&gt;以授予权限。</string>
+    <string name="local_network_permission_title">局域网权限</string>
+    <string name="local_network_permission_description">Android 17 及更高版本要求局域网权限才能访问你的 Wi-Fi 或以太网网络。Android 以附近的设备的名义请求该权限。</string>
     <string name="notification_permission_title">通知权限</string>
     <string name="notification_permission_required_description">sing-box 无法在没有发送通知权限的情况下显示实时网速。请授予权限或禁用实时网速通知后再启动服务。</string>
     <string name="root_access_required">需要 Root 权限</string>

@@ -73,6 +73,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -138,6 +139,9 @@ class MainActivity :
     private var currentAlert by mutableStateOf<Pair<Alert, String?>?>(null)
     private var showLocationPermissionDialog by mutableStateOf(false)
     private var showBackgroundLocationDialog by mutableStateOf(false)
+    private var showLocalNetworkPermissionDialog by mutableStateOf(false)
+    private var notificationPermissionRequested = false
+    private var localNetworkPermissionRequested = false
     private var showImportProfileDialog by mutableStateOf(false)
     private var pendingImportProfile by mutableStateOf<Triple<String, String, String>?>(null)
     private var showImportLocalProfileDialog by mutableStateOf(false)
@@ -150,12 +154,8 @@ class MainActivity :
     private val notificationPermissionLauncher =
         registerForActivityResult(
             ActivityResultContracts.RequestPermission(),
-        ) { isGranted ->
-            if (Settings.dynamicNotification && !isGranted) {
-                onServiceAlert(Alert.RequestNotificationPermission, null)
-            } else {
-                startService0()
-            }
+        ) {
+            startService()
         }
 
     private val locationPermissionLauncher =
@@ -174,6 +174,11 @@ class MainActivity :
             if (it) {
                 startService()
             }
+        }
+
+    private val localNetworkPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+            startService()
         }
 
     private val prepareLauncher =
@@ -272,7 +277,26 @@ class MainActivity :
     @SuppressLint("NewApi")
     fun startService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !ServiceNotification.checkPermission()) {
-            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            if (!notificationPermissionRequested) {
+                notificationPermissionRequested = true
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                return
+            }
+            if (Settings.dynamicNotification) {
+                onServiceAlert(Alert.RequestNotificationPermission, null)
+                return
+            }
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN &&
+            !hasPermission(Manifest.permission.ACCESS_LOCAL_NETWORK) &&
+            !localNetworkPermissionRequested
+        ) {
+            localNetworkPermissionRequested = true
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_LOCAL_NETWORK)) {
+                showLocalNetworkPermissionDialog = true
+            } else {
+                localNetworkPermissionLauncher.launch(Manifest.permission.ACCESS_LOCAL_NETWORK)
+            }
             return
         }
         startService0()
@@ -390,6 +414,16 @@ class MainActivity :
                     backgroundLocationPermissionLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
                 }
             }, onDismiss = { showBackgroundLocationDialog = false })
+        }
+
+        if (showLocalNetworkPermissionDialog) {
+            LocalNetworkPermissionDialog(onConfirm = {
+                showLocalNetworkPermissionDialog = false
+                localNetworkPermissionLauncher.launch(Manifest.permission.ACCESS_LOCAL_NETWORK)
+            }, onDismiss = {
+                showLocalNetworkPermissionDialog = false
+                startService()
+            })
         }
 
         // Handle import remote profile dialog
@@ -1253,6 +1287,25 @@ class MainActivity :
             onDismissRequest = onDismiss,
             title = { Text(stringResource(R.string.location_permission_title)) },
             text = { Text(stringResource(R.string.location_permission_background_description)) },
+            confirmButton = {
+                TextButton(onClick = onConfirm) {
+                    Text(stringResource(R.string.ok))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(R.string.no_thanks))
+                }
+            },
+        )
+    }
+
+    @Composable
+    private fun LocalNetworkPermissionDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = { Text(stringResource(R.string.local_network_permission_title)) },
+            text = { Text(stringResource(R.string.local_network_permission_description)) },
             confirmButton = {
                 TextButton(onClick = onConfirm) {
                     Text(stringResource(R.string.ok))
