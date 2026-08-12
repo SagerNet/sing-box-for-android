@@ -84,7 +84,6 @@
     <string name="reset_order">重置顺序</string>
 
     <!-- Connections -->
-    <string name="empty_connections">无连接</string>
     <string name="search_connections">搜索连接…</string>
     <string name="close_connections_confirm">关闭所有连接？</string>
     <string name="connection_state_all">全部</string>

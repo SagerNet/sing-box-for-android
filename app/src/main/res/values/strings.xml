@@ -84,7 +84,6 @@
     <string name="reset_order">Reset order</string>
 
     <!-- Connections -->
-    <string name="empty_connections">No connections</string>
     <string name="search_connections">Search connections…</string>
     <string name="close_connections_confirm">Close all connections?</string>
     <string name="connection_state_all">All</string>

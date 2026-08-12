@@ -24,6 +24,7 @@ data class GroupsUiState(
     val groups: List<Group> = emptyList(),
     val isLoading: Boolean = false,
     val expandedGroups: Set<String> = emptySet(),
+    val testingGroups: Set<String> = emptySet(),
     val showCloseConnectionsSnackbar: Boolean = false,
 )
 
@@ -232,6 +233,21 @@ class GroupsViewModel(private val sharedCommandClient: CommandClient? = null) :
         }
     }
 
+    fun urlTestGroup(groupTag: String) {
+        updateState { copy(testingGroups = testingGroups + groupTag) }
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                CommandTarget.standaloneClient().urlTest(groupTag)
+            } catch (e: Exception) {
+                sendError(e)
+            } finally {
+                withContext(Dispatchers.Main) {
+                    updateState { copy(testingGroups = testingGroups - groupTag) }
+                }
+            }
+        }
+    }
+
     // CommandClient.Handler implementation
     override fun onConnected() {
         viewModelScope.launch(Dispatchers.Main) {
@@ -253,63 +269,12 @@ class GroupsViewModel(private val sharedCommandClient: CommandClient? = null) :
     override fun updateGroups(newGroups: MutableList<OutboundGroup>) {
         viewModelScope.launch(Dispatchers.Default) {
             val currentGroups = uiState.value.groups
-            val newGroupsMap = newGroups.associateBy { it.tag }
-
-            // Smart merge: preserve existing Group objects when only delays change
-            val mergedGroups =
-                if (currentGroups.isEmpty()) {
-                    // Initial load
-                    newGroups.map(::Group)
-                } else {
-                    currentGroups.map { existingGroup ->
-                        val newGroupData = newGroupsMap[existingGroup.tag]
-                        if (newGroupData != null) {
-                            // Check if only delays have changed
-                            val newItems = newGroupData.items.toList()
-                            val hasStructuralChange =
-                                existingGroup.items.size != newItems.size ||
-                                    existingGroup.selected != newGroupData.selected ||
-                                    existingGroup.type != newGroupData.type ||
-                                    existingGroup.selectable != newGroupData.selectable
-
-                            if (hasStructuralChange) {
-                                // Structural change, create new Group
-                                Group(newGroupData)
-                            } else {
-                                // Only delays might have changed, update items efficiently
-                                val updatedItems =
-                                    existingGroup.items.mapIndexed { index, item ->
-                                        val newItemData = newItems.getOrNull(index)
-                                        if (newItemData != null &&
-                                            item.tag == newItemData.tag &&
-                                            item.type == newItemData.type
-                                        ) {
-                                            // Only update if delay actually changed
-                                            if (item.urlTestDelay != newItemData.urlTestDelay ||
-                                                item.urlTestTime != newItemData.urlTestTime
-                                            ) {
-                                                GroupItem(newItemData)
-                                            } else {
-                                                item // Keep existing object
-                                            }
-                                        } else {
-                                            if (newItemData != null) {
-                                                GroupItem(newItemData)
-                                            } else {
-                                                item // Keep existing if index out of bounds
-                                            }
-                                        }
-                                    }
-                                existingGroup.copy(items = updatedItems)
-                            }
-                        } else {
-                            existingGroup
-                        }
-                    } +
-                        newGroups.filter { newGroup ->
-                            currentGroups.none { it.tag == newGroup.tag }
-                        }.map(::Group)
-                }
+            val currentByTag = currentGroups.associateBy { it.tag }
+            val mergedGroups = newGroups.map { goGroup ->
+                val converted = Group(goGroup)
+                val existing = currentByTag[converted.tag]
+                if (existing == converted) existing else converted
+            }
 
             withContext(Dispatchers.Main) {
                 updateState {
@@ -319,7 +284,7 @@ class GroupsViewModel(private val sharedCommandClient: CommandClient? = null) :
                         expandedGroups
                     }
                     copy(
-                        groups = mergedGroups,
+                        groups = if (mergedGroups == groups) groups else mergedGroups,
                         expandedGroups = initialExpandedGroups,
                         isLoading = false,
                     )

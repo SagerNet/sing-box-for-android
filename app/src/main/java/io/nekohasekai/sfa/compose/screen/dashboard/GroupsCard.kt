@@ -1,18 +1,15 @@
 package io.nekohasekai.sfa.compose.screen.dashboard
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -22,35 +19,32 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.UnfoldLess
 import androidx.compose.material.icons.filled.UnfoldMore
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -58,8 +52,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -71,12 +68,12 @@ import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compat.LazyColumnCompat
 import io.nekohasekai.sfa.compat.rememberOverscrollEffectCompat
 import io.nekohasekai.sfa.compose.model.Group
 import io.nekohasekai.sfa.compose.model.GroupItem
+import io.nekohasekai.sfa.compose.screen.dashboard.groups.GroupsUiState
 import io.nekohasekai.sfa.compose.screen.dashboard.groups.GroupsViewModel
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.compose.util.rememberSheetDismissFromContentOnlyIfGestureStartedAtTopModifier
@@ -135,7 +132,6 @@ fun GroupsCard(
         }
     }
 
-    // Stable callbacks to prevent recomposition - use remember with viewModel as key
     val onToggleExpanded =
         remember(actualViewModel) {
             { groupTag: String -> actualViewModel.toggleGroupExpand(groupTag) }
@@ -146,53 +142,65 @@ fun GroupsCard(
         }
     val onUrlTest =
         remember(actualViewModel) {
-            { groupTag: String -> actualViewModel.urlTest(groupTag) }
+            { groupTag: String -> actualViewModel.urlTestGroup(groupTag) }
+        }
+    val onItemUrlTest =
+        remember(actualViewModel) {
+            { itemTag: String -> actualViewModel.urlTest(itemTag) }
         }
 
-    // Only update service status when it actually changes
     LaunchedEffect(serviceStatus) {
         actualViewModel.updateServiceStatus(serviceStatus)
     }
 
-    // Show snackbar when needed
+    val closeConnectionsMessage = stringResource(R.string.close_connections_confirm)
+    val closeConnectionsAction = stringResource(R.string.close)
     LaunchedEffect(uiState.showCloseConnectionsSnackbar) {
         if (uiState.showCloseConnectionsSnackbar) {
             val result =
                 snackbarHostState.showSnackbar(
-                    message = "Close all connections?",
-                    actionLabel = "Close",
-                    duration = androidx.compose.material3.SnackbarDuration.Indefinite,
+                    message = closeConnectionsMessage,
+                    actionLabel = closeConnectionsAction,
+                    duration = SnackbarDuration.Indefinite,
                     withDismissAction = true,
                 )
             when (result) {
-                androidx.compose.material3.SnackbarResult.ActionPerformed -> {
+                SnackbarResult.ActionPerformed -> {
                     actualViewModel.closeConnections()
                 }
 
-                androidx.compose.material3.SnackbarResult.Dismissed -> {
+                SnackbarResult.Dismissed -> {
                     actualViewModel.dismissCloseConnectionsSnackbar()
                 }
             }
         }
     }
 
-    GroupsCardContent(
-        uiState = uiState,
-        onToggleExpanded = onToggleExpanded,
-        onItemSelected = onItemSelected,
-        onUrlTest = onUrlTest,
-        listHeaderContent = listHeaderContent,
-        asSheet = asSheet,
-        modifier = modifier,
-    )
+    Box(modifier = modifier) {
+        GroupsCardContent(
+            uiState = uiState,
+            onToggleExpanded = onToggleExpanded,
+            onItemSelected = onItemSelected,
+            onUrlTest = onUrlTest,
+            onItemUrlTest = onItemUrlTest,
+            listHeaderContent = listHeaderContent,
+            asSheet = asSheet,
+        )
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter),
+        )
+    }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun GroupsCardContent(
-    uiState: io.nekohasekai.sfa.compose.screen.dashboard.groups.GroupsUiState,
+    uiState: GroupsUiState,
     onToggleExpanded: (String) -> Unit,
     onItemSelected: (String, String) -> Unit,
     onUrlTest: (String) -> Unit,
+    onItemUrlTest: (String) -> Unit,
     listHeaderContent: (@Composable () -> Unit)? = null,
     asSheet: Boolean = false,
     modifier: Modifier = Modifier,
@@ -208,6 +216,7 @@ private fun GroupsCardContent(
             Modifier.nestedScroll(rememberBounceBlockingNestedScrollConnection(lazyListState))
         }
     val overscrollEffect = if (asSheet) null else rememberOverscrollEffectCompat()
+    val palette = rememberUrlTestPalette()
 
     LazyColumnCompat(
         modifier =
@@ -222,7 +231,6 @@ private fun GroupsCardContent(
             top = 8.dp,
             bottom = 16.dp,
         ),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
         overscrollEffect = overscrollEffect,
     ) {
         if (listHeaderContent != null) {
@@ -246,439 +254,401 @@ private fun GroupsCardContent(
                 }
             }
 
-            uiState.groups.isEmpty() -> {
-                item(key = "groups_empty") {
-                    Box(
-                        modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .height(100.dp),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            text = "No groups available",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            else -> {
+                uiState.groups.forEach { group ->
+                    val isExpanded = uiState.expandedGroups.contains(group.tag)
+                    val headerContent: @Composable () -> Unit = {
+                        GroupHeader(
+                            group = group,
+                            isExpanded = isExpanded,
+                            isTesting = uiState.testingGroups.contains(group.tag),
+                            onToggleExpanded = { onToggleExpanded(group.tag) },
+                            onUrlTest = { onUrlTest(group.tag) },
                         )
+                    }
+                    if (isExpanded) {
+                        stickyHeader(key = "header:${group.tag}", contentType = "GroupHeader") {
+                            headerContent()
+                        }
+                    } else {
+                        item(key = "header:${group.tag}", contentType = "GroupHeader") {
+                            headerContent()
+                        }
+                    }
+                    if (isExpanded) {
+                        val rowItems = group.items.chunked(2)
+                        rowItems.forEachIndexed { rowIndex, row ->
+                            item(
+                                key = "row:${group.tag}:${row.first().tag}",
+                                contentType = "GroupItemRow",
+                            ) {
+                                GroupItemRow(
+                                    row = row,
+                                    selectedTag = group.selected,
+                                    isSelectable = group.selectable,
+                                    isLast = rowIndex == rowItems.lastIndex,
+                                    palette = palette,
+                                    onItemSelected = { itemTag -> onItemSelected(group.tag, itemTag) },
+                                    onItemUrlTest = onItemUrlTest,
+                                    modifier = Modifier.animateItem(),
+                                )
+                            }
+                        }
+                    } else {
+                        item(key = "dots:${group.tag}", contentType = "GroupDots") {
+                            GroupDotsGrid(
+                                group = group,
+                                palette = palette,
+                                onClick = { onToggleExpanded(group.tag) },
+                                modifier = Modifier.animateItem(),
+                            )
+                        }
                     }
                 }
             }
+        }
+    }
+}
 
-            else -> {
-                items(
-                    items = uiState.groups,
-                    key = { it.tag },
-                    contentType = { "GroupCard" },
-                ) { group ->
-                    ProxyGroupItem(
-                        group = group,
-                        isExpanded = uiState.expandedGroups.contains(group.tag),
-                        onToggleExpanded = { onToggleExpanded(group.tag) },
-                        onItemSelected = { itemTag -> onItemSelected(group.tag, itemTag) },
-                        onUrlTest = { onUrlTest(group.tag) },
-                        onItemUrlTest = { itemTag -> onUrlTest(itemTag) },
-                    )
-                }
-            }
+private val GroupCardTopShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+private val GroupCardBottomShape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)
+
+@Immutable
+private data class UrlTestPalette(
+    val good: Color,
+    val medium: Color,
+    val bad: Color,
+    val neutral: Color,
+) {
+    fun forDelay(delay: Int): Color = when {
+        delay <= 0 -> neutral
+        delay < 800 -> good
+        delay < 1500 -> medium
+        else -> bad
+    }
+}
+
+@Composable
+private fun rememberUrlTestPalette(): UrlTestPalette {
+    val darkTheme = isSystemInDarkTheme()
+    val neutral = MaterialTheme.colorScheme.onSurface.copy(alpha = if (darkTheme) 0.09f else 0.07f)
+    return remember(darkTheme, neutral) {
+        if (darkTheme) {
+            UrlTestPalette(
+                good = Color(0xFF7CB89E),
+                medium = Color(0xFFD3A45E),
+                bad = Color(0xFFDB8A62),
+                neutral = neutral,
+            )
+        } else {
+            UrlTestPalette(
+                good = Color(0xFF3D8168),
+                medium = Color(0xFFA8742F),
+                bad = Color(0xFFC25E32),
+                neutral = neutral,
+            )
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ProxyGroupItem(
+private fun GroupHeader(
     group: Group,
     isExpanded: Boolean,
+    isTesting: Boolean,
     onToggleExpanded: () -> Unit,
-    onItemSelected: (String) -> Unit,
-    onUrlTest: () -> Unit,
-    onItemUrlTest: (String) -> Unit,
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            // Header (clickable to expand/collapse)
-            Surface(
-                onClick = onToggleExpanded,
-                color = Color.Transparent,
-            ) {
-                ListItem(
-                    headlineContent = {
-                        Column {
-                            Text(
-                                text = group.tag,
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurface,
-                            )
-
-                            Spacer(modifier = Modifier.height(4.dp))
-
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            ) {
-                                Text(
-                                    text = Libbox.proxyDisplayType(group.type),
-                                    style = MaterialTheme.typography.titleSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-
-                                // Show selected item when collapsed
-                                AnimatedVisibility(
-                                    visible = !isExpanded && group.selected.isNotEmpty(),
-                                    enter = fadeIn(),
-                                    exit = fadeOut(),
-                                ) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                    ) {
-                                        Text(
-                                            text = "•",
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        )
-                                        Text(
-                                            text = group.selected,
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            fontWeight = FontWeight.Medium,
-                                            color = MaterialTheme.colorScheme.primary,
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    trailingContent = {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            // URL Test button
-                            AnimatedVisibility(
-                                visible = group.selectable,
-                                enter = slideInVertically() + fadeIn(),
-                                exit = slideOutVertically() + fadeOut(),
-                            ) {
-                                IconButton(
-                                    onClick = {
-                                        onUrlTest()
-                                    },
-                                    modifier = Modifier.size(40.dp),
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Speed,
-                                        contentDescription = stringResource(R.string.url_test),
-                                        modifier = Modifier.size(20.dp),
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                }
-                            }
-
-                            // Expand/Collapse indicator
-                            val rotationAngle by animateFloatAsState(
-                                targetValue = if (isExpanded) 180f else 0f,
-                                animationSpec = tween(300),
-                                label = "ExpandIcon",
-                            )
-
-                            Icon(
-                                imageVector = Icons.Default.ExpandMore,
-                                contentDescription = if (isExpanded) "Collapse" else "Expand",
-                                modifier =
-                                Modifier
-                                    .size(24.dp)
-                                    .graphicsLayer { rotationZ = rotationAngle },
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    },
-                    colors =
-                    ListItemDefaults.colors(
-                        containerColor = Color.Transparent,
-                    ),
-                )
-            }
-
-            // Expandable content
-            AnimatedVisibility(
-                visible = isExpanded && group.items.isNotEmpty(),
-                enter =
-                expandVertically(animationSpec = tween(300)) +
-                    fadeIn(
-                        animationSpec =
-                        tween(
-                            300,
-                        ),
-                    ),
-                exit =
-                shrinkVertically(animationSpec = tween(300)) +
-                    fadeOut(
-                        animationSpec =
-                        tween(
-                            300,
-                        ),
-                    ),
-            ) {
-                Column {
-                    HorizontalDivider(
-                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f),
-                        thickness = 1.dp,
-                    )
-
-                    // Proxy Items
-                    ProxyItemsList(
-                        items = group.items,
-                        selectedTag = group.selected,
-                        isSelectable = group.selectable,
-                        onItemSelected = onItemSelected,
-                        onItemUrlTest = onItemUrlTest,
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun ProxyItemsList(
-    items: List<GroupItem>,
-    selectedTag: String,
-    isSelectable: Boolean,
-    onItemSelected: (String) -> Unit,
-    onItemUrlTest: (String) -> Unit,
-) {
-    val itemsPerRow = 2
-    val chunkedItems =
-        remember(items) {
-            items.chunked(itemsPerRow)
-        }
-
-    Column(
-        modifier =
-        Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        chunkedItems.forEach { rowItems ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                rowItems.forEach { item ->
-                    key(item.tag) {
-                        Box(
-                            modifier = Modifier.weight(1f),
-                        ) {
-                            ProxyChip(
-                                item = item,
-                                isSelected = item.tag == selectedTag,
-                                isSelectable = isSelectable,
-                                onClick = { onItemSelected(item.tag) },
-                                onUrlTest = { onItemUrlTest(item.tag) },
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-                        }
-                    }
-                }
-                repeat(itemsPerRow - rowItems.size) {
-                    Box(modifier = Modifier.weight(1f))
-                }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
-@Composable
-private fun ProxyChip(
-    item: GroupItem,
-    isSelected: Boolean,
-    isSelectable: Boolean,
-    onClick: () -> Unit,
     onUrlTest: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    // Use simpler, faster animations
-    val animatedElevation by animateFloatAsState(
-        targetValue = if (isSelected) 6.dp.value else 1.dp.value,
-        animationSpec = tween(150),
-        label = "Elevation",
-    )
-
-    var showContextMenu by remember { mutableStateOf(false) }
-    val surfaceShape = RoundedCornerShape(8.dp)
-    val surfaceColor =
-        when {
-            isSelected -> MaterialTheme.colorScheme.primaryContainer
-            else -> MaterialTheme.colorScheme.surface
-        }
-    val surfaceBorder =
-        androidx.compose.foundation.BorderStroke(
-            width = if (isSelected) 2.dp else 1.dp,
-            color =
-            when {
-                isSelected -> MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
-                else -> MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
-            },
-        )
-
-    val content: @Composable () -> Unit = {
+    Surface(
+        onClick = onToggleExpanded,
+        modifier =
+        modifier
+            .fillMaxWidth(),
+        shape = GroupCardTopShape,
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
+    ) {
         Row(
-            modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.padding(start = 16.dp, end = 8.dp, top = 6.dp, bottom = 2.dp),
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Column(
+            Row(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                // First line: Name
                 Text(
-                    text = item.tag,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
-                    color =
-                    if (isSelected) {
-                        MaterialTheme.colorScheme.onPrimaryContainer
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    },
+                    text = group.tag,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false),
                 )
-
-                // Second line: Type on left, Latency on right
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    // Type
-                    Text(
-                        text = Libbox.proxyDisplayType(item.type),
-                        style = MaterialTheme.typography.labelSmall,
-                        color =
-                        if (isSelected) {
-                            MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-                        } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                        },
+                Text(
+                    text = group.displayType,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Surface(
+                shape = RoundedCornerShape(999.dp),
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
+            ) {
+                Text(
+                    text = "${group.items.size}",
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                )
+            }
+            IconButton(
+                onClick = onUrlTest,
+                enabled = !isTesting,
+                modifier = Modifier.size(40.dp),
+            ) {
+                if (isTesting) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(18.dp),
+                        strokeWidth = 2.dp,
                     )
-
-                    // Latency
-                    AnimatedVisibility(
-                        visible = item.urlTestTime > 0,
-                        enter = fadeIn(),
-                        exit = fadeOut(),
-                    ) {
-                        ProxyLatencyBadge(
-                            delay = item.urlTestDelay,
-                            isSelected = isSelected,
-                        )
-                    }
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.Speed,
+                        contentDescription = stringResource(R.string.url_test),
+                        modifier = Modifier.size(20.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                 }
             }
-        }
-    }
-
-    Box(modifier = modifier) {
-        Surface(
-            modifier =
-            Modifier
-                .fillMaxWidth()
-                .clip(surfaceShape)
-                .combinedClickable(
-                    onClick = { if (isSelectable) onClick() },
-                    onLongClick = { showContextMenu = true },
-                ),
-            shape = surfaceShape,
-            color = surfaceColor,
-            tonalElevation = animatedElevation.dp,
-            border = surfaceBorder,
-            content = content,
-        )
-        DropdownMenu(
-            expanded = showContextMenu,
-            onDismissRequest = { showContextMenu = false },
-        ) {
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.url_test)) },
-                leadingIcon = {
-                    Icon(
-                        Icons.Default.Speed,
-                        contentDescription = null,
-                    )
+            val rotationAngle by animateFloatAsState(
+                targetValue = if (isExpanded) 180f else 0f,
+                animationSpec = tween(200),
+                label = "ExpandIcon",
+            )
+            Icon(
+                imageVector = Icons.Default.ExpandMore,
+                contentDescription =
+                if (isExpanded) {
+                    stringResource(R.string.collapse)
+                } else {
+                    stringResource(R.string.expand)
                 },
-                onClick = {
-                    showContextMenu = false
-                    onUrlTest()
-                },
+                modifier =
+                Modifier
+                    .size(24.dp)
+                    .graphicsLayer { rotationZ = rotationAngle },
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }
 }
 
 @Composable
-private fun ProxyLatencyBadge(delay: Int, isSelected: Boolean, modifier: Modifier = Modifier) {
-    // Direct color calculation without animation for better performance
-    val colorScheme = MaterialTheme.colorScheme
-    val latencyColor =
-        remember(delay, isSelected) {
-            when {
-                delay < 100 -> {
-                    // Excellent - green/tertiary
-                    if (isSelected) {
-                        colorScheme.tertiary
-                    } else {
-                        colorScheme.tertiary.copy(alpha = 0.9f)
-                    }
-                }
-
-                delay < 300 -> {
-                    // Good - primary
-                    if (isSelected) {
-                        colorScheme.primary
-                    } else {
-                        colorScheme.primary.copy(alpha = 0.9f)
-                    }
-                }
-
-                delay < 500 -> {
-                    // Fair - secondary/warning
-                    if (isSelected) {
-                        colorScheme.secondary
-                    } else {
-                        colorScheme.secondary.copy(alpha = 0.9f)
-                    }
-                }
-
-                else -> {
-                    // Poor - error
-                    if (isSelected) {
-                        colorScheme.error
-                    } else {
-                        colorScheme.error.copy(alpha = 0.9f)
+private fun GroupDotsGrid(
+    group: Group,
+    palette: UrlTestPalette,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier =
+        modifier
+            .padding(bottom = 12.dp)
+            .fillMaxWidth(),
+        shape = GroupCardBottomShape,
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
+    ) {
+        BoxWithConstraints(
+            modifier =
+            Modifier
+                .clickable(onClick = onClick)
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp, top = 6.dp, bottom = 16.dp),
+        ) {
+            val dotSize = 11.dp
+            val dotSpacing = 4.dp
+            val columns = maxOf(1, ((maxWidth + dotSpacing) / (dotSize + dotSpacing)).toInt())
+            val rows = (group.items.size + columns - 1) / columns
+            val gridHeight = dotSize * rows + dotSpacing * maxOf(0, rows - 1)
+            Canvas(
+                modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(gridHeight),
+            ) {
+                val dotSizePx = dotSize.toPx()
+                val dotSpacingPx = dotSpacing.toPx()
+                val cornerRadius = CornerRadius(4.dp.toPx())
+                val selectedDotRadius = 2.dp.toPx()
+                group.items.forEachIndexed { index, item ->
+                    val x = (index % columns) * (dotSizePx + dotSpacingPx)
+                    val y = (index / columns) * (dotSizePx + dotSpacingPx)
+                    drawRoundRect(
+                        color = palette.forDelay(item.urlTestDelay),
+                        topLeft = Offset(x, y),
+                        size = Size(dotSizePx, dotSizePx),
+                        cornerRadius = cornerRadius,
+                    )
+                    if (item.tag == group.selected) {
+                        drawCircle(
+                            color = Color.White,
+                            radius = selectedDotRadius,
+                            center = Offset(x + dotSizePx / 2, y + dotSizePx / 2),
+                        )
                     }
                 }
             }
         }
+    }
+}
 
-    Text(
-        text = "${delay}ms",
-        style = MaterialTheme.typography.labelSmall,
-        fontWeight = FontWeight.SemiBold,
-        color = latencyColor,
-        modifier = modifier,
-    )
+@Composable
+private fun GroupItemRow(
+    row: List<GroupItem>,
+    selectedTag: String,
+    isSelectable: Boolean,
+    isLast: Boolean,
+    palette: UrlTestPalette,
+    onItemSelected: (String) -> Unit,
+    onItemUrlTest: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier =
+        modifier
+            .padding(bottom = if (isLast) 12.dp else 0.dp)
+            .fillMaxWidth(),
+        shape = if (isLast) GroupCardBottomShape else RectangleShape,
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
+    ) {
+        Row(
+            modifier =
+            Modifier.padding(
+                start = 16.dp,
+                end = 16.dp,
+                top = 5.dp,
+                bottom = if (isLast) 16.dp else 5.dp,
+            ),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            row.forEach { item ->
+                ProxyChip(
+                    item = item,
+                    isSelected = item.tag == selectedTag,
+                    isSelectable = isSelectable,
+                    palette = palette,
+                    onClick = { onItemSelected(item.tag) },
+                    onUrlTest = { onItemUrlTest(item.tag) },
+                    modifier = Modifier.weight(1f),
+                )
+            }
+            repeat(2 - row.size) {
+                Spacer(modifier = Modifier.weight(1f))
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun ProxyChip(
+    item: GroupItem,
+    isSelected: Boolean,
+    isSelectable: Boolean,
+    palette: UrlTestPalette,
+    onClick: () -> Unit,
+    onUrlTest: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var showContextMenu by remember { mutableStateOf(false) }
+    val chipShape = RoundedCornerShape(12.dp)
+    Box(modifier = modifier) {
+        Surface(
+            modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(chipShape)
+                .combinedClickable(
+                    onClick = { if (isSelectable) onClick() },
+                    onLongClick = { showContextMenu = true },
+                ),
+            shape = chipShape,
+            color =
+            if (isSelected) {
+                MaterialTheme.colorScheme.primaryContainer
+            } else {
+                MaterialTheme.colorScheme.surface
+            },
+        ) {
+            Column(
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+                Text(
+                    text = item.tag,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color =
+                    if (isSelected) {
+                        MaterialTheme.colorScheme.onPrimaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.onSurface
+                    },
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = item.displayType,
+                        style = MaterialTheme.typography.labelSmall,
+                        color =
+                        if (isSelected) {
+                            MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        },
+                    )
+                    if (item.urlTestDelay > 0) {
+                        Text(
+                            text = "${item.urlTestDelay}ms",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.SemiBold,
+                            color = palette.forDelay(item.urlTestDelay),
+                        )
+                    }
+                }
+            }
+        }
+        if (showContextMenu) {
+            DropdownMenu(
+                expanded = true,
+                onDismissRequest = { showContextMenu = false },
+            ) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.url_test)) },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Default.Speed,
+                            contentDescription = null,
+                        )
+                    },
+                    onClick = {
+                        showContextMenu = false
+                        onUrlTest()
+                    },
+                )
+            }
+        }
+    }
 }
 
 @Composable

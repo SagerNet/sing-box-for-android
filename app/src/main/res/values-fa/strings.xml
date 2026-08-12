@@ -84,7 +84,6 @@
     <string name="reset_order">بازنشانی ترتیب</string>
 
     <!-- Connections -->
-    <string name="empty_connections">هیچ اتصالی وجود ندارد</string>
     <string name="search_connections">جستجوی اتصال‌ها…</string>
     <string name="close_connections_confirm">همه اتصال‌ها بسته شوند؟</string>
     <string name="connection_state_all">همه</string>

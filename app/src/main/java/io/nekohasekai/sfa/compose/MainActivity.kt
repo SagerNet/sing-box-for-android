@@ -1286,6 +1286,18 @@ class MainActivity :
             }
         }
 
+        LaunchedEffect(dashboardUiState.hasGroups) {
+            if (!dashboardUiState.hasGroups) {
+                showGroupsSheet = false
+            }
+        }
+        val connectionsAvailable = if (isRemote) remoteConnected else currentServiceStatus == Status.Started
+        LaunchedEffect(connectionsAvailable) {
+            if (!connectionsAvailable) {
+                showConnectionsSheet = false
+            }
+        }
+
         // Groups ModalBottomSheet
         if (showGroupsSheet && !useNavigationRail) {
             val groupsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)

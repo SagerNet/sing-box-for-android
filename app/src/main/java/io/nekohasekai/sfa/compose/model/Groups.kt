@@ -1,21 +1,25 @@
 package io.nekohasekai.sfa.compose.model
 
 import androidx.compose.runtime.Immutable
+import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.OutboundGroup
 import io.nekohasekai.libbox.OutboundGroupItem
 import io.nekohasekai.libbox.OutboundGroupItemIterator
 
+@Immutable
 data class Group(
     val tag: String,
     val type: String,
+    val displayType: String,
     val selectable: Boolean,
-    var selected: String,
-    var isExpand: Boolean,
+    val selected: String,
+    val isExpand: Boolean,
     val items: List<GroupItem>,
 ) {
     constructor(item: OutboundGroup) : this(
         item.tag,
         item.type,
+        Libbox.proxyDisplayType(item.type),
         item.selectable,
         item.selected,
         item.isExpand,
@@ -24,10 +28,17 @@ data class Group(
 }
 
 @Immutable
-data class GroupItem(val tag: String, val type: String, val urlTestTime: Long, val urlTestDelay: Int) {
+data class GroupItem(
+    val tag: String,
+    val type: String,
+    val displayType: String,
+    val urlTestTime: Long,
+    val urlTestDelay: Int,
+) {
     constructor(item: OutboundGroupItem) : this(
         item.tag,
         item.type,
+        Libbox.proxyDisplayType(item.type),
         item.urlTestTime,
         item.urlTestDelay,
     )

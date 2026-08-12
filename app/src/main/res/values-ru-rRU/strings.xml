@@ -84,7 +84,6 @@
     <string name="reset_order">Сбросить порядок</string>
 
     <!-- Connections -->
-    <string name="empty_connections">Нет подключений</string>
     <string name="search_connections">Поиск подключений...</string>
     <string name="close_connections_confirm">Закрыть все соединения?</string>
     <string name="connection_state_all">Все</string>
