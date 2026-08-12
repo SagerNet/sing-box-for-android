@@ -38,63 +38,30 @@ class HookNetworkInterfaceGetName(private val classLoader: ClassLoader) : XHook 
     private val seq = AtomicInteger(1)
 
     override fun injectHook() {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            hookJniGetNameApi33Plus()
-        } else {
-            hookJniGetNameLegacy()
-        }
-    }
-
-    private fun hookJniGetNameApi33Plus() {
-        val vpnClass = findVpnClass()
-        val depsClass = XposedHelpers.findClass("${vpnClass.name}\$Dependencies", classLoader)
+        val vpnClass = XposedHelpers.findClass("com.android.server.connectivity.Vpn", classLoader)
         XposedHelpers.findAndHookMethod(
-            depsClass,
-            "jniGetName",
             vpnClass,
-            Int::class.javaPrimitiveType,
-            object : SafeMethodHook(SOURCE) {
-                override fun afterHook(param: MethodHookParam) {
-                    processJniGetNameResult(param)
-                }
-            },
-        )
-        HookErrorStore.i(SOURCE, "Hooked ${depsClass.name}.jniGetName (API 33+)")
-    }
-
-    private fun hookJniGetNameLegacy() {
-        val cls = findVpnClass()
-        XposedHelpers.findAndHookMethod(
-            cls,
             "jniGetName",
             Int::class.javaPrimitiveType,
             object : SafeMethodHook(SOURCE) {
                 override fun afterHook(param: MethodHookParam) {
-                    processJniGetNameResult(param)
+                    val result = param.result
+                    if (result !is String) {
+                        if (result != null) {
+                            HookErrorStore.e(SOURCE, "jniGetName returned unexpected type: ${result.javaClass.name}")
+                        }
+                        return
+                    }
+                    if (!PrivilegeSettingsStore.shouldRenameInterface()) return
+                    if (!result.startsWith("tun")) return
+                    val prefix = PrivilegeSettingsStore.interfacePrefix()
+                    val renamed = renameInterface(result, prefix) ?: return
+                    param.result = renamed
                 }
             },
         )
-        HookErrorStore.i(SOURCE, "Hooked ${cls.name}.jniGetName (legacy)")
+        HookErrorStore.i(SOURCE, "Hooked ${vpnClass.name}.jniGetName")
     }
-
-    private fun processJniGetNameResult(param: de.robv.android.xposed.XC_MethodHook.MethodHookParam) {
-        val result = param.result
-        if (result !is String) {
-            if (result != null) {
-                HookErrorStore.e(SOURCE, "jniGetName returned unexpected type: ${result.javaClass.name}")
-            }
-            return
-        }
-        if (!PrivilegeSettingsStore.shouldRenameInterface()) return
-        if (!isTunInterface(result)) return
-        val prefix = PrivilegeSettingsStore.interfacePrefix()
-        val renamed = renameInterface(result, prefix) ?: return
-        param.result = renamed
-    }
-
-    private fun findVpnClass(): Class<*> = XposedHelpers.findClass("com.android.server.connectivity.Vpn", classLoader)
-
-    private fun isTunInterface(name: String): Boolean = name.startsWith("tun")
 
     private fun renameInterface(oldName: String, prefix: String): String? {
         val oldIndex = getInterfaceIndex(oldName)
