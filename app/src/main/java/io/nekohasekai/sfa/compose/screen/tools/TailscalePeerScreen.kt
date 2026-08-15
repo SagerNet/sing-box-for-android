@@ -1,8 +1,14 @@
 package io.nekohasekai.sfa.compose.screen.tools
 
+import android.net.Uri
 import android.text.format.DateUtils
+import androidx.activity.compose.LocalActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.draganddrop.dragAndDropTarget
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,6 +33,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.Terminal
+import androidx.compose.material.icons.filled.UploadFile
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -47,9 +54,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draganddrop.DragAndDropEvent
+import androidx.compose.ui.draganddrop.DragAndDropTarget
+import androidx.compose.ui.draganddrop.mimeTypes
+import androidx.compose.ui.draganddrop.toAndroidDragEvent
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
@@ -58,16 +70,22 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.LineChart
+import io.nekohasekai.sfa.compose.base.GlobalEventBus
+import io.nekohasekai.sfa.compose.base.UiEvent
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.ktx.clipboardText
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun TailscalePeerScreen(
     navController: NavController,
@@ -138,6 +156,33 @@ fun TailscalePeerScreen(
     }
 
     var copiedAddress by remember { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
+
+    fun sendFiles(uris: List<Uri>, releasePermissions: () -> Unit = {}) {
+        if (uris.isEmpty()) {
+            releasePermissions()
+            return
+        }
+        scope.launch {
+            try {
+                val files = try {
+                    withContext(Dispatchers.IO) { TaildropSendManager.openURIs(uris) }
+                } finally {
+                    releasePermissions()
+                }
+                TaildropSendManager.send(endpointTag, peer.stableID, peer.displayName, files)
+                navController.navigate("tools/tailscale/${Uri.encode(endpointTag)}/taildrop")
+            } catch (e: Exception) {
+                GlobalEventBus.emit(UiEvent.ErrorMessage(e.message ?: e.toString()))
+            }
+        }
+    }
+
+    val sendFilesLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenMultipleDocuments(),
+    ) { uris ->
+        sendFiles(uris)
+    }
 
     Column(
         modifier = Modifier
@@ -321,6 +366,15 @@ fun TailscalePeerScreen(
                                     text = stringResource(R.string.tailscale_ping_direct),
                                     color = Color(0xFF4CAF50),
                                 )
+                            } else if (pingState.peerRelay.isNotEmpty()) {
+                                Text(
+                                    text = "\u21BB ",
+                                    color = Color(0xFF2196F3),
+                                )
+                                Text(
+                                    text = stringResource(R.string.tailscale_ping_peer_relay),
+                                    color = Color(0xFF2196F3),
+                                )
                             } else {
                                 Text(
                                     text = "\u21BB ",
@@ -345,7 +399,16 @@ fun TailscalePeerScreen(
                                 value = pingState.endpoint,
                             )
                         }
-                        if (!pingState.isDirect && pingState.derpRegionCode.isNotEmpty()) {
+                        if (!pingState.isDirect && pingState.peerRelay.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            DetailRow(
+                                label = stringResource(R.string.tailscale_ping_peer_relay_address),
+                                value = pingState.peerRelay,
+                            )
+                        }
+                        if (!pingState.isDirect && pingState.peerRelay.isEmpty() &&
+                            pingState.derpRegionCode.isNotEmpty()
+                        ) {
                             Spacer(modifier = Modifier.height(8.dp))
                             DetailRow(
                                 label = stringResource(R.string.tailscale_ping_derp_region),
@@ -432,6 +495,55 @@ fun TailscalePeerScreen(
                     }
                 }
             }
+        }
+
+        // Taildrop send zone (not for self peer)
+        val canSendFiles = peer.online && peer.canReceiveFiles && endpoint?.canShareFiles == true && !isSelf
+        if (canSendFiles) {
+            val activity = LocalActivity.current
+            var dropTargeted by remember { mutableStateOf(false) }
+            val dropTarget = remember {
+                object : DragAndDropTarget {
+                    override fun onEntered(event: DragAndDropEvent) {
+                        dropTargeted = true
+                    }
+
+                    override fun onExited(event: DragAndDropEvent) {
+                        dropTargeted = false
+                    }
+
+                    override fun onEnded(event: DragAndDropEvent) {
+                        dropTargeted = false
+                    }
+
+                    override fun onDrop(event: DragAndDropEvent): Boolean {
+                        dropTargeted = false
+                        val dragEvent = event.toAndroidDragEvent()
+                        val clipData = dragEvent.clipData ?: return false
+                        val uris = (0 until clipData.itemCount).mapNotNull { clipData.getItemAt(it).uri }
+                        if (uris.isEmpty()) {
+                            return false
+                        }
+                        val permissions = activity?.let {
+                            ActivityCompat.requestDragAndDropPermissions(it, dragEvent)
+                        }
+                        sendFiles(uris) { permissions?.release() }
+                        return true
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            SectionHeader(stringResource(R.string.taildrop))
+            TaildropSendZone(
+                targeted = dropTargeted,
+                onClick = { sendFilesLauncher.launch(arrayOf("*/*")) },
+                modifier = Modifier.dragAndDropTarget(
+                    shouldStartDragAndDrop = { event ->
+                        event.mimeTypes().isNotEmpty()
+                    },
+                    target = dropTarget,
+                ),
+            )
         }
 
         // Details section
@@ -523,7 +635,8 @@ fun TailscalePeerScreen(
             }
         }
 
-        if (peer.sshHostKeys.isNotEmpty() && peer.online && !isSelf && peer.tailscaleIPs.isNotEmpty()) {
+        val canSSH = peer.sshHostKeys.isNotEmpty() && peer.online && !isSelf && peer.tailscaleIPs.isNotEmpty()
+        if (canSSH) {
             Spacer(modifier = Modifier.height(16.dp))
             Card(
                 modifier = Modifier
@@ -559,7 +672,7 @@ fun TailscalePeerScreen(
                         .clip(RoundedCornerShape(12.dp))
                         .clickable {
                             navController.navigate(
-                                "tools/tailscale/${android.net.Uri.encode(endpointTag)}/peer/${android.net.Uri.encode(peerId)}/ssh",
+                                "tools/tailscale/${Uri.encode(endpointTag)}/peer/${Uri.encode(peerId)}/ssh",
                             )
                         },
                     colors = ListItemDefaults.colors(containerColor = Color.Transparent),
@@ -650,5 +763,47 @@ private fun AddressRow(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun TaildropSendZone(
+    targeted: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val color = if (targeted) {
+        MaterialTheme.colorScheme.primary
+    } else {
+        MaterialTheme.colorScheme.onSurfaceVariant
+    }
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(
+                if (targeted) {
+                    MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
+                } else {
+                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                },
+            )
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Icon(
+            imageVector = Icons.Default.UploadFile,
+            contentDescription = null,
+            tint = color,
+        )
+        Text(
+            text = stringResource(R.string.taildrop_drop_zone),
+            style = MaterialTheme.typography.bodyMedium,
+            color = color,
+            textAlign = TextAlign.Center,
+        )
     }
 }

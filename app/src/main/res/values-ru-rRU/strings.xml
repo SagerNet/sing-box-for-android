@@ -432,6 +432,7 @@
     <string name="content_description_pause_logs">Приостановить лог</string>
     <string name="content_description_collapse_search">Свернуть поиск</string>
     <string name="content_description_search_logs">Поиск в логе</string>
+    <string name="content_description_more_options">Дополнительные параметры</string>
     
     <!-- Tools -->
     <string name="title_tools">Инструменты</string>
@@ -486,8 +487,10 @@
     <string name="tailscale_ping_stop">Остановить</string>
     <string name="tailscale_ping_direct">Прямое соединение</string>
     <string name="tailscale_ping_derp">Соединение через DERP</string>
+    <string name="tailscale_ping_peer_relay">Соединение через одноранговый ретранслятор</string>
     <string name="tailscale_ping_endpoint">Конечная точка</string>
     <string name="tailscale_ping_derp_region">Регион DERP</string>
+    <string name="tailscale_ping_peer_relay_address">Одноранговый ретранслятор</string>
     <string name="tailscale_ping_connecting">Подключение…</string>
     <string name="tailscale_ping_no_data">Нет данных</string>
     <string name="tailscale_shared_in">Поделено</string>
@@ -630,4 +633,28 @@
     <string name="remote_unavailable">Недоступно</string>
     <string name="endpoint_globalprotect_sso_unsupported_android">Браузерная аутентификация GlobalProtect SAML не поддерживается на Android.</string>
     <string name="endpoint_browser_cookie_missing">Аутентификация в браузере завершена, но необходимый VPN cookie не получен.</string>
+
+    <!-- Taildrop -->
+    <plurals name="taildrop_file_count">
+        <item quantity="one">%1$d файл</item>
+        <item quantity="few">%1$d файла</item>
+        <item quantity="many">%1$d файлов</item>
+        <item quantity="other">%1$d файла</item>
+    </plurals>
+    <string name="taildrop_send">Отправка</string>
+    <string name="taildrop_receive">Получение</string>
+    <string name="taildrop_files">Файлы</string>
+    <string name="taildrop_from">от %1$s</string>
+    <string name="taildrop_to">кому %1$s</string>
+    <string name="taildrop_save">Сохранить</string>
+    <string name="taildrop_share">Поделиться</string>
+    <string name="taildrop_delete">Удалить</string>
+    <string name="taildrop_drop_zone">Перетащите файлы сюда, чтобы отправить, или коснитесь, чтобы выбрать</string>
+    <string name="taildrop_done">Готово</string>
+    <string name="taildrop_no_targets">Нет устройств, способных принимать файлы</string>
+    <string name="taildrop_no_files_selected">Файлы не выбраны</string>
+    <string name="taildrop_connecting">Подключение…</string>
+    <string name="taildrop_dismiss">Закрыть</string>
+    <string name="taildrop_open_app">Открыть sing-box</string>
+    <string name="taildrop_notification_title">Отправка файлов</string>
 </resources>

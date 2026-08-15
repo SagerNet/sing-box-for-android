@@ -426,6 +426,7 @@
     <string name="content_description_pause_logs">مکث لاگ‌ها</string>
     <string name="content_description_collapse_search">جمع کردن جستجو</string>
     <string name="content_description_search_logs">جستجوی لاگ‌ها</string>
+    <string name="content_description_more_options">گزینه‌های بیشتر</string>
 
     <!-- Tools -->
     <string name="title_tools">ابزارها</string>
@@ -480,8 +481,10 @@
     <string name="tailscale_ping_stop">توقف</string>
     <string name="tailscale_ping_direct">اتصال مستقیم</string>
     <string name="tailscale_ping_derp">اتصال از طریق DERP</string>
+    <string name="tailscale_ping_peer_relay">اتصال از طریق بازپخش همتا</string>
     <string name="tailscale_ping_endpoint">نقطه پایانی</string>
     <string name="tailscale_ping_derp_region">منطقه DERP</string>
+    <string name="tailscale_ping_peer_relay_address">بازپخش همتا</string>
     <string name="tailscale_ping_connecting">در حال اتصال…</string>
     <string name="tailscale_ping_no_data">بدون داده</string>
     <string name="tailscale_shared_in">به اشتراک گذاشته شده</string>
@@ -624,4 +627,26 @@
     <string name="remote_unavailable">در دسترس نیست</string>
     <string name="endpoint_globalprotect_sso_unsupported_android">احراز هویت مرورگر SAML در GlobalProtect در Android پشتیبانی نمی‌شود.</string>
     <string name="endpoint_browser_cookie_missing">احراز هویت مرورگر تکمیل شد، اما کوکی VPN موردنیاز دریافت نشد.</string>
+
+    <!-- Taildrop -->
+    <plurals name="taildrop_file_count">
+        <item quantity="one">%1$d فایل</item>
+        <item quantity="other">%1$d فایل</item>
+    </plurals>
+    <string name="taildrop_send">ارسال</string>
+    <string name="taildrop_receive">دریافت</string>
+    <string name="taildrop_files">فایل‌ها</string>
+    <string name="taildrop_from">از %1$s</string>
+    <string name="taildrop_to">به %1$s</string>
+    <string name="taildrop_save">ذخیره</string>
+    <string name="taildrop_share">اشتراک‌گذاری</string>
+    <string name="taildrop_delete">حذف</string>
+    <string name="taildrop_drop_zone">فایل‌ها را برای ارسال به اینجا بکشید یا برای انتخاب ضربه بزنید</string>
+    <string name="taildrop_done">انجام شد</string>
+    <string name="taildrop_no_targets">هیچ دستگاهی نمی‌تواند فایل دریافت کند</string>
+    <string name="taildrop_no_files_selected">فایلی انتخاب نشده است</string>
+    <string name="taildrop_connecting">در حال اتصال…</string>
+    <string name="taildrop_dismiss">بستن</string>
+    <string name="taildrop_open_app">باز کردن sing-box</string>
+    <string name="taildrop_notification_title">در حال ارسال فایل‌ها</string>
 </resources>

@@ -428,6 +428,7 @@
     <string name="content_description_pause_logs">Pause logs</string>
     <string name="content_description_collapse_search">Collapse search</string>
     <string name="content_description_search_logs">Search logs</string>
+    <string name="content_description_more_options">More options</string>
 
     <!-- Tools -->
     <string name="title_tools">Tools</string>
@@ -486,8 +487,10 @@
     <string name="tailscale_ping_stop">Stop</string>
     <string name="tailscale_ping_direct">Direct connection</string>
     <string name="tailscale_ping_derp">DERP-relayed connection</string>
+    <string name="tailscale_ping_peer_relay">Peer relay connection</string>
     <string name="tailscale_ping_endpoint">Endpoint</string>
     <string name="tailscale_ping_derp_region">DERP region</string>
+    <string name="tailscale_ping_peer_relay_address">Peer relay</string>
     <string name="tailscale_ping_connecting">Connecting…</string>
     <string name="tailscale_ping_no_data">No data</string>
     <string name="tailscale_shared_in">Shared in</string>
@@ -525,6 +528,29 @@
     <string name="tailscale_terminal_font_imported">Imported Fonts</string>
     <string name="tailscale_terminal_import_font">Import from File</string>
     <string name="tailscale_terminal_search_themes">Search themes</string>
+
+    <!-- Taildrop -->
+    <string name="taildrop" translatable="false">Taildrop</string>
+    <plurals name="taildrop_file_count">
+        <item quantity="one">%1$d file</item>
+        <item quantity="other">%1$d files</item>
+    </plurals>
+    <string name="taildrop_send">Send</string>
+    <string name="taildrop_receive">Receive</string>
+    <string name="taildrop_files">Files</string>
+    <string name="taildrop_to">to %1$s</string>
+    <string name="taildrop_from">from %1$s</string>
+    <string name="taildrop_save">Save</string>
+    <string name="taildrop_share">Share</string>
+    <string name="taildrop_delete">Delete</string>
+    <string name="taildrop_drop_zone">Drop files here to send, or tap to select</string>
+    <string name="taildrop_done">Done</string>
+    <string name="taildrop_no_targets">No devices can receive files</string>
+    <string name="taildrop_no_files_selected">No files selected</string>
+    <string name="taildrop_connecting">Connecting…</string>
+    <string name="taildrop_dismiss">Dismiss</string>
+    <string name="taildrop_open_app">Open sing-box</string>
+    <string name="taildrop_notification_title">Sending files</string>
 
     <!-- STUN Test -->
     <string name="stun_test">STUN Test</string>

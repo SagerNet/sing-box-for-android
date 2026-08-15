@@ -17,6 +17,7 @@ data class TailscalePingState(
     val isDirect: Boolean = false,
     val derpRegionCode: String = "",
     val endpoint: String = "",
+    val peerRelay: String = "",
     val error: String = "",
     val latencyHistory: List<Float> = emptyList(),
 )
@@ -65,6 +66,7 @@ class TailscalePingViewModel : BaseViewModel<TailscalePingState, Nothing>() {
                                                 isDirect = result.isDirect,
                                                 derpRegionCode = result.derpRegionCode,
                                                 endpoint = result.endpoint,
+                                                peerRelay = result.peerRelay,
                                                 error = "",
                                                 latencyHistory = newHistory,
                                             )

@@ -37,7 +37,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -57,7 +56,6 @@ import io.nekohasekai.sfa.compose.component.RemoteControlMenuItems
 import io.nekohasekai.sfa.compose.component.rememberRemoteServers
 import io.nekohasekai.sfa.compose.screen.usbip.USBIPStatusViewModel
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
-import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.terminal.TailscaleSSHPresentedSession
 import io.nekohasekai.sfa.utils.RemoteControlManager
@@ -66,7 +64,6 @@ import io.nekohasekai.sfa.utils.RemoteControlManager
 @Composable
 fun ToolsScreen(
     navController: NavController,
-    serviceStatus: Status = Status.Stopped,
     tailscaleViewModel: TailscaleStatusViewModel,
     sshSharedViewModel: TailscaleSSHSharedViewModel,
     usbIPViewModel: USBIPStatusViewModel,
@@ -107,44 +104,11 @@ fun ToolsScreen(
     val crashUnreadCount by CrashReportManager.unreadCount.collectAsState()
     val oomUnreadCount by OOMReportManager.unreadCount.collectAsState()
     val tailscaleState by tailscaleViewModel.uiState.collectAsState()
+    val taildropSendSessions by TaildropSendManager.sessions.collectAsState()
     val usbIPState by usbIPViewModel.uiState.collectAsState()
     val openConnectState by openConnectViewModel.uiState.collectAsState()
     val openVPNState by openVPNViewModel.uiState.collectAsState()
     val remoteServer by RemoteControlManager.remoteServer.collectAsState()
-
-    LaunchedEffect(remoteServer?.id) {
-        // Drop the previous target's subscription when switching between the
-        // local service and a remote server, or between two servers: a server
-        // without tailscale leaves no active stream to error out, so the
-        // subscription would stay stale without an explicit cancel.
-        tailscaleViewModel.cancel()
-        usbIPViewModel.cancel()
-        openConnectViewModel.cancel()
-        openVPNViewModel.cancel()
-        if (remoteServer != null || serviceStatus == Status.Started) {
-            tailscaleViewModel.subscribe()
-            usbIPViewModel.subscribe()
-            openConnectViewModel.subscribe()
-            openVPNViewModel.subscribe()
-        }
-    }
-
-    LaunchedEffect(serviceStatus) {
-        if (remoteServer != null) {
-            return@LaunchedEffect
-        }
-        if (serviceStatus == Status.Started) {
-            tailscaleViewModel.subscribe()
-            usbIPViewModel.subscribe()
-            openConnectViewModel.subscribe()
-            openVPNViewModel.subscribe()
-        } else {
-            tailscaleViewModel.cancel()
-            usbIPViewModel.cancel()
-            openConnectViewModel.cancel()
-            openVPNViewModel.cancel()
-        }
-    }
 
     Column(
         modifier = Modifier
@@ -201,6 +165,17 @@ fun ToolsScreen(
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.primary,
                                 )
+                            },
+                            trailingContent = {
+                                if (taildropSendSessions.any { it.endpointTag == endpoint.endpointTag && it.errorMessage != null }) {
+                                    Badge(containerColor = MaterialTheme.colorScheme.error) {
+                                        Text("!")
+                                    }
+                                } else if (endpoint.unreadFileCount > 0) {
+                                    Badge(containerColor = MaterialTheme.colorScheme.primary) {
+                                        Text("${endpoint.unreadFileCount}")
+                                    }
+                                }
                             },
                             modifier = Modifier
                                 .clip(shape)

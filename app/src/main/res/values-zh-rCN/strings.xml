@@ -425,6 +425,7 @@
     <string name="content_description_pause_logs">暂停日志</string>
     <string name="content_description_collapse_search">折叠搜索</string>
     <string name="content_description_search_logs">搜索日志</string>
+    <string name="content_description_more_options">更多选项</string>
 
     <!-- Tools -->
     <string name="title_tools">工具</string>
@@ -479,8 +480,10 @@
     <string name="tailscale_ping_stop">停止</string>
     <string name="tailscale_ping_direct">直接连接</string>
     <string name="tailscale_ping_derp">DERP 中继连接</string>
+    <string name="tailscale_ping_peer_relay">对等中继连接</string>
     <string name="tailscale_ping_endpoint">端点</string>
     <string name="tailscale_ping_derp_region">DERP 区域</string>
+    <string name="tailscale_ping_peer_relay_address">对等中继</string>
     <string name="tailscale_ping_connecting">连接中…</string>
     <string name="tailscale_ping_no_data">无数据</string>
     <string name="tailscale_shared_in">共享至此</string>
@@ -625,4 +628,25 @@
     <string name="endpoint_browser_navigation_failed">浏览器导航失败：%1$s</string>
     <string name="endpoint_browser_too_many_windows">认证页面打开了过多浏览器窗口。</string>
     <string name="endpoint_browser_profile_unavailable">此设备无法使用浏览器认证。</string>
+
+    <!-- Taildrop -->
+    <plurals name="taildrop_file_count">
+        <item quantity="other">%1$d 个文件</item>
+    </plurals>
+    <string name="taildrop_send">发送</string>
+    <string name="taildrop_receive">接收</string>
+    <string name="taildrop_files">文件</string>
+    <string name="taildrop_from">来自 %1$s</string>
+    <string name="taildrop_to">发送至 %1$s</string>
+    <string name="taildrop_save">保存</string>
+    <string name="taildrop_share">分享</string>
+    <string name="taildrop_delete">删除</string>
+    <string name="taildrop_drop_zone">拖放文件到此处发送，或轻点选择</string>
+    <string name="taildrop_done">完成</string>
+    <string name="taildrop_no_targets">没有可接收文件的设备</string>
+    <string name="taildrop_no_files_selected">未选择文件</string>
+    <string name="taildrop_connecting">正在连接…</string>
+    <string name="taildrop_dismiss">关闭</string>
+    <string name="taildrop_open_app">打开 sing-box</string>
+    <string name="taildrop_notification_title">正在发送文件</string>
 </resources>
