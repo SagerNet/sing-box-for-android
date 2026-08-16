@@ -257,22 +257,23 @@ private fun GroupsCardContent(
             else -> {
                 uiState.groups.forEach { group ->
                     val isExpanded = uiState.expandedGroups.contains(group.tag)
-                    val headerContent: @Composable () -> Unit = {
+                    val headerContent: @Composable (Modifier) -> Unit = { headerModifier ->
                         GroupHeader(
                             group = group,
                             isExpanded = isExpanded,
                             isTesting = uiState.testingGroups.contains(group.tag),
                             onToggleExpanded = { onToggleExpanded(group.tag) },
                             onUrlTest = { onUrlTest(group.tag) },
+                            modifier = headerModifier,
                         )
                     }
                     if (isExpanded) {
                         stickyHeader(key = "header:${group.tag}", contentType = "GroupHeader") {
-                            headerContent()
+                            headerContent(Modifier.animateItem())
                         }
                     } else {
                         item(key = "header:${group.tag}", contentType = "GroupHeader") {
-                            headerContent()
+                            headerContent(Modifier.animateItem())
                         }
                     }
                     if (isExpanded) {
