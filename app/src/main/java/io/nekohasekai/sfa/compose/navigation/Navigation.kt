@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import io.nekohasekai.sfa.compose.screen.configuration.NewProfileScreen
@@ -86,7 +85,7 @@ private val slideOutToLeft: AnimatedContentTransitionScope<*>.() -> androidx.com
 }
 
 @Composable
-fun SFANavHost(
+fun NavHost(
     navController: NavHostController,
     serviceStatus: Status = Status.Stopped,
     showStartFab: Boolean = false,
@@ -105,7 +104,7 @@ fun SFANavHost(
     openVPNStatusViewModel: OpenVPNStatusViewModel? = null,
     modifier: Modifier = Modifier,
 ) {
-    NavHost(
+    androidx.navigation.compose.NavHost(
         navController = navController,
         startDestination = Screen.Dashboard.route,
         modifier = modifier,

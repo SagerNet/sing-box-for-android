@@ -53,7 +53,6 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -103,12 +102,13 @@ import io.nekohasekai.sfa.compose.base.SelectableMessageDialog
 import io.nekohasekai.sfa.compose.base.UiEvent
 import io.nekohasekai.sfa.compose.component.RemoteStatusBar
 import io.nekohasekai.sfa.compose.component.ServiceStatusBar
+import io.nekohasekai.sfa.compose.component.SnackbarHost
 import io.nekohasekai.sfa.compose.component.UpdateAvailableDialog
 import io.nekohasekai.sfa.compose.component.UptimeText
 import io.nekohasekai.sfa.compose.model.Connection
+import io.nekohasekai.sfa.compose.navigation.NavHost
 import io.nekohasekai.sfa.compose.navigation.NewProfileArgs
 import io.nekohasekai.sfa.compose.navigation.ProfileRoutes
-import io.nekohasekai.sfa.compose.navigation.SFANavHost
 import io.nekohasekai.sfa.compose.navigation.Screen
 import io.nekohasekai.sfa.compose.navigation.bottomNavigationScreens
 import io.nekohasekai.sfa.compose.screen.configuration.ProfileImportHandler
@@ -125,7 +125,7 @@ import io.nekohasekai.sfa.compose.screen.tools.TaildropSendManager
 import io.nekohasekai.sfa.compose.screen.tools.TailscaleSSHSharedViewModel
 import io.nekohasekai.sfa.compose.screen.tools.TailscaleStatusViewModel
 import io.nekohasekai.sfa.compose.screen.usbip.USBIPStatusViewModel
-import io.nekohasekai.sfa.compose.theme.SFATheme
+import io.nekohasekai.sfa.compose.theme.Theme
 import io.nekohasekai.sfa.compose.topbar.LocalTopBarController
 import io.nekohasekai.sfa.compose.topbar.TopBarController
 import io.nekohasekai.sfa.compose.topbar.TopBarEntry
@@ -237,8 +237,8 @@ class MainActivity :
         handleIntent(intent)
 
         setContent {
-            SFATheme {
-                SFAApp()
+            Theme {
+                App()
             }
         }
     }
@@ -370,7 +370,7 @@ class MainActivity :
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun SFAApp() {
+    fun App() {
         val navController = rememberNavController()
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination
@@ -1022,7 +1022,7 @@ class MainActivity :
                 val showStatusBar = isRemote || serviceRunning || currentServiceStatus == Status.Stopping
                 val showStartFab = !isRemote && !serviceRunning && dashboardUiState.selectedProfileId != -1L
 
-                SFANavHost(
+                NavHost(
                     navController = navController,
                     serviceStatus = currentServiceStatus,
                     showStartFab = showStartFab,

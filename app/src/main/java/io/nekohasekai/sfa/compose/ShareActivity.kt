@@ -60,7 +60,7 @@ import io.nekohasekai.sfa.compose.screen.tools.TaildropSendProgress
 import io.nekohasekai.sfa.compose.screen.tools.TailscaleEndpointData
 import io.nekohasekai.sfa.compose.screen.tools.TailscalePeerData
 import io.nekohasekai.sfa.compose.screen.tools.TailscaleStatusViewModel
-import io.nekohasekai.sfa.compose.theme.SFATheme
+import io.nekohasekai.sfa.compose.theme.Theme
 import io.nekohasekai.sfa.constant.Alert
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.utils.RemoteControlManager
@@ -97,7 +97,7 @@ class ShareActivity :
             }
         }
         setContent {
-            SFATheme {
+            Theme {
                 ShareSheet()
             }
         }
