@@ -36,6 +36,7 @@ import io.nekohasekai.sfa.compose.screen.settings.RemoteControlScreen
 import io.nekohasekai.sfa.compose.screen.settings.ServiceSettingsScreen
 import io.nekohasekai.sfa.compose.screen.settings.SettingsScreen
 import io.nekohasekai.sfa.compose.screen.settings.TailscaleFontPickerScreen
+import io.nekohasekai.sfa.compose.screen.settings.TailscaleGhosttyConfigEditorScreen
 import io.nekohasekai.sfa.compose.screen.settings.TailscaleTerminalConfigScreen
 import io.nekohasekai.sfa.compose.screen.settings.TailscaleThemePickerScreen
 import io.nekohasekai.sfa.compose.screen.tools.CrashReportDetailScreen
@@ -254,7 +255,7 @@ fun NavHost(
             val usbIPViewModel: USBIPStatusViewModel = usbIPStatusViewModel ?: viewModel()
             val openConnectViewModel: OpenConnectStatusViewModel = openConnectStatusViewModel ?: viewModel()
             val openVPNViewModel: OpenVPNStatusViewModel = openVPNStatusViewModel ?: viewModel()
-            ToolsScreen(navController = navController, tailscaleViewModel = tailscaleViewModel, sshSharedViewModel = sshSharedViewModel, usbIPViewModel = usbIPViewModel, openConnectViewModel = openConnectViewModel, openVPNViewModel = openVPNViewModel)
+            ToolsScreen(navController = navController, tailscaleViewModel = tailscaleViewModel, sshSharedViewModel = sshSharedViewModel, usbIPViewModel = usbIPViewModel, openConnectViewModel = openConnectViewModel, openVPNViewModel = openVPNViewModel, showStatusBar = showStatusBar)
         }
 
         // Tools subscreens with slide animations
@@ -688,6 +689,18 @@ fun NavHost(
         ) { backStackEntry ->
             val isDarkStr = backStackEntry.arguments?.getString("isDark") ?: "false"
             TailscaleThemePickerScreen(navController = navController, isDark = isDarkStr == "true")
+        }
+
+        composable(
+            route = "settings/tailscale/config_editor/{isDark}",
+            arguments = listOf(navArgument("isDark") { type = NavType.StringType }),
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) { backStackEntry ->
+            val isDarkStr = backStackEntry.arguments?.getString("isDark") ?: "false"
+            TailscaleGhosttyConfigEditorScreen(navController = navController, isDark = isDarkStr == "true")
         }
 
         composable(

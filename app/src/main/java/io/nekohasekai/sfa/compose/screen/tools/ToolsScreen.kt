@@ -57,6 +57,7 @@ import io.nekohasekai.sfa.compose.component.rememberRemoteServers
 import io.nekohasekai.sfa.compose.screen.usbip.USBIPStatusViewModel
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.database.Settings
+import io.nekohasekai.sfa.terminal.DEFAULT_SSH_TERMINAL_TYPE
 import io.nekohasekai.sfa.terminal.TailscaleSSHPresentedSession
 import io.nekohasekai.sfa.utils.RemoteControlManager
 
@@ -69,6 +70,7 @@ fun ToolsScreen(
     usbIPViewModel: USBIPStatusViewModel,
     openConnectViewModel: OpenConnectStatusViewModel,
     openVPNViewModel: OpenVPNStatusViewModel,
+    showStatusBar: Boolean = false,
 ) {
     val remoteServers by rememberRemoteServers()
 
@@ -115,7 +117,7 @@ fun ToolsScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface)
             .verticalScroll(rememberScrollState())
-            .padding(vertical = 8.dp),
+            .padding(top = 8.dp, bottom = if (showStatusBar) STATUS_BAR_CONTENT_PADDING else 8.dp),
     ) {
         val tailscaleEndpoints = tailscaleState.endpoints
         val openConnectEndpoints = openConnectState.endpoints
@@ -426,6 +428,7 @@ fun ToolsScreen(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer,
                 ),
             ) {
+                val debugRowCount = 2
                 ListItem(
                     headlineContent = {
                         Text(
@@ -474,7 +477,7 @@ fun ToolsScreen(
                         }
                     },
                     modifier = Modifier
-                        .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
+                        .clip(endpointRowShape(1, debugRowCount))
                         .clickable { navController.navigate("tools/oom_report") },
                     colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                 )
@@ -482,6 +485,8 @@ fun ToolsScreen(
         }
     }
 }
+
+private val STATUS_BAR_CONTENT_PADDING = 74.dp
 
 private fun endpointRowShape(index: Int, count: Int): RoundedCornerShape = when {
     count == 1 -> RoundedCornerShape(12.dp)
@@ -499,12 +504,15 @@ internal fun handleSSHNavigation(
     val quickConnectPeers = Settings.tailscaleSSHQuickConnectPeers
     if (quickConnectPeers.contains(peer.stableID)) {
         val usernames = Settings.tailscaleSSHRememberedUsernames
+        val terminalTypes = Settings.tailscaleSSHRememberedTerminalTypes
         sshSharedViewModel.setPendingSession(
             TailscaleSSHPresentedSession(
                 endpointTag = endpointTag,
                 peerHostName = peer.hostName,
                 peerAddress = peer.tailscaleIPs.first(),
-                username = usernames[peer.stableID]?.takeIf { it.isNotBlank() } ?: "root",
+                username = usernames[peer.stableID]?.takeIf { it.isNotBlank() } ?: DEFAULT_SSH_USERNAME,
+                terminalType = terminalTypes[peer.stableID]?.takeIf { it.isNotBlank() }
+                    ?: DEFAULT_SSH_TERMINAL_TYPE,
                 hostKeys = peer.sshHostKeys,
             ),
         )

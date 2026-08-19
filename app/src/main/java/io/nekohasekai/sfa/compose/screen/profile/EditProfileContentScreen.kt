@@ -455,6 +455,7 @@ fun EditProfileContentScreen(
                         currentLineBackground = colorScheme.surfaceContainer.toArgb(),
                         cursor = colorScheme.primary.toArgb(),
                         matchedTextBackground = colorScheme.tertiary.copy(alpha = 0.35f).toArgb(),
+                        comment = colorScheme.onSurfaceVariant.toArgb(),
                         key = colorScheme.primary.toArgb(),
                         string = colorScheme.tertiary.toArgb(),
                         number = colorScheme.secondary.toArgb(),

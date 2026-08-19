@@ -1,22 +1,22 @@
 package io.nekohasekai.sfa.compose.screen.tools
 
-import android.content.Context
 import android.graphics.Typeface
-import android.view.KeyEvent
-import android.view.MotionEvent
-import android.view.inputmethod.InputMethodManager
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.MoreVert
@@ -51,23 +51,28 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.termux.terminal.TerminalSession
-import com.termux.terminal.TerminalSessionClient
-import com.termux.view.TerminalView
-import com.termux.view.TerminalViewClient
+import io.github.sagernet.libghostty.compose.GhosttyDialogs
+import io.github.sagernet.libghostty.compose.GhosttyExtraKeysBar
+import io.github.sagernet.libghostty.compose.GhosttyProgressIndicator
+import io.github.sagernet.libghostty.compose.GhosttyTerminal
+import io.github.sagernet.libghostty.compose.rememberGhosttyTerminalState
+import io.github.sagernet.libghostty.extras.GhosttyFontStore
+import io.github.sagernet.libghostty.extras.GhosttyThemeStore
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.database.Settings
-import io.nekohasekai.sfa.terminal.ImportedFontStore
+import io.nekohasekai.sfa.terminal.DEFAULT_SSH_TERMINAL_TYPE
+import io.nekohasekai.sfa.terminal.GhosttyCustomConfig
+import io.nekohasekai.sfa.terminal.ManagedSession
 import io.nekohasekai.sfa.terminal.TailscaleSSHPresentedSession
-import io.nekohasekai.sfa.terminal.TailscaleSSHTerminalSession
-import io.nekohasekai.sfa.terminal.TerminalColorSchemeLoader
-import io.nekohasekai.sfa.terminal.TerminalExtraKeysState
+import io.nekohasekai.sfa.terminal.TailscaleSSHSessionStore
+import io.nekohasekai.sfa.terminal.TerminalSessionPhase
+
+internal const val DEFAULT_SSH_USERNAME = "root"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,43 +81,30 @@ fun TailscaleSSHTerminalScreen(
     sharedViewModel: TailscaleSSHSharedViewModel,
     tailscaleViewModel: TailscaleStatusViewModel,
 ) {
-    val terminalViewModel: TailscaleSSHTerminalViewModel = viewModel()
-    val state by terminalViewModel.uiState.collectAsState()
-    val context = LocalContext.current
+    val sessionStore = TailscaleSSHSessionStore
+    val state by sessionStore.state.collectAsState()
     val isDark = isSystemInDarkTheme()
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    val terminalViewRef = remember { TerminalViewRef() }
-    val extraKeysState = remember { TerminalExtraKeysState() }
-    val sessionClient = remember { createSessionClient(terminalViewModel, terminalViewRef) }
+    val terminalState = rememberGhosttyTerminalState()
 
     LaunchedEffect(Unit) {
-        terminalViewModel.sessionClient = sessionClient
         val pending = sharedViewModel.consumePendingSession()
-        if (pending != null && state.sessions.isEmpty()) {
-            terminalViewModel.addSession(pending)
+        if (pending != null) {
+            sessionStore.addSession(pending)
         }
     }
 
     val activeSession = state.activeSession
-    val displayTitle = when {
-        activeSession == null -> ""
-        activeSession.terminalSession.phase == TailscaleSSHTerminalSession.Phase.CONNECTING ->
-            activeSession.presentedSession.peerHostName
-        else -> {
-            val termTitle = activeSession.terminalSession.title
-            if (termTitle.isNullOrBlank()) activeSession.presentedSession.peerHostName else termTitle
-        }
-    }
 
     var showSessionMenu by remember { mutableStateOf(false) }
     var expandedNewSession by remember { mutableStateOf(false) }
 
     val tailscaleState by tailscaleViewModel.uiState.collectAsState()
     val quickConnectPeerIDs = Settings.tailscaleSSHQuickConnectPeers
-    val otherQCPeers = remember(tailscaleState, quickConnectPeerIDs, activeSession) {
-        val currentAddress = activeSession?.presentedSession?.peerAddress
-        val currentEndpointTag = activeSession?.presentedSession?.endpointTag
+    val activePeerAddress = activeSession?.presentedSession?.peerAddress
+    val activeEndpointTag = activeSession?.presentedSession?.endpointTag
+    val otherQuickConnectPeers = remember(tailscaleState, quickConnectPeerIDs, activePeerAddress, activeEndpointTag) {
         tailscaleState.endpoints.flatMap { endpoint ->
             endpoint.userGroups.flatMap { group ->
                 group.peers.filter { peer ->
@@ -120,7 +112,7 @@ fun TailscaleSSHTerminalScreen(
                         peer.tailscaleIPs.isNotEmpty() &&
                         peer.id != endpoint.selfPeer?.id &&
                         quickConnectPeerIDs.contains(peer.stableID) &&
-                        !(endpoint.endpointTag == currentEndpointTag && peer.tailscaleIPs.firstOrNull() == currentAddress)
+                        !(endpoint.endpointTag == activeEndpointTag && peer.tailscaleIPs.firstOrNull() == activePeerAddress)
                 }.map { peer -> peer to endpoint.endpointTag }
             }
         }
@@ -128,7 +120,30 @@ fun TailscaleSSHTerminalScreen(
 
     OverrideTopBar {
         TopAppBar(
-            title = { Text(displayTitle, style = MaterialTheme.typography.titleMedium) },
+            title = {
+                Column {
+                    Text(
+                        if (activeSession != null) sessionTitle(activeSession) else "",
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    val workingDirectory = if (activeSession != null) {
+                        activeSession.terminalSession.workingDirectory.collectAsState().value
+                    } else {
+                        null
+                    }
+                    if (!workingDirectory.isNullOrEmpty()) {
+                        Text(
+                            workingDirectory,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                }
+            },
             navigationIcon = {
                 IconButton(onClick = {
                     keyboardController?.hide()
@@ -149,13 +164,13 @@ fun TailscaleSSHTerminalScreen(
                             expandedNewSession = false
                         },
                     ) {
-                        if (otherQCPeers.isEmpty()) {
+                        if (otherQuickConnectPeers.isEmpty()) {
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.tailscale_ssh_new_session)) },
                                 leadingIcon = { Icon(Icons.Default.Add, contentDescription = null) },
                                 onClick = {
                                     showSessionMenu = false
-                                    terminalViewModel.duplicateCurrentSession()
+                                    sessionStore.duplicateCurrentSession()
                                 },
                             )
                         } else {
@@ -182,12 +197,13 @@ fun TailscaleSSHTerminalScreen(
                                         onClick = {
                                             showSessionMenu = false
                                             expandedNewSession = false
-                                            terminalViewModel.duplicateCurrentSession()
+                                            sessionStore.duplicateCurrentSession()
                                         },
                                     )
                                 }
-                                otherQCPeers.forEach { (peer, endpointTag) ->
-                                    val usernames = Settings.tailscaleSSHRememberedUsernames
+                                val rememberedUsernames = Settings.tailscaleSSHRememberedUsernames
+                                val rememberedTerminalTypes = Settings.tailscaleSSHRememberedTerminalTypes
+                                otherQuickConnectPeers.forEach { (peer, endpointTag) ->
                                     DropdownMenuItem(
                                         text = {
                                             Text(
@@ -198,12 +214,15 @@ fun TailscaleSSHTerminalScreen(
                                         onClick = {
                                             showSessionMenu = false
                                             expandedNewSession = false
-                                            terminalViewModel.addSession(
+                                            sessionStore.addSession(
                                                 TailscaleSSHPresentedSession(
                                                     endpointTag = endpointTag,
                                                     peerHostName = peer.hostName,
                                                     peerAddress = peer.tailscaleIPs.first(),
-                                                    username = usernames[peer.stableID]?.takeIf { it.isNotBlank() } ?: "root",
+                                                    username = rememberedUsernames[peer.stableID]?.takeIf { it.isNotBlank() }
+                                                        ?: DEFAULT_SSH_USERNAME,
+                                                    terminalType = rememberedTerminalTypes[peer.stableID]?.takeIf { it.isNotBlank() }
+                                                        ?: DEFAULT_SSH_TERMINAL_TYPE,
                                                     hostKeys = peer.sshHostKeys,
                                                 ),
                                             )
@@ -212,23 +231,30 @@ fun TailscaleSSHTerminalScreen(
                                 }
                             }
                         }
+                        if (activeSession != null) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.tailscale_ssh_close_session)) },
+                                leadingIcon = { Icon(Icons.Default.Close, contentDescription = null) },
+                                onClick = {
+                                    showSessionMenu = false
+                                    expandedNewSession = false
+                                    sessionStore.removeSession(activeSession.id)
+                                    if (sessionStore.state.value.sessions.isEmpty()) {
+                                        keyboardController?.hide()
+                                        navController.navigateUp()
+                                    }
+                                },
+                            )
+                        }
                         if (state.sessions.size > 1) {
                             HorizontalDivider()
                             state.sessions.forEach { session ->
                                 val isActive = session.id == state.activeSessionId
-                                val sessionTitle = when {
-                                    session.terminalSession.phase == TailscaleSSHTerminalSession.Phase.CONNECTING ->
-                                        session.presentedSession.peerHostName
-                                    else -> {
-                                        val termTitle = session.terminalSession.title
-                                        if (termTitle.isNullOrBlank()) session.presentedSession.peerHostName else termTitle
-                                    }
-                                }
                                 DropdownMenuItem(
-                                    text = { Text(sessionTitle) },
+                                    text = { Text(sessionTitle(session)) },
                                     onClick = {
                                         showSessionMenu = false
-                                        terminalViewModel.switchSession(session.id)
+                                        sessionStore.switchSession(session.id)
                                     },
                                     leadingIcon = {
                                         RadioButton(
@@ -245,67 +271,77 @@ fun TailscaleSSHTerminalScreen(
         )
     }
 
-    Column(modifier = Modifier.fillMaxSize().imePadding()) {
+    Column(
+        modifier = Modifier.fillMaxSize()
+            .consumeWindowInsets(WindowInsets.navigationBars)
+            .imePadding(),
+    ) {
         if (activeSession != null) {
+            GhosttyProgressIndicator(
+                activeSession.terminalSession,
+                modifier = Modifier.fillMaxWidth(),
+            )
             Box(modifier = Modifier.weight(1f)) {
+                val context = LocalContext.current
                 val themeName = if (isDark) Settings.tailscaleSSHDarkTheme else Settings.tailscaleSSHLightTheme
-                val fontSize = Settings.tailscaleSSHFontSize
-                val fontFamily = Settings.tailscaleSSHFontFamily
-                val customFontPath = Settings.tailscaleSSHCustomFontPath
+                val customConfig = remember(themeName, isDark) {
+                    if (themeName.isEmpty()) {
+                        GhosttyCustomConfig.parse(
+                            if (isDark) Settings.tailscaleSSHDarkConfig else Settings.tailscaleSSHLightConfig,
+                        )
+                    } else {
+                        null
+                    }
+                }
+                val theme = remember(themeName, isDark, customConfig) {
+                    customConfig?.theme ?: GhosttyThemeStore.loadThemeOrDefault(context, themeName, isDark)
+                }
+                val typeface = remember(customConfig) {
+                    if (Settings.tailscaleSSHFontFollowTheme) {
+                        customConfig?.fontFamily
+                            ?.takeIf { it.isNotBlank() }
+                            ?.let { Typeface.create(it, Typeface.NORMAL) }
+                    } else {
+                        GhosttyFontStore.resolveTypeface(
+                            Settings.tailscaleSSHFontFamily,
+                            Settings.tailscaleSSHCustomFontPath,
+                        )
+                    } ?: Typeface.MONOSPACE
+                }
+                val fontSize = remember { Settings.tailscaleSSHFontSize }
 
-                AndroidView(
-                    factory = { ctx ->
-                        TerminalColorSchemeLoader.applyScheme(ctx, themeName)
-                        TerminalView(ctx, null).apply {
-                            isFocusable = true
-                            isFocusableInTouchMode = true
-                            terminalViewRef.view = this
-                            setTerminalViewClient(
-                                createViewClient(ctx, this, extraKeysState) {
-                                    val active = terminalViewModel.uiState.value.activeSession
-                                    if (active != null) {
-                                        terminalViewModel.removeSession(active.id)
-                                        if (terminalViewModel.uiState.value.sessions.isEmpty()) {
-                                            keyboardController?.hide()
-                                            navController.navigateUp()
-                                        }
-                                    }
-                                },
-                            )
-                            attachSession(activeSession.terminalSession)
-                            setTextSize(fontSize)
-                            val typeface = resolveTypeface(fontFamily, customFontPath)
-                            if (typeface != null) {
-                                setTypeface(typeface)
-                            }
-                            post {
-                                requestFocus()
-                                val imm = ctx.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                                imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
-                            }
-                        }
-                    },
-                    update = { view ->
-                        if (view.currentSession !== activeSession.terminalSession) {
-                            TerminalColorSchemeLoader.applyScheme(context, themeName)
-                            view.attachSession(activeSession.terminalSession)
-                            view.onScreenUpdated()
-                        }
-                    },
+                GhosttyTerminal(
+                    session = activeSession.terminalSession,
+                    state = terminalState,
                     modifier = Modifier.fillMaxSize(),
+                    theme = theme,
+                    darkColorScheme = isDark,
+                    typeface = typeface,
+                    fontSizeSp = fontSize.toFloat(),
+                    onFontSizeChanged = { Settings.tailscaleSSHFontSize = it.toInt() },
+                    onFinishedSessionKey = {
+                        val active = sessionStore.state.value.activeSession
+                        if (active != null) {
+                            sessionStore.removeSession(active.id)
+                            if (sessionStore.state.value.sessions.isEmpty()) {
+                                keyboardController?.hide()
+                                navController.navigateUp()
+                            }
+                        }
+                    },
                 )
 
-                val terminalPhase = activeSession.terminalSession.phase
-                val banner = activeSession.terminalSession.authBanner
-                if (terminalPhase == TailscaleSSHTerminalSession.Phase.CONNECTING ||
-                    (terminalPhase == TailscaleSSHTerminalSession.Phase.FINISHED && !banner.isNullOrBlank())
+                val terminalPhase = activeSession.phase.collectAsState().value
+                val banner = activeSession.banner.collectAsState().value
+                if (terminalPhase == TerminalSessionPhase.CONNECTING ||
+                    (terminalPhase == TerminalSessionPhase.FINISHED && !banner.isNullOrBlank())
                 ) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center,
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            if (terminalPhase == TailscaleSSHTerminalSession.Phase.CONNECTING) {
+                            if (terminalPhase == TerminalSessionPhase.CONNECTING) {
                                 CircularProgressIndicator()
                                 Text(
                                     stringResource(R.string.tailscale_ssh_connecting),
@@ -335,9 +371,8 @@ fun TailscaleSSHTerminalScreen(
                     }
                 }
             }
-            TerminalExtraKeysBar(
-                terminalView = terminalViewRef.view,
-                extraKeysState = extraKeysState,
+            GhosttyExtraKeysBar(
+                terminalState,
                 modifier = Modifier.fillMaxWidth(),
             )
         } else if (state.sessions.isEmpty()) {
@@ -353,6 +388,8 @@ fun TailscaleSSHTerminalScreen(
         }
     }
 
+    GhosttyDialogs(terminalState)
+
     DisposableEffect(Unit) {
         onDispose {
             keyboardController?.hide()
@@ -360,8 +397,14 @@ fun TailscaleSSHTerminalScreen(
     }
 }
 
-private class TerminalViewRef {
-    var view: TerminalView? = null
+@Composable
+private fun sessionTitle(session: ManagedSession): String {
+    val phase = session.phase.collectAsState().value
+    val terminalTitle = session.terminalSession.title.collectAsState().value
+    if (phase == TerminalSessionPhase.CONNECTING || terminalTitle.isNullOrBlank()) {
+        return session.presentedSession.peerHostName
+    }
+    return terminalTitle
 }
 
 private val bannerUrlRegex = Regex("""https?://\S+""")
@@ -386,109 +429,4 @@ private fun bannerAnnotatedString(text: String, linkColor: Color) = buildAnnotat
     if (lastIndex < text.length) {
         append(text.substring(lastIndex))
     }
-}
-
-private fun resolveTypeface(fontFamily: String, customFontPath: String): Typeface? {
-    if (customFontPath.isNotBlank()) {
-        val typeface = ImportedFontStore.loadTypeface(customFontPath)
-        if (typeface != null) return typeface
-    }
-    if (fontFamily.isNotBlank()) {
-        return Typeface.create(fontFamily, Typeface.NORMAL)
-    }
-    return null
-}
-
-private fun createSessionClient(viewModel: TailscaleSSHTerminalViewModel, viewRef: TerminalViewRef): TerminalSessionClient = object : TerminalSessionClient {
-    override fun onTextChanged(changedSession: TerminalSession) {
-        viewRef.view?.onScreenUpdated()
-    }
-    override fun onTitleChanged(changedSession: TerminalSession) {
-        viewModel.onTitleChanged()
-    }
-    override fun onSessionFinished(finishedSession: TerminalSession) {
-        val state = viewModel.uiState.value
-        if (state.sessions.size > 1) {
-            val managed = state.sessions.firstOrNull { it.terminalSession === finishedSession }
-            if (managed != null) {
-                if (managed.id == state.activeSessionId) {
-                    val sshSession = finishedSession as TailscaleSSHTerminalSession
-                    if (sshSession.getSSHExitCode() != 0) {
-                        return
-                    }
-                }
-                viewModel.removeSession(managed.id)
-            }
-        }
-    }
-    override fun onCopyTextToClipboard(session: TerminalSession, text: String) {}
-    override fun onPasteTextFromClipboard(session: TerminalSession?) {}
-    override fun onBell(session: TerminalSession) {}
-    override fun onColorsChanged(session: TerminalSession) {}
-    override fun onTerminalCursorStateChange(state: Boolean) {}
-    override fun setTerminalShellPid(session: TerminalSession, pid: Int) {}
-    override fun getTerminalCursorStyle(): Int = 0
-    override fun logError(tag: String, message: String) {}
-    override fun logWarn(tag: String, message: String) {}
-    override fun logInfo(tag: String, message: String) {}
-    override fun logDebug(tag: String, message: String) {}
-    override fun logVerbose(tag: String, message: String) {}
-    override fun logStackTraceWithMessage(tag: String, message: String, e: Exception) {}
-    override fun logStackTrace(tag: String, e: Exception) {}
-}
-
-private fun createViewClient(context: Context, terminalView: TerminalView, extraKeysState: TerminalExtraKeysState, onDismissFinishedSession: () -> Unit): TerminalViewClient = object : TerminalViewClient {
-    override fun onScale(scale: Float): Float {
-        if (scale < 0.9f || scale > 1.1f) {
-            val increase = scale > 1f
-            var currentSize = Settings.tailscaleSSHFontSize
-            currentSize = if (increase) {
-                (currentSize + 1).coerceAtMost(48)
-            } else {
-                (currentSize - 1).coerceAtLeast(8)
-            }
-            Settings.tailscaleSSHFontSize = currentSize
-            terminalView.setTextSize(currentSize)
-            return 1.0f
-        }
-        return scale
-    }
-    override fun onSingleTapUp(e: MotionEvent) {
-        terminalView.requestFocus()
-        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(terminalView, 0)
-    }
-    override fun shouldBackButtonBeMappedToEscape(): Boolean = false
-    override fun shouldEnforceCharBasedInput(): Boolean = true
-    override fun shouldUseCtrlSpaceWorkaround(): Boolean = false
-    override fun isTerminalViewSelected(): Boolean = true
-    override fun copyModeChanged(copyMode: Boolean) {}
-    override fun onKeyDown(keyCode: Int, e: KeyEvent, session: TerminalSession): Boolean {
-        if (!session.isRunning) {
-            onDismissFinishedSession()
-            return true
-        }
-        return false
-    }
-    override fun onKeyUp(keyCode: Int, e: KeyEvent): Boolean = false
-    override fun onLongPress(event: MotionEvent): Boolean = false
-    override fun readControlKey(): Boolean = extraKeysState.isCtrlActive
-    override fun readAltKey(): Boolean = extraKeysState.isAltActive
-    override fun readShiftKey(): Boolean = false
-    override fun readFnKey(): Boolean = false
-    override fun onCodePoint(codePoint: Int, ctrlDown: Boolean, session: TerminalSession): Boolean {
-        if (!session.isRunning) {
-            onDismissFinishedSession()
-            return true
-        }
-        return false
-    }
-    override fun onEmulatorSet() {}
-    override fun logError(tag: String, message: String) {}
-    override fun logWarn(tag: String, message: String) {}
-    override fun logInfo(tag: String, message: String) {}
-    override fun logDebug(tag: String, message: String) {}
-    override fun logVerbose(tag: String, message: String) {}
-    override fun logStackTraceWithMessage(tag: String, message: String, e: Exception) {}
-    override fun logStackTrace(tag: String, e: Exception) {}
 }

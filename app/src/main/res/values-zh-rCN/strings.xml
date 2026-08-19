@@ -498,28 +498,42 @@
     <string name="tailscale_ssh_connect">通过 SSH 连接</string>
     <string name="tailscale_ssh_options">SSH 选项</string>
     <string name="tailscale_ssh_username">用户名</string>
+    <string name="tailscale_ssh_terminal_type">终端类型</string>
     <string name="tailscale_ssh_remember_options">记住 SSH 选项</string>
     <string name="tailscale_ssh_quick_connect">快速连接</string>
     <string name="tailscale_ssh_quick_connect_description">启用后，你可以通过工具中 Tailscale 条目和节点列表中节点条目的上下文菜单（长按）快速连接到此节点。\n\n当通过 SSH 连接到其他节点时，此节点也会出现在新建会话菜单中。</string>
-    <string name="tailscale_ssh_terminal_hint">你可以在设置 → Termux 配置中自定义终端外观。</string>
+    <string name="tailscale_ssh_terminal_hint">你可以在设置 → Ghostty 配置中自定义终端外观。</string>
     <string name="tailscale_ssh_connect_button">连接</string>
     <string name="tailscale_ssh_connecting">连接中…</string>
     <string name="tailscale_ssh_no_sessions">无活动会话</string>
+    <string name="terminal_session_ended">会话已结束</string>
+    <string name="terminal_press_any_key">按任意键</string>
     <string name="tailscale_ssh_new_session">新建会话</string>
+    <string name="tailscale_ssh_close_session">关闭会话</string>
+    <string name="terminal_notification_channel">终端通知</string>
 
     <!-- Terminal Configuration -->
-    <string name="tailscale_terminal_config">Termux 配置</string>
-    <string name="tailscale_terminal_color_theme">颜色主题</string>
+    <string name="tailscale_terminal_config">Ghostty 配置</string>
     <string name="tailscale_terminal_light_theme">浅色主题</string>
     <string name="tailscale_terminal_dark_theme">深色主题</string>
     <string name="tailscale_terminal_font_config">字体</string>
     <string name="tailscale_terminal_font">字体</string>
     <string name="tailscale_terminal_font_size">字号</string>
-    <string name="tailscale_terminal_font_default">默认</string>
     <string name="tailscale_terminal_font_system">系统字体</string>
     <string name="tailscale_terminal_font_imported">已导入的字体</string>
     <string name="tailscale_terminal_import_font">从文件导入</string>
+    <string name="tailscale_terminal_manage_fonts">管理已导入的字体</string>
+    <string name="tailscale_terminal_manage_fonts_done">完成</string>
     <string name="tailscale_terminal_search_themes">搜索主题</string>
+    <string name="tailscale_terminal_light_config">浅色配置</string>
+    <string name="tailscale_terminal_dark_config">深色配置</string>
+    <string name="tailscale_terminal_theme">主题</string>
+    <string name="tailscale_terminal_custom_config">自定义配置</string>
+    <string name="tailscale_terminal_edit_custom_config">编辑自定义配置</string>
+    <string name="tailscale_terminal_light_custom_config">浅色自定义配置</string>
+    <string name="tailscale_terminal_dark_custom_config">深色自定义配置</string>
+    <string name="tailscale_terminal_font_follow_theme">跟随主题</string>
+    <string name="tailscale_terminal_import_config">从文件导入</string>
 
     <string name="stun_test">STUN 测试</string>
     <string name="stun_server">服务器</string>

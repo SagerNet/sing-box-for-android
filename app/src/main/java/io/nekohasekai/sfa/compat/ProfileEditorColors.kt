@@ -9,6 +9,7 @@ data class ProfileEditorColors(
     val currentLineBackground: Int,
     val cursor: Int,
     val matchedTextBackground: Int,
+    val comment: Int,
     val key: Int,
     val string: Int,
     val number: Int,

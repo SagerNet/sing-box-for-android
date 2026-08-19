@@ -505,28 +505,40 @@
     <string name="tailscale_ssh_connect">Подключение по SSH</string>
     <string name="tailscale_ssh_options">Параметры SSH</string>
     <string name="tailscale_ssh_username">Имя пользователя</string>
+    <string name="tailscale_ssh_terminal_type">Тип терминала</string>
     <string name="tailscale_ssh_remember_options">Запомнить параметры SSH</string>
     <string name="tailscale_ssh_quick_connect">Быстрое подключение</string>
     <string name="tailscale_ssh_quick_connect_description">Если включено, вы можете быстро подключиться к этому узлу через контекстное меню (долгое нажатие) записи Tailscale в инструментах и записей узлов в списке узлов.\n\nЭтот узел также появится в меню «Новая сессия» при подключении к другим узлам по SSH.</string>
-    <string name="tailscale_ssh_terminal_hint">Вы можете настроить внешний вид терминала в разделе Параметры → Конфигурация Termux.</string>
+    <string name="tailscale_ssh_terminal_hint">Вы можете настроить внешний вид терминала в разделе Параметры → Конфигурация Ghostty.</string>
     <string name="tailscale_ssh_connect_button">Подключение</string>
     <string name="tailscale_ssh_connecting">Подключение…</string>
     <string name="tailscale_ssh_no_sessions">Нет активных сессий</string>
+    <string name="terminal_session_ended">Сеанс завершён</string>
+    <string name="terminal_press_any_key">нажмите любую клавишу</string>
     <string name="tailscale_ssh_new_session">Новая сессия</string>
 
     <!-- Terminal Configuration -->
-    <string name="tailscale_terminal_config">Конфигурация Termux</string>
-    <string name="tailscale_terminal_color_theme">Цветовая тема</string>
+    <string name="tailscale_terminal_config">Конфигурация Ghostty</string>
     <string name="tailscale_terminal_light_theme">Светлая тема</string>
     <string name="tailscale_terminal_dark_theme">Тёмная тема</string>
     <string name="tailscale_terminal_font_config">Шрифт</string>
     <string name="tailscale_terminal_font">Семейство шрифтов</string>
     <string name="tailscale_terminal_font_size">Размер шрифта</string>
-    <string name="tailscale_terminal_font_default">По умолчанию</string>
     <string name="tailscale_terminal_font_system">Системные шрифты</string>
     <string name="tailscale_terminal_font_imported">Импортированные шрифты</string>
     <string name="tailscale_terminal_import_font">Импорт из файла</string>
+    <string name="tailscale_terminal_manage_fonts">Управление импортированными шрифтами</string>
+    <string name="tailscale_terminal_manage_fonts_done">Готово</string>
     <string name="tailscale_terminal_search_themes">Поиск тем</string>
+    <string name="tailscale_terminal_light_config">Светлая конфигурация</string>
+    <string name="tailscale_terminal_dark_config">Тёмная конфигурация</string>
+    <string name="tailscale_terminal_theme">Тема</string>
+    <string name="tailscale_terminal_custom_config">Пользовательская конфигурация</string>
+    <string name="tailscale_terminal_edit_custom_config">Изменить пользовательскую конфигурацию</string>
+    <string name="tailscale_terminal_light_custom_config">Светлая пользовательская конфигурация</string>
+    <string name="tailscale_terminal_dark_custom_config">Тёмная пользовательская конфигурация</string>
+    <string name="tailscale_terminal_font_follow_theme">Следовать теме</string>
+    <string name="tailscale_terminal_import_config">Импорт из файла</string>
 
     <string name="stun_test">STUN-тест</string>
     <string name="stun_server">Сервер</string>

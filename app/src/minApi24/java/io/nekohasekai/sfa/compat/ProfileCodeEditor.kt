@@ -18,7 +18,7 @@ import io.github.rosemoe.sora.widget.EditorSearcher
 import io.github.rosemoe.sora.widget.component.EditorAutoCompletion
 import io.github.rosemoe.sora.widget.schemes.EditorColorScheme
 
-class ProfileCodeEditor(context: Context) {
+class ProfileCodeEditor(context: Context, private val syntax: CodeEditorSyntax = CodeEditorSyntax.JSON) {
 
     companion object {
         private const val JSON_HIGHLIGHTS = """
@@ -46,7 +46,9 @@ class ProfileCodeEditor(context: Context) {
     }
 
     init {
-        ConfigSchema.preload()
+        if (syntax == CodeEditorSyntax.JSON) {
+            ConfigSchema.preload()
+        }
     }
 
     var onTextChanged: (() -> Unit)? = null
@@ -71,12 +73,16 @@ class ProfileCodeEditor(context: Context) {
                 InsetDrawable(scrollbarThumb, (6 * context.resources.displayMetrics.density).toInt(), 0, 0, 0),
             )
             setEditorLanguage(
-                ConfigJsonLanguage(TsLanguageSpec(TSLanguageJson.getInstance(), JSON_HIGHLIGHTS, JSON_BLOCKS, JSON_BRACKETS)) {
-                    TextStyle.makeStyle(EditorColorScheme.LITERAL) applyTo "string"
-                    TextStyle.makeStyle(EditorColorScheme.ATTRIBUTE_NAME) applyTo "string.special.key"
-                    TextStyle.makeStyle(EditorColorScheme.ATTRIBUTE_VALUE) applyTo "number"
-                    TextStyle.makeStyle(EditorColorScheme.KEYWORD, true) applyTo "constant.builtin"
-                    TextStyle.makeStyle(EditorColorScheme.OPERATOR) applyTo "escape"
+                if (syntax == CodeEditorSyntax.GHOSTTY_CONFIG) {
+                    GhosttyConfigLanguage()
+                } else {
+                    ConfigJsonLanguage(TsLanguageSpec(TSLanguageJson.getInstance(), JSON_HIGHLIGHTS, JSON_BLOCKS, JSON_BRACKETS)) {
+                        TextStyle.makeStyle(EditorColorScheme.LITERAL) applyTo "string"
+                        TextStyle.makeStyle(EditorColorScheme.ATTRIBUTE_NAME) applyTo "string.special.key"
+                        TextStyle.makeStyle(EditorColorScheme.ATTRIBUTE_VALUE) applyTo "number"
+                        TextStyle.makeStyle(EditorColorScheme.KEYWORD, true) applyTo "constant.builtin"
+                        TextStyle.makeStyle(EditorColorScheme.OPERATOR) applyTo "escape"
+                    }
                 },
             )
             getComponent(EditorAutoCompletion::class.java).popup.setOnDismissListener {
@@ -198,6 +204,7 @@ class ProfileCodeEditor(context: Context) {
         scheme.setColor(EditorColorScheme.BLOCK_LINE_CURRENT, colors.cursor)
         scheme.setColor(EditorColorScheme.SCROLL_BAR_TRACK, 0)
         scrollbarThumb.setColor(colors.foreground and 0x00FFFFFF or 0x50000000)
+        scheme.setColor(EditorColorScheme.COMMENT, colors.comment)
         scheme.setColor(EditorColorScheme.ATTRIBUTE_NAME, colors.key)
         scheme.setColor(EditorColorScheme.LITERAL, colors.string)
         scheme.setColor(EditorColorScheme.ATTRIBUTE_VALUE, colors.number)
@@ -255,7 +262,7 @@ private class ConfigCodeEditor(context: Context) : CodeEditor(context) {
         val newlineFromHandler = language?.consumeNewlineHandlerCommit() == true
         val content = getText()
         val commaIndex =
-            if (text.length == 1 && isEditable && !cursor.isSelected) {
+            if (language != null && text.length == 1 && isEditable && !cursor.isSelected) {
                 siblingCommaInsertIndex(content, cursor.left().index, text[0])
             } else {
                 -1

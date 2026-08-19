@@ -28,6 +28,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -42,7 +43,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.navigation.NavController
+import io.github.sagernet.libghostty.extras.GhosttyThemeStore
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.database.Settings
@@ -61,11 +65,33 @@ fun TailscaleTerminalConfigScreen(navController: NavController) {
         )
     }
 
-    var lightTheme by remember { mutableStateOf(Settings.tailscaleSSHLightTheme) }
-    var darkTheme by remember { mutableStateOf(Settings.tailscaleSSHDarkTheme) }
+    val storedLightTheme = Settings.tailscaleSSHLightTheme
+    val storedDarkTheme = Settings.tailscaleSSHDarkTheme
+    var lightTheme by remember {
+        mutableStateOf(storedLightTheme.ifEmpty { GhosttyThemeStore.DEFAULT_LIGHT_THEME })
+    }
+    var lightCustomEnabled by remember { mutableStateOf(storedLightTheme.isEmpty()) }
+    var darkTheme by remember {
+        mutableStateOf(storedDarkTheme.ifEmpty { GhosttyThemeStore.DEFAULT_DARK_THEME })
+    }
+    var darkCustomEnabled by remember { mutableStateOf(storedDarkTheme.isEmpty()) }
+    var fontFollowTheme by remember { mutableStateOf(Settings.tailscaleSSHFontFollowTheme) }
     var fontFamily by remember { mutableStateOf(Settings.tailscaleSSHFontFamily) }
     var customFontPath by remember { mutableStateOf(Settings.tailscaleSSHCustomFontPath) }
     var fontSize by remember { mutableIntStateOf(Settings.tailscaleSSHFontSize) }
+
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        val lightStored = Settings.tailscaleSSHLightTheme
+        lightCustomEnabled = lightStored.isEmpty()
+        lightTheme = lightStored.ifEmpty { GhosttyThemeStore.DEFAULT_LIGHT_THEME }
+        val darkStored = Settings.tailscaleSSHDarkTheme
+        darkCustomEnabled = darkStored.isEmpty()
+        darkTheme = darkStored.ifEmpty { GhosttyThemeStore.DEFAULT_DARK_THEME }
+        fontFollowTheme = Settings.tailscaleSSHFontFollowTheme
+        fontFamily = Settings.tailscaleSSHFontFamily
+        customFontPath = Settings.tailscaleSSHCustomFontPath
+        fontSize = Settings.tailscaleSSHFontSize
+    }
 
     Column(
         modifier = Modifier
@@ -74,53 +100,39 @@ fun TailscaleTerminalConfigScreen(navController: NavController) {
             .verticalScroll(rememberScrollState())
             .padding(vertical = 8.dp),
     ) {
-        Text(
-            text = stringResource(R.string.tailscale_terminal_color_theme),
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(horizontal = 32.dp, vertical = 8.dp),
+        SchemeSection(
+            title = stringResource(R.string.tailscale_terminal_light_config),
+            themeName = lightTheme,
+            customEnabled = lightCustomEnabled,
+            onThemeClick = {
+                navController.navigate("settings/tailscale/theme_picker/${Uri.encode("false")}")
+            },
+            onCustomEnabledChange = { enabled ->
+                lightCustomEnabled = enabled
+                Settings.tailscaleSSHLightTheme = if (enabled) "" else lightTheme
+            },
+            onEditCustomClick = {
+                navController.navigate("settings/tailscale/config_editor/${Uri.encode("false")}")
+            },
         )
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-            ),
-        ) {
-            Column {
-                ListItem(
-                    headlineContent = { Text(stringResource(R.string.tailscale_terminal_light_theme)) },
-                    trailingContent = {
-                        Text(
-                            lightTheme.ifBlank { "Default" },
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    },
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
-                        .clickable {
-                            navController.navigate("settings/tailscale/theme_picker/${Uri.encode("false")}")
-                        },
-                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                )
-                ListItem(
-                    headlineContent = { Text(stringResource(R.string.tailscale_terminal_dark_theme)) },
-                    trailingContent = {
-                        Text(
-                            darkTheme.ifBlank { "Default" },
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    },
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
-                        .clickable {
-                            navController.navigate("settings/tailscale/theme_picker/${Uri.encode("true")}")
-                        },
-                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                )
-            }
-        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        SchemeSection(
+            title = stringResource(R.string.tailscale_terminal_dark_config),
+            themeName = darkTheme,
+            customEnabled = darkCustomEnabled,
+            onThemeClick = {
+                navController.navigate("settings/tailscale/theme_picker/${Uri.encode("true")}")
+            },
+            onCustomEnabledChange = { enabled ->
+                darkCustomEnabled = enabled
+                Settings.tailscaleSSHDarkTheme = if (enabled) "" else darkTheme
+            },
+            onEditCustomClick = {
+                navController.navigate("settings/tailscale/config_editor/${Uri.encode("true")}")
+            },
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -140,85 +152,188 @@ fun TailscaleTerminalConfigScreen(navController: NavController) {
         ) {
             Column {
                 ListItem(
-                    headlineContent = { Text(stringResource(R.string.tailscale_terminal_font)) },
+                    headlineContent = { Text(stringResource(R.string.tailscale_terminal_font_follow_theme)) },
                     trailingContent = {
-                        val fontDisplayName = when {
-                            customFontPath.isNotBlank() -> java.io.File(customFontPath).nameWithoutExtension
-                            fontFamily.isNotBlank() -> fontFamily
-                            else -> stringResource(R.string.tailscale_terminal_font_default)
-                        }
-                        Text(
-                            fontDisplayName,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        Switch(
+                            checked = fontFollowTheme,
+                            onCheckedChange = null,
                         )
                     },
                     modifier = Modifier
-                        .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+                        .clip(
+                            if (fontFollowTheme) {
+                                RoundedCornerShape(12.dp)
+                            } else {
+                                RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
+                            },
+                        )
                         .clickable {
-                            navController.navigate("settings/tailscale/font_picker")
+                            fontFollowTheme = !fontFollowTheme
+                            Settings.tailscaleSSHFontFollowTheme = fontFollowTheme
                         },
                     colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                 )
-                ListItem(
-                    headlineContent = { Text(stringResource(R.string.tailscale_terminal_font_size)) },
-                    trailingContent = {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
-                            Surface(
-                                onClick = {
-                                    if (fontSize > 8) {
-                                        fontSize--
-                                        Settings.tailscaleSSHFontSize = fontSize
-                                    }
-                                },
-                                shape = RoundedCornerShape(6.dp),
-                                color = MaterialTheme.colorScheme.surfaceContainerHighest,
-                                modifier = Modifier.size(32.dp),
-                            ) {
-                                IconButton(onClick = {
-                                    if (fontSize > 8) {
-                                        fontSize--
-                                        Settings.tailscaleSSHFontSize = fontSize
-                                    }
-                                }) {
-                                    Icon(Icons.Default.Remove, contentDescription = null, modifier = Modifier.size(16.dp))
-                                }
+                if (!fontFollowTheme) {
+                    ListItem(
+                        headlineContent = { Text(stringResource(R.string.tailscale_terminal_font)) },
+                        trailingContent = {
+                            val fontDisplayName = when {
+                                customFontPath.isNotBlank() -> java.io.File(customFontPath).nameWithoutExtension
+                                fontFamily.isNotBlank() -> fontFamily
+                                else -> stringResource(R.string.tailscale_terminal_font_follow_theme)
                             }
                             Text(
-                                "$fontSize",
-                                style = MaterialTheme.typography.bodyMedium,
+                                fontDisplayName,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
-                            Surface(
-                                onClick = {
-                                    if (fontSize < 32) {
-                                        fontSize++
-                                        Settings.tailscaleSSHFontSize = fontSize
-                                    }
-                                },
-                                shape = RoundedCornerShape(6.dp),
-                                color = MaterialTheme.colorScheme.surfaceContainerHighest,
-                                modifier = Modifier.size(32.dp),
+                        },
+                        modifier = Modifier.clickable {
+                            navController.navigate("settings/tailscale/font_picker")
+                        },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                    )
+                    ListItem(
+                        headlineContent = { Text(stringResource(R.string.tailscale_terminal_font_size)) },
+                        trailingContent = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
                             ) {
-                                IconButton(onClick = {
-                                    if (fontSize < 32) {
-                                        fontSize++
-                                        Settings.tailscaleSSHFontSize = fontSize
+                                Surface(
+                                    onClick = {
+                                        if (fontSize > 8) {
+                                            fontSize--
+                                            Settings.tailscaleSSHFontSize = fontSize
+                                        }
+                                    },
+                                    shape = RoundedCornerShape(6.dp),
+                                    color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                                    modifier = Modifier.size(32.dp),
+                                ) {
+                                    IconButton(onClick = {
+                                        if (fontSize > 8) {
+                                            fontSize--
+                                            Settings.tailscaleSSHFontSize = fontSize
+                                        }
+                                    }) {
+                                        Icon(Icons.Default.Remove, contentDescription = null, modifier = Modifier.size(16.dp))
                                     }
-                                }) {
-                                    Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                                }
+                                Text(
+                                    "$fontSize",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                )
+                                Surface(
+                                    onClick = {
+                                        if (fontSize < 32) {
+                                            fontSize++
+                                            Settings.tailscaleSSHFontSize = fontSize
+                                        }
+                                    },
+                                    shape = RoundedCornerShape(6.dp),
+                                    color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                                    modifier = Modifier.size(32.dp),
+                                ) {
+                                    IconButton(onClick = {
+                                        if (fontSize < 32) {
+                                            fontSize++
+                                            Settings.tailscaleSSHFontSize = fontSize
+                                        }
+                                    }) {
+                                        Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                                    }
                                 }
                             }
-                        }
-                    },
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)),
-                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                )
+                        },
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)),
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                    )
+                }
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+@Composable
+private fun SchemeSection(
+    title: String,
+    themeName: String,
+    customEnabled: Boolean,
+    onThemeClick: () -> Unit,
+    onCustomEnabledChange: (Boolean) -> Unit,
+    onEditCustomClick: () -> Unit,
+) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.titleSmall,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier.padding(horizontal = 32.dp, vertical = 8.dp),
+    )
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        ),
+    ) {
+        Column {
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.tailscale_terminal_theme)) },
+                trailingContent = {
+                    Text(
+                        themeName,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                },
+                modifier = Modifier
+                    .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+                    .clickable(enabled = !customEnabled, onClick = onThemeClick),
+                colors = ListItemDefaults.colors(
+                    containerColor = Color.Transparent,
+                    headlineColor = if (customEnabled) {
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                    } else {
+                        MaterialTheme.colorScheme.onSurface
+                    },
+                    trailingIconColor = if (customEnabled) {
+                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
+                ),
+            )
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.tailscale_terminal_custom_config)) },
+                trailingContent = {
+                    Switch(
+                        checked = customEnabled,
+                        onCheckedChange = null,
+                    )
+                },
+                modifier = Modifier
+                    .clip(
+                        if (customEnabled) {
+                            RoundedCornerShape(0.dp)
+                        } else {
+                            RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)
+                        },
+                    )
+                    .clickable { onCustomEnabledChange(!customEnabled) },
+                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+            )
+            if (customEnabled) {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.tailscale_terminal_edit_custom_config)) },
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
+                        .clickable(onClick = onEditCustomClick),
+                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                )
+            }
+        }
     }
 }
