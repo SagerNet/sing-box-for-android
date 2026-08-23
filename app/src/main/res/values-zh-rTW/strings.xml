@@ -586,6 +586,11 @@
     <string name="oom_report_kill_connections">終止連線</string>
     <string name="oom_report_kill_connections_description">當服務記憶體超出限制時，終止所有連線以釋放記憶體。</string>
 
+    <!-- Power Report -->
+    <string name="power_report">電源報告</string>
+    <string name="power_report_enable">啟用電源報告</string>
+    <string name="power_report_enable_description">每次執行服務都會儲存一份報告</string>
+
     <!-- Xposed Module -->
     <string name="xposed_description">sing-box 的特權強化</string>
     <!-- Privileged Enhancement -->

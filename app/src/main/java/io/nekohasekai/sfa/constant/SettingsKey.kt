@@ -37,6 +37,9 @@ object SettingsKey {
     const val OOM_KILLER_DISABLED = "oom_killer_disabled"
     const val OOM_MEMORY_LIMIT_MB = "oom_memory_limit_mb"
 
+    // Power report
+    const val POWER_REPORT_ENABLED = "power_report_enabled"
+
     // dashboard
     const val DASHBOARD_ITEM_ORDER = "dashboard_item_order"
     const val DASHBOARD_DISABLED_ITEMS = "dashboard_disabled_items"

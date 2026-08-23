@@ -53,6 +53,10 @@ import io.nekohasekai.sfa.compose.screen.tools.OpenConnectStatusViewModel
 import io.nekohasekai.sfa.compose.screen.tools.OpenVPNEndpointScreen
 import io.nekohasekai.sfa.compose.screen.tools.OpenVPNStatusViewModel
 import io.nekohasekai.sfa.compose.screen.tools.OutboundPickerScreen
+import io.nekohasekai.sfa.compose.screen.tools.PowerReportDetailScreen
+import io.nekohasekai.sfa.compose.screen.tools.PowerReportFileContentScreen
+import io.nekohasekai.sfa.compose.screen.tools.PowerReportListScreen
+import io.nekohasekai.sfa.compose.screen.tools.PowerReportMetadataScreen
 import io.nekohasekai.sfa.compose.screen.tools.STUNTestScreen
 import io.nekohasekai.sfa.compose.screen.tools.TaildropInboxScreen
 import io.nekohasekai.sfa.compose.screen.tools.TaildropViewModel
@@ -550,6 +554,56 @@ fun NavHost(
             val reportId = backStackEntry.arguments?.getString("reportId") ?: return@composable
             val fileKind = backStackEntry.arguments?.getString("fileKind") ?: return@composable
             OOMReportFileContentScreen(navController = navController, reportId = reportId, fileKind = fileKind)
+        }
+
+        composable(
+            route = "tools/power_report",
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) {
+            PowerReportListScreen(navController = navController, serviceStatus = serviceStatus)
+        }
+
+        composable(
+            route = "tools/power_report/{reportId}",
+            arguments = listOf(navArgument("reportId") { type = NavType.StringType }),
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) { backStackEntry ->
+            val reportId = backStackEntry.arguments?.getString("reportId") ?: return@composable
+            PowerReportDetailScreen(navController = navController, reportId = reportId)
+        }
+
+        composable(
+            route = "tools/power_report/{reportId}/metadata",
+            arguments = listOf(navArgument("reportId") { type = NavType.StringType }),
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) { backStackEntry ->
+            val reportId = backStackEntry.arguments?.getString("reportId") ?: return@composable
+            PowerReportMetadataScreen(navController = navController, reportId = reportId)
+        }
+
+        composable(
+            route = "tools/power_report/{reportId}/file/{fileKind}",
+            arguments = listOf(
+                navArgument("reportId") { type = NavType.StringType },
+                navArgument("fileKind") { type = NavType.StringType },
+            ),
+            enterTransition = slideInFromRight,
+            exitTransition = slideOutToLeft,
+            popEnterTransition = slideInFromLeft,
+            popExitTransition = slideOutToRight,
+        ) { backStackEntry ->
+            val reportId = backStackEntry.arguments?.getString("reportId") ?: return@composable
+            val fileKind = backStackEntry.arguments?.getString("fileKind") ?: return@composable
+            PowerReportFileContentScreen(navController = navController, reportId = reportId, fileKind = fileKind)
         }
 
         composable(Screen.Settings.route) {

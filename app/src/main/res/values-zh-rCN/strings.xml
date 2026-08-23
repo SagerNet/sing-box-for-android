@@ -583,6 +583,11 @@
     <string name="oom_report_kill_connections">终止连接</string>
     <string name="oom_report_kill_connections_description">当服务内存超出限制时，终止所有连接以释放内存。</string>
 
+    <!-- Power Report -->
+    <string name="power_report">电源报告</string>
+    <string name="power_report_enable">启用电源报告</string>
+    <string name="power_report_enable_description">每次运行服务都会保存一份报告</string>
+
     <!-- Xposed Module -->
     <string name="xposed_description">sing-box 的特权增强</string>
     <!-- Privileged Enhancement -->

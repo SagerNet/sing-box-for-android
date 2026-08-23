@@ -588,6 +588,11 @@
     <string name="oom_report_kill_connections">Завершить соединения</string>
     <string name="oom_report_kill_connections_description">Завершить все соединения для освобождения памяти при превышении лимита памяти сервиса.</string>
 
+    <!-- Power Report -->
+    <string name="power_report">Отчёт об энергопотреблении</string>
+    <string name="power_report_enable">Включить отчёт об энергопотреблении</string>
+    <string name="power_report_enable_description">Записывать статистику процессорного времени, пробуждений и трафика сервиса. Отчёт сохраняется для каждого запуска сервиса.</string>
+
     <!-- Xposed Module -->
     <string name="xposed_description">Привилегированное расширение для sing-box</string>
 

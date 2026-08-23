@@ -615,6 +615,11 @@
     <string name="oom_report_kill_connections">Kill Connections</string>
     <string name="oom_report_kill_connections_description">Kill all connections to free memory when the service memory exceeds the limit.</string>
 
+    <!-- Power Report -->
+    <string name="power_report">Power Report</string>
+    <string name="power_report_enable">Enable Power Report</string>
+    <string name="power_report_enable_description">A report is saved for each service run</string>
+
     <!-- Xposed Module -->
     <string name="xposed_description">Privileged Enhancement for sing-box</string>
 
