@@ -47,6 +47,7 @@ import io.nekohasekai.libbox.RemoteConnectionOptions
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.theme.ServiceError
 import io.nekohasekai.sfa.compose.theme.ServiceRunning
+import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.database.RemoteServer
 import io.nekohasekai.sfa.database.RemoteServerManager
@@ -143,13 +144,19 @@ fun EditRemoteServerScreen(navController: NavController, serverId: Long = -1L) {
         return
     }
 
+    val scaffoldPadding = LocalScaffoldPadding.current
+
     Column(
         modifier =
         Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface)
             .verticalScroll(rememberScrollState())
-            .padding(16.dp),
+            .padding(horizontal = 16.dp)
+            .padding(
+                top = scaffoldPadding.calculateTopPadding() + 16.dp,
+                bottom = scaffoldPadding.calculateBottomPadding() + 16.dp,
+            ),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         OutlinedTextField(

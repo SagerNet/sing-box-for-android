@@ -63,6 +63,7 @@ import io.github.sagernet.libghostty.compose.rememberGhosttyTerminalState
 import io.github.sagernet.libghostty.extras.GhosttyFontStore
 import io.github.sagernet.libghostty.extras.GhosttyThemeStore
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.terminal.DEFAULT_SSH_TERMINAL_TYPE
@@ -271,9 +272,11 @@ fun TailscaleSSHTerminalScreen(
         )
     }
 
+    val scaffoldPadding = LocalScaffoldPadding.current
+
     Column(
         modifier = Modifier.fillMaxSize()
-            .consumeWindowInsets(WindowInsets.navigationBars)
+            .padding(scaffoldPadding)
             .imePadding(),
     ) {
         if (activeSession != null) {

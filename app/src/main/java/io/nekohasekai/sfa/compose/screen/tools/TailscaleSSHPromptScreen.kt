@@ -41,6 +41,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.terminal.DEFAULT_SSH_TERMINAL_TYPE
@@ -89,11 +90,14 @@ fun TailscaleSSHPromptScreen(
         )
     }
 
+    val scaffoldPadding = LocalScaffoldPadding.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface)
             .verticalScroll(rememberScrollState())
+            .padding(scaffoldPadding)
             .padding(vertical = 8.dp),
     ) {
         Text(

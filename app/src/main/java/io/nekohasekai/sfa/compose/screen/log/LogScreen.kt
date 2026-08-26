@@ -96,6 +96,7 @@ import io.nekohasekai.sfa.compat.WindowSizeClassCompat
 import io.nekohasekai.sfa.compat.isWidthAtLeastBreakpointCompat
 import io.nekohasekai.sfa.compose.component.RemoteControlMenuItems
 import io.nekohasekai.sfa.compose.component.rememberRemoteServers
+import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.utils.RemoteControlManager
@@ -271,11 +272,15 @@ fun LogScreen(
         }
     }
 
+    val scaffoldPadding = LocalScaffoldPadding.current
+
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(scaffoldPadding),
         ) {
             // Show selection mode bar
             if (uiState.isSelectionMode) {
@@ -509,7 +514,7 @@ fun LogScreen(
                         start = 8.dp,
                         end = 8.dp,
                         top = 8.dp,
-                        bottom = bottomPadding,
+                        bottom = scaffoldPadding.calculateBottomPadding() + bottomPadding + 8.dp,
                     ),
                     verticalArrangement = Arrangement.spacedBy(2.dp),
                 ) {
@@ -860,7 +865,7 @@ fun LogScreen(
             modifier =
             Modifier
                 .align(Alignment.BottomEnd)
-                .padding(bottom = fabBottomPadding, end = fabEndPadding, top = 16.dp),
+                .padding(bottom = scaffoldPadding.calculateBottomPadding() + fabBottomPadding, end = fabEndPadding, top = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             // Scroll to bottom FAB

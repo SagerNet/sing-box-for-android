@@ -1,5 +1,6 @@
 package io.nekohasekai.sfa.compose.topbar
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
@@ -24,6 +25,8 @@ class TopBarController internal constructor(private val state: MutableState<List
 val LocalTopBarController = compositionLocalOf<TopBarController> {
     error("TopBarController not provided")
 }
+
+val LocalScaffoldPadding = compositionLocalOf { PaddingValues() }
 
 @Composable
 fun OverrideTopBar(content: @Composable () -> Unit) {

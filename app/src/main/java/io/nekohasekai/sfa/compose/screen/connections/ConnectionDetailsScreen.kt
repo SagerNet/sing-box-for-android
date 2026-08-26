@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -47,6 +48,7 @@ import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compat.rememberOverscrollEffectCompat
 import io.nekohasekai.sfa.compat.verticalScrollCompat
 import io.nekohasekai.sfa.compose.model.Connection
+import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.util.rememberSheetDismissFromContentOnlyIfGestureStartedAtTopModifier
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -73,11 +75,14 @@ fun ConnectionDetailsScreen(
             Modifier.nestedScroll(rememberBounceBlockingNestedScrollConnection(scrollState))
         }
 
+    val scaffoldPadding = if (asSheet) PaddingValues(0.dp) else LocalScaffoldPadding.current
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .then(scrollModifier)
-            .verticalScrollCompat(scrollState, overscrollEffect = if (asSheet) null else rememberOverscrollEffectCompat()),
+            .verticalScrollCompat(scrollState, overscrollEffect = if (asSheet) null else rememberOverscrollEffectCompat())
+            .padding(scaffoldPadding),
     ) {
         if (showHeader) {
             Row(

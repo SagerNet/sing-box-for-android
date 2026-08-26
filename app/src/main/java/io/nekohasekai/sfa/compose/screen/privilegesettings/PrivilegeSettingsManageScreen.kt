@@ -59,6 +59,7 @@ import io.nekohasekai.sfa.compose.shared.AppSelectionCard
 import io.nekohasekai.sfa.compose.shared.PackageCache
 import io.nekohasekai.sfa.compose.shared.SortMode
 import io.nekohasekai.sfa.compose.shared.buildDisplayPackages
+import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.database.Settings
@@ -454,8 +455,12 @@ fun PrivilegeSettingsManageScreen(
         )
     }
 
+    val scaffoldPadding = LocalScaffoldPadding.current
+
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(scaffoldPadding),
     ) {
         AnimatedVisibility(
             visible = isLoading,
@@ -529,8 +534,10 @@ fun PrivilegeSettingsManageScreen(
             modifier = Modifier.fillMaxSize(),
             contentPadding =
             androidx.compose.foundation.layout.PaddingValues(
-                horizontal = 16.dp,
-                vertical = 12.dp,
+                start = 16.dp,
+                end = 16.dp,
+                top = 12.dp,
+                bottom = scaffoldPadding.calculateBottomPadding() + 12.dp,
             ),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {

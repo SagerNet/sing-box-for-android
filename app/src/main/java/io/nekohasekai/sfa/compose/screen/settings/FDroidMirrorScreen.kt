@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.database.Settings
 import kotlinx.coroutines.Dispatchers
@@ -155,12 +156,17 @@ fun FDroidMirrorScreen(navController: NavController) {
     }
     val countryOrder = remember(grouped) { grouped.keys.toList() }
 
+    val scaffoldPadding = LocalScaffoldPadding.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface)
             .verticalScroll(rememberScrollState())
-            .padding(vertical = 8.dp),
+            .padding(
+                top = scaffoldPadding.calculateTopPadding() + 8.dp,
+                bottom = scaffoldPadding.calculateBottomPadding() + 8.dp,
+            ),
     ) {
         FilledTonalButton(
             onClick = { testAllMirrors() },

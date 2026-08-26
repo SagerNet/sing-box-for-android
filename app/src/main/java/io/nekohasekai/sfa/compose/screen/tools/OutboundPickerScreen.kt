@@ -45,6 +45,7 @@ import androidx.navigation.NavController
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.model.GroupItem
+import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.utils.CommandClient
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -125,9 +126,12 @@ fun OutboundPickerScreen(
         )
     }
 
+    val scaffoldPadding = LocalScaffoldPadding.current
+
     Column(
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .padding(scaffoldPadding),
     ) {
         OutlinedTextField(
             value = searchText,

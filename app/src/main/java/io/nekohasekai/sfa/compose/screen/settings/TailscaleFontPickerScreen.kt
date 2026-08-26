@@ -7,6 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -45,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import io.github.sagernet.libghostty.extras.GhosttyFontStore
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.database.Settings
 
@@ -145,10 +147,16 @@ fun TailscaleFontPickerScreen(navController: NavController) {
         )
     }
 
+    val scaffoldPadding = LocalScaffoldPadding.current
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface),
+        contentPadding = PaddingValues(
+            top = scaffoldPadding.calculateTopPadding() + 8.dp,
+            bottom = scaffoldPadding.calculateBottomPadding() + 16.dp,
+        ),
     ) {
         item {
             Text(

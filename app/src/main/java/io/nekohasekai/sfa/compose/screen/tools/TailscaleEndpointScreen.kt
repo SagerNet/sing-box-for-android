@@ -65,6 +65,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.component.qr.QRCodeDialog
+import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.compose.util.QRCodeGenerator
 
@@ -111,11 +112,14 @@ fun TailscaleEndpointScreen(
     val endpointSends = sendSessions.filter { it.endpointTag == endpointTag }
     val hasActiveSend = endpointSends.any { !it.finished }
     val hasFailedSend = endpointSends.any { it.errorMessage != null }
+    val scaffoldPadding = LocalScaffoldPadding.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface)
             .verticalScroll(rememberScrollState())
+            .padding(scaffoldPadding)
             .padding(vertical = 8.dp),
     ) {
         val hasThisDevice = endpoint.backendState == "Running" && endpoint.selfPeer != null

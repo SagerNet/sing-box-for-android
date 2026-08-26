@@ -39,6 +39,7 @@ import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.component.RemoteControlMenuItems
 import io.nekohasekai.sfa.compose.component.rememberRemoteServers
 import io.nekohasekai.sfa.compose.navigation.NewProfileArgs
+import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.utils.RemoteControlManager
@@ -133,6 +134,8 @@ fun DashboardScreen(
         return
     }
 
+    val scaffoldPadding = LocalScaffoldPadding.current
+
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
@@ -145,6 +148,7 @@ fun DashboardScreen(
             modifier =
             Modifier
                 .fillMaxSize()
+                .padding(scaffoldPadding)
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(bottom = bottomPadding),

@@ -56,6 +56,7 @@ import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.bg.OOMReport
 import io.nekohasekai.sfa.bg.OOMReportFile
 import io.nekohasekai.sfa.bg.OOMReportManager
+import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -179,11 +180,14 @@ fun OOMReportDetailScreen(navController: NavController, reportId: String) {
             )
         }
     } else {
+        val scaffoldPadding = LocalScaffoldPadding.current
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.surface)
                 .verticalScroll(rememberScrollState())
+                .padding(scaffoldPadding)
                 .padding(vertical = 8.dp),
         ) {
             Text(

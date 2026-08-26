@@ -56,6 +56,7 @@ import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.bg.PowerReport
 import io.nekohasekai.sfa.bg.PowerReportFile
 import io.nekohasekai.sfa.bg.PowerReportManager
+import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -178,11 +179,14 @@ fun PowerReportDetailScreen(navController: NavController, reportId: String) {
             )
         }
     } else {
+        val scaffoldPadding = LocalScaffoldPadding.current
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.surface)
                 .verticalScroll(rememberScrollState())
+                .padding(scaffoldPadding)
                 .padding(vertical = 8.dp),
         ) {
             Text(

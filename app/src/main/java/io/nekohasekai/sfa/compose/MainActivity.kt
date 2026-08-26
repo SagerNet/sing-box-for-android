@@ -23,11 +23,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
@@ -53,6 +59,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -127,6 +134,7 @@ import io.nekohasekai.sfa.compose.screen.tools.TailscaleSSHSharedViewModel
 import io.nekohasekai.sfa.compose.screen.tools.TailscaleStatusViewModel
 import io.nekohasekai.sfa.compose.screen.usbip.USBIPStatusViewModel
 import io.nekohasekai.sfa.compose.theme.Theme
+import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.LocalTopBarController
 import io.nekohasekai.sfa.compose.topbar.TopBarController
 import io.nekohasekai.sfa.compose.topbar.TopBarEntry
@@ -1011,110 +1019,194 @@ class MainActivity :
         }
 
         val scaffoldContent: @Composable (PaddingValues) -> Unit = { paddingValues ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-            ) {
-                // Service Status Bar (shown when service is running or stopping);
-                // remote control replaces it with the remote session bar.
-                val serviceRunning =
-                    currentServiceStatus == Status.Started || currentServiceStatus == Status.Starting
-                val showStatusBar = isRemote || serviceRunning || currentServiceStatus == Status.Stopping
-                val showStartFab = !isRemote && !serviceRunning && dashboardUiState.selectedProfileId != -1L
+            CompositionLocalProvider(LocalScaffoldPadding provides paddingValues) {
+                Box(
+                    modifier = Modifier.fillMaxSize().consumeWindowInsets(paddingValues),
+                ) {
+                    // Service Status Bar (shown when service is running or stopping);
+                    // remote control replaces it with the remote session bar.
+                    val serviceRunning =
+                        currentServiceStatus == Status.Started || currentServiceStatus == Status.Starting
+                    val showStatusBar = isRemote || serviceRunning || currentServiceStatus == Status.Stopping
+                    val showStartFab = !isRemote && !serviceRunning && dashboardUiState.selectedProfileId != -1L
 
-                NavHost(
-                    navController = navController,
-                    serviceStatus = currentServiceStatus,
-                    showStartFab = showStartFab,
-                    showStatusBar = showStatusBar,
-                    newProfileArgs = newProfileArgs,
-                    onClearNewProfileArgs = { newProfileArgs = NewProfileArgs() },
-                    onOpenNewProfile = openNewProfile,
-                    dashboardViewModel = dashboardViewModel,
-                    logViewModel = logViewModel,
-                    groupsViewModel = groupsViewModel,
-                    connectionsViewModel = connectionsViewModel,
-                    tailscaleStatusViewModel = tailscaleStatusViewModel,
-                    tailscaleSSHSharedViewModel = tailscaleSSHSharedViewModel,
-                    usbIPStatusViewModel = usbIPStatusViewModel,
-                    openConnectStatusViewModel = openConnectStatusViewModel,
-                    openVPNStatusViewModel = openVPNStatusViewModel,
-                    modifier = Modifier.fillMaxSize(),
-                )
-                if (!useNavigationRail) {
-                    if (isRemote) {
-                        RemoteStatusBar(
-                            visible = !isSubScreen,
-                            serverName = remoteServer?.displayName ?: "",
-                            isConnected = remoteConnected,
-                            startTime = remoteStartedAt,
-                            groupsCount = dashboardUiState.groupsCount,
-                            hasGroups = dashboardUiState.hasGroups,
-                            onGroupsClick = { showGroupsSheet = true },
-                            connectionsCount = dashboardUiState.connectionsCount,
-                            onConnectionsClick = { showConnectionsSheet = true },
-                            onDisconnectClick = { RemoteControlManager.exitRemoteControl() },
-                            modifier = Modifier.align(Alignment.BottomCenter),
-                        )
-                    } else {
-                        ServiceStatusBar(
-                            visible = showStatusBar && !isSubScreen,
-                            serviceStatus = currentServiceStatus,
-                            startTime = dashboardUiState.serviceStartTime,
-                            groupsCount = dashboardUiState.groupsCount,
-                            hasGroups = dashboardUiState.hasGroups,
-                            onGroupsClick = { showGroupsSheet = true },
-                            connectionsCount = dashboardUiState.connectionsCount,
-                            onConnectionsClick = { showConnectionsSheet = true },
-                            onStopClick = { dashboardViewModel.toggleService() },
-                            modifier = Modifier.align(Alignment.BottomCenter),
-                        )
-                    }
-                }
-
-                val showPadFab = useNavigationRail && !isSubScreen && (showStartFab || showStatusBar)
-                if (useNavigationRail) {
-                    androidx.compose.animation.AnimatedVisibility(
-                        visible = showPadFab,
-                        enter = scaleIn(),
-                        exit = scaleOut(),
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(20.dp),
-                    ) {
-                        val isRunning =
-                            currentServiceStatus == Status.Started || currentServiceStatus == Status.Starting
-                        val isStopping = currentServiceStatus == Status.Stopping
+                    NavHost(
+                        navController = navController,
+                        serviceStatus = currentServiceStatus,
+                        showStartFab = showStartFab,
+                        showStatusBar = showStatusBar,
+                        newProfileArgs = newProfileArgs,
+                        onClearNewProfileArgs = { newProfileArgs = NewProfileArgs() },
+                        onOpenNewProfile = openNewProfile,
+                        dashboardViewModel = dashboardViewModel,
+                        logViewModel = logViewModel,
+                        groupsViewModel = groupsViewModel,
+                        connectionsViewModel = connectionsViewModel,
+                        tailscaleStatusViewModel = tailscaleStatusViewModel,
+                        tailscaleSSHSharedViewModel = tailscaleSSHSharedViewModel,
+                        usbIPStatusViewModel = usbIPStatusViewModel,
+                        openConnectStatusViewModel = openConnectStatusViewModel,
+                        openVPNStatusViewModel = openVPNStatusViewModel,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                    if (!useNavigationRail) {
                         if (isRemote) {
-                            ExtendedFloatingActionButton(
-                                onClick = { RemoteControlManager.exitRemoteControl() },
-                                icon = {
-                                    Icon(
-                                        imageVector = Icons.Default.LinkOff,
-                                        contentDescription = stringResource(R.string.remote_disconnect),
-                                    )
-                                },
-                                text = {
-                                    if (remoteConnected && remoteStartedAt != null) {
-                                        UptimeText(startTime = remoteStartedAt!!)
-                                    } else {
-                                        Text(
-                                            text =
-                                            if (remoteConnected) {
-                                                remoteServer?.displayName ?: ""
-                                            } else {
-                                                stringResource(R.string.remote_connecting)
-                                            },
-                                            style = MaterialTheme.typography.labelLarge,
-                                        )
-                                    }
-                                },
-                                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                modifier = Modifier.height(64.dp),
+                            RemoteStatusBar(
+                                visible = !isSubScreen,
+                                serverName = remoteServer?.displayName ?: "",
+                                isConnected = remoteConnected,
+                                startTime = remoteStartedAt,
+                                groupsCount = dashboardUiState.groupsCount,
+                                hasGroups = dashboardUiState.hasGroups,
+                                onGroupsClick = { showGroupsSheet = true },
+                                connectionsCount = dashboardUiState.connectionsCount,
+                                onConnectionsClick = { showConnectionsSheet = true },
+                                onDisconnectClick = { RemoteControlManager.exitRemoteControl() },
+                                modifier = Modifier.align(Alignment.BottomCenter),
                             )
-                        } else if (currentServiceStatus == Status.Stopped) {
+                        } else {
+                            ServiceStatusBar(
+                                visible = showStatusBar && !isSubScreen,
+                                serviceStatus = currentServiceStatus,
+                                startTime = dashboardUiState.serviceStartTime,
+                                groupsCount = dashboardUiState.groupsCount,
+                                hasGroups = dashboardUiState.hasGroups,
+                                onGroupsClick = { showGroupsSheet = true },
+                                connectionsCount = dashboardUiState.connectionsCount,
+                                onConnectionsClick = { showConnectionsSheet = true },
+                                onStopClick = { dashboardViewModel.toggleService() },
+                                modifier = Modifier.align(Alignment.BottomCenter),
+                            )
+                        }
+                    }
+
+                    val showPadFab = useNavigationRail && !isSubScreen && (showStartFab || showStatusBar)
+                    if (useNavigationRail) {
+                        androidx.compose.animation.AnimatedVisibility(
+                            visible = showPadFab,
+                            enter = scaleIn(),
+                            exit = scaleOut(),
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .padding(20.dp),
+                        ) {
+                            val isRunning =
+                                currentServiceStatus == Status.Started || currentServiceStatus == Status.Starting
+                            val isStopping = currentServiceStatus == Status.Stopping
+                            if (isRemote) {
+                                ExtendedFloatingActionButton(
+                                    onClick = { RemoteControlManager.exitRemoteControl() },
+                                    icon = {
+                                        Icon(
+                                            imageVector = Icons.Default.LinkOff,
+                                            contentDescription = stringResource(R.string.remote_disconnect),
+                                        )
+                                    },
+                                    text = {
+                                        if (remoteConnected && remoteStartedAt != null) {
+                                            UptimeText(startTime = remoteStartedAt!!)
+                                        } else {
+                                            Text(
+                                                text =
+                                                if (remoteConnected) {
+                                                    remoteServer?.displayName ?: ""
+                                                } else {
+                                                    stringResource(R.string.remote_connecting)
+                                                },
+                                                style = MaterialTheme.typography.labelLarge,
+                                            )
+                                        }
+                                    },
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    modifier = Modifier.height(64.dp),
+                                )
+                            } else if (currentServiceStatus == Status.Stopped) {
+                                FloatingActionButton(
+                                    onClick = { startService() },
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.PlayArrow,
+                                        contentDescription = stringResource(R.string.action_start),
+                                    )
+                                }
+                            } else {
+                                ExtendedFloatingActionButton(
+                                    onClick = {
+                                        if (isRunning || isStopping) {
+                                            dashboardViewModel.toggleService()
+                                        } else {
+                                            startService()
+                                        }
+                                    },
+                                    icon = {
+                                        Icon(
+                                            imageVector =
+                                            if (isRunning || isStopping) {
+                                                Icons.Default.Stop
+                                            } else {
+                                                Icons.Default.PlayArrow
+                                            },
+                                            contentDescription =
+                                            if (isRunning || isStopping) {
+                                                stringResource(R.string.stop)
+                                            } else {
+                                                stringResource(R.string.action_start)
+                                            },
+                                        )
+                                    },
+                                    text = {
+                                        when {
+                                            isRunning && dashboardUiState.serviceStartTime != null -> {
+                                                UptimeText(startTime = dashboardUiState.serviceStartTime!!)
+                                            }
+                                            currentServiceStatus == Status.Started -> {
+                                                Text(
+                                                    text = stringResource(R.string.status_started),
+                                                    style = MaterialTheme.typography.labelLarge,
+                                                )
+                                            }
+                                            currentServiceStatus == Status.Starting -> {
+                                                Text(
+                                                    text = stringResource(R.string.status_starting),
+                                                    style = MaterialTheme.typography.labelLarge,
+                                                )
+                                            }
+                                            currentServiceStatus == Status.Stopping -> {
+                                                Text(
+                                                    text = stringResource(R.string.status_stopping),
+                                                    style = MaterialTheme.typography.labelLarge,
+                                                )
+                                            }
+                                            else -> {
+                                                Text(
+                                                    text = stringResource(R.string.action_start),
+                                                    style = MaterialTheme.typography.labelLarge,
+                                                )
+                                            }
+                                        }
+                                    },
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    modifier = Modifier.height(64.dp),
+                                )
+                            }
+                        }
+                    } else {
+                        // Start FAB (shown when service is stopped and a profile is selected)
+                        androidx.compose.animation.AnimatedVisibility(
+                            visible = !isRemote &&
+                                currentServiceStatus == Status.Stopped &&
+                                dashboardUiState.selectedProfileId != -1L &&
+                                !isSubScreen,
+                            enter = scaleIn(),
+                            exit = scaleOut(),
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .padding(16.dp),
+                        ) {
                             FloatingActionButton(
                                 onClick = { startService() },
                                 containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -1125,90 +1217,6 @@ class MainActivity :
                                     contentDescription = stringResource(R.string.action_start),
                                 )
                             }
-                        } else {
-                            ExtendedFloatingActionButton(
-                                onClick = {
-                                    if (isRunning || isStopping) {
-                                        dashboardViewModel.toggleService()
-                                    } else {
-                                        startService()
-                                    }
-                                },
-                                icon = {
-                                    Icon(
-                                        imageVector =
-                                        if (isRunning || isStopping) {
-                                            Icons.Default.Stop
-                                        } else {
-                                            Icons.Default.PlayArrow
-                                        },
-                                        contentDescription =
-                                        if (isRunning || isStopping) {
-                                            stringResource(R.string.stop)
-                                        } else {
-                                            stringResource(R.string.action_start)
-                                        },
-                                    )
-                                },
-                                text = {
-                                    when {
-                                        isRunning && dashboardUiState.serviceStartTime != null -> {
-                                            UptimeText(startTime = dashboardUiState.serviceStartTime!!)
-                                        }
-                                        currentServiceStatus == Status.Started -> {
-                                            Text(
-                                                text = stringResource(R.string.status_started),
-                                                style = MaterialTheme.typography.labelLarge,
-                                            )
-                                        }
-                                        currentServiceStatus == Status.Starting -> {
-                                            Text(
-                                                text = stringResource(R.string.status_starting),
-                                                style = MaterialTheme.typography.labelLarge,
-                                            )
-                                        }
-                                        currentServiceStatus == Status.Stopping -> {
-                                            Text(
-                                                text = stringResource(R.string.status_stopping),
-                                                style = MaterialTheme.typography.labelLarge,
-                                            )
-                                        }
-                                        else -> {
-                                            Text(
-                                                text = stringResource(R.string.action_start),
-                                                style = MaterialTheme.typography.labelLarge,
-                                            )
-                                        }
-                                    }
-                                },
-                                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                modifier = Modifier.height(64.dp),
-                            )
-                        }
-                    }
-                } else {
-                    // Start FAB (shown when service is stopped and a profile is selected)
-                    androidx.compose.animation.AnimatedVisibility(
-                        visible = !isRemote &&
-                            currentServiceStatus == Status.Stopped &&
-                            dashboardUiState.selectedProfileId != -1L &&
-                            !isSubScreen,
-                        enter = scaleIn(),
-                        exit = scaleOut(),
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(16.dp),
-                    ) {
-                        FloatingActionButton(
-                            onClick = { startService() },
-                            containerColor = MaterialTheme.colorScheme.primaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.PlayArrow,
-                                contentDescription = stringResource(R.string.action_start),
-                            )
                         }
                     }
                 }
@@ -1276,7 +1284,12 @@ class MainActivity :
                     }
 
                     Scaffold(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .consumeWindowInsets(WindowInsets.safeDrawing.only(WindowInsetsSides.Start)),
+                        contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(
+                            WindowInsets.safeDrawing.only(WindowInsetsSides.Start),
+                        ),
                         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
                         topBar = topBarContent,
                     ) { paddingValues ->

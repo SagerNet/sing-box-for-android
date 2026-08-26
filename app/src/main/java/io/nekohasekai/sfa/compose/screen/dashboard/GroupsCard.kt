@@ -75,6 +75,7 @@ import io.nekohasekai.sfa.compose.model.Group
 import io.nekohasekai.sfa.compose.model.GroupItem
 import io.nekohasekai.sfa.compose.screen.dashboard.groups.GroupsUiState
 import io.nekohasekai.sfa.compose.screen.dashboard.groups.GroupsViewModel
+import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.compose.util.rememberSheetDismissFromContentOnlyIfGestureStartedAtTopModifier
 import io.nekohasekai.sfa.constant.Status
@@ -215,6 +216,7 @@ private fun GroupsCardContent(
         } else {
             Modifier.nestedScroll(rememberBounceBlockingNestedScrollConnection(lazyListState))
         }
+    val scaffoldPadding = if (asSheet) PaddingValues(0.dp) else LocalScaffoldPadding.current
     val overscrollEffect = if (asSheet) null else rememberOverscrollEffectCompat()
     val palette = rememberUrlTestPalette()
 
@@ -222,7 +224,8 @@ private fun GroupsCardContent(
         modifier =
         modifier
             .fillMaxSize()
-            .then(scrollModifier),
+            .then(scrollModifier)
+            .padding(scaffoldPadding),
         state = lazyListState,
         contentPadding =
         PaddingValues(

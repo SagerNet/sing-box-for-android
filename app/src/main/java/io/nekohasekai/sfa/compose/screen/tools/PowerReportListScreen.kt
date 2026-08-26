@@ -50,6 +50,7 @@ import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.bg.PowerReportManager
 import io.nekohasekai.sfa.compose.base.UiEvent
 import io.nekohasekai.sfa.compose.base.rememberApplyServiceChangeNotifier
+import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.database.Settings
@@ -131,11 +132,14 @@ fun PowerReportListScreen(
                 CircularProgressIndicator()
             }
         } else {
+            val scaffoldPadding = LocalScaffoldPadding.current
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.surface)
                     .verticalScroll(rememberScrollState())
+                    .padding(scaffoldPadding)
                     .padding(vertical = 8.dp),
             ) {
                 // Settings section

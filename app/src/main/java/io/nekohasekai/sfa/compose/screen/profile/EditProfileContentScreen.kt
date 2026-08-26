@@ -88,6 +88,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compat.ProfileCodeEditor
 import io.nekohasekai.sfa.compat.ProfileEditorColors
+import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -227,10 +228,13 @@ fun EditProfileContentScreen(
         )
     }
 
+    val scaffoldPadding = LocalScaffoldPadding.current
+
     Column(
         modifier =
         modifier
             .fillMaxSize()
+            .padding(scaffoldPadding)
             .onPreviewKeyEvent { event ->
                 if (event.type == KeyEventType.KeyDown) {
                     // Support both Ctrl (Windows/Linux) and Cmd (macOS)

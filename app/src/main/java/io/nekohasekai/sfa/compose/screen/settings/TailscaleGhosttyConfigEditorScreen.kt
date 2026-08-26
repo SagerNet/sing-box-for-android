@@ -4,6 +4,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.FileOpen
@@ -34,6 +35,7 @@ import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compat.CodeEditorSyntax
 import io.nekohasekai.sfa.compat.ProfileCodeEditor
 import io.nekohasekai.sfa.compat.ProfileEditorColors
+import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.database.Settings
 import kotlinx.coroutines.Dispatchers
@@ -147,11 +149,14 @@ fun TailscaleGhosttyConfigEditorScreen(navController: NavController, isDark: Boo
         )
     }
 
+    val scaffoldPadding = LocalScaffoldPadding.current
+
     AndroidView(
         factory = { editor.view },
         update = { editor.applyColors(editorColors) },
         modifier = Modifier
             .fillMaxSize()
+            .padding(top = scaffoldPadding.calculateTopPadding())
             .imePadding(),
     )
 }

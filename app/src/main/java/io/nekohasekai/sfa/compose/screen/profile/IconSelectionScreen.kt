@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,7 +19,6 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -59,7 +57,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -67,6 +64,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.compose.util.ProfileIcon
 import io.nekohasekai.sfa.compose.util.icons.IconCategory
@@ -149,22 +147,21 @@ fun IconSelectionScreen(currentIconId: String?, onIconSelected: (String?) -> Uni
         currentIconId?.let { id ->
             MaterialIconsLibrary.getIconById(id)?.let { icon -> id to icon }
         }
-    val bottomInset =
-        with(LocalDensity.current) {
-            WindowInsets.navigationBars.getBottom(this).toDp()
-        }
     val bottomBarPadding =
         if (currentIcon != null) {
-            88.dp + bottomInset
+            88.dp
         } else {
             0.dp
         }
 
     Box(modifier = Modifier.fillMaxSize()) {
+        val scaffoldPadding = LocalScaffoldPadding.current
+
         Column(
             modifier =
             Modifier
                 .fillMaxSize()
+                .padding(scaffoldPadding)
                 .padding(bottom = bottomBarPadding),
         ) {
             // Show search bar with animation
@@ -386,7 +383,7 @@ fun IconSelectionScreen(currentIconId: String?, onIconSelected: (String?) -> Uni
                 Modifier
                     .fillMaxWidth()
                     .align(Alignment.BottomCenter)
-                    .windowInsetsPadding(WindowInsets.navigationBars)
+                    .padding(bottom = scaffoldPadding.calculateBottomPadding())
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 colors =
                 CardDefaults.cardColors(

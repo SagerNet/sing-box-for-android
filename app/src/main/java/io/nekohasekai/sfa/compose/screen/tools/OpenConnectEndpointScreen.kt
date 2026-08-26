@@ -58,6 +58,7 @@ import androidx.navigation.NavController
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compat.menuAnchorCompat
 import io.nekohasekai.sfa.compose.base.UiEvent
+import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import kotlinx.coroutines.launch
 
@@ -112,11 +113,14 @@ fun OpenConnectEndpointScreen(
             viewModel.sendGlobalEvent(UiEvent.ErrorMessage(challengeError))
         }
     }
+    val scaffoldPadding = LocalScaffoldPadding.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface)
             .verticalScroll(rememberScrollState())
+            .padding(scaffoldPadding)
             .padding(vertical = 8.dp),
     ) {
         SectionHeader(stringResource(R.string.endpoint_status))

@@ -3,6 +3,7 @@ package io.nekohasekai.sfa.compose.screen.settings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -33,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import io.github.sagernet.libghostty.extras.GhosttyThemeStore
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.database.Settings
 import kotlinx.coroutines.Dispatchers
@@ -90,10 +92,13 @@ fun TailscaleThemePickerScreen(
         )
     }
 
+    val scaffoldPadding = LocalScaffoldPadding.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface),
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(top = scaffoldPadding.calculateTopPadding()),
     ) {
         SearchBarDefaults.InputField(
             query = searchQuery,
@@ -110,7 +115,12 @@ fun TailscaleThemePickerScreen(
             },
         )
 
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(
+                bottom = scaffoldPadding.calculateBottomPadding() + 16.dp,
+            ),
+        ) {
             items(filteredThemes) { theme ->
                 ListItem(
                     headlineContent = { Text(theme) },

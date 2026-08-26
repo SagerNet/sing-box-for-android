@@ -49,6 +49,7 @@ import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.BuildConfig
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.bg.CrashReportManager
+import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import kotlinx.coroutines.launch
 import java.text.DateFormat
@@ -170,11 +171,14 @@ fun CrashReportListScreen(navController: NavController) {
             CircularProgressIndicator()
         }
     } else {
+        val scaffoldPadding = LocalScaffoldPadding.current
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.surface)
                 .verticalScroll(rememberScrollState())
+                .padding(scaffoldPadding)
                 .padding(vertical = 8.dp),
         ) {
             Text(

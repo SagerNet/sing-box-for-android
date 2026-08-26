@@ -52,6 +52,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.database.RemoteServer
 import io.nekohasekai.sfa.database.RemoteServerManager
@@ -104,13 +105,20 @@ fun RemoteControlScreen(navController: NavController) {
         }
     }
 
+    val scaffoldPadding = LocalScaffoldPadding.current
+
     if (servers.isEmpty()) {
         Box(
             modifier =
             Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.surface)
-                .padding(32.dp),
+                .padding(
+                    top = scaffoldPadding.calculateTopPadding() + 32.dp,
+                    bottom = scaffoldPadding.calculateBottomPadding() + 32.dp,
+                    start = 32.dp,
+                    end = 32.dp,
+                ),
             contentAlignment = Alignment.Center,
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -138,7 +146,10 @@ fun RemoteControlScreen(navController: NavController) {
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface)
             .verticalScroll(rememberScrollState())
-            .padding(vertical = 8.dp),
+            .padding(
+                top = scaffoldPadding.calculateTopPadding() + 8.dp,
+                bottom = scaffoldPadding.calculateBottomPadding() + 8.dp,
+            ),
     ) {
         Card(
             modifier =
