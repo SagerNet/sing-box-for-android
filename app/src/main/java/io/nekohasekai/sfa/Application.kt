@@ -108,6 +108,8 @@ class Application : Application() {
         it.logMaxLines = 3000
         it.debug = BuildConfig.DEBUG
         it.crashReportSource = "Application"
+        it.appVersion = BuildConfig.VERSION_CODE.toString()
+        it.appMarketingVersion = BuildConfig.VERSION_NAME
         it.oomKillerEnabled = Settings.oomKillerEnabled
         it.oomKillerDisabled = Settings.oomKillerDisabled
         it.oomMemoryLimit = Settings.oomMemoryLimitMB.toLong() * 1024L * 1024L
