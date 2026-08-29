@@ -1029,6 +1029,7 @@ class MainActivity :
                         currentServiceStatus == Status.Started || currentServiceStatus == Status.Starting
                     val showStatusBar = isRemote || serviceRunning || currentServiceStatus == Status.Stopping
                     val showStartFab = !isRemote && !serviceRunning && dashboardUiState.selectedProfileId != -1L
+                    val bottomOverlayPadding = paddingValues.calculateBottomPadding()
 
                     NavHost(
                         navController = navController,
@@ -1062,7 +1063,7 @@ class MainActivity :
                                 connectionsCount = dashboardUiState.connectionsCount,
                                 onConnectionsClick = { showConnectionsSheet = true },
                                 onDisconnectClick = { RemoteControlManager.exitRemoteControl() },
-                                modifier = Modifier.align(Alignment.BottomCenter),
+                                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = bottomOverlayPadding),
                             )
                         } else {
                             ServiceStatusBar(
@@ -1075,7 +1076,7 @@ class MainActivity :
                                 connectionsCount = dashboardUiState.connectionsCount,
                                 onConnectionsClick = { showConnectionsSheet = true },
                                 onStopClick = { dashboardViewModel.toggleService() },
-                                modifier = Modifier.align(Alignment.BottomCenter),
+                                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = bottomOverlayPadding),
                             )
                         }
                     }
@@ -1088,6 +1089,7 @@ class MainActivity :
                             exit = scaleOut(),
                             modifier = Modifier
                                 .align(Alignment.BottomEnd)
+                                .padding(bottom = bottomOverlayPadding)
                                 .padding(20.dp),
                         ) {
                             val isRunning =
@@ -1205,6 +1207,7 @@ class MainActivity :
                             exit = scaleOut(),
                             modifier = Modifier
                                 .align(Alignment.BottomEnd)
+                                .padding(bottom = bottomOverlayPadding)
                                 .padding(16.dp),
                         ) {
                             FloatingActionButton(
