@@ -10,8 +10,6 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        // For libghostty-android snapshots; remove after release.
-        maven { url = uri("https://central.sonatype.com/repository/maven-snapshots/") }
         maven { url = uri("https://jitpack.io") }
         maven { url = uri("https://api.xposed.info/") }
     }
