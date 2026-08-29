@@ -320,6 +320,7 @@ class DashboardViewModel :
     }
 
     fun editProfile(profile: Profile) {
+        updateState { copy(showProfilePickerSheet = false) }
         sendGlobalEvent(UiEvent.EditProfile(profile.id))
     }
 
