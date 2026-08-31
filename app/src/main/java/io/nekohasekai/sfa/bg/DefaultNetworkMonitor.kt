@@ -57,6 +57,7 @@ object DefaultNetworkMonitor {
                     continue
                 }
                 listener.updateDefaultInterface(linkProperties.interfaceName, interfaceIndex, false, false)
+                return
             }
         } else {
             listener.updateDefaultInterface("", -1, false, false)
