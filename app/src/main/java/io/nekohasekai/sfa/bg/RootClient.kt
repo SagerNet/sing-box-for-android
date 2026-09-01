@@ -185,6 +185,15 @@ object RootClient {
         }
     }
 
+    suspend fun startAutoRedirect(options: ByteArray, handler: IAutoRedirectHandler): IAutoRedirectSession {
+        val svc = bindService()
+        try {
+            return svc.startAutoRedirect(options, handler)
+        } catch (e: RemoteException) {
+            throw e.rethrowAsRuntime()
+        }
+    }
+
     suspend fun unregisterNeighborTableCallback(callback: INeighborTableCallback) {
         try {
             service?.unregisterNeighborTableCallback(callback)

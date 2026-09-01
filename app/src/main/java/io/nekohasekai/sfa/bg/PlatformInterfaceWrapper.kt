@@ -1,14 +1,19 @@
 package io.nekohasekai.sfa.bg
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.net.NetworkCapabilities
 import android.os.Build
+import android.os.DeadObjectException
+import android.os.IBinder
 import android.os.ParcelFileDescriptor
 import android.os.Process
 import android.provider.Settings
 import android.system.OsConstants
 import android.util.Log
 import androidx.annotation.RequiresApi
+import io.nekohasekai.libbox.AutoRedirectHandler
+import io.nekohasekai.libbox.AutoRedirectSession
 import io.nekohasekai.libbox.BridgeOptions
 import io.nekohasekai.libbox.BridgeSession
 import io.nekohasekai.libbox.ConnectionOwner
@@ -25,6 +30,7 @@ import io.nekohasekai.libbox.StringIterator
 import io.nekohasekai.libbox.TunOptions
 import io.nekohasekai.libbox.WIFIState
 import io.nekohasekai.sfa.Application
+import io.nekohasekai.sfa.constant.Action
 import io.nekohasekai.sfa.ktx.toList
 import io.nekohasekai.sfa.ktx.toStringIterator
 import kotlinx.coroutines.Dispatchers
@@ -307,6 +313,93 @@ interface PlatformInterfaceWrapper : PlatformInterface {
             )
         }
         return RootBridgeSessionWrapper(session)
+    }
+
+    override fun usePlatformAutoRedirect(): Boolean = RootClient.rootAvailable.value ?: runBlocking(Dispatchers.IO) {
+        RootClient.checkRootAvailable()
+    }
+
+    override fun createAutoRedirect(options: ByteArray?, handler: AutoRedirectHandler?): AutoRedirectSession {
+        options!!
+        handler!!
+        val binderHandler = object : IAutoRedirectHandler.Stub() {
+            override fun judgeFlow(
+                ipProtocol: Int,
+                sourceAddress: String?,
+                sourcePort: Int,
+                destinationAddress: String?,
+                destinationPort: Int,
+                firstPacket: ByteArray?,
+            ): Int = try {
+                handler.judgeFlow(
+                    ipProtocol,
+                    sourceAddress,
+                    sourcePort,
+                    destinationAddress,
+                    destinationPort,
+                    firstPacket,
+                )
+            } catch (e: Exception) {
+                throw IllegalStateException(e.message ?: e.toString())
+            }
+
+            override fun writeLog(level: Int, message: String?) {
+                handler.writeLog(level, message)
+            }
+
+            // Binder only marshals a handful of exception types; a Go error escaping here
+            // reaches the root service as a bare failure without the message, so it is
+            // converted to IllegalStateException.
+            override fun getRedirectListener(): ParcelFileDescriptor = try {
+                ParcelFileDescriptor.adoptFd(handler.redirectListenerFileDescriptor())
+            } catch (e: Exception) {
+                throw IllegalStateException(e.message ?: e.toString())
+            }
+
+            override fun getRouteAddressSet(): ParcelFileDescriptor = try {
+                ParcelFileDescriptor.adoptFd(handler.routeAddressSetFileDescriptor())
+            } catch (e: Exception) {
+                throw IllegalStateException(e.message ?: e.toString())
+            }
+        }
+        val session = runBlocking(Dispatchers.IO) {
+            RootClient.startAutoRedirect(options, binderHandler)
+        }
+        return RootAutoRedirectSessionWrapper(session)
+    }
+
+    // Without a bypass flag on the queue rules, a root process dying while the
+    // VPN is up leaves every new flow of VPN apps dropped in the kernel, so the
+    // service is stopped instead of running with a dead network.
+    private class RootAutoRedirectSessionWrapper(
+        private val session: IAutoRedirectSession,
+    ) : AutoRedirectSession,
+        IBinder.DeathRecipient {
+        init {
+            session.asBinder().linkToDeath(this, 0)
+        }
+
+        override fun binderDied() {
+            Log.e("PlatformInterface", "auto-redirect root service died, stopping service")
+            Application.application.sendBroadcast(
+                Intent(Action.SERVICE_CLOSE).setPackage(Application.application.packageName),
+            )
+        }
+
+        override fun close() {
+            try {
+                session.asBinder().unlinkToDeath(this, 0)
+            } catch (_: NoSuchElementException) {
+            }
+            try {
+                session.close()
+            } catch (_: DeadObjectException) {
+            }
+        }
+
+        override fun updateRouteAddressSet() {
+            session.updateRouteAddressSet()
+        }
     }
 
     override fun lookupUser(username: String?): io.nekohasekai.libbox.PlatformUser {
