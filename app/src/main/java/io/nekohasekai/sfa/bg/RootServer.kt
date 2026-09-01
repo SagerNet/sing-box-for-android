@@ -7,8 +7,11 @@ import android.os.Build
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
 import android.os.RemoteCallbackList
+import android.os.RemoteException
 import android.util.Log
 import com.topjohnwu.superuser.ipc.RootService
+import io.nekohasekai.libbox.AutoRedirectHandler
+import io.nekohasekai.libbox.AutoRedirectSession
 import io.nekohasekai.libbox.BridgeOptions
 import io.nekohasekai.libbox.BridgeSession
 import io.nekohasekai.libbox.Libbox
@@ -39,6 +42,14 @@ class RootServer : RootService() {
     private var tetheringManager: Any? = null
 
     private val bridgeSessions = mutableSetOf<BridgeSessionBinder>()
+    private val autoRedirectSessions = mutableSetOf<AutoRedirectSessionBinder>()
+
+    private var destroyed = false
+
+    // libsu exits the process right after onDestroy, so a session whose Start
+    // is still running when the client dies must be registered before onDestroy
+    // sweeps the set.
+    private val autoRedirectLifecycle = Any()
 
     private val binder = object : IRootService.Stub() {
         override fun destroy() {
@@ -205,6 +216,81 @@ class RootServer : RootService() {
             return binder
         }
 
+        // Binder only marshals a handful of exception types; a Go error or a
+        // RemoteException escaping here reaches the app as a bare failure
+        // without the message, so everything is converted to IllegalStateException.
+        override fun startAutoRedirect(options: ByteArray?, handler: IAutoRedirectHandler?): IAutoRedirectSession = try {
+            requireNotNull(options)
+            val autoRedirectHandler = handler!!
+            synchronized(autoRedirectLifecycle) {
+                if (destroyed) throw IllegalStateException("root service destroyed")
+                startAutoRedirectLocked(options, autoRedirectHandler)
+            }
+        } catch (e: Exception) {
+            throw IllegalStateException(e.message ?: e.toString())
+        }
+
+        private fun startAutoRedirectLocked(options: ByteArray, handler: IAutoRedirectHandler): IAutoRedirectSession {
+            val session = Libbox.newAutoRedirectService(
+                options,
+                object : AutoRedirectHandler {
+                    override fun judgeFlow(
+                        ipProtocol: Int,
+                        sourceAddress: String?,
+                        sourcePort: Int,
+                        destinationAddress: String?,
+                        destinationPort: Int,
+                        firstPacket: ByteArray?,
+                    ): Int = try {
+                        handler.judgeFlow(
+                            ipProtocol,
+                            sourceAddress,
+                            sourcePort,
+                            destinationAddress,
+                            destinationPort,
+                            firstPacket,
+                        )
+                    } catch (e: RemoteException) {
+                        throw IOException(e)
+                    }
+
+                    override fun writeLog(level: Int, message: String?) {
+                        try {
+                            handler.writeLog(level, message)
+                        } catch (_: RemoteException) {
+                        }
+                    }
+
+                    override fun redirectListenerFileDescriptor(): Int = try {
+                        val listener = handler.redirectListener
+                            ?: throw IOException("no redirect listener")
+                        listener.detachFd()
+                    } catch (e: RemoteException) {
+                        throw IOException(e)
+                    }
+
+                    override fun routeAddressSetFileDescriptor(): Int = try {
+                        val addressSet = handler.routeAddressSet
+                            ?: throw IOException("no route address set")
+                        addressSet.detachFd()
+                    } catch (e: RemoteException) {
+                        throw IOException(e)
+                    }
+                },
+            )
+            val binder = AutoRedirectSessionBinder(session, handler.asBinder())
+            synchronized(autoRedirectSessions) {
+                autoRedirectSessions.add(binder)
+            }
+            try {
+                handler.asBinder().linkToDeath(binder, 0)
+            } catch (e: RemoteException) {
+                binder.closeSession()
+                throw e
+            }
+            return binder
+        }
+
         override fun lookupSFTPServer(): String {
             val termuxPrefix = File(UserResolver.TERMUX_PREFIX)
             for (name in arrayOf("libexec/sftp-server", "lib/openssh/sftp-server")) {
@@ -265,6 +351,54 @@ class RootServer : RootService() {
                 bridgeSessions.remove(this)
             }
             session.close()
+        }
+    }
+
+    private inner class AutoRedirectSessionBinder(
+        private val session: AutoRedirectSession,
+        private val handlerBinder: IBinder,
+    ) : IAutoRedirectSession.Stub(),
+        IBinder.DeathRecipient {
+
+        override fun binderDied() {
+            Log.w("RootServer", "auto-redirect handler died, closing session")
+            closeSession()
+        }
+
+        override fun close() {
+            try {
+                closeSession()
+            } catch (e: Exception) {
+                throw IllegalStateException(e.message ?: e.toString())
+            }
+            handlerBinder.unlinkToDeath(this, 0)
+        }
+
+        override fun updateRouteAddressSet() {
+            try {
+                session.updateRouteAddressSet()
+            } catch (e: Exception) {
+                throw IllegalStateException(e.message ?: e.toString())
+            }
+        }
+
+        // libsu terminates the root process as soon as the last client dies,
+        // so the Go-side cleanup must finish inside this call and onDestroy
+        // must block on it.
+        private var closed = false
+
+        fun closeSession() {
+            synchronized(this) {
+                if (closed) return
+                closed = true
+                try {
+                    session.close()
+                } finally {
+                    synchronized(autoRedirectSessions) {
+                        autoRedirectSessions.remove(this)
+                    }
+                }
+            }
         }
     }
 
@@ -420,6 +554,18 @@ class RootServer : RootService() {
         for (session in sessions) {
             try {
                 session.close()
+            } catch (_: Exception) {
+            }
+        }
+        val autoRedirects = synchronized(autoRedirectLifecycle) {
+            destroyed = true
+            synchronized(autoRedirectSessions) {
+                autoRedirectSessions.toList()
+            }
+        }
+        for (session in autoRedirects) {
+            try {
+                session.closeSession()
             } catch (_: Exception) {
             }
         }
