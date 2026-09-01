@@ -1,6 +1,8 @@
 package io.nekohasekai.sfa.bg;
 
 import android.os.ParcelFileDescriptor;
+import io.nekohasekai.sfa.bg.IAutoRedirectHandler;
+import io.nekohasekai.sfa.bg.IAutoRedirectSession;
 import io.nekohasekai.sfa.bg.IBridgeSession;
 import io.nekohasekai.sfa.bg.INeighborTableCallback;
 import io.nekohasekai.sfa.bg.IRootShellSession;
@@ -24,4 +26,6 @@ interface IRootService {
     String lookupSFTPServer() = 7;
 
     IBridgeSession openBridge(String bridgeName, int mtu, String inet4Port, String inet6Port, int ruleIndex, int routeTable) = 8;
+
+    IAutoRedirectSession startAutoRedirect(in byte[] options, IAutoRedirectHandler handler) = 9;
 }
