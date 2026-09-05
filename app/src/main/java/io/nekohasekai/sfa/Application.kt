@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.net.wifi.WifiManager
+import android.os.Build
 import android.os.PowerManager
 import android.util.Log
 import androidx.core.content.getSystemService
@@ -29,6 +30,7 @@ import io.nekohasekai.sfa.vendor.Vendor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import java.io.File
 import java.util.Locale
 import io.nekohasekai.sfa.Application as BoxApplication
@@ -114,6 +116,12 @@ class Application : Application() {
         it.oomKillerDisabled = Settings.oomKillerDisabled
         it.oomMemoryLimit = Settings.oomMemoryLimitMB.toLong() * 1024L * 1024L
         it.powerReportEnabled = Settings.powerReportEnabled
+        it.platformMetadata = JSONObject().apply {
+            put("os", "Android " + Build.VERSION.RELEASE)
+            put("sdk", Build.VERSION.SDK_INT)
+            put("manufacturer", Build.MANUFACTURER)
+            put("model", Build.MODEL)
+        }.toString()
     }
 
     companion object {
