@@ -11,6 +11,11 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven { url = uri("https://jitpack.io") }
+        maven {
+            url = uri("https://central.sonatype.com/repository/maven-snapshots/")
+            mavenContent { snapshotsOnly() }
+            content { includeGroup("io.github.sagernet") }
+        }
         maven { url = uri("https://api.xposed.info/") }
     }
 }
