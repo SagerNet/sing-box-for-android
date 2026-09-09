@@ -18,6 +18,10 @@ plugins {
     alias(libs.plugins.spotless)
 }
 
+configurations.configureEach {
+    resolutionStrategy.cacheChangingModulesFor(0, "seconds")
+}
+
 fun getProps(propName: String): String {
     val propsInEnv = System.getenv("LOCAL_PROPERTIES")
     if (propsInEnv != null) {
@@ -355,7 +359,7 @@ dependencies {
     implementation("org.kodein.emoji:emoji-kt:2.5.0")
 
     // Terminal emulator
-    val libghosttyVersion = "0.1.0-alpha01"
+    val libghosttyVersion = "0.1.0-SNAPSHOT"
     implementation("io.github.sagernet:libghostty-android:$libghosttyVersion")
     implementation("io.github.sagernet:libghostty-android-extras:$libghosttyVersion")
     "playImplementation"("io.github.sagernet:libghostty-android-compose:$libghosttyVersion")
