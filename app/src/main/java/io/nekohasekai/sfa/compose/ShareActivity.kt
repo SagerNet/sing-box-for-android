@@ -63,8 +63,14 @@ import io.nekohasekai.sfa.compose.screen.tools.TailscaleStatusViewModel
 import io.nekohasekai.sfa.compose.theme.Theme
 import io.nekohasekai.sfa.constant.Alert
 import io.nekohasekai.sfa.constant.Status
+import io.nekohasekai.sfa.database.Settings
 import io.nekohasekai.sfa.utils.RemoteControlManager
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ShareActivity :
     AppCompatActivity(),
@@ -80,25 +86,41 @@ class ShareActivity :
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         sendID = savedInstanceState?.getLong(STATE_SEND_ID) ?: -1L
-        if (sendID == -1L) {
-            try {
-                sharedFiles = openSharedContent(intent)
-            } catch (e: Exception) {
-                errorMessage = e.message ?: e.toString()
-            }
-        }
-        connection.reconnect()
-        RemoteControlManager.restore()
         lifecycleScope.launch {
-            GlobalEventBus.events.collect { event ->
-                if (event is UiEvent.ErrorMessage) {
-                    errorMessage = event.message
+            Settings.dataStore.initialize()
+            if (sendID == -1L) {
+                var openedFiles = emptyList<TaildropSendFile>()
+                try {
+                    withContext(Dispatchers.IO) {
+                        openedFiles = openSharedContent(intent)
+                    }
+                    sharedFiles = openedFiles
+                    openedFiles = emptyList()
+                } catch (exception: CancellationException) {
+                    throw exception
+                } catch (exception: Exception) {
+                    errorMessage = exception.message ?: exception.toString()
+                } finally {
+                    if (openedFiles.isNotEmpty()) {
+                        withContext(NonCancellable + Dispatchers.IO) {
+                            openedFiles.forEach { it.close() }
+                        }
+                    }
                 }
             }
-        }
-        setContent {
-            Theme {
-                ShareSheet()
+            connection.reconnect()
+            RemoteControlManager.restore()
+            lifecycleScope.launch {
+                GlobalEventBus.events.collect { event ->
+                    if (event is UiEvent.ErrorMessage) {
+                        errorMessage = event.message
+                    }
+                }
+            }
+            setContent {
+                Theme {
+                    ShareSheet()
+                }
             }
         }
     }
@@ -112,8 +134,10 @@ class ShareActivity :
         connection.disconnect()
         val files = sharedFiles
         sharedFiles = emptyList()
-        for (file in files) {
-            file.close()
+        if (files.isNotEmpty()) {
+            CoroutineScope(Dispatchers.IO).launch {
+                files.forEach { it.close() }
+            }
         }
         super.onDestroy()
     }

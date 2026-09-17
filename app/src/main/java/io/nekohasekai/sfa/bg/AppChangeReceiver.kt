@@ -20,18 +20,19 @@ class AppChangeReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         Log.d(TAG, "onReceive: ${intent.action}")
-        if (!Settings.perAppProxyEnabled) {
-            Log.d(TAG, "per app proxy disabled")
-            return
-        }
-        if (!Settings.perAppProxyManagedMode) {
-            Log.d(TAG, "managed mode disabled")
-            return
-        }
         val pendingResult = goAsync()
         CoroutineScope(Dispatchers.IO).launch {
             try {
+                if (!Settings.perAppProxyEnabled) {
+                    Log.d(TAG, "per app proxy disabled")
+                    return@launch
+                }
+                if (!Settings.perAppProxyManagedMode) {
+                    Log.d(TAG, "managed mode disabled")
+                    return@launch
+                }
                 rescanAllApps()
+                Settings.dataStore.flush()
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to rescan apps", e)
                 withContext(Dispatchers.Main) {

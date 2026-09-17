@@ -228,26 +228,29 @@ class MainActivity :
         }
         enableEdgeToEdge()
 
-        connection.reconnect()
-        RemoteControlManager.restore()
+        lifecycleScope.launch {
+            Settings.dataStore.initialize()
+            connection.reconnect()
+            RemoteControlManager.restore()
 
-        UpdateState.loadFromCache()
-        if (Settings.checkUpdateEnabled) {
-            lifecycleScope.launch(Dispatchers.IO) {
-                try {
-                    val updateInfo = Vendor.checkUpdateAsync()
-                    UpdateState.setUpdate(updateInfo)
-                } catch (_: Exception) {
-                    UpdateState.setUpdate(null)
+            UpdateState.loadFromCache()
+            if (Settings.checkUpdateEnabled) {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    try {
+                        val updateInfo = Vendor.checkUpdateAsync()
+                        UpdateState.setUpdate(updateInfo)
+                    } catch (_: Exception) {
+                        UpdateState.setUpdate(null)
+                    }
                 }
             }
-        }
 
-        handleIntent(intent)
+            handleIntent(intent)
 
-        setContent {
-            Theme {
-                App()
+            setContent {
+                Theme {
+                    App()
+                }
             }
         }
     }
@@ -318,36 +321,41 @@ class MainActivity :
 
     @SuppressLint("NewApi")
     fun startService() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !ServiceNotification.checkPermission()) {
-            if (!notificationPermissionRequested) {
-                notificationPermissionRequested = true
-                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                return
+        lifecycleScope.launch {
+            Settings.dataStore.initialize()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !ServiceNotification.checkPermission()) {
+                if (!notificationPermissionRequested) {
+                    notificationPermissionRequested = true
+                    notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    return@launch
+                }
+                if (Settings.dynamicNotification) {
+                    onServiceAlert(Alert.RequestNotificationPermission, null)
+                    return@launch
+                }
             }
-            if (Settings.dynamicNotification) {
-                onServiceAlert(Alert.RequestNotificationPermission, null)
-                return
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN &&
+                !hasPermission(Manifest.permission.ACCESS_LOCAL_NETWORK) &&
+                !localNetworkPermissionRequested
+            ) {
+                localNetworkPermissionRequested = true
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this@MainActivity, Manifest.permission.ACCESS_LOCAL_NETWORK)) {
+                    showLocalNetworkPermissionDialog = true
+                } else {
+                    localNetworkPermissionLauncher.launch(Manifest.permission.ACCESS_LOCAL_NETWORK)
+                }
+                return@launch
             }
+            startService0()
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN &&
-            !hasPermission(Manifest.permission.ACCESS_LOCAL_NETWORK) &&
-            !localNetworkPermissionRequested
-        ) {
-            localNetworkPermissionRequested = true
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_LOCAL_NETWORK)) {
-                showLocalNetworkPermissionDialog = true
-            } else {
-                localNetworkPermissionLauncher.launch(Manifest.permission.ACCESS_LOCAL_NETWORK)
-            }
-            return
-        }
-        startService0()
     }
 
     private fun startService0() {
         lifecycleScope.launch(Dispatchers.IO) {
             if (Settings.rebuildServiceMode()) {
-                connection.reconnect()
+                withContext(Dispatchers.Main) {
+                    connection.reconnect()
+                }
             }
             if (Settings.serviceMode == ServiceMode.VPN) {
                 if (prepare()) {

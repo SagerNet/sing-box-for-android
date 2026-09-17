@@ -31,13 +31,12 @@ object Settings {
             Application.application,
             KeyValueDatabase::class.java,
             Path.SETTINGS_DATABASE_PATH,
-        ).allowMainThreadQueries()
-            .fallbackToDestructiveMigration()
+        ).fallbackToDestructiveMigration()
             .enableMultiInstanceInvalidation()
             .setQueryExecutor { GlobalScope.launch { it.run() } }
             .build()
     }
-    val dataStore = RoomPreferenceDataStore(instance.keyValuePairDao())
+    val dataStore = RoomPreferenceDataStore { instance.keyValuePairDao() }
     var selectedProfile by dataStore.long(SettingsKey.SELECTED_PROFILE) { -1L }
     var serviceMode by dataStore.string(SettingsKey.SERVICE_MODE) { ServiceMode.NORMAL }
     var startedByUser by dataStore.boolean(SettingsKey.STARTED_BY_USER)

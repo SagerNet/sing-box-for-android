@@ -12,12 +12,17 @@ import io.nekohasekai.sfa.utils.CommandTarget
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.selects.select
+import kotlinx.coroutines.withContext
+import java.util.concurrent.atomic.AtomicBoolean
 
 data class TailscaleSSHTerminalState(
     val sessions: List<ManagedSession> = emptyList(),
@@ -34,7 +39,7 @@ data class TailscaleSSHTerminalState(
  */
 object TailscaleSSHSessionStore : GhosttyTerminalSession.EventListener {
 
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
     private val _state = MutableStateFlow(TailscaleSSHTerminalState())
     val state: StateFlow<TailscaleSSHTerminalState> = _state.asStateFlow()
@@ -113,31 +118,39 @@ object TailscaleSSHSessionStore : GhosttyTerminalSession.EventListener {
 
                 val commandClient = CommandTarget.ownedStandaloneClient()
                 managed.commandClient = commandClient
-                val sshSession = commandClient.startTailscaleSSHSession(
-                    options,
-                    object : TailscaleSSHHandler {
-                        override fun onReady() {
-                            managed.phase.value = TerminalSessionPhase.RUNNING
-                        }
+                val sshSession = withContext(Dispatchers.IO) {
+                    commandClient.startTailscaleSSHSession(
+                        options,
+                        object : TailscaleSSHHandler {
+                            override fun onReady() {
+                                managed.phase.value = TerminalSessionPhase.RUNNING
+                            }
 
-                        override fun onOutput(data: ByteArray) {
-                            managed.terminalSession.feedOutput(data)
-                        }
+                            override fun onOutput(data: ByteArray) {
+                                managed.terminalSession.feedOutput(data)
+                            }
 
-                        override fun onAuthBanner(message: String) {
-                            managed.banner.value = message
-                        }
+                            override fun onAuthBanner(message: String) {
+                                managed.banner.value = message
+                            }
 
-                        override fun onExit(exitCode: Int, signal: String, errorMessage: String) {
-                            finishSession(managed, exitCode, signal.takeIf { it.isNotEmpty() }, errorMessage.takeIf { it.isNotEmpty() })
-                        }
+                            override fun onExit(exitCode: Int, signal: String, errorMessage: String) {
+                                finishSession(managed, exitCode, signal.takeIf { it.isNotEmpty() }, errorMessage.takeIf { it.isNotEmpty() })
+                            }
 
-                        override fun onError(message: String) {
-                            finishSession(managed, -1, null, message)
-                        }
-                    },
-                )
-                managed.terminalSession.transport = TailscaleSSHTransport(sshSession)
+                            override fun onError(message: String) {
+                                finishSession(managed, -1, null, message)
+                            }
+                        },
+                    )
+                }
+                if (managed.terminalSession.isFinished || _state.value.sessions.none { it === managed }) {
+                    withContext(Dispatchers.IO) { sshSession.close() }
+                    return@launch
+                }
+                managed.terminalSession.transport = TailscaleSSHTransport(sshSession) { exception ->
+                    finishSession(managed, -1, null, exception.message ?: "SSH transport failed")
+                }
             } catch (e: Exception) {
                 finishSession(managed, -1, null, e.message ?: "SSH connection failed")
             }
@@ -151,6 +164,9 @@ object TailscaleSSHSessionStore : GhosttyTerminalSession.EventListener {
     }
 
     private fun onSessionExited(managed: ManagedSession) {
+        managed.terminalSession.transport?.close()
+        managed.terminalSession.transport = null
+        disconnectClient(managed)
         managed.phase.value = TerminalSessionPhase.FINISHED
         managed.terminalSession.feedOutput(exitNotice(managed).toByteArray())
 
@@ -187,7 +203,7 @@ object TailscaleSSHSessionStore : GhosttyTerminalSession.EventListener {
     private fun disconnectClient(session: ManagedSession) {
         val commandClient = session.commandClient ?: return
         session.commandClient = null
-        scope.launch {
+        scope.launch(Dispatchers.IO) {
             runCatching {
                 commandClient.disconnect()
             }
@@ -195,16 +211,55 @@ object TailscaleSSHSessionStore : GhosttyTerminalSession.EventListener {
     }
 }
 
-private class TailscaleSSHTransport(private val session: TailscaleSSHSession) : GhosttyTerminalSession.Transport {
+private class TailscaleSSHTransport(
+    private val session: TailscaleSSHSession,
+    private val onError: (Exception) -> Unit,
+) : GhosttyTerminalSession.Transport {
+    private data class Resize(val columns: Int, val rows: Int, val widthPixels: Int, val heightPixels: Int)
+
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val closed = AtomicBoolean()
+    private val input = Channel<ByteArray>(Channel.UNLIMITED)
+    private val resize = Channel<Resize>(Channel.CONFLATED)
+
+    init {
+        scope.launch {
+            try {
+                while (!closed.get()) {
+                    select<Unit> {
+                        input.onReceive { session.sendInput(it) }
+                        resize.onReceive {
+                            session.sendResize(it.columns, it.rows, it.widthPixels, it.heightPixels)
+                        }
+                    }
+                }
+            } catch (exception: Exception) {
+                if (!closed.get()) {
+                    onError(exception)
+                    close()
+                }
+            }
+        }
+    }
+
     override fun sendInput(data: ByteArray) {
-        session.sendInput(data)
+        input.trySend(data.copyOf())
     }
 
     override fun sendResize(columns: Int, rows: Int, widthPixels: Int, heightPixels: Int) {
-        session.sendResize(columns, rows, widthPixels, heightPixels)
+        resize.trySend(Resize(columns, rows, widthPixels, heightPixels))
     }
 
     override fun close() {
-        session.close()
+        if (!closed.compareAndSet(false, true)) return
+        input.cancel()
+        resize.cancel()
+        scope.launch {
+            try {
+                runCatching { session.close() }
+            } finally {
+                scope.cancel()
+            }
+        }
     }
 }

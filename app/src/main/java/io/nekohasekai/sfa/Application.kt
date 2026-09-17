@@ -49,8 +49,6 @@ class Application : Application() {
         }.onFailure {
             Log.d("Application", "set locale: ${it.message}")
         }
-        HookStatusClient.register(this)
-        PrivilegeSettingsClient.register(this)
 
         val baseDir = filesDir
         baseDir.mkdirs()
@@ -66,6 +64,9 @@ class Application : Application() {
 
         @Suppress("OPT_IN_USAGE")
         GlobalScope.launch(Dispatchers.IO) {
+            Settings.dataStore.initialize()
+            HookStatusClient.register(this@Application)
+            PrivilegeSettingsClient.register(this@Application)
             initialize(baseDir, workingDir, tempDir)
             UpdateProfileWork.reconfigureUpdater()
             HookModuleUpdateNotifier.sync(this@Application)

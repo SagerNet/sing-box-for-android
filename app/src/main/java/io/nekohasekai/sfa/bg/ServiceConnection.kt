@@ -14,9 +14,11 @@ import io.nekohasekai.sfa.constant.Action
 import io.nekohasekai.sfa.constant.Alert
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.database.Settings
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
 class ServiceConnection(private val context: Context, callback: Callback, private val register: Boolean = true) : ServiceConnection {
     companion object {
@@ -25,21 +27,24 @@ class ServiceConnection(private val context: Context, callback: Callback, privat
 
     private val callback = ServiceCallback(callback)
     private var service: IService? = null
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    private var connectJob: Job? = null
 
     val status get() = service?.status?.let { Status.values()[it] } ?: Status.Stopped
 
     fun connect() {
-        val intent =
-            runBlocking {
-                withContext(Dispatchers.IO) {
-                    Intent(context, Settings.serviceClass()).setAction(Action.SERVICE)
-                }
-            }
-        context.bindService(intent, this, AppCompatActivity.BIND_AUTO_CREATE)
-        Log.d(TAG, "request connect")
+        connectJob?.cancel()
+        connectJob = scope.launch {
+            Settings.dataStore.initialize()
+            val intent = Intent(context, Settings.serviceClass()).setAction(Action.SERVICE)
+            context.bindService(intent, this@ServiceConnection, AppCompatActivity.BIND_AUTO_CREATE)
+            Log.d(TAG, "request connect")
+        }
     }
 
     fun disconnect() {
+        connectJob?.cancel()
+        connectJob = null
         try {
             context.unbindService(this)
         } catch (_: IllegalArgumentException) {
@@ -48,18 +53,8 @@ class ServiceConnection(private val context: Context, callback: Callback, privat
     }
 
     fun reconnect() {
-        try {
-            context.unbindService(this)
-        } catch (_: IllegalArgumentException) {
-        }
-        val intent =
-            runBlocking {
-                withContext(Dispatchers.IO) {
-                    Intent(context, Settings.serviceClass()).setAction(Action.SERVICE)
-                }
-            }
-        context.bindService(intent, this, AppCompatActivity.BIND_AUTO_CREATE)
-        Log.d(TAG, "request reconnect")
+        disconnect()
+        connect()
     }
 
     override fun onServiceConnected(name: ComponentName, binder: IBinder) {
