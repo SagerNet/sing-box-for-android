@@ -180,7 +180,6 @@ fun DashboardScreen(
                 processCardsForRendering(
                     cardOrder = uiState.cardOrder,
                     visibleCards = actuallyVisibleCards,
-                    cardWidths = uiState.cardWidths,
                 )
 
             items(cardRenderItems) { renderItem ->
@@ -193,9 +192,6 @@ fun DashboardScreen(
                         renderItem.cards.forEach { cardGroup ->
                             DashboardCardRenderer(
                                 cardGroup = cardGroup,
-                                cardWidth =
-                                uiState.cardWidths[cardGroup]
-                                    ?: CardWidth.Full,
                                 uiState = uiState,
                                 onClashModeSelected = viewModel::selectClashMode,
                                 onSystemProxyToggle = viewModel::toggleSystemProxy,
@@ -232,9 +228,6 @@ fun DashboardScreen(
                     renderItem.cards.forEach { cardGroup ->
                         DashboardCardRenderer(
                             cardGroup = cardGroup,
-                            cardWidth =
-                            uiState.cardWidths[cardGroup]
-                                ?: CardWidth.Full,
                             uiState = uiState,
                             serviceStatus = serviceStatus,
                             onClashModeSelected = viewModel::selectClashMode,
@@ -269,12 +262,11 @@ fun DashboardScreen(
 }
 
 /**
- * Process cards for rendering, grouping consecutive half-width cards into rows
+ * Process cards for rendering, grouping consecutive cards of the same pair group into rows
  */
 fun processCardsForRendering(
     cardOrder: List<CardGroup>,
     visibleCards: Set<CardGroup>,
-    cardWidths: Map<CardGroup, CardWidth>,
 ): List<CardRenderItem> {
     val renderItems = mutableListOf<CardRenderItem>()
     val visibleOrderedCards = cardOrder.filter { visibleCards.contains(it) }
@@ -282,42 +274,26 @@ fun processCardsForRendering(
     var i = 0
     while (i < visibleOrderedCards.size) {
         val currentCard = visibleOrderedCards[i]
-        val currentWidth = cardWidths[currentCard] ?: CardWidth.Full
+        val pairGroup = currentCard.pairGroup
+        val nextCard = visibleOrderedCards.getOrNull(i + 1)
 
-        if (currentWidth == CardWidth.Half) {
-            // Check if next card is also half-width
-            if (i + 1 < visibleOrderedCards.size) {
-                val nextCard = visibleOrderedCards[i + 1]
-                val nextWidth = cardWidths[nextCard] ?: CardWidth.Full
-
-                if (nextWidth == CardWidth.Half) {
-                    // Group two half-width cards together
-                    renderItems.add(
-                        CardRenderItem(
-                            cards = listOf(currentCard, nextCard),
-                            isRow = true,
-                        ),
-                    )
-                    i += 2
-                    continue
-                }
-            }
-            // Single half-width card
+        if (pairGroup != null && nextCard?.pairGroup == pairGroup) {
             renderItems.add(
                 CardRenderItem(
-                    cards = listOf(currentCard),
-                    isRow = false,
+                    cards = listOf(currentCard, nextCard),
+                    isRow = true,
                 ),
             )
-        } else {
-            // Full-width card
-            renderItems.add(
-                CardRenderItem(
-                    cards = listOf(currentCard),
-                    isRow = false,
-                ),
-            )
+            i += 2
+            continue
         }
+
+        renderItems.add(
+            CardRenderItem(
+                cards = listOf(currentCard),
+                isRow = false,
+            ),
+        )
         i++
     }
 
