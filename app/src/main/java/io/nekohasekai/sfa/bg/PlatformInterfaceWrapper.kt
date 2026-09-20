@@ -49,7 +49,7 @@ interface PlatformInterfaceWrapper : PlatformInterface {
     }
 
     override fun openTun(options: TunOptions): Int {
-        error("invalid argument")
+        error("android: tun inbound requires VPN service")
     }
 
     override fun useProcFS(): Boolean = Build.VERSION.SDK_INT < Build.VERSION_CODES.Q

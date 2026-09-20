@@ -2,6 +2,7 @@ package io.nekohasekai.sfa.database
 
 import android.os.Build
 import androidx.room.Room
+import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.BuildConfig
 import io.nekohasekai.sfa.bg.ProxyService
@@ -20,7 +21,6 @@ import io.nekohasekai.sfa.ktx.stringSet
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 import java.io.File
 
 object Settings {
@@ -158,15 +158,7 @@ object Settings {
     private suspend fun needVPNService(): Boolean {
         val selectedProfileId = selectedProfile
         if (selectedProfileId == -1L) return false
-        val profile = ProfileManager.get(selectedProfile) ?: return false
-        val content = JSONObject(File(profile.typed.path).readText())
-        val inbounds = content.getJSONArray("inbounds")
-        for (index in 0 until inbounds.length()) {
-            val inbound = inbounds.getJSONObject(index)
-            if (inbound.getString("type") == "tun") {
-                return true
-            }
-        }
-        return false
+        val profile = ProfileManager.get(selectedProfileId) ?: return false
+        return Libbox.hasTunInbound(File(profile.typed.path).readText())
     }
 }

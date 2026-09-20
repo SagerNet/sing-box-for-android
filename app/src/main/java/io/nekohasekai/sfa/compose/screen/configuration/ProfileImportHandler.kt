@@ -11,7 +11,6 @@ import io.nekohasekai.sfa.database.ProfileManager
 import io.nekohasekai.sfa.database.TypedProfile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
 import java.io.File
 import java.util.Date
 
@@ -63,10 +62,6 @@ class ProfileImportHandler(private val context: Context) {
                 try {
                     Libbox.decodeProfileContent(data)
                 } catch (e: Exception) {
-                    // If it fails, try one more time as JSON
-                    if (dataString.trimStart().startsWith("{") || dataString.trimStart().startsWith("[")) {
-                        return@withContext importJsonConfiguration(dataString, filename)
-                    }
                     return@withContext ImportResult.Error(
                         context.getString(R.string.error_decode_profile, e.message),
                     )
@@ -95,9 +90,6 @@ class ProfileImportHandler(private val context: Context) {
                 try {
                     Libbox.decodeProfileContent(data)
                 } catch (e: Exception) {
-                    if (dataString.trimStart().startsWith("{") || dataString.trimStart().startsWith("[")) {
-                        return@withContext UriParseResult.Success(name = filename)
-                    }
                     return@withContext UriParseResult.Error(
                         context.getString(R.string.error_decode_profile, e.message),
                     )
@@ -324,24 +316,8 @@ class ProfileImportHandler(private val context: Context) {
     }
 
     private fun isJsonConfiguration(content: String): Boolean {
-        val trimmed = content.trim()
-        if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) {
-            return false
-        }
-
-        return try {
-            // Try to parse as JSON and check for sing-box configuration fields
-            val json = JSONObject(content)
-            // Check for common sing-box configuration fields
-            json.has("inbounds") ||
-                json.has("outbounds") ||
-                json.has("route") ||
-                json.has("dns") ||
-                json.has("experimental")
-        } catch (e: Exception) {
-            // If it's an array, it might still be valid
-            trimmed.startsWith("[") && trimmed.endsWith("]")
-        }
+        val trimmed = content.trimStart()
+        return trimmed.startsWith("{") || trimmed.startsWith("[")
     }
 
     private suspend fun importJsonConfiguration(jsonContent: String, profileName: String): ImportResult {
