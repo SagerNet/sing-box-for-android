@@ -26,25 +26,31 @@ class GitHubUpdateChecker : Closeable {
     private val json = Json { ignoreUnknownKeys = true }
 
     fun checkUpdate(track: UpdateTrack, githubToken: String): UpdateInfo? {
-        val releases = getReleases(githubToken)
-        var selected: ReleaseCandidate? = null
-
-        for (release in releases) {
-            if (!isReleaseInTrack(release, track)) {
-                continue
-            }
-            val metadata = runCatching { downloadMetadata(release) }.getOrNull() ?: continue
-            if (!isNewerThanCurrent(metadata.versionName)) {
-                continue
-            }
-            val currentBest = selected
-            if (currentBest == null || isBetterVersion(metadata, currentBest.metadata)) {
-                selected = ReleaseCandidate(release, metadata)
-            }
+        val request = client.newRequest()
+        request.setURL(
+            when (track) {
+                UpdateTrack.STABLE -> "$RELEASES_URL/latest"
+                UpdateTrack.BETA -> "$RELEASES_URL?per_page=3"
+            },
+        )
+        request.setHeader("Accept", "application/vnd.github+json")
+        val token = githubToken.trim()
+        if (token.isNotEmpty()) {
+            request.setHeader("Authorization", "Bearer $token")
         }
-
-        val release = selected?.release ?: return null
-        val metadata = selected.metadata
+        request.setUserAgent(HTTPClient.userAgent)
+        val content = request.execute().content.unwrap
+        val releases = when (track) {
+            UpdateTrack.STABLE -> listOf(json.decodeFromString<GitHubRelease>(content))
+            UpdateTrack.BETA -> json.decodeFromString<List<GitHubRelease>>(content)
+        }
+        val release = releases.filter { !it.draft }.reduceOrNull { best, candidate ->
+            if (Libbox.compareSemver(candidate.version, best.version)) candidate else best
+        } ?: return null
+        if (!Libbox.compareSemver(release.version, BuildConfig.VERSION_NAME)) {
+            return null
+        }
+        val metadata = downloadMetadata(release) ?: return null
 
         val isLegacy = Build.VERSION.SDK_INT < Build.VERSION_CODES.M
         val apkAsset = release.assets.find { asset ->
@@ -55,51 +61,13 @@ class GitHubUpdateChecker : Closeable {
 
         return UpdateInfo(
             versionCode = metadata.versionCode,
-            versionName = metadata.versionName,
+            versionName = release.version,
             downloadUrl = apkAsset?.browserDownloadUrl ?: release.htmlUrl,
             releaseUrl = release.htmlUrl,
             releaseNotes = release.body,
             isPrerelease = release.prerelease,
             fileSize = apkAsset?.size ?: 0,
         )
-    }
-
-    private fun getReleases(githubToken: String): List<GitHubRelease> {
-        val request = client.newRequest()
-        request.setURL(RELEASES_URL)
-        request.setHeader("Accept", "application/vnd.github.v3+json")
-        val token = githubToken.trim()
-        if (token.isNotEmpty()) {
-            request.setHeader("Authorization", "Bearer $token")
-        }
-        request.setUserAgent(HTTPClient.userAgent)
-
-        val response = request.execute()
-        val content = response.content.unwrap
-
-        return json.decodeFromString(content)
-    }
-
-    private fun isReleaseInTrack(release: GitHubRelease, track: UpdateTrack): Boolean {
-        if (release.draft) {
-            return false
-        }
-        return when (track) {
-            UpdateTrack.STABLE -> !release.prerelease
-            UpdateTrack.BETA -> true
-        }
-    }
-
-    private fun isNewerThanCurrent(versionName: String): Boolean = Libbox.compareSemver(versionName, BuildConfig.VERSION_NAME)
-
-    private fun isBetterVersion(version: VersionMetadata, other: VersionMetadata): Boolean {
-        if (Libbox.compareSemver(version.versionName, other.versionName)) {
-            return true
-        }
-        if (Libbox.compareSemver(other.versionName, version.versionName)) {
-            return false
-        }
-        return version.versionCode > other.versionCode
     }
 
     private fun downloadMetadata(release: GitHubRelease): VersionMetadata? {
@@ -129,7 +97,9 @@ class GitHubUpdateChecker : Closeable {
         val prerelease: Boolean = false,
         @SerialName("html_url") val htmlUrl: String = "",
         val assets: List<GitHubAsset> = emptyList(),
-    )
+    ) {
+        val version: String get() = tagName.removePrefix("v")
+    }
 
     @Serializable
     data class GitHubAsset(
@@ -141,11 +111,5 @@ class GitHubUpdateChecker : Closeable {
     @Serializable
     data class VersionMetadata(
         @SerialName("version_code") val versionCode: Int = 0,
-        @SerialName("version_name") val versionName: String = "",
-    )
-
-    private data class ReleaseCandidate(
-        val release: GitHubRelease,
-        val metadata: VersionMetadata,
     )
 }
