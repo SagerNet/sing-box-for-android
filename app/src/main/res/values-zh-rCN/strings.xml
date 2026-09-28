@@ -89,6 +89,10 @@
     <string name="connection_state_all">全部</string>
     <string name="connection_state_active">活动</string>
     <string name="connection_state_closed">已关闭</string>
+    <string name="connection_empty_all">暂无连接</string>
+    <string name="connection_empty_active">暂无活动连接</string>
+    <string name="connection_empty_closed">暂无已关闭连接</string>
+    <string name="connection_empty_search">没有匹配的连接</string>
     <string name="connection_sort_date">日期</string>
     <string name="connection_sort_traffic">流量</string>
     <string name="connection_sort_traffic_total">总流量</string>

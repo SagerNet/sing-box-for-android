@@ -89,6 +89,10 @@
     <string name="connection_state_all">همه</string>
     <string name="connection_state_active">فعال</string>
     <string name="connection_state_closed">بسته</string>
+    <string name="connection_empty_all">اتصالی وجود ندارد</string>
+    <string name="connection_empty_active">اتصال فعالی وجود ندارد</string>
+    <string name="connection_empty_closed">اتصال بسته‌شده‌ای وجود ندارد</string>
+    <string name="connection_empty_search">اتصال منطبقی یافت نشد</string>
     <string name="connection_sort_date">تاریخ</string>
     <string name="connection_sort_traffic">ترافیک</string>
     <string name="connection_sort_traffic_total">ترافیک کل</string>

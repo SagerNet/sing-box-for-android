@@ -89,6 +89,10 @@
     <string name="connection_state_all">Все</string>
     <string name="connection_state_active">Активно</string>
     <string name="connection_state_closed">Закрыто</string>
+    <string name="connection_empty_all">Нет соединений</string>
+    <string name="connection_empty_active">Нет активных соединений</string>
+    <string name="connection_empty_closed">Нет закрытых соединений</string>
+    <string name="connection_empty_search">Совпадающих соединений нет</string>
     <string name="connection_sort_date">Дата</string>
     <string name="connection_sort_traffic">Трафик</string>
     <string name="connection_sort_traffic_total">Общий трафик</string>

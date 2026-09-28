@@ -89,6 +89,10 @@
     <string name="connection_state_all">All</string>
     <string name="connection_state_active">Active</string>
     <string name="connection_state_closed">Closed</string>
+    <string name="connection_empty_all">No connections</string>
+    <string name="connection_empty_active">No active connections</string>
+    <string name="connection_empty_closed">No closed connections</string>
+    <string name="connection_empty_search">No matching connections</string>
     <string name="connection_sort_date">Date</string>
     <string name="connection_sort_traffic">Traffic</string>
     <string name="connection_sort_traffic_total">Total Traffic</string>

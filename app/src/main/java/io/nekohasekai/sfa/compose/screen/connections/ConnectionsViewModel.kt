@@ -18,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -60,15 +61,6 @@ class ConnectionsViewModel :
 
     override fun createInitialState() = ConnectionsUiState()
 
-    private data class ConnectionState(
-        val foreground: Boolean,
-        val screenOn: Boolean,
-        val visibleCount: Int,
-        val status: Status,
-        val remoteServerId: Long?,
-        val remoteConnected: Boolean,
-    )
-
     init {
         viewModelScope.launch {
             combine(
@@ -81,12 +73,10 @@ class ConnectionsViewModel :
                     RemoteControlManager.isConnected,
                 ) { remoteServer, remoteConnected -> remoteServer?.id to remoteConnected },
             ) { foreground, screenOn, visibleCount, status, (remoteServerId, remoteConnected) ->
-                ConnectionState(foreground, screenOn, visibleCount, status, remoteServerId, remoteConnected)
-            }.collect { state ->
-                val serviceReady =
-                    if (state.remoteServerId != null) state.remoteConnected else state.status == Status.Started
-                val shouldConnect = state.foreground && state.screenOn &&
-                    state.visibleCount > 0 && serviceReady
+                val serviceReady = if (remoteServerId != null) remoteConnected else status == Status.Started
+                val shouldConnect = foreground && screenOn && visibleCount > 0 && serviceReady
+                shouldConnect to remoteServerId
+            }.distinctUntilChanged().collect { (shouldConnect, _) ->
                 if (shouldConnect) {
                     updateState { copy(isLoading = true) }
                     commandClient.connect()
@@ -183,12 +173,6 @@ class ConnectionsViewModel :
             } catch (e: Exception) {
                 sendError(e)
             }
-        }
-    }
-
-    override fun onConnected() {
-        viewModelScope.launch(Dispatchers.Main) {
-            updateState { copy(isLoading = false) }
         }
     }
 

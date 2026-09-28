@@ -397,6 +397,13 @@ fun ConnectionsScreen(
     }
 
     val lazyListState = rememberSaveable(saver = LazyListState.Saver) { LazyListState() }
+    val emptyMessage =
+        when {
+            uiState.searchText.isNotBlank() -> R.string.connection_empty_search
+            uiState.stateFilter == ConnectionStateFilter.All -> R.string.connection_empty_all
+            uiState.stateFilter == ConnectionStateFilter.Active -> R.string.connection_empty_active
+            else -> R.string.connection_empty_closed
+        }
 
     if (asSheet) {
         val sheetSwipeToDismissModifier =
@@ -468,6 +475,22 @@ fun ConnectionsScreen(
                     }
                 }
 
+                uiState.connections.isEmpty() -> {
+                    item(key = "connections_empty") {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 48.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(
+                                stringResource(emptyMessage),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+                }
+
                 else -> {
                     items(
                         items = uiState.connections,
@@ -524,6 +547,18 @@ fun ConnectionsScreen(
                         contentAlignment = Alignment.Center,
                     ) {
                         CircularProgressIndicator()
+                    }
+                }
+
+                uiState.connections.isEmpty() -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            stringResource(emptyMessage),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
                     }
                 }
 
