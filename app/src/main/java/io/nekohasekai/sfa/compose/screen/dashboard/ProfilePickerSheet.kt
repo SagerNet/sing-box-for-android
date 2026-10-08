@@ -253,7 +253,7 @@ private fun ProfilePickerRow(
                     withContext(Dispatchers.Main) {
                         Toast.makeText(
                             context,
-                            "${context.getString(R.string.failed_save_profile)}: ${e.message}",
+                            context.getString(R.string.failed_save_profile, e.message),
                             Toast.LENGTH_SHORT,
                         ).show()
                     }
