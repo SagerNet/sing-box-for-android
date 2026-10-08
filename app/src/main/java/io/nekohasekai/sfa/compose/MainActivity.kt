@@ -79,7 +79,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -1610,7 +1612,7 @@ class MainActivity :
         AlertDialog(
             onDismissRequest = onDismiss,
             title = { Text(stringResource(R.string.location_permission_title)) },
-            text = { Text(stringResource(R.string.location_permission_description)) },
+            text = { Text(AnnotatedString.fromHtml(stringResource(R.string.location_permission_description))) },
             confirmButton = {
                 TextButton(onClick = onConfirm) {
                     Text(stringResource(R.string.ok))
@@ -1629,7 +1631,7 @@ class MainActivity :
         AlertDialog(
             onDismissRequest = onDismiss,
             title = { Text(stringResource(R.string.location_permission_title)) },
-            text = { Text(stringResource(R.string.location_permission_background_description)) },
+            text = { Text(AnnotatedString.fromHtml(stringResource(R.string.location_permission_background_description))) },
             confirmButton = {
                 TextButton(onClick = onConfirm) {
                     Text(stringResource(R.string.ok))
