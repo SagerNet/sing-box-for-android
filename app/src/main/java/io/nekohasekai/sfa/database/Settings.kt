@@ -140,19 +140,21 @@ object Settings {
         else -> ProxyService::class.java
     }
 
-    suspend fun rebuildServiceMode(): Boolean {
-        var newMode = ServiceMode.NORMAL
+    suspend fun rebuildServiceMode() {
+        val newMode = detectServiceMode()
+        if (serviceMode != newMode) {
+            serviceMode = newMode
+        }
+    }
+
+    suspend fun detectServiceMode(): String {
         try {
             if (needVPNService()) {
-                newMode = ServiceMode.VPN
+                return ServiceMode.VPN
             }
         } catch (_: Exception) {
         }
-        if (serviceMode == newMode) {
-            return false
-        }
-        serviceMode = newMode
-        return true
+        return ServiceMode.NORMAL
     }
 
     private suspend fun needVPNService(): Boolean {

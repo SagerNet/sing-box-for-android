@@ -280,11 +280,10 @@ class DashboardViewModel :
 
                 // Check if service is running
                 if (_serviceStatus.value == Status.Started) {
-                    val restart = Settings.rebuildServiceMode()
+                    val restart = Settings.detectServiceMode() != Settings.serviceMode
                     if (restart) {
                         // Need full restart
                         BoxService.stop()
-                        sendGlobalEvent(UiEvent.RequestReconnectService)
                         for (i in 0 until 30) {
                             if (_serviceStatus.value == Status.Stopped) {
                                 break

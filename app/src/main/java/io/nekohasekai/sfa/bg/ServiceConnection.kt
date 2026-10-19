@@ -8,19 +8,24 @@ import android.os.IBinder
 import android.os.RemoteException
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.PreferenceDataStore
 import io.nekohasekai.sfa.aidl.IService
 import io.nekohasekai.sfa.aidl.IServiceCallback
 import io.nekohasekai.sfa.constant.Action
 import io.nekohasekai.sfa.constant.Alert
+import io.nekohasekai.sfa.constant.SettingsKey
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.database.Settings
+import io.nekohasekai.sfa.database.preference.OnPreferenceDataStoreChangeListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
-class ServiceConnection(private val context: Context, callback: Callback, private val register: Boolean = true) : ServiceConnection {
+class ServiceConnection(private val context: Context, callback: Callback, private val register: Boolean = true) :
+    ServiceConnection,
+    OnPreferenceDataStoreChangeListener {
     companion object {
         private const val TAG = "ServiceConnection"
     }
@@ -36,6 +41,7 @@ class ServiceConnection(private val context: Context, callback: Callback, privat
         connectJob?.cancel()
         connectJob = scope.launch {
             Settings.dataStore.initialize()
+            Settings.dataStore.registerChangeListener(this@ServiceConnection)
             val intent = Intent(context, Settings.serviceClass()).setAction(Action.SERVICE)
             context.bindService(intent, this@ServiceConnection, AppCompatActivity.BIND_AUTO_CREATE)
             Log.d(TAG, "request connect")
@@ -45,6 +51,7 @@ class ServiceConnection(private val context: Context, callback: Callback, privat
     fun disconnect() {
         connectJob?.cancel()
         connectJob = null
+        Settings.dataStore.unregisterChangeListener(this)
         try {
             context.unbindService(this)
         } catch (_: IllegalArgumentException) {
@@ -55,6 +62,13 @@ class ServiceConnection(private val context: Context, callback: Callback, privat
     fun reconnect() {
         disconnect()
         connect()
+    }
+
+    override fun onPreferenceDataStoreChanged(store: PreferenceDataStore, key: String) {
+        if (key != SettingsKey.SERVICE_MODE) return
+        scope.launch {
+            if (connectJob != null) reconnect()
+        }
     }
 
     override fun onServiceConnected(name: ComponentName, binder: IBinder) {

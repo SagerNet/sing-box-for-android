@@ -56,6 +56,9 @@ class BoxService(private val service: Service, private val platformInterface: Pl
         @OptIn(DelicateCoroutinesApi::class)
         fun start() = GlobalScope.launch(Dispatchers.Main.immediate) {
             Settings.dataStore.initialize()
+            withContext(Dispatchers.IO) {
+                Settings.rebuildServiceMode()
+            }
             val intent = Intent(Application.application, Settings.serviceClass())
             ContextCompat.startForegroundService(Application.application, intent)
         }

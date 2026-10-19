@@ -354,11 +354,7 @@ class MainActivity :
 
     private fun startService0() {
         lifecycleScope.launch(Dispatchers.IO) {
-            if (Settings.rebuildServiceMode()) {
-                withContext(Dispatchers.Main) {
-                    connection.reconnect()
-                }
-            }
+            Settings.rebuildServiceMode()
             if (Settings.serviceMode == ServiceMode.VPN) {
                 if (prepare()) {
                     return@launch
