@@ -19,8 +19,6 @@ sealed class UiEvent {
 
     object RequestStartService : UiEvent()
 
-    object RequestReconnectService : UiEvent()
-
     data class ApplyServiceChange(val mode: Mode) : UiEvent() {
         enum class Mode {
             Reload,

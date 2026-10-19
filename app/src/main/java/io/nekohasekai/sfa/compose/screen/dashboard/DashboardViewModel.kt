@@ -277,25 +277,7 @@ class DashboardViewModel :
                 val profile = ProfileManager.get(profileId) ?: return@launch
 
                 Settings.selectedProfile = profileId
-
-                // Check if service is running
-                if (_serviceStatus.value == Status.Started) {
-                    val restart = Settings.detectServiceMode() != Settings.serviceMode
-                    if (restart) {
-                        // Need full restart
-                        BoxService.stop()
-                        for (i in 0 until 30) {
-                            if (_serviceStatus.value == Status.Stopped) {
-                                break
-                            }
-                            delay(100L)
-                        }
-                        sendGlobalEvent(UiEvent.RequestStartService)
-                    } else {
-                        // Just reload
-                        Libbox.newStandaloneCommandClient().serviceReload()
-                    }
-                }
+                applySelectedProfile()
 
                 withContext(Dispatchers.Main) {
                     loadProfiles()
@@ -306,6 +288,22 @@ class DashboardViewModel :
                 updateState { copy(isLoading = false) }
             }
         }
+    }
+
+    private suspend fun applySelectedProfile() {
+        if (_serviceStatus.value != Status.Started) return
+        if (Settings.detectServiceMode() == Settings.serviceMode) {
+            Libbox.newStandaloneCommandClient().serviceReload()
+            return
+        }
+        BoxService.stop()
+        for (i in 0 until 30) {
+            if (_serviceStatus.value == Status.Stopped) {
+                break
+            }
+            delay(100L)
+        }
+        sendGlobalEvent(UiEvent.RequestStartService)
     }
 
     fun editProfile(profile: Profile) {
@@ -368,6 +366,14 @@ class DashboardViewModel :
                 profile.typed.lastUpdated = Date()
                 ProfileManager.update(profile)
 
+                if (contentChanged && profile.id == Settings.selectedProfile) {
+                    try {
+                        applySelectedProfile()
+                    } catch (e: Exception) {
+                        sendError(e)
+                    }
+                }
+
                 // Reload profiles
                 loadProfiles()
 
@@ -380,13 +386,6 @@ class DashboardViewModel :
                 withContext(Dispatchers.Main) {
                     delay(1500)
                     updateState { copy(updatedProfileId = null) }
-                }
-
-                // Restart service if this is the selected profile and content changed
-                if (contentChanged && profile.id == Settings.selectedProfile) {
-                    withContext(Dispatchers.Main) {
-                        sendGlobalEvent(UiEvent.RequestReconnectService)
-                    }
                 }
             } catch (e: Exception) {
                 sendErrorMessage("Failed to update profile: ${e.message}")

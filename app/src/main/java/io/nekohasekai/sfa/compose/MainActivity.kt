@@ -994,10 +994,6 @@ class MainActivity :
                         startService()
                     }
 
-                    is UiEvent.RequestReconnectService -> {
-                        connection.reconnect()
-                    }
-
                     is UiEvent.EditProfile -> {
                         navController.navigate(ProfileRoutes.editProfile(event.profileId)) {
                             launchSingleTop = true
