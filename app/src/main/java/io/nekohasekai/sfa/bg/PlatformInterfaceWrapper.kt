@@ -8,7 +8,6 @@ import android.os.Process
 import android.provider.Settings
 import android.system.OsConstants
 import android.util.Log
-import androidx.annotation.RequiresApi
 import io.nekohasekai.libbox.BridgeOptions
 import io.nekohasekai.libbox.BridgeSession
 import io.nekohasekai.libbox.ConnectionOwner
@@ -52,9 +51,6 @@ interface PlatformInterfaceWrapper : PlatformInterface {
         error("android: tun inbound requires VPN service")
     }
 
-    override fun useProcFS(): Boolean = Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
-
-    @RequiresApi(Build.VERSION_CODES.Q)
     override fun findConnectionOwner(
         ipProtocol: Int,
         sourceAddress: String,
@@ -63,21 +59,25 @@ interface PlatformInterfaceWrapper : PlatformInterface {
         destinationPort: Int,
     ): ConnectionOwner {
         try {
-            val uid =
-                Application.connectivity.getConnectionOwnerUid(
-                    ipProtocol,
-                    InetSocketAddress(sourceAddress, sourcePort),
-                    InetSocketAddress(destinationAddress, destinationPort),
-                )
-            if (uid == Process.INVALID_UID) error("android: connection owner not found")
-            val packages = Application.packageManager.getPackagesForUid(uid)
-            val owner = ConnectionOwner()
-            owner.userId = uid
+            val owner =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    val uid =
+                        Application.connectivity.getConnectionOwnerUid(
+                            ipProtocol,
+                            InetSocketAddress(sourceAddress, sourcePort),
+                            InetSocketAddress(destinationAddress, destinationPort),
+                        )
+                    if (uid == Process.INVALID_UID) error("android: connection owner not found")
+                    ConnectionOwner().also { it.userId = uid }
+                } else {
+                    Libbox.findConnectionOwner(ipProtocol, sourceAddress, sourcePort, destinationAddress, destinationPort)
+                }
+            val packages = Application.packageManager.getPackagesForUid(owner.userId)
             owner.userName = packages?.firstOrNull() ?: ""
             owner.setAndroidPackageNames(StringArray(packages?.toList()?.iterator() ?: emptyList<String>().iterator()))
             return owner
         } catch (e: Exception) {
-            Log.e("PlatformInterface", "getConnectionOwnerUid", e)
+            Log.e("PlatformInterface", "findConnectionOwner", e)
             e.printStackTrace(System.err)
             throw e
         }
