@@ -210,7 +210,9 @@ fun PerAppProxyScreen(
                         scanPackages.map { packageCache ->
                             async {
                                 if (PerAppProxyScanner.scanChinaPackage(packageCache.info)) {
-                                    found[packageCache.packageName] = packageCache
+                                    synchronized(found) {
+                                        found[packageCache.packageName] = packageCache
+                                    }
                                 }
                                 val nextValue = progressInt.incrementAndGet()
                                 withContext(Dispatchers.Main) {
