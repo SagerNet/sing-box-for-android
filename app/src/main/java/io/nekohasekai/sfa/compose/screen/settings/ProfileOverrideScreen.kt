@@ -2,6 +2,7 @@ package io.nekohasekai.sfa.compose.screen.settings
 
 import android.content.Intent
 import android.net.Uri
+import android.os.BadParcelableException
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -101,9 +102,13 @@ fun ProfileOverrideScreen(
     fun scanAndSaveManagedList(shouldNotify: Boolean = false) {
         isScanning = true
         scope.launch {
-            val chinaApps = PerAppProxyScanner.scanAllChinaApps()
-            withContext(Dispatchers.IO) {
-                Settings.perAppProxyManagedList = chinaApps
+            try {
+                val chinaApps = PerAppProxyScanner.scanAllChinaApps()
+                withContext(Dispatchers.IO) {
+                    Settings.perAppProxyManagedList = chinaApps
+                }
+            } catch (e: BadParcelableException) {
+                Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
             }
             isScanning = false
             if (shouldNotify) {

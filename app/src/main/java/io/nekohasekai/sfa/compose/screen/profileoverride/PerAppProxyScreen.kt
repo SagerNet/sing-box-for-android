@@ -2,6 +2,7 @@ package io.nekohasekai.sfa.compose.screen.profileoverride
 
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.os.BadParcelableException
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
@@ -240,6 +241,7 @@ fun PerAppProxyScreen(
                 @Suppress("DEPRECATION")
                 PackageManager.GET_PERMISSIONS or PackageManager.GET_UNINSTALLED_PACKAGES
             }
+        var loadError: String? = null
         val loadResult =
             withContext(Dispatchers.IO) {
                 try {
@@ -268,13 +270,17 @@ fun PerAppProxyScreen(
                         }.toSet()
                     LoadResult(mode, packageCaches, selectedUidSet)
                 } catch (_: PrivilegedAccessRequiredException) {
+                    loadError = context.getString(R.string.privileged_access_required)
+                    null
+                } catch (e: BadParcelableException) {
+                    loadError = e.message
                     null
                 }
             }
         if (loadResult == null) {
             Toast.makeText(
                 context,
-                R.string.privileged_access_required,
+                loadError,
                 Toast.LENGTH_LONG,
             ).show()
             onBack()

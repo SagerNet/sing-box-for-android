@@ -1,6 +1,7 @@
 package io.nekohasekai.sfa.utils
 
 import android.content.Context
+import android.os.BadParcelableException
 import android.os.RemoteException
 import io.nekohasekai.sfa.bg.LogEntry
 import io.nekohasekai.sfa.bg.ParceledListSlice
@@ -40,7 +41,12 @@ object HookErrorClient {
                 return@withParcel failureResult(Failure.PROTOCOL_ERROR, "reply too short: ${reply.dataAvail()}")
             }
             val hasWarnings = reply.readInt() != 0
-            val slice = ParceledListSlice.CREATOR.createFromParcel(reply, LogEntry::class.java.classLoader)
+            val slice =
+                try {
+                    ParceledListSlice.CREATOR.createFromParcel(reply, LogEntry::class.java.classLoader)
+                } catch (e: BadParcelableException) {
+                    return@withParcel failureResult(Failure.REMOTE_ERROR, e.message)
+                }
             @Suppress("UNCHECKED_CAST")
             Result(logs = slice.list as List<LogEntry>, hasWarnings = hasWarnings)
         }

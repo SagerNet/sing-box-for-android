@@ -1,6 +1,7 @@
 package io.nekohasekai.sfa.compose.screen.privilegesettings
 
 import android.content.pm.PackageManager
+import android.os.BadParcelableException
 import android.os.Build
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
@@ -273,6 +274,7 @@ fun PrivilegeSettingsManageScreen(
                 @Suppress("DEPRECATION")
                 PackageManager.GET_PERMISSIONS or PackageManager.GET_UNINSTALLED_PACKAGES
             }
+        var loadError: String? = null
         val loadResult =
             withContext(Dispatchers.IO) {
                 try {
@@ -294,13 +296,17 @@ fun PrivilegeSettingsManageScreen(
                         }.toSet()
                     LoadResult(packageCaches, selectedUidSet)
                 } catch (_: PrivilegedAccessRequiredException) {
+                    loadError = context.getString(R.string.privileged_access_required)
+                    null
+                } catch (e: BadParcelableException) {
+                    loadError = e.message
                     null
                 }
             }
         if (loadResult == null) {
             Toast.makeText(
                 context,
-                R.string.privileged_access_required,
+                loadError,
                 Toast.LENGTH_LONG,
             ).show()
             onBack()

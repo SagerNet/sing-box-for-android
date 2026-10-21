@@ -16,6 +16,7 @@
 
 package io.nekohasekai.sfa.bg;
 
+import android.os.BadParcelableException;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.Parcel;
@@ -59,20 +60,22 @@ public class ParceledListSlice<T extends Parcelable> implements Parcelable {
       Parcel reply = Parcel.obtain();
       data.writeInt(i);
       try {
-        retriever.transact(IBinder.FIRST_CALL_TRANSACTION, data, reply, 0);
+        if (!retriever.transact(IBinder.FIRST_CALL_TRANSACTION, data, reply, 0)) {
+          throw new BadParcelableException(
+              "Failure retrieving array; only received " + i + " of " + n);
+        }
+        while (i < n && reply.readInt() != 0) {
+          @SuppressWarnings("unchecked")
+          T item = (T) reply.readParcelable(loader);
+          mList.add(item);
+          i++;
+        }
       } catch (RemoteException e) {
+        throw new BadParcelableException(e);
+      } finally {
         reply.recycle();
         data.recycle();
-        return;
       }
-      while (i < n && reply.readInt() != 0) {
-        @SuppressWarnings("unchecked")
-        T item = (T) reply.readParcelable(loader);
-        mList.add(item);
-        i++;
-      }
-      reply.recycle();
-      data.recycle();
     }
   }
 

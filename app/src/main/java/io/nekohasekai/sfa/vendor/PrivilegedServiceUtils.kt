@@ -14,6 +14,7 @@ import android.os.ParcelFileDescriptor
 import android.system.Os
 import io.nekohasekai.sfa.BuildConfig
 import java.io.IOException
+import java.lang.reflect.InvocationTargetException
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -76,10 +77,14 @@ object PrivilegedServiceUtils {
 
     fun getInstalledPackages(flags: Int, userId: Int): List<PackageInfo> {
         val iPackageManager = getPackageManager()
-        val result = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            getInstalledPackagesMethodLong.invoke(iPackageManager, flags.toLong(), userId)
-        } else {
-            getInstalledPackagesMethodInt.invoke(iPackageManager, flags, userId)
+        val result = try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                getInstalledPackagesMethodLong.invoke(iPackageManager, flags.toLong(), userId)
+            } else {
+                getInstalledPackagesMethodInt.invoke(iPackageManager, flags, userId)
+            }
+        } catch (e: InvocationTargetException) {
+            throw e.cause ?: e
         }
         return extractPackageList(result)
     }

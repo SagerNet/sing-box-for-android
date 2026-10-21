@@ -2,6 +2,7 @@ package io.nekohasekai.sfa.xposed.hooks
 
 import android.content.Context
 import android.content.pm.PackageInfo
+import android.os.BadParcelableException
 import android.os.Binder
 import android.os.Parcel
 import de.robv.android.xposed.XposedHelpers
@@ -82,7 +83,14 @@ class HookIConnectivityManagerOnTransact(private val classLoader: ClassLoader, p
                         return
                     }
                     val enabled = data.readInt() != 0
-                    val slice = ParceledListSlice.CREATOR.createFromParcel(data, PackageEntry::class.java.classLoader)
+                    val slice =
+                        try {
+                            ParceledListSlice.CREATOR.createFromParcel(data, PackageEntry::class.java.classLoader)
+                        } catch (e: BadParcelableException) {
+                            reply!!.writeException(e)
+                            param.result = true
+                            return
+                        }
                     val packages = HashSet<String>()
                     for (entry in slice.list) {
                         if (entry is PackageEntry) {
