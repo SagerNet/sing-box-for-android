@@ -276,7 +276,7 @@ fun PrivilegeSettingsManageScreen(
         val loadResult =
             withContext(Dispatchers.IO) {
                 try {
-                    val installedPackages = PackageQueryManager.getInstalledPackages(packageManagerFlags, packageManagerFlags)
+                    val installedPackages = PackageQueryManager.getInstalledPackages(packageManagerFlags)
                     val packageManager = context.packageManager
                     val packageCaches =
                         installedPackages.mapNotNull { packageInfo ->
