@@ -120,10 +120,6 @@ class BoxService(private val service: Service, private val platformInterface: Pl
 
     private suspend fun startService() {
         try {
-            withContext(Dispatchers.Main) {
-                notification.show(lastProfileName, R.string.status_starting)
-            }
-
             val selectedProfileId = Settings.selectedProfile
             if (selectedProfileId == -1L) {
                 stopAndAlert(Alert.EmptyConfiguration)
@@ -357,6 +353,7 @@ class BoxService(private val service: Service, private val platformInterface: Pl
     internal fun onStartCommand(): Int {
         if (status.value != Status.Stopped) return Service.START_NOT_STICKY
         status.value = Status.Starting
+        notification.show(lastProfileName, R.string.status_starting)
 
         if (!receiverRegistered) {
             ContextCompat.registerReceiver(
@@ -376,6 +373,7 @@ class BoxService(private val service: Service, private val platformInterface: Pl
         GlobalScope.launch(Dispatchers.IO) {
             Settings.startedByUser = true
             try {
+                Application.application.setupLibbox()
                 startCommandServer()
             } catch (e: Exception) {
                 stopAndAlert(Alert.StartCommandServer, e.message)
