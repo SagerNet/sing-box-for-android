@@ -65,6 +65,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.component.qr.QRCodeDialog
+import io.nekohasekai.sfa.compose.theme.LocalStatusColors
 import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.compose.util.QRCodeGenerator
@@ -617,9 +618,10 @@ private fun PeerBadgeView(badge: PeerBadge) {
     )
 }
 
+@Composable
 private fun stateColor(state: String): Color = when (state) {
-    "Running" -> Color(0xFF4CAF50)
-    "NeedsLogin", "NeedsMachineAuth" -> Color(0xFFFF9800)
-    "Starting" -> Color(0xFFFFEB3B)
+    "Running" -> LocalStatusColors.current.good
+    "Starting" -> LocalStatusColors.current.medium
+    "NeedsLogin", "NeedsMachineAuth" -> LocalStatusColors.current.bad
     else -> Color.Gray
 }

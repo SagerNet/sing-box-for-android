@@ -45,6 +45,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.compose.theme.LocalStatusColors
 import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.database.Settings
@@ -233,7 +234,7 @@ fun SettingsScreen(navController: NavController) {
                         if (hasPendingPrivilegeDowngrade) {
                             Badge(containerColor = MaterialTheme.colorScheme.error)
                         } else if (hasPendingPrivilegeUpdate) {
-                            Badge(containerColor = Color(0xFFFFC107))
+                            Badge(containerColor = LocalStatusColors.current.medium)
                         }
                     },
                     modifier =

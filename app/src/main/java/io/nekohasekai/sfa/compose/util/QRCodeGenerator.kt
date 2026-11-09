@@ -9,54 +9,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.toArgb
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
+import androidx.compose.ui.graphics.Color as ComposeColor
 
 object QRCodeGenerator {
-
-    private fun luminance(color: Int): Float {
-        val r = Color.red(color) / 255f
-        val g = Color.green(color) / 255f
-        val b = Color.blue(color) / 255f
-        return 0.299f * r + 0.587f * g + 0.114f * b
-    }
-
-    private fun adjustBrightness(color: Int, factor: Float): Int {
-        val a = Color.alpha(color)
-        val r = (Color.red(color) * factor).toInt().coerceIn(0, 255)
-        val g = (Color.green(color) * factor).toInt().coerceIn(0, 255)
-        val b = (Color.blue(color) * factor).toInt().coerceIn(0, 255)
-        return Color.argb(a, r, g, b)
-    }
-
-    fun ensureContrast(foreground: Int, background: Int, minRatio: Float = 4.5f): Int {
-        val bgLum = luminance(background)
-        var fg = foreground
-        var fgLum = luminance(fg)
-
-        var ratio = if (fgLum > bgLum) {
-            (fgLum + 0.05f) / (bgLum + 0.05f)
-        } else {
-            (bgLum + 0.05f) / (fgLum + 0.05f)
-        }
-
-        if (ratio >= minRatio) return fg
-
-        val shouldDarken = bgLum > 0.5f
-        repeat(10) {
-            fg = if (shouldDarken) {
-                adjustBrightness(fg, 0.8f)
-            } else {
-                adjustBrightness(fg, 1.25f)
-            }
-            fgLum = luminance(fg)
-            ratio = if (fgLum > bgLum) {
-                (fgLum + 0.05f) / (bgLum + 0.05f)
-            } else {
-                (bgLum + 0.05f) / (fgLum + 0.05f)
-            }
-            if (ratio >= minRatio) return fg
-        }
-        return fg
-    }
 
     @Composable
     fun rememberBitmap(content: String, size: Int = 512): Bitmap {
@@ -72,10 +27,10 @@ object QRCodeGenerator {
     }
 
     @Composable
-    fun rememberPrimaryBitmap(content: String, size: Int = 512, backgroundColor: Int): Bitmap {
-        val primaryColor = MaterialTheme.colorScheme.primary.toArgb()
+    fun rememberPrimaryBitmap(content: String, size: Int = 512, backgroundColor: ComposeColor): Bitmap {
+        val primaryColor = MaterialTheme.colorScheme.primary
         val safeColor = remember(primaryColor, backgroundColor) {
-            ensureContrast(primaryColor, backgroundColor)
+            primaryColor.ensureContrast(backgroundColor).toArgb()
         }
         return remember(content, safeColor) {
             generate(

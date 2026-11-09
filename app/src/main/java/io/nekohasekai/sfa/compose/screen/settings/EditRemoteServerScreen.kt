@@ -45,8 +45,7 @@ import androidx.navigation.NavController
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.RemoteConnectionOptions
 import io.nekohasekai.sfa.R
-import io.nekohasekai.sfa.compose.theme.ServiceError
-import io.nekohasekai.sfa.compose.theme.ServiceRunning
+import io.nekohasekai.sfa.compose.theme.LocalStatusColors
 import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.database.RemoteServer
@@ -239,9 +238,9 @@ fun EditRemoteServerScreen(navController: NavController, serverId: Long = -1L) {
                             .clip(CircleShape)
                             .background(
                                 if (probeState == ProbeState.Available) {
-                                    ServiceRunning
+                                    LocalStatusColors.current.good
                                 } else {
-                                    ServiceError
+                                    MaterialTheme.colorScheme.error
                                 },
                             ),
                     )
@@ -257,8 +256,8 @@ fun EditRemoteServerScreen(navController: NavController, serverId: Long = -1L) {
                     ),
                     color =
                     when (probeState) {
-                        ProbeState.Available -> ServiceRunning
-                        ProbeState.Unavailable -> ServiceError
+                        ProbeState.Available -> LocalStatusColors.current.good
+                        ProbeState.Unavailable -> MaterialTheme.colorScheme.error
                         else -> MaterialTheme.colorScheme.onSurfaceVariant
                     },
                     style = MaterialTheme.typography.bodySmall,

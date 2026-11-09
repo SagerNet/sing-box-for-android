@@ -48,6 +48,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.compose.theme.LocalStatusColors
 import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.constant.Status
@@ -278,17 +279,19 @@ fun STUNTestScreen(
     }
 }
 
+@Composable
 private fun natMappingColor(value: Int): Color = when (value) {
-    Libbox.NATMappingEndpointIndependent.toInt() -> Color.Green
-    Libbox.NATMappingAddressDependent.toInt() -> Color.Yellow
-    Libbox.NATMappingAddressAndPortDependent.toInt() -> Color.Red
+    Libbox.NATMappingEndpointIndependent.toInt() -> LocalStatusColors.current.good
+    Libbox.NATMappingAddressDependent.toInt() -> LocalStatusColors.current.medium
+    Libbox.NATMappingAddressAndPortDependent.toInt() -> LocalStatusColors.current.bad
     else -> Color.Unspecified
 }
 
+@Composable
 private fun natFilteringColor(value: Int): Color = when (value) {
-    Libbox.NATFilteringEndpointIndependent.toInt() -> Color.Green
-    Libbox.NATFilteringAddressDependent.toInt() -> Color.Yellow
-    Libbox.NATFilteringAddressAndPortDependent.toInt() -> Color.Red
+    Libbox.NATFilteringEndpointIndependent.toInt() -> LocalStatusColors.current.good
+    Libbox.NATFilteringAddressDependent.toInt() -> LocalStatusColors.current.medium
+    Libbox.NATFilteringAddressAndPortDependent.toInt() -> LocalStatusColors.current.bad
     else -> Color.Unspecified
 }
 

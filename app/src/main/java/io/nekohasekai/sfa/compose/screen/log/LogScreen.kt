@@ -81,9 +81,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -98,6 +101,7 @@ import io.nekohasekai.sfa.compose.component.RemoteControlMenuItems
 import io.nekohasekai.sfa.compose.component.rememberRemoteServers
 import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
+import io.nekohasekai.sfa.compose.util.ensureContrast
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.utils.RemoteControlManager
 import kotlinx.coroutines.CancellationException
@@ -892,13 +896,32 @@ fun LogScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LogItem(
-    annotatedString: androidx.compose.ui.text.AnnotatedString,
+    annotatedString: AnnotatedString,
     index: Int,
     isSelected: Boolean,
     isSelectionMode: Boolean,
     onLongClick: () -> Unit,
     onClick: () -> Unit,
 ) {
+    val containerColor =
+        if (isSelected) {
+            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+        } else {
+            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+        }
+    val background = containerColor.compositeOver(MaterialTheme.colorScheme.background)
+    val text = remember(annotatedString, background) {
+        AnnotatedString(
+            annotatedString.text,
+            annotatedString.spanStyles.map { range ->
+                if (range.item.color.isSpecified) {
+                    range.copy(item = range.item.copy(color = range.item.color.ensureContrast(background)))
+                } else {
+                    range
+                }
+            },
+        )
+    }
     Card(
         modifier =
         Modifier
@@ -908,15 +931,7 @@ fun LogItem(
                 onLongClick = onLongClick,
             ),
         shape = RoundedCornerShape(4.dp),
-        colors =
-        CardDefaults.cardColors(
-            containerColor =
-            if (isSelected) {
-                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
-            } else {
-                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-            },
-        ),
+        colors = CardDefaults.cardColors(containerColor = containerColor),
         border =
         if (isSelected) {
             CardDefaults.outlinedCardBorder().copy(
@@ -950,7 +965,7 @@ fun LogItem(
                 )
             }
             Text(
-                text = annotatedString,
+                text = text,
                 modifier =
                 Modifier
                     .weight(1f)

@@ -61,6 +61,7 @@ import androidx.navigation.NavController
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.base.UiEvent
 import io.nekohasekai.sfa.compose.component.qr.QRCodeDialog
+import io.nekohasekai.sfa.compose.theme.LocalStatusColors
 import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.compose.util.QRCodeGenerator
@@ -428,10 +429,10 @@ private fun TunnelInfoRow(value: String, label: String) {
     }
 }
 
+@Composable
 private fun stateColor(state: String): Color = when (state) {
-    "connected" -> Color(0xFF4CAF50)
-    "auth-pending" -> Color(0xFFFF9800)
-    "connecting" -> Color(0xFFFFEB3B)
-    "error" -> Color(0xFFF44336)
+    "connected" -> LocalStatusColors.current.good
+    "connecting" -> LocalStatusColors.current.medium
+    "auth-pending", "error" -> LocalStatusColors.current.bad
     else -> Color.Gray
 }

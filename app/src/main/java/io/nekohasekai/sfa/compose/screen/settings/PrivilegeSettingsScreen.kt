@@ -65,6 +65,7 @@ import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.base.SelectableMessageDialog
 import io.nekohasekai.sfa.compose.base.UiEvent
 import io.nekohasekai.sfa.compose.base.rememberApplyServiceChangeNotifier
+import io.nekohasekai.sfa.compose.theme.LocalStatusColors
 import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.constant.Status
@@ -349,7 +350,7 @@ fun PrivilegeSettingsScreen(navController: NavController, serviceStatus: Status 
         val statusIconTint =
             when {
                 hasPendingDowngrade -> MaterialTheme.colorScheme.error
-                hasPendingUpdate -> Color(0xFFFFC107)
+                hasPendingUpdate -> LocalStatusColors.current.medium
                 isLsposedActivated -> MaterialTheme.colorScheme.primary
                 else -> MaterialTheme.colorScheme.error
             }
@@ -902,7 +903,7 @@ private fun SelfTestDialog(isRunning: Boolean, result: DetectionResult?, onDismi
                             Text(
                                 text = notDetectedText,
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = Color(0xFF4CAF50),
+                                color = LocalStatusColors.current.good,
                             )
                         } else {
                             Text(
@@ -938,7 +939,7 @@ private fun SelfTestDialog(isRunning: Boolean, result: DetectionResult?, onDismi
                             Text(
                                 text = notDetectedText,
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = Color(0xFF4CAF50),
+                                color = LocalStatusColors.current.good,
                             )
                         } else {
                             Text(

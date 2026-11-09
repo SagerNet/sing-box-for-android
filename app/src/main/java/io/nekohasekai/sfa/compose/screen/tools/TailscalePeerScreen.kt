@@ -78,6 +78,7 @@ import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.LineChart
 import io.nekohasekai.sfa.compose.base.GlobalEventBus
 import io.nekohasekai.sfa.compose.base.UiEvent
+import io.nekohasekai.sfa.compose.theme.LocalStatusColors
 import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.ktx.clipboardText
@@ -363,29 +364,29 @@ fun TailscalePeerScreen(
                             if (pingState.isDirect) {
                                 Text(
                                     text = "\u2192 ",
-                                    color = Color(0xFF4CAF50),
+                                    color = LocalStatusColors.current.good,
                                 )
                                 Text(
                                     text = stringResource(R.string.tailscale_ping_direct),
-                                    color = Color(0xFF4CAF50),
+                                    color = LocalStatusColors.current.good,
                                 )
                             } else if (pingState.peerRelay.isNotEmpty()) {
                                 Text(
                                     text = "\u21BB ",
-                                    color = Color(0xFF2196F3),
+                                    color = LocalStatusColors.current.info,
                                 )
                                 Text(
                                     text = stringResource(R.string.tailscale_ping_peer_relay),
-                                    color = Color(0xFF2196F3),
+                                    color = LocalStatusColors.current.info,
                                 )
                             } else {
                                 Text(
                                     text = "\u21BB ",
-                                    color = Color(0xFFFF9800),
+                                    color = LocalStatusColors.current.medium,
                                 )
                                 Text(
                                     text = stringResource(R.string.tailscale_ping_derp),
-                                    color = Color(0xFFFF9800),
+                                    color = LocalStatusColors.current.medium,
                                 )
                             }
                             Spacer(modifier = Modifier.weight(1f))
@@ -426,9 +427,9 @@ fun TailscalePeerScreen(
                                 LineChart(
                                     data = pingState.latencyHistory,
                                     lineColor = if (pingState.isDirect) {
-                                        Color(0xFF4CAF50)
+                                        LocalStatusColors.current.good
                                     } else {
-                                        Color(0xFF2196F3)
+                                        LocalStatusColors.current.info
                                     },
                                     animate = false,
                                     modifier = Modifier.weight(1f),

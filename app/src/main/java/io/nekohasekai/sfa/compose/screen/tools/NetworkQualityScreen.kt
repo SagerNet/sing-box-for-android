@@ -51,6 +51,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.compose.theme.LocalStatusColors
 import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.constant.Status
@@ -398,10 +399,13 @@ fun NetworkQualityScreen(
 }
 
 @Composable
-private fun accuracyLabel(value: Int): Pair<String, Color> = when (value) {
-    Libbox.NetworkQualityAccuracyHigh -> stringResource(R.string.network_quality_confidence_high) to Color.Green
-    Libbox.NetworkQualityAccuracyMedium -> stringResource(R.string.network_quality_confidence_medium) to Color.Yellow
-    else -> stringResource(R.string.network_quality_confidence_low) to Color.Red
+private fun accuracyLabel(value: Int): Pair<String, Color> {
+    val status = LocalStatusColors.current
+    return when (value) {
+        Libbox.NetworkQualityAccuracyHigh -> stringResource(R.string.network_quality_confidence_high) to status.good
+        Libbox.NetworkQualityAccuracyMedium -> stringResource(R.string.network_quality_confidence_medium) to status.medium
+        else -> stringResource(R.string.network_quality_confidence_low) to status.bad
+    }
 }
 
 @Composable
