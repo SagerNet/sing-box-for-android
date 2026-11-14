@@ -300,7 +300,7 @@ fun NewProfileScreen(
                     modifier = Modifier.fillMaxWidth(),
                     colors =
                     CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f),
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
                     ),
                 ) {
                     Column(
@@ -469,7 +469,7 @@ fun NewProfileScreen(
                     modifier = Modifier.fillMaxWidth(),
                     colors =
                     CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.3f),
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
                     ),
                 ) {
                     Column(

@@ -387,7 +387,7 @@ fun IconSelectionScreen(currentIconId: String?, onIconSelected: (String?) -> Uni
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 colors =
                 CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
                 ),
             ) {
                 Row(
@@ -401,7 +401,6 @@ fun IconSelectionScreen(currentIconId: String?, onIconSelected: (String?) -> Uni
                         imageVector = icon,
                         contentDescription = null,
                         modifier = Modifier.size(24.dp),
-                        tint = MaterialTheme.colorScheme.primary,
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
@@ -418,7 +417,6 @@ fun IconSelectionScreen(currentIconId: String?, onIconSelected: (String?) -> Uni
                             Text(
                                 text = category,
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                     }
@@ -446,6 +444,12 @@ private fun CategoryList(categories: List<IconCategory>, currentIconId: String?,
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CategoryCard(category: IconCategory, hasSelectedIcon: Boolean, onClick: () -> Unit) {
+    val secondaryContentColor =
+        if (hasSelectedIcon) {
+            MaterialTheme.colorScheme.onPrimaryContainer
+        } else {
+            MaterialTheme.colorScheme.onSurfaceVariant
+        }
     Card(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
@@ -453,7 +457,7 @@ private fun CategoryCard(category: IconCategory, hasSelectedIcon: Boolean, onCli
         CardDefaults.cardColors(
             containerColor =
             if (hasSelectedIcon) {
-                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+                MaterialTheme.colorScheme.primaryContainer
             } else {
                 MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
             },
@@ -475,7 +479,7 @@ private fun CategoryCard(category: IconCategory, hasSelectedIcon: Boolean, onCli
                 Text(
                     text = stringResource(R.string.icon_count_format, category.icons.size),
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = secondaryContentColor,
                 )
             }
 
@@ -488,13 +492,13 @@ private fun CategoryCard(category: IconCategory, hasSelectedIcon: Boolean, onCli
                         imageVector = icon.icon,
                         contentDescription = null,
                         modifier = Modifier.size(20.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        tint = secondaryContentColor,
                     )
                 }
                 Icon(
                     Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    tint = secondaryContentColor,
                 )
             }
         }

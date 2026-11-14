@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.BatteryChargingFull
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,10 +31,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -136,7 +138,7 @@ fun ServiceSettingsScreen(
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 colors =
                 CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.5f),
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                 ),
             ) {
                 Column(
@@ -148,21 +150,18 @@ fun ServiceSettingsScreen(
                         Icon(
                             imageVector = Icons.Outlined.BatteryChargingFull,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.tertiary,
                             modifier = Modifier.padding(end = 12.dp),
                         )
                         Text(
                             stringResource(R.string.background_permission),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onTertiaryContainer,
                         )
                     }
 
                     Text(
                         stringResource(R.string.background_permission_description),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onTertiaryContainer,
                         modifier = Modifier.padding(top = 8.dp, bottom = 16.dp),
                     )
 
@@ -170,11 +169,14 @@ fun ServiceSettingsScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.End,
                     ) {
-                        OutlinedButton(
+                        TextButton(
                             onClick = {
                                 context.launchCustomTab("https://dontkillmyapp.com/")
                             },
                             modifier = Modifier.padding(end = 8.dp),
+                            colors = ButtonDefaults.textButtonColors(
+                                contentColor = LocalContentColor.current,
+                            ),
                         ) {
                             Text(stringResource(R.string.read_more))
                         }
@@ -190,6 +192,10 @@ fun ServiceSettingsScreen(
                                     requestBatteryOptimizationLauncher.launch(intent)
                                 }
                             },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                                contentColor = MaterialTheme.colorScheme.tertiaryContainer,
+                            ),
                         ) {
                             Text(stringResource(R.string.request_background_permission))
                         }

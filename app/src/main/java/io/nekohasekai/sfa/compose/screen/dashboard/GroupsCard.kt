@@ -79,6 +79,7 @@ import io.nekohasekai.sfa.compose.theme.LocalStatusColors
 import io.nekohasekai.sfa.compose.theme.StatusColors
 import io.nekohasekai.sfa.compose.topbar.LocalScaffoldPadding
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
+import io.nekohasekai.sfa.compose.util.ensureContrast
 import io.nekohasekai.sfa.compose.util.rememberSheetDismissFromContentOnlyIfGestureStartedAtTopModifier
 import io.nekohasekai.sfa.constant.Status
 import io.nekohasekai.sfa.utils.CommandClient
@@ -600,7 +601,7 @@ private fun ProxyChip(
                         style = MaterialTheme.typography.labelSmall,
                         color =
                         if (isSelected) {
-                            MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                            MaterialTheme.colorScheme.onPrimaryContainer
                         } else {
                             MaterialTheme.colorScheme.onSurfaceVariant
                         },
@@ -610,7 +611,12 @@ private fun ProxyChip(
                             text = "${item.urlTestDelay}ms",
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.SemiBold,
-                            color = palette.forDelay(item.urlTestDelay),
+                            color =
+                            if (isSelected) {
+                                palette.forDelay(item.urlTestDelay).ensureContrast(MaterialTheme.colorScheme.primaryContainer)
+                            } else {
+                                palette.forDelay(item.urlTestDelay)
+                            },
                         )
                     }
                 }
