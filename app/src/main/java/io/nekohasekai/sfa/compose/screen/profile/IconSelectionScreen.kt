@@ -58,6 +58,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
@@ -477,7 +478,7 @@ private fun CategoryCard(category: IconCategory, hasSelectedIcon: Boolean, onCli
                     style = MaterialTheme.typography.titleMedium,
                 )
                 Text(
-                    text = stringResource(R.string.icon_count_format, category.icons.size),
+                    text = pluralStringResource(R.plurals.icon_count, category.icons.size, category.icons.size),
                     style = MaterialTheme.typography.bodySmall,
                     color = secondaryContentColor,
                 )

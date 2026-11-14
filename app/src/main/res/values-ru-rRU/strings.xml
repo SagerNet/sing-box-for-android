@@ -3,6 +3,7 @@
     <!-- App -->
     <string name="app_name" translatable="false">sing-box</string>
     <string name="app_version_title">Версия приложения</string>
+    <string name="badge_new">Новое</string>
     <string name="language">Язык</string>
     <string name="system_default">Как в системе</string>
 
@@ -367,6 +368,10 @@
     <string name="error_empty_file">Пустой файл</string>
     <string name="error_decode_profile">Не удалось декодировать профиль: %s</string>
     <string name="error_invalid_configuration">Недопустимая конфигурация sing-box: %s</string>
+    <string name="error_profile_not_found">Профиль не найден</string>
+    <string name="error_configuration_file_not_found">Файл конфигурации не найден</string>
+    <string name="error_invalid_remote_profile_uri">Недопустимый URI удалённого профиля sing-box</string>
+    <string name="error_parse_profile_link">Не удалось разобрать ссылку на профиль</string>
     <string name="error_start_command_server">Запуск сервера команд</string>
     <string name="error_create_service">Создание службы</string>
     <string name="error_start_service">Запуск службы</string>
@@ -380,11 +385,14 @@
     <string name="failed_save_logs">Не удалось сохранить лог: %s</string>
     <string name="failed_share_logs">Не удалось отправить лог: %s</string>
     <string name="failed_read_configuration">Не удалось прочитать конфигурацию: %s</string>
+    <string name="failed_export_configuration">Не удалось экспортировать конфигурацию: %s</string>
+    <string name="failed_update_profile">Не удалось обновить профиль: %s</string>
     
     <!-- Success Messages -->
     <string name="success_profile_saved">Профиль успешно сохранён</string>
     <string name="success_logs_saved">Лог успешно сохранён</string>
     <string name="success_configuration_saved">Конфигурация сохранена</string>
+    <string name="success_configuration_exported">Конфигурация успешно экспортирована</string>
     <string name="copied_to_clipboard">Скопировано в буфер обмена</string>
     
     <!-- Toast Messages -->
@@ -402,7 +410,12 @@
 
     <!-- Icon Selection -->
     <string name="icon">Иконка</string>
-    <string name="icon_count_format">%d иконок</string>
+    <plurals name="icon_count">
+        <item quantity="one">%d иконка</item>
+        <item quantity="few">%d иконки</item>
+        <item quantity="many">%d иконок</item>
+        <item quantity="other">%d иконки</item>
+    </plurals>
     <string name="no_icons_found">Иконки не найдены</string>
     <string name="no_icons_match">Нет иконок, соответствующих \'%s\'</string>
     <string name="profile_icon">Иконка профиля</string>
@@ -624,6 +637,11 @@
     <string name="privilege_settings_view_logs">Просмотреть журнал</string>
     <string name="privilege_settings_export_debug">Экспорт отладочной информации</string>
     <string name="privilege_settings_hook_logs_empty">Журнал пуст</string>
+    <string name="hook_log_error_service_unavailable">Служба подключений недоступна. Перезагрузите устройство или активируйте модуль LSPosed.</string>
+    <string name="hook_log_error_transaction_failed">Транзакция хука отклонена. Перезагрузите устройство, чтобы загрузить модуль LSPosed.</string>
+    <string name="hook_log_error_remote">Удалённая ошибка при чтении журнала.</string>
+    <string name="hook_log_error_protocol">Несовпадение протокола журнала. Перезагрузите устройство, чтобы обновить модуль LSPosed.</string>
+    <string name="hook_log_error_unknown">Неизвестная ошибка.</string>
     <string name="privilege_settings_export_debug_complete">Экспорт завершён</string>
     <string name="privilege_settings_export_debug_message">Файл содержит конфиденциальную информацию и не должен распространяться публично. Размер: %s</string>
     <string name="privilege_settings_export_debug_failed">Не удалось экспортировать отладочную информацию: %s</string>

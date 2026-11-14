@@ -3,6 +3,7 @@ package io.nekohasekai.sfa.compose.screen.log
 import android.content.Context
 import android.text.format.DateFormat
 import androidx.lifecycle.viewModelScope
+import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.bg.LogEntry
 import io.nekohasekai.sfa.compose.util.AnsiColorUtils
 import io.nekohasekai.sfa.constant.Status
@@ -21,13 +22,13 @@ class HookLogViewModel : BaseLogViewModel() {
                 HookErrorClient.query(context)
             }
             if (result.failure != null) {
-                val detail = buildErrorMessage(result)
+                val detail = buildErrorMessage(context, result)
                 allLogs.clear()
                 _uiState.update {
                     it.copy(
                         logs = emptyList(),
                         isConnected = false,
-                        errorTitle = "Error",
+                        errorTitle = context.getString(R.string.error_title),
                         errorMessage = detail,
                     )
                 }
@@ -88,18 +89,16 @@ class HookLogViewModel : BaseLogViewModel() {
         )
     }
 
-    private fun buildErrorMessage(result: HookErrorClient.Result): String {
-        val message = when (result.failure) {
-            HookErrorClient.Failure.SERVICE_UNAVAILABLE ->
-                "Connectivity service unavailable. Reboot or activate LSPosed module."
-            HookErrorClient.Failure.TRANSACTION_FAILED ->
-                "Hook transaction rejected. Reboot to load LSPosed module."
-            HookErrorClient.Failure.REMOTE_ERROR ->
-                "Remote error while reading logs."
-            HookErrorClient.Failure.PROTOCOL_ERROR ->
-                "Log protocol mismatch. Reboot to update LSPosed module."
-            null -> "Unknown error."
-        }
+    private fun buildErrorMessage(context: Context, result: HookErrorClient.Result): String {
+        val message = context.getString(
+            when (result.failure) {
+                HookErrorClient.Failure.SERVICE_UNAVAILABLE -> R.string.hook_log_error_service_unavailable
+                HookErrorClient.Failure.TRANSACTION_FAILED -> R.string.hook_log_error_transaction_failed
+                HookErrorClient.Failure.REMOTE_ERROR -> R.string.hook_log_error_remote
+                HookErrorClient.Failure.PROTOCOL_ERROR -> R.string.hook_log_error_protocol
+                null -> R.string.hook_log_error_unknown
+            },
+        )
         val detail = result.detail?.takeIf { it.isNotBlank() }
         return if (detail != null) "$message\n$detail" else message
     }

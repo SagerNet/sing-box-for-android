@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LifecycleOwner
 import io.nekohasekai.libbox.Libbox
+import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.qrs.QRSDecoder
 import io.nekohasekai.sfa.qrs.readIntLE
 import io.nekohasekai.sfa.vendor.Vendor
@@ -381,7 +382,9 @@ class QRScanViewModel(application: Application) : AndroidViewModel(application) 
         try {
             val uri = Uri.parse(value)
             if (uri.scheme != "sing-box" || uri.host != "import-remote-profile") {
-                _uiState.update { it.copy(errorMessage = "Not a valid sing-box remote profile URI") }
+                _uiState.update {
+                    it.copy(errorMessage = getApplication<Application>().getString(R.string.error_invalid_remote_profile_uri))
+                }
                 imageAnalysis?.setAnalyzer(analysisExecutor, imageAnalyzer!!)
                 return false
             }

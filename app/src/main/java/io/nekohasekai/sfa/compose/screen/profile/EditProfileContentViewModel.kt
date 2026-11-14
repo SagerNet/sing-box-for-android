@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import io.nekohasekai.libbox.Libbox
+import io.nekohasekai.sfa.Application
+import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compat.ProfileCodeEditor
 import io.nekohasekai.sfa.compat.ProfileEditorColors
 import io.nekohasekai.sfa.database.Profile
@@ -154,7 +156,7 @@ class EditProfileContentViewModel(private val profileId: Long, initialIsReadOnly
             try {
                 val loadedProfile =
                     ProfileManager.get(profileId)
-                        ?: throw IllegalArgumentException("Profile not found")
+                        ?: throw IllegalArgumentException(Application.application.getString(R.string.error_profile_not_found))
                 profile = loadedProfile
 
                 // Just load the content, we already have profile metadata from Intent

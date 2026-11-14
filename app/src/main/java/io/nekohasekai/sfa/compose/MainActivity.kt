@@ -298,7 +298,7 @@ class MainActivity :
                 pendingImportProfile = Triple(profile.name, profile.host, profile.url)
                 showImportProfileDialog = true
             } catch (e: Exception) {
-                pendingIntentErrorMessage = e.message ?: "Failed to parse profile link"
+                pendingIntentErrorMessage = e.message ?: getString(R.string.error_parse_profile_link)
             }
             return
         }

@@ -68,7 +68,7 @@ class EditProfileViewModel(application: Application) : AndroidViewModel(applicat
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = "Profile not found",
+                            errorMessage = getApplication<Application>().getString(R.string.error_profile_not_found),
                         )
                     }
                     return@launch
@@ -315,7 +315,7 @@ class EditProfileViewModel(application: Application) : AndroidViewModel(applicat
             // Read the configuration file
             val configFile = File(profile.typed.path)
             if (!configFile.exists()) {
-                Toast.makeText(context, "Configuration file not found", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, R.string.error_configuration_file_not_found, Toast.LENGTH_SHORT).show()
                 return null
             }
 
@@ -353,13 +353,17 @@ class EditProfileViewModel(application: Application) : AndroidViewModel(applicat
                 withContext(Dispatchers.Main) {
                     Toast.makeText(
                         context,
-                        "Configuration exported successfully",
+                        R.string.success_configuration_exported,
                         Toast.LENGTH_SHORT,
                     ).show()
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(context, "Export failed: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.failed_export_configuration, e.message),
+                        Toast.LENGTH_LONG,
+                    ).show()
                 }
             } finally {
                 // Clear pending export data

@@ -3,6 +3,7 @@
     <!-- App -->
     <string name="app_name" translatable="false">sing-box</string>
     <string name="app_version_title">应用版本</string>
+    <string name="badge_new">新</string>
     <string name="language">语言</string>
     <string name="system_default">跟随系统</string>
 
@@ -358,6 +359,10 @@
     <string name="error_empty_file">空文件</string>
     <string name="error_decode_profile">解码配置文件失败：%s</string>
     <string name="error_invalid_configuration">无效的 sing-box 配置：%s</string>
+    <string name="error_profile_not_found">未找到配置文件</string>
+    <string name="error_configuration_file_not_found">未找到配置 JSON 文件</string>
+    <string name="error_invalid_remote_profile_uri">不是有效的 sing-box 远程配置文件 URI</string>
+    <string name="error_parse_profile_link">解析配置文件链接失败</string>
     <string name="error_start_command_server">启动命令服务器</string>
     <string name="error_create_service">创建服务</string>
     <string name="error_start_service">启动服务</string>
@@ -371,11 +376,14 @@
     <string name="failed_save_logs">保存日志失败：%s</string>
     <string name="failed_share_logs">分享日志失败：%s</string>
     <string name="failed_read_configuration">读取配置失败：%s</string>
+    <string name="failed_export_configuration">导出配置失败：%s</string>
+    <string name="failed_update_profile">更新配置文件失败：%s</string>
 
     <!-- Success Messages -->
     <string name="success_profile_saved">配置文件保存成功</string>
     <string name="success_logs_saved">日志保存成功</string>
     <string name="success_configuration_saved">配置已保存</string>
+    <string name="success_configuration_exported">配置导出成功</string>
     <string name="copied_to_clipboard">已复制到剪贴板</string>
 
     <!-- Toast Messages -->
@@ -393,7 +401,9 @@
 
     <!-- Icon Selection -->
     <string name="icon">图标</string>
-    <string name="icon_count_format">%d 个图标</string>
+    <plurals name="icon_count">
+        <item quantity="other">%d 个图标</item>
+    </plurals>
     <string name="no_icons_found">未找到图标</string>
     <string name="no_icons_match">没有匹配 \"%s\" 的图标</string>
     <string name="profile_icon">配置文件图标</string>
@@ -610,6 +620,11 @@
     <string name="privilege_settings_view_logs">查看日志</string>
     <string name="privilege_settings_export_debug">导出调试信息</string>
     <string name="privilege_settings_hook_logs_empty">暂无日志</string>
+    <string name="hook_log_error_service_unavailable">网络连接服务不可用。请重启设备或激活 LSPosed 模块。</string>
+    <string name="hook_log_error_transaction_failed">Hook 事务被拒绝。请重启设备以加载 LSPosed 模块。</string>
+    <string name="hook_log_error_remote">读取日志时发生远程错误。</string>
+    <string name="hook_log_error_protocol">日志协议不匹配。请重启设备以更新 LSPosed 模块。</string>
+    <string name="hook_log_error_unknown">未知错误。</string>
     <string name="privilege_settings_export_debug_complete">导出完成</string>
     <string name="privilege_settings_export_debug_message">此文件带有隐私内容，不应该发布到公共场合。大小：%s</string>
     <string name="privilege_settings_export_debug_failed">导出调试信息失败：%s</string>

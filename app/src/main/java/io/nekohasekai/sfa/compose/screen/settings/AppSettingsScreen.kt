@@ -505,7 +505,7 @@ fun AppSettingsScreen(
                         },
                         trailingContent = {
                             if (hasUpdate) {
-                                Badge(containerColor = MaterialTheme.colorScheme.primary) { Text("New") }
+                                Badge(containerColor = MaterialTheme.colorScheme.primary) { Text(stringResource(R.string.badge_new)) }
                             }
                         },
                         modifier =

@@ -3,6 +3,7 @@
     <!-- App -->
     <string name="app_name" translatable="false">sing-box</string>
     <string name="app_version_title">نسخه برنامه</string>
+    <string name="badge_new">جدید</string>
     <string name="language">زبان</string>
     <string name="system_default">پیش‌فرض سیستم</string>
 
@@ -361,6 +362,10 @@
     <string name="error_empty_file">فایل خالی است</string>
     <string name="error_decode_profile">بازگشایی پروفایل ناموفق بود: %s</string>
     <string name="error_invalid_configuration">پیکربندی sing-box نامعتبر است: %s</string>
+    <string name="error_profile_not_found">پروفایل پیدا نشد</string>
+    <string name="error_configuration_file_not_found">فایل پیکربندی پیدا نشد</string>
+    <string name="error_invalid_remote_profile_uri">URI پروفایل راه دور sing-box معتبر نیست</string>
+    <string name="error_parse_profile_link">تجزیه پیوند پروفایل ناموفق بود</string>
     <string name="error_start_command_server">شروع سرور فرمان</string>
     <string name="error_create_service">ایجاد سرویس</string>
     <string name="error_start_service">شروع سرویس</string>
@@ -374,11 +379,14 @@
     <string name="failed_save_logs">ذخیره لاگ‌ها ناموفق بود: %s</string>
     <string name="failed_share_logs">اشتراک‌گذاری لاگ‌ها ناموفق بود: %s</string>
     <string name="failed_read_configuration">خواندن پیکربندی ناموفق بود: %s</string>
+    <string name="failed_export_configuration">خروجی گرفتن پیکربندی ناموفق بود: %s</string>
+    <string name="failed_update_profile">به‌روزرسانی پروفایل ناموفق بود: %s</string>
 
     <!-- Success Messages -->
     <string name="success_profile_saved">پروفایل با موفقیت ذخیره شد</string>
     <string name="success_logs_saved">لاگ‌ها با موفقیت ذخیره شدند</string>
     <string name="success_configuration_saved">پیکربندی ذخیره شد</string>
+    <string name="success_configuration_exported">پیکربندی با موفقیت خروجی گرفته شد</string>
     <string name="copied_to_clipboard">در کلیپ‌بورد کپی شد</string>
 
     <!-- Toast Messages -->
@@ -396,7 +404,10 @@
 
     <!-- Icon Selection -->
     <string name="icon">آیکن</string>
-    <string name="icon_count_format">%d آیکن</string>
+    <plurals name="icon_count">
+        <item quantity="one">%d آیکن</item>
+        <item quantity="other">%d آیکن</item>
+    </plurals>
     <string name="no_icons_found">آیکنی پیدا نشد</string>
     <string name="no_icons_match">هیچ آیکنی با \"%s\" مطابقت ندارد</string>
     <string name="profile_icon">آیکن پروفایل</string>
@@ -618,6 +629,11 @@
     <string name="privilege_settings_view_logs">مشاهده لاگ‌ها</string>
     <string name="privilege_settings_export_debug">خروجی گرفتن اطلاعات اشکال‌زدایی</string>
     <string name="privilege_settings_hook_logs_empty">لاگی وجود ندارد</string>
+    <string name="hook_log_error_service_unavailable">سرویس اتصال در دسترس نیست. دستگاه را راه‌اندازی مجدد کنید یا ماژول LSPosed را فعال کنید.</string>
+    <string name="hook_log_error_transaction_failed">تراکنش هوک رد شد. برای بارگذاری ماژول LSPosed دستگاه را راه‌اندازی مجدد کنید.</string>
+    <string name="hook_log_error_remote">خطای راه دور هنگام خواندن لاگ‌ها.</string>
+    <string name="hook_log_error_protocol">پروتکل لاگ مطابقت ندارد. برای به‌روزرسانی ماژول LSPosed دستگاه را راه‌اندازی مجدد کنید.</string>
+    <string name="hook_log_error_unknown">خطای ناشناخته.</string>
     <string name="privilege_settings_export_debug_complete">خروجی‌گیری کامل شد</string>
     <string name="privilege_settings_export_debug_message">این فایل حاوی اطلاعات خصوصی است و نباید عمومی به اشتراک گذاشته شود. اندازه: %s</string>
     <string name="privilege_settings_export_debug_failed">خروجی گرفتن اطلاعات اشکال‌زدایی ناموفق بود: %s</string>

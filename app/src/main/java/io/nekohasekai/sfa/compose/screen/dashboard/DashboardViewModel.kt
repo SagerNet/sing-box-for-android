@@ -4,6 +4,8 @@ import androidx.lifecycle.viewModelScope
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.OutboundGroup
 import io.nekohasekai.libbox.StatusMessage
+import io.nekohasekai.sfa.Application
+import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.bg.BoxService
 import io.nekohasekai.sfa.compose.base.BaseViewModel
 import io.nekohasekai.sfa.compose.base.UiEvent
@@ -388,7 +390,7 @@ class DashboardViewModel :
                     updateState { copy(updatedProfileId = null) }
                 }
             } catch (e: Exception) {
-                sendErrorMessage("Failed to update profile: ${e.message}")
+                sendErrorMessage(Application.application.getString(R.string.failed_update_profile, e.message))
                 // Clear updating state on error
                 withContext(Dispatchers.Main) {
                     updateState { copy(updatingProfileId = null) }
