@@ -4,7 +4,7 @@
     <string name="app_name" translatable="false">sing-box</string>
     <string name="app_version_title">Версия приложения</string>
     <string name="language">Язык</string>
-    <string name="system_default">Системный по умолчанию</string>
+    <string name="system_default">Как в системе</string>
 
     <!-- Common Actions -->
     <string name="ok">OK</string>
@@ -31,7 +31,7 @@
     <string name="collapse_all">Свернуть все</string>
     <string name="previous">Предыдущий</string>
     <string name="next">Следующий</string>
-    <string name="update">Обновление</string>
+    <string name="update">Обновить</string>
     <string name="read_more">Подробнее</string>
     <string name="no_thanks">Нет, спасибо</string>
     <string name="options">Настройки</string>
@@ -40,8 +40,8 @@
     <!-- Common States -->
     <string name="enabled">Включено</string>
     <string name="disabled">Выключено</string>
-    <string name="loading">Загрузка...</string>
-    <string name="calculating">Вычисление...</string>
+    <string name="loading">Загрузка…</string>
+    <string name="calculating">Вычисление…</string>
     <string name="auto">Авто</string>
     <string name="success">Успешно</string>
     <string name="default_text">По умолчанию</string>
@@ -84,7 +84,7 @@
     <string name="reset_order">Сбросить порядок</string>
 
     <!-- Connections -->
-    <string name="search_connections">Поиск подключений...</string>
+    <string name="search_connections">Поиск подключений…</string>
     <string name="close_connections_confirm">Закрыть все соединения?</string>
     <string name="connection_state_all">Все</string>
     <string name="connection_state_active">Активно</string>
@@ -103,15 +103,15 @@
     <string name="connection_section_basic">Основная информация</string>
     <string name="connection_section_metadata">Метаданные</string>
     <string name="connection_section_process">Информация о процессе</string>
-    <string name="connection_created_at">Создано в</string>
-    <string name="connection_closed_at">Закрыто в</string>
+    <string name="connection_created_at">Время создания</string>
+    <string name="connection_closed_at">Время закрытия</string>
     <string name="connection_duration">Продолжительность</string>
     <string name="connection_uplink">Восходящий канал</string>
     <string name="connection_downlink">Нисходящий канал</string>
     <string name="connection_inbound">Входящий</string>
-    <string name="connection_inbound_type">Входящий тип</string>
+    <string name="connection_inbound_type">Тип входящего</string>
     <string name="connection_outbound">Исходящий</string>
-    <string name="connection_outbound_type">Исходящий тип</string>
+    <string name="connection_outbound_type">Тип исходящего</string>
     <string name="connection_ip_version">Версия IP</string>
     <string name="connection_network">Сеть</string>
     <string name="connection_source">Источник</string>
@@ -149,7 +149,7 @@
     <string name="profile_update">Обновить</string>
     <string name="profile_auto_update">Автообновление</string>
     <string name="profile_auto_update_interval">Интервал автообновления (минуты)</string>
-    <string name="profile_auto_update_interval_minimum_hint">Минимальное значение - 15</string>
+    <string name="profile_auto_update_interval_minimum_hint">Минимальное значение — 15</string>
     <string name="profile_type_local">Локальный</string>
     <string name="profile_type_remote">Удалённый</string>
     <string name="profile_type_remote_updated">Удалённый • %s</string>
@@ -184,7 +184,7 @@
     <string name="filter_label">Фильтр: %s</string>
     <string name="clear_filter">Очистить</string>
     <string name="clear_logs">Очистить логи</string>
-    <string name="search_logs_placeholder">Поиск в логах...</string>
+    <string name="search_logs_placeholder">Поиск в логах…</string>
     <string name="logs_copied_to_clipboard">Лог скопирован в буфер обмена</string>
     <string name="no_logs_to_copy">Нет записей для копирования</string>
     <string name="no_logs_to_share">Нет записей для отправки</string>
@@ -223,17 +223,17 @@
     <!-- Per-App Proxy -->
     <string name="per_app_proxy">Прокси для отдельных приложений</string>
     <string name="per_app_proxy_mode">Режим прокси</string>
-    <string name="per_app_proxy_mode_include">Включить</string>
+    <string name="per_app_proxy_mode_include">Только выбранные</string>
     <string name="per_app_proxy_mode_include_description">Только выбранные приложения будут использовать VPN</string>
-    <string name="per_app_proxy_mode_exclude">Исключить</string>
+    <string name="per_app_proxy_mode_exclude">Кроме выбранных</string>
     <string name="per_app_proxy_mode_exclude_description">Выбранные приложения не будут использовать VPN</string>
     <string name="per_app_proxy_action_copy">Копировать</string>
     <string name="per_app_proxy_action_copy_package_name">Имя пакета</string>
-    <string name="per_app_proxy_action_copy_uid">Уникальный ID</string>
+    <string name="per_app_proxy_action_copy_uid">UID</string>
     <string name="per_app_proxy_sort_mode">Сортировка</string>
     <string name="per_app_proxy_sort_mode_name">По имени</string>
     <string name="per_app_proxy_sort_mode_package_name">По имени пакета</string>
-    <string name="per_app_proxy_sort_mode_uid">По уникальному ID</string>
+    <string name="per_app_proxy_sort_mode_uid">По UID</string>
     <string name="per_app_proxy_sort_mode_install_time">По дате установки</string>
     <string name="per_app_proxy_sort_mode_update_time">По дате обновления</string>
     <string name="per_app_proxy_sort_mode_reverse">В обратном порядке</string>
@@ -254,13 +254,13 @@
     <string name="per_app_proxy_managed_mode">Управляемый режим</string>
     <string name="per_app_proxy_managed_mode_description">Автоматически исключать китайские приложения</string>
     <string name="per_app_proxy_package_query_mode">Режим</string>
-    <string name="per_app_proxy_shizuku_required">При установке из Play Store для работы прокси для каждого приложения требуется Shizuku. Google Play не позволяет нам использовать разрешение QUERY_ALL_PACKAGES (хотя другим подобным приложениям это разрешено), которое необходимо для отображения списка приложений.</string>
+    <string name="per_app_proxy_shizuku_required">При установке из Play Store для работы прокси для отдельных приложений требуется Shizuku. Google Play не позволяет нам использовать разрешение QUERY_ALL_PACKAGES (хотя другим подобным приложениям это разрешено), которое необходимо для отображения списка приложений.</string>
     <string name="per_app_proxy_root_required">При установке из Play Store для функции прокси для отдельных приложений требуются права ROOT. Google Play не разрешает нам использовать разрешение QUERY_ALL_PACKAGES (хотя другим подобным приложениям это разрешено), которое необходимо для отображения списка приложений.</string>
     <string name="privileged_access_required">Для полного списка приложений необходимы права ROOT или доступ через Shizuku</string>
 
     <!-- Permissions -->
     <string name="background_permission">Фоновое разрешение</string>
-    <string name="background_permission_description">Предоставить необходимые разрешения для корректной работы VPN.\n\nЕсли Вы используете устройство китайского производителя, уведомление может не исчезнуть даже после предоставления разрешения.</string>
+    <string name="background_permission_description">Предоставить необходимые разрешения для корректной работы VPN.\n\nЕсли Вы используете устройство китайского производителя, эта карточка может не исчезнуть даже после предоставления разрешения.</string>
     <string name="request_background_permission">Игнорировать оптимизацию батареи</string>
     <string name="location_permission_title">Разрешение на определение местоположения</string>
     <string name="location_permission_description">Ваш профиль содержит правила маршрутизации &lt;strong&gt;&lt;tt&gt;wifi_ssid&lt;/tt&gt; или &lt;tt&gt;wifi_bssid&lt;/tt&gt;&lt;/strong&gt;. Для их работы sing-box использует разрешение на &lt;strong&gt;определение местоположения&lt;/strong&gt; &lt;strong&gt;в фоновом режиме&lt;/strong&gt;, чтобы получить информацию о подключённой сети Wi-Fi. Эта информация будет использоваться &lt;strong&gt;исключительно для маршрутизации&lt;/strong&gt;.</string>
@@ -280,8 +280,8 @@
     <string name="update_track_beta">Бета</string>
     <string name="update_track_not_supported">Этот канал пока не поддерживает проверку обновлений</string>
     <string name="view_release">Посмотреть релиз</string>
-    <string name="downloading">Загрузка...</string>
-    <string name="exporting">Экспорт...</string>
+    <string name="downloading">Загрузка…</string>
+    <string name="exporting">Экспорт…</string>
     <string name="no_updates_available">Обновлений нет</string>
     <string name="new_version_available">Доступна новая версия: %s</string>
     <string name="auto_update">Автообновление</string>
@@ -328,7 +328,7 @@
     <string name="time_just_now">Только что</string>
     <string name="time_yesterday">Вчера</string>
     <string name="time_now">Сейчас</string>
-    <string name="time_yesterday_short">1 день</string>
+    <string name="time_yesterday_short">1 дн.</string>
     <string name="time_minutes_short">%d мин.</string>
     <string name="time_hours_short">%d ч.</string>
     <string name="time_days_short">%d дн.</string>
@@ -406,7 +406,7 @@
     <string name="profile_icon">Иконка профиля</string>
     <string name="select_icon">Выбрать иконку</string>
     <string name="select_profile_icon">Выбрать иконку профиля</string>
-    <string name="search_icons_placeholder">Поиск иконок...</string>
+    <string name="search_icons_placeholder">Поиск иконок…</string>
     <string name="search_icons">Поиск иконок</string>
     <string name="close_search">Закрыть поиск</string>
     <string name="current_icon_format">Текущая: %s</string>
@@ -514,7 +514,7 @@
     <string name="tailscale_ssh_quick_connect">Быстрое подключение</string>
     <string name="tailscale_ssh_quick_connect_description">Если включено, вы можете быстро подключиться к этому узлу через контекстное меню (долгое нажатие) записи Tailscale в инструментах и записей узлов в списке узлов.\n\nЭтот узел также появится в меню «Новая сессия» при подключении к другим узлам по SSH.</string>
     <string name="tailscale_ssh_terminal_hint">Вы можете настроить внешний вид терминала в разделе Параметры → Конфигурация Ghostty.</string>
-    <string name="tailscale_ssh_connect_button">Подключение</string>
+    <string name="tailscale_ssh_connect_button">Подключиться</string>
     <string name="tailscale_ssh_connecting">Подключение…</string>
     <string name="tailscale_ssh_no_sessions">Нет активных сессий</string>
     <string name="terminal_session_ended">Сеанс завершён</string>
@@ -587,7 +587,7 @@
     <string name="oom_report_description">При включённом ограничении памяти вы получите отчёт, если память сервиса превысит лимит. Вы также можете вручную запросить сбор отчёта.</string>
     <string name="oom_report_fetch">Получить отчёт о памяти</string>
     <string name="oom_report_enable_memory_limit">Включить ограничение памяти</string>
-    <string name="oom_report_enable_memory_limit_description">Задайте мягкое ограничение памяти для сервиса. Сервис будет выполнять различные процессы, чтобы оставаться в пределах этого ограничения.</string>
+    <string name="oom_report_enable_memory_limit_description">Задайте мягкое ограничение памяти для сервиса. Сервис будет принимать различные меры, чтобы оставаться в пределах этого ограничения.</string>
     <string name="oom_report_memory_limit">Ограничение памяти</string>
     <string name="oom_report_kill_connections">Завершить соединения</string>
     <string name="oom_report_kill_connections_description">Завершить все соединения для освобождения памяти при превышении лимита памяти сервиса.</string>
@@ -595,7 +595,7 @@
     <!-- Power Report -->
     <string name="power_report">Отчёт об энергопотреблении</string>
     <string name="power_report_enable">Включить отчёт об энергопотреблении</string>
-    <string name="power_report_enable_description">Записывать статистику процессорного времени, пробуждений и трафика сервиса. Отчёт сохраняется для каждого запуска сервиса.</string>
+    <string name="power_report_enable_description">Отчёт сохраняется для каждого запуска сервиса.</string>
 
     <!-- Xposed Module -->
     <string name="xposed_description">Привилегированное расширение для sing-box</string>
@@ -612,7 +612,7 @@
     <string name="privilege_settings_hide_manage">Управление</string>
     <string name="privilege_settings_hide_test">Запустить тест</string>
     <string name="privilege_settings_hide_test_result">Результат теста</string>
-    <string name="privilege_settings_hide_test_running">Выполняются тесты на обнаружение...</string>
+    <string name="privilege_settings_hide_test_running">Выполняются тесты на обнаружение…</string>
     <string name="privilege_settings_hide_test_not_detected">Не обнаружено</string>
     <string name="privilege_settings_interface_rename_title">Переименование интерфейса</string>
     <string name="privilege_settings_interface_prefix">Префикс интерфейса</string>
@@ -624,8 +624,8 @@
     <string name="privilege_settings_export_debug_message">Файл содержит конфиденциальную информацию и не должен распространяться публично. Размер: %s</string>
     <string name="privilege_settings_export_debug_failed">Не удалось экспортировать отладочную информацию: %s</string>
     <string name="privilege_settings_risky_app_title">Предупреждение</string>
-    <string name="privilege_settings_risky_vpn_message_single">Это приложение - VPN-клиент. Скрытие VPN может вызвать проблемы: %1$s</string>
-    <string name="privilege_settings_risky_vpn_message_multi">Эти приложения - VPN-клиенты. Скрытие VPN может вызвать проблемы: %1$s</string>
+    <string name="privilege_settings_risky_vpn_message_single">Это приложение — VPN-клиент. Скрытие VPN может вызвать проблемы: %1$s</string>
+    <string name="privilege_settings_risky_vpn_message_multi">Эти приложения — VPN-клиенты. Скрытие VPN может вызвать проблемы: %1$s</string>
     <string name="privilege_settings_risky_management_message_single">Это приложение имеет права управления сетью. Скрытие VPN может вызвать проблемы: %1$s</string>
     <string name="privilege_settings_risky_management_message_multi">Эти приложения имеют права управления сетью. Скрытие VPN может вызвать проблемы: %1$s</string>
     <string name="privilege_module_restart_action">Перезагрузить</string>

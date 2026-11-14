@@ -41,7 +41,7 @@
     <string name="enabled">فعال</string>
     <string name="disabled">غیرفعال</string>
     <string name="loading">در حال بارگذاری…</string>
-    <string name="calculating">در حال محاسبه...</string>
+    <string name="calculating">در حال محاسبه…</string>
     <string name="auto">خودکار</string>
     <string name="success">موفق</string>
     <string name="default_text">پیش‌فرض</string>
@@ -400,7 +400,7 @@
     <string name="profile_icon">آیکن پروفایل</string>
     <string name="select_icon">انتخاب آیکن</string>
     <string name="select_profile_icon">انتخاب آیکن پروفایل</string>
-    <string name="search_icons_placeholder">جستجوی آیکن‌ها...</string>
+    <string name="search_icons_placeholder">جستجوی آیکن‌ها…</string>
     <string name="search_icons">جستجوی آیکن‌ها</string>
     <string name="close_search">بستن جستجو</string>
     <string name="current_icon_format">فعلی: %s</string>
@@ -547,7 +547,7 @@
     <string name="stun_nat_mapping">نگاشت NAT</string>
     <string name="stun_nat_filtering">فیلتر NAT</string>
     <string name="stun_nat_type_detection">تشخیص نوع NAT</string>
-    <string name="stun_nat_not_supported">پشتیبانی نمی‌شود توسط سرور</string>
+    <string name="stun_nat_not_supported">توسط سرور پشتیبانی نمی‌شود</string>
 
     <!-- Shared Report -->
     <string name="report_empty">خالی</string>
@@ -581,7 +581,7 @@
     <string name="oom_report_description">هنگامی که محدودیت حافظه فعال است، در صورت تجاوز حافظه سرویس از حد مجاز، گزارشی دریافت خواهید کرد. همچنین می‌توانید جمع‌آوری گزارش را به صورت دستی فعال کنید.</string>
     <string name="oom_report_fetch">دریافت گزارش حافظه</string>
     <string name="oom_report_enable_memory_limit">فعال‌سازی محدودیت حافظه</string>
-    <string name="oom_report_enable_memory_limit_description">یک محدودیت نرم حافظه برای سرویس تعیین کنید. سرویس چندین فرآیند را انجام خواهد داد تا سعی کند در محدوده این محدودیت حافظه باقی بماند.</string>
+    <string name="oom_report_enable_memory_limit_description">یک محدودیت نرم حافظه برای سرویس تعیین کنید. سرویس اقدامات مختلفی انجام می‌دهد تا در محدوده این محدودیت حافظه باقی بماند.</string>
     <string name="oom_report_memory_limit">محدودیت حافظه</string>
     <string name="oom_report_kill_connections">قطع اتصالات</string>
     <string name="oom_report_kill_connections_description">هنگام تجاوز حافظه سرویس از حد مجاز، تمام اتصالات را برای آزادسازی حافظه قطع کنید.</string>
@@ -589,7 +589,7 @@
     <!-- Power Report -->
     <string name="power_report">گزارش مصرف انرژی</string>
     <string name="power_report_enable">فعال‌سازی گزارش مصرف انرژی</string>
-    <string name="power_report_enable_description">آمار زمان پردازنده، بیدارسازی و ترافیک سرویس را ثبت می‌کند. برای هر اجرای سرویس یک گزارش ذخیره می‌شود.</string>
+    <string name="power_report_enable_description">برای هر اجرای سرویس یک گزارش ذخیره می‌شود.</string>
 
     <!-- Xposed Module -->
     <string name="xposed_description">بهبود دسترسی ویژه برای sing-box</string>

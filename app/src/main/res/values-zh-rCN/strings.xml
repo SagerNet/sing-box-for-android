@@ -40,8 +40,8 @@
     <!-- Common States -->
     <string name="enabled">启用</string>
     <string name="disabled">禁用</string>
-    <string name="loading">加载中...</string>
-    <string name="calculating">计算中...</string>
+    <string name="loading">加载中…</string>
+    <string name="calculating">计算中…</string>
     <string name="auto">自动</string>
     <string name="success">成功</string>
     <string name="default_text">默认</string>
@@ -53,7 +53,7 @@
     <string name="title_settings">设置</string>
     <string name="title_app_settings">应用</string>
     <string name="title_new_profile">新建配置</string>
-    <string name="title_edit_profile">编辑配置</string>
+    <string name="title_edit_profile">编辑配置文件</string>
     <string name="title_edit_configuration">编辑配置</string>
     <string name="title_groups">组</string>
     <string name="title_debug">调试</string>
@@ -129,7 +129,7 @@
     <string name="connection_package_name">包名</string>
 
     <!-- Profiles -->
-    <string name="no_profiles">没有配置的配置文件</string>
+    <string name="no_profiles">暂无配置文件</string>
     <string name="add_profile">添加配置文件</string>
     <string name="update_profile">更新配置文件</string>
     <string name="import_remote_profile">导入远程配置</string>
@@ -145,10 +145,10 @@
     <string name="profile_import_file">导入文件</string>
     <string name="profile_create">创建</string>
     <string name="profile_share_url">通过二维码分享 URL</string>
-    <string name="profile_input_required">必须</string>
+    <string name="profile_input_required">必填</string>
     <string name="profile_update">更新</string>
     <string name="profile_auto_update">自动更新</string>
-    <string name="profile_auto_update_interval">自动更新间隔 （分）</string>
+    <string name="profile_auto_update_interval">自动更新间隔（分钟）</string>
     <string name="profile_auto_update_interval_minimum_hint">最低值为 15</string>
     <string name="profile_type_local">本地</string>
     <string name="profile_type_remote">远程</string>
@@ -245,12 +245,12 @@
     <string name="per_app_proxy_select_all">全选</string>
     <string name="per_app_proxy_select_none">全不选</string>
     <string name="per_app_proxy_backup">备份</string>
-    <string name="per_app_proxy_import">从剪切板导入</string>
-    <string name="per_app_proxy_export">导出到剪切板</string>
+    <string name="per_app_proxy_import">从剪贴板导入</string>
+    <string name="per_app_proxy_export">导出到剪贴板</string>
     <string name="per_app_proxy_scan">扫描</string>
     <string name="per_app_proxy_scan_china_apps">中国应用</string>
     <string name="per_app_proxy_manage">管理</string>
-    <string name="content_description_app_icon">App 图标</string>
+    <string name="content_description_app_icon">应用图标</string>
     <string name="per_app_proxy_managed_mode">托管模式</string>
     <string name="per_app_proxy_managed_mode_description">自动排除中国应用</string>
     <string name="per_app_proxy_package_query_mode">模式</string>
@@ -260,13 +260,13 @@
 
     <!-- Permissions -->
     <string name="background_permission">后台权限</string>
-    <string name="background_permission_description">申请必要的权限以使 VPN 正常运行。  如果您使用的是中国公司生产的设备，则授予权限后该卡可能不会消失。</string>
+    <string name="background_permission_description">申请必要的权限以使 VPN 正常运行。\n\n如果您使用的是中国公司生产的设备，授予权限后此卡片可能仍会显示。</string>
     <string name="request_background_permission">忽略电池优化</string>
     <string name="location_permission_title">位置权限</string>
-    <string name="location_permission_description">您的个人资料包含 &lt;strong&gt;&lt;tt&gt;wifi_ssid&lt;/tt&gt; 或 &lt;tt&gt;wifi_bssid&lt;/tt&gt; 路由规则&lt;/strong&gt;。为了使它们正常工作，sing-box 在&lt;strong&gt;后台&lt;/strong&gt;使用 &lt;strong&gt;位置&lt;/strong&gt; 权限来获取有关所连接 Wi-Fi 网络的信息。该信息将&lt;strong&gt;仅用于路由目的&lt;/strong&gt;。</string>
+    <string name="location_permission_description">您的配置文件包含 &lt;strong&gt;&lt;tt&gt;wifi_ssid&lt;/tt&gt; 或 &lt;tt&gt;wifi_bssid&lt;/tt&gt; 路由规则&lt;/strong&gt;。为了使它们正常工作，sing-box 在&lt;strong&gt;后台&lt;/strong&gt;使用&lt;strong&gt;位置&lt;/strong&gt;权限来获取有关所连接 Wi-Fi 网络的信息。该信息将&lt;strong&gt;仅用于路由目的&lt;/strong&gt;。</string>
     <string name="location_permission_background_description">在 Android 10 及更高版本中，需要&lt;strong&gt;后台位置&lt;/strong&gt;权限。选择&lt;strong&gt;始终允许&lt;/strong&gt;以授予权限。</string>
     <string name="local_network_permission_title">局域网权限</string>
-    <string name="local_network_permission_description">Android 17 及更高版本要求局域网权限才能访问你的 Wi-Fi 或以太网网络。Android 以附近的设备的名义请求该权限。</string>
+    <string name="local_network_permission_description">Android 17 及更高版本要求局域网权限才能访问你的 Wi-Fi 或以太网网络。Android 会以“附近的设备”权限的形式请求。</string>
     <string name="notification_permission_title">通知权限</string>
     <string name="notification_permission_required_description">sing-box 无法在没有发送通知权限的情况下显示实时网速。请授予权限或禁用实时网速通知后再启动服务。</string>
     <string name="root_access_required">需要 Root 权限</string>
@@ -277,10 +277,10 @@
     <string name="check_update_automatic">自动检查更新</string>
     <string name="check_update_prompt_play">是否启用从 **Play Store** 自动检查更新？</string>
     <string name="check_update_prompt_github">是否启用从 **GitHub** 自动检查更新？</string>
-    <string name="update_track">更新轨道</string>
+    <string name="update_track">更新通道</string>
     <string name="update_track_stable">稳定版</string>
     <string name="update_track_beta">Beta 版</string>
-    <string name="update_track_not_supported">当前轨道尚不支持检查更新</string>
+    <string name="update_track_not_supported">当前通道尚不支持检查更新</string>
     <string name="view_release">查看发布</string>
     <string name="downloading">下载中…</string>
     <string name="exporting">导出中…</string>
@@ -379,15 +379,15 @@
     <string name="copied_to_clipboard">已复制到剪贴板</string>
 
     <!-- Toast Messages -->
-    <string name="toast_clipboard_empty">剪切板为空</string>
-    <string name="toast_copied_to_clipboard">已导出到剪切板</string>
+    <string name="toast_clipboard_empty">剪贴板为空</string>
+    <string name="toast_copied_to_clipboard">已导出到剪贴板</string>
     <string name="toast_imported_from_clipboard">已从剪贴板导入</string>
 
     <!-- Scanning -->
     <string name="profile_add_scan_use_front_camera">前置摄像头</string>
     <string name="profile_add_scan_use_vendor_analyzer">使用 MLKit 扫描</string>
-    <string name="profile_add_scan_enable_torch">灯光</string>
-    <string name="message_scanning">扫描中...</string>
+    <string name="profile_add_scan_enable_torch">手电筒</string>
+    <string name="message_scanning">扫描中…</string>
     <string name="message_scan_app_no_apps_found">未找到匹配的应用</string>
     <string name="message_scan_app_found">找到以下应用程序，请选择您想要的操作。</string>
 
@@ -399,7 +399,7 @@
     <string name="profile_icon">配置文件图标</string>
     <string name="select_icon">选择图标</string>
     <string name="select_profile_icon">选择配置文件图标</string>
-    <string name="search_icons_placeholder">搜索图标...</string>
+    <string name="search_icons_placeholder">搜索图标…</string>
     <string name="search_icons">搜索图标</string>
     <string name="close_search">关闭搜索</string>
     <string name="current_icon_format">当前：%s</string>
@@ -521,7 +521,7 @@
     <string name="tailscale_terminal_light_theme">浅色主题</string>
     <string name="tailscale_terminal_dark_theme">深色主题</string>
     <string name="tailscale_terminal_font_config">字体</string>
-    <string name="tailscale_terminal_font">字体</string>
+    <string name="tailscale_terminal_font">字体系列</string>
     <string name="tailscale_terminal_font_size">字号</string>
     <string name="tailscale_terminal_font_system">系统字体</string>
     <string name="tailscale_terminal_font_imported">已导入的字体</string>
@@ -582,7 +582,7 @@
     <string name="oom_report_description">启用内存限制后，当服务内存超出限制时，您将会收到报告。您也可以手动触发收集报告。</string>
     <string name="oom_report_fetch">获取内存报告</string>
     <string name="oom_report_enable_memory_limit">启用内存限制</string>
-    <string name="oom_report_enable_memory_limit_description">为服务提供软内存限制。服务将执行多个进程以尝试保持在此内存限制范围内。</string>
+    <string name="oom_report_enable_memory_limit_description">为服务提供软内存限制。服务将采取多种措施，尽量将内存保持在此限制内。</string>
     <string name="oom_report_memory_limit">内存限制</string>
     <string name="oom_report_kill_connections">终止连接</string>
     <string name="oom_report_kill_connections_description">当服务内存超出限制时，终止所有连接以释放内存。</string>
@@ -640,7 +640,7 @@
     <string name="remote_optional">可选</string>
     <string name="remote_connecting">连接中…</string>
     <string name="remote_disconnect">断开连接</string>
-    <string name="remote_invalid_url">无效的服务器 URL: %1$s, 应为 host:port、http://host:port 或 https://host:port</string>
+    <string name="remote_invalid_url">无效的服务器 URL：%1$s，应为 host:port、http://host:port 或 https://host:port</string>
     <string name="remote_connect_failed">无法连接到远程服务器 %1$s</string>
     <string name="remote_disconnected_from">已断开与远程服务器 %1$s 的连接</string>
     <string name="remote_checking">检查中…</string>

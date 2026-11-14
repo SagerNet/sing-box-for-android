@@ -40,8 +40,8 @@
     <!-- Common States -->
     <string name="enabled">啟用</string>
     <string name="disabled">停用</string>
-    <string name="loading">載入中...</string>
-    <string name="calculating">計算中...</string>
+    <string name="loading">載入中…</string>
+    <string name="calculating">計算中…</string>
     <string name="auto">自動</string>
     <string name="success">成功</string>
     <string name="default_text">預設</string>
@@ -144,19 +144,19 @@
     <string name="profile_url" translatable="false">URL</string>
     <string name="profile_import_file">匯入檔案</string>
     <string name="profile_create">建立</string>
-    <string name="profile_share_url">透過二維碼分享 URL</string>
+    <string name="profile_share_url">透過 QR 碼分享 URL</string>
     <string name="profile_input_required">必填</string>
     <string name="profile_update">更新</string>
     <string name="profile_auto_update">自動更新</string>
-    <string name="profile_auto_update_interval">自動更新間隔 （分）</string>
+    <string name="profile_auto_update_interval">自動更新間隔（分鐘）</string>
     <string name="profile_auto_update_interval_minimum_hint">最低值為 15</string>
-    <string name="profile_type_local">本地</string>
+    <string name="profile_type_local">本機</string>
     <string name="profile_type_remote">遠端</string>
     <string name="profile_type_remote_updated">遠端 • %s</string>
     <string name="profile_source_create_new">建立新項目</string>
     <string name="profile_source_import">匯入</string>
     <string name="profile_add_import_file">從檔案匯入</string>
-    <string name="profile_add_scan_qr_code">掃描二維碼</string>
+    <string name="profile_add_scan_qr_code">掃描 QR 碼</string>
     <string name="profile_add_create_manually">手動建立</string>
     <string name="profile_override">設定覆寫</string>
     <string name="basic_information">基本資訊</string>
@@ -170,8 +170,8 @@
     <string name="share_as_file">分享為檔案</string>
     <string name="save_content_json">儲存設定 JSON 檔案</string>
     <string name="share_content_json">分享設定 JSON 檔案</string>
-    <string name="unsaved_changes">未儲存的更改</string>
-    <string name="unsaved_changes_message">您有未儲存的更改。要放棄它們嗎？</string>
+    <string name="unsaved_changes">未儲存的變更</string>
+    <string name="unsaved_changes_message">您有未儲存的變更。要放棄它們嗎？</string>
     <string name="import_profile_confirm_title">匯入設定檔</string>
     <string name="import_profile_confirm_message">匯入設定檔「%s」？</string>
     <string name="import_action">匯入</string>
@@ -221,12 +221,12 @@
     <string name="update_settings">更新設定</string>
 
     <!-- Per-App Proxy -->
-    <string name="per_app_proxy">每個應用程式代理</string>
+    <string name="per_app_proxy">個別應用程式代理</string>
     <string name="per_app_proxy_mode">代理模式</string>
     <string name="per_app_proxy_mode_include">包含</string>
     <string name="per_app_proxy_mode_include_description">僅允許選定的應用程式透過 VPN</string>
     <string name="per_app_proxy_mode_exclude">排除</string>
-    <string name="per_app_proxy_mode_exclude_description">選定的應用將從 VPN 中排除</string>
+    <string name="per_app_proxy_mode_exclude_description">選定的應用程式將從 VPN 中排除</string>
     <string name="per_app_proxy_action_copy">複製</string>
     <string name="per_app_proxy_action_copy_package_name">套件名稱</string>
     <string name="per_app_proxy_action_copy_uid">UID</string>
@@ -254,8 +254,8 @@
     <string name="per_app_proxy_managed_mode">受管理模式</string>
     <string name="per_app_proxy_managed_mode_description">自動排除中國應用程式</string>
     <string name="per_app_proxy_package_query_mode">模式</string>
-    <string name="per_app_proxy_shizuku_required">透過 Play 商店安裝時，每個應用程式代理需要 Shizuku。Google Play 拒絕允許我們使用 QUERY_ALL_PACKAGES 權限（同時不禁止其他類似應用程式這樣做），而這是列出應用程式清單所必需的。</string>
-    <string name="per_app_proxy_root_required">透過 Play 商店安裝時，每個應用程式代理需要 ROOT。Google Play 拒絕允許我們使用 QUERY_ALL_PACKAGES 權限（同時不禁止其他類似應用程式這樣做），而這是列出應用程式清單所必需的。</string>
+    <string name="per_app_proxy_shizuku_required">透過 Play 商店安裝時，個別應用程式代理需要 Shizuku。Google Play 拒絕允許我們使用 QUERY_ALL_PACKAGES 權限（同時不禁止其他類似應用程式這樣做），而這是列出應用程式清單所必需的。</string>
+    <string name="per_app_proxy_root_required">透過 Play 商店安裝時，個別應用程式代理需要 ROOT。Google Play 拒絕允許我們使用 QUERY_ALL_PACKAGES 權限（同時不禁止其他類似應用程式這樣做），而這是列出應用程式清單所必需的。</string>
     <string name="privileged_access_required">需要 Root 或 Shizuku 權限來取得完整應用程式清單</string>
 
     <!-- Permissions -->
@@ -266,7 +266,7 @@
     <string name="location_permission_description">您的設定檔包含 &lt;strong&gt;&lt;tt&gt;wifi_ssid&lt;/tt&gt; 或 &lt;tt&gt;wifi_bssid&lt;/tt&gt; 路由規則&lt;/strong&gt;。為了使它們正常工作，sing-box 在&lt;strong&gt;背景&lt;/strong&gt;使用 &lt;strong&gt;位置&lt;/strong&gt; 權限來取得已連線 Wi-Fi 網路資訊。這些資訊將&lt;strong&gt;僅用於路由&lt;/strong&gt;。</string>
     <string name="location_permission_background_description">在 Android 10 及更高版本中，需要&lt;strong&gt;背景位置&lt;/strong&gt;權限。選擇&lt;strong&gt;始終允許&lt;/strong&gt;以授予權限。</string>
     <string name="local_network_permission_title">區域網路權限</string>
-    <string name="local_network_permission_description">Android 17 及更高版本要求區域網路權限才能存取你的 Wi-Fi 或乙太網路。Android 以附近的裝置的名義請求該權限。</string>
+    <string name="local_network_permission_description">Android 17 及更高版本要求區域網路權限才能存取你的 Wi-Fi 或乙太網路。Android 會以「鄰近裝置」權限的形式請求。</string>
     <string name="notification_permission_title">通知權限</string>
     <string name="notification_permission_required_description">若未授予通知權限，sing-box 無法顯示即時網速。請先授權，或關閉即時網速通知後再啟動服務。</string>
     <string name="root_access_required">需要 Root 權限</string>
@@ -322,7 +322,7 @@
     <!-- Shizuku -->
     <string name="shizuku_not_available">Shizuku 未安裝或未執行</string>
     <string name="shizuku_description">Shizuku 允許應用程式以更高權限直接使用系統 API</string>
-    <string name="get_shizuku">獲取 Shizuku</string>
+    <string name="get_shizuku">取得 Shizuku</string>
     <string name="start_shizuku">啟動 Shizuku</string>
     <string name="request_shizuku">授權 Shizuku</string>
 
@@ -390,7 +390,7 @@
     <string name="profile_add_scan_use_front_camera">前鏡頭</string>
     <string name="profile_add_scan_use_vendor_analyzer">使用 MLKit 掃描</string>
     <string name="profile_add_scan_enable_torch">手電筒</string>
-    <string name="message_scanning">掃描中...</string>
+    <string name="message_scanning">掃描中…</string>
     <string name="message_scan_app_no_apps_found">找不到符合條件的應用程式</string>
     <string name="message_scan_app_found">找到以下應用程式，請選擇您想要的操作。</string>
 
@@ -402,10 +402,10 @@
     <string name="profile_icon">設定檔圖示</string>
     <string name="select_icon">選擇圖示</string>
     <string name="select_profile_icon">選擇設定檔圖示</string>
-    <string name="search_icons_placeholder">搜尋圖示...</string>
+    <string name="search_icons_placeholder">搜尋圖示…</string>
     <string name="search_icons">搜尋圖示</string>
     <string name="close_search">關閉搜尋</string>
-    <string name="current_icon_format">當前：%s</string>
+    <string name="current_icon_format">目前：%s</string>
     <string name="categories">分類</string>
     <string name="all_icons">所有圖示</string>
     <string name="back_to_categories">回到分類</string>
@@ -455,12 +455,12 @@
     <string name="network_quality_confidence_medium">置信度中</string>
     <string name="network_quality_confidence_low">置信度低</string>
     <string name="network_quality_metered_title">按流量計費連線</string>
-    <string name="network_quality_metered_message">您正在使用按流量計費的連線。此測試將消耗大量數據。</string>
+    <string name="network_quality_metered_message">您正在使用按流量計費的連線。此測試將消耗大量資料。</string>
     <string name="network_quality_metered_continue">繼續</string>
-    <string name="tool_configuration">配置</string>
+    <string name="tool_configuration">設定</string>
     <string name="tool_results">結果</string>
     <string name="tool_outbound">出站</string>
-    <string name="tool_default_outbound">默認</string>
+    <string name="tool_default_outbound">預設</string>
 
     <!-- STUN Test -->
     <!-- Tailscale -->
@@ -508,19 +508,19 @@
     <string name="tailscale_ssh_terminal_type">終端機類型</string>
     <string name="tailscale_ssh_remember_options">記住 SSH 選項</string>
     <string name="tailscale_ssh_quick_connect">快速連接</string>
-    <string name="tailscale_ssh_quick_connect_description">啟用後，你可以透過工具中 Tailscale 條目和節點列表中節點條目的上下文選單（長按）快速連接到此節點。\n\n當透過 SSH 連接到其他節點時，此節點也會出現在新建工作階段選單中。</string>
-    <string name="tailscale_ssh_terminal_hint">你可以在設定 → Ghostty 配置中自定義終端外觀。</string>
+    <string name="tailscale_ssh_quick_connect_description">啟用後，你可以透過工具中 Tailscale 條目和節點清單中節點條目的內容選單（長按）快速連接到此節點。\n\n當透過 SSH 連接到其他節點時，此節點也會出現在新增工作階段選單中。</string>
+    <string name="tailscale_ssh_terminal_hint">你可以在設定 → Ghostty 設定中自訂終端外觀。</string>
     <string name="tailscale_ssh_connect_button">連接</string>
     <string name="tailscale_ssh_connecting">連接中…</string>
     <string name="tailscale_ssh_no_sessions">無活動工作階段</string>
     <string name="terminal_session_ended">工作階段已結束</string>
     <string name="terminal_press_any_key">按任意鍵</string>
-    <string name="tailscale_ssh_new_session">新建工作階段</string>
+    <string name="tailscale_ssh_new_session">新增工作階段</string>
     <string name="tailscale_ssh_close_session">關閉工作階段</string>
     <string name="terminal_notification_channel">終端機通知</string>
 
     <!-- Terminal Configuration -->
-    <string name="tailscale_terminal_config">Ghostty 配置</string>
+    <string name="tailscale_terminal_config">Ghostty 設定</string>
     <string name="tailscale_terminal_light_theme">淺色主題</string>
     <string name="tailscale_terminal_dark_theme">深色主題</string>
     <string name="tailscale_terminal_font_config">字體</string>
@@ -531,14 +531,14 @@
     <string name="tailscale_terminal_import_font">從檔案匯入</string>
     <string name="tailscale_terminal_manage_fonts">管理已匯入的字型</string>
     <string name="tailscale_terminal_manage_fonts_done">完成</string>
-    <string name="tailscale_terminal_search_themes">搜索主題</string>
-    <string name="tailscale_terminal_light_config">淺色配置</string>
-    <string name="tailscale_terminal_dark_config">深色配置</string>
+    <string name="tailscale_terminal_search_themes">搜尋主題</string>
+    <string name="tailscale_terminal_light_config">淺色設定</string>
+    <string name="tailscale_terminal_dark_config">深色設定</string>
     <string name="tailscale_terminal_theme">主題</string>
-    <string name="tailscale_terminal_custom_config">自訂配置</string>
-    <string name="tailscale_terminal_edit_custom_config">編輯自訂配置</string>
-    <string name="tailscale_terminal_light_custom_config">淺色自訂配置</string>
-    <string name="tailscale_terminal_dark_custom_config">深色自訂配置</string>
+    <string name="tailscale_terminal_custom_config">自訂設定</string>
+    <string name="tailscale_terminal_edit_custom_config">編輯自訂設定</string>
+    <string name="tailscale_terminal_light_custom_config">淺色自訂設定</string>
+    <string name="tailscale_terminal_dark_custom_config">深色自訂設定</string>
     <string name="tailscale_terminal_font_follow_theme">跟隨主題</string>
     <string name="tailscale_terminal_import_config">從檔案匯入</string>
 
@@ -560,16 +560,16 @@
     <string name="report_delete_all">全部刪除</string>
     <string name="report_delete">刪除</string>
     <string name="report_share">分享</string>
-    <string name="report_share_with_config">附帶配置分享</string>
-    <string name="report_with_config">附帶配置</string>
+    <string name="report_share_with_config">附帶設定分享</string>
+    <string name="report_with_config">附帶設定</string>
     <string name="report_with_log">附帶日誌</string>
-    <string name="report_share_privacy_warning">日誌和配置檔案可能包含隱私內容，不應該被公開發佈。</string>
-    <string name="report_share_privacy_warning_config">配置檔案可能包含隱私內容，不應該被公開發佈。</string>
+    <string name="report_share_privacy_warning">日誌和設定檔可能包含隱私內容，不應該被公開發佈。</string>
+    <string name="report_share_privacy_warning_config">設定檔可能包含隱私內容，不應該被公開發佈。</string>
     <string name="report_with_age_encryption">使用 age 加密給 Project S</string>
     <string name="report_age_encryption_description">[age](https://github.com/filosottile/age) 是一個現代且安全的非對稱加密工具。啟用後，zip 檔案將透過本專案的公鑰加密，以便在 GitHub issues 等公開場合發佈。</string>
-    <string name="report_metadata">元數據</string>
-    <string name="report_configuration">配置</string>
-    <string name="report_origin_local">本地</string>
+    <string name="report_metadata">後設資料</string>
+    <string name="report_configuration">設定</string>
+    <string name="report_origin_local">本機</string>
     <string name="service_not_started">服務未啟動</string>
     <string name="service_reload_required">需要重新載入服務以套用變更</string>
     <string name="service_restart_required">需要重新啟動服務以套用變更</string>
@@ -585,7 +585,7 @@
     <string name="oom_report_description">啟用記憶體限制後，當服務記憶體超出限制時，您將會收到報告。您也可以手動觸發收集報告。</string>
     <string name="oom_report_fetch">取得記憶體報告</string>
     <string name="oom_report_enable_memory_limit">啟用記憶體限制</string>
-    <string name="oom_report_enable_memory_limit_description">為服務提供軟記憶體限制。服務將執行多個程序以嘗試保持在此記憶體限制範圍內。</string>
+    <string name="oom_report_enable_memory_limit_description">為服務提供軟記憶體限制。服務將採取多種措施，盡量將記憶體保持在此限制內。</string>
     <string name="oom_report_memory_limit">記憶體限制</string>
     <string name="oom_report_kill_connections">終止連線</string>
     <string name="oom_report_kill_connections_description">當服務記憶體超出限制時，終止所有連線以釋放記憶體。</string>
@@ -605,11 +605,11 @@
     <string name="privilege_settings_hide_manage">管理</string>
     <string name="privilege_settings_hide_test">執行測試</string>
     <string name="privilege_settings_hide_test_result">測試結果</string>
-    <string name="privilege_settings_hide_test_running">正在執行檢測測試…</string>
-    <string name="privilege_settings_hide_test_not_detected">未檢測到</string>
+    <string name="privilege_settings_hide_test_running">正在執行偵測測試…</string>
+    <string name="privilege_settings_hide_test_not_detected">未偵測到</string>
     <string name="privilege_settings_interface_rename_title">介面重新命名</string>
     <string name="privilege_settings_interface_prefix">介面前綴</string>
-    <string name="privilege_settings_vpn_detection_title">VPN 檢測</string>
+    <string name="privilege_settings_vpn_detection_title">VPN 偵測</string>
     <string name="privilege_settings_view_logs">檢視日誌</string>
     <string name="privilege_settings_export_debug">匯出除錯資訊</string>
     <string name="privilege_settings_hook_logs_empty">暫無日誌</string>
@@ -617,10 +617,10 @@
     <string name="privilege_settings_export_debug_message">此檔案包含隱私資訊，不應公開分享。大小：%s</string>
     <string name="privilege_settings_export_debug_failed">匯出除錯資訊失敗：%s</string>
     <string name="privilege_settings_risky_app_title">警告</string>
-    <string name="privilege_settings_risky_vpn_message_single">此應用程式是 VPN 應用程式，抵抗 VPN 檢測可能造成問題：%1$s</string>
-    <string name="privilege_settings_risky_vpn_message_multi">這些應用程式是 VPN 應用程式，抵抗 VPN 檢測可能造成問題：%1$s</string>
-    <string name="privilege_settings_risky_management_message_single">此應用程式具有網路管理權限，抵抗 VPN 檢測可能造成問題：%1$s</string>
-    <string name="privilege_settings_risky_management_message_multi">這些應用程式具有網路管理權限，抵抗 VPN 檢測可能造成問題：%1$s</string>
+    <string name="privilege_settings_risky_vpn_message_single">此應用程式是 VPN 應用程式，抵抗 VPN 偵測可能造成問題：%1$s</string>
+    <string name="privilege_settings_risky_vpn_message_multi">這些應用程式是 VPN 應用程式，抵抗 VPN 偵測可能造成問題：%1$s</string>
+    <string name="privilege_settings_risky_management_message_single">此應用程式具有網路管理權限，抵抗 VPN 偵測可能造成問題：%1$s</string>
+    <string name="privilege_settings_risky_management_message_multi">這些應用程式具有網路管理權限，抵抗 VPN 偵測可能造成問題：%1$s</string>
     <string name="privilege_module_restart_action">重新啟動</string>
     <string name="privilege_module_restart_failed">請求重啟失敗：%1$s</string>
     <string name="privilege_module_restart_notification_title">需要重啟</string>
@@ -635,7 +635,7 @@
     <string name="remote_control">遠端控制</string>
     <string name="remote_servers">伺服器</string>
     <string name="remote_no_servers">無伺服器</string>
-    <string name="remote_new_server">新建伺服器</string>
+    <string name="remote_new_server">新增伺服器</string>
     <string name="remote_edit_server">編輯伺服器</string>
     <string name="remote_local_device">本機</string>
     <string name="remote_manage_servers">管理伺服器…</string>
@@ -643,7 +643,7 @@
     <string name="remote_optional">可選</string>
     <string name="remote_connecting">連接中…</string>
     <string name="remote_disconnect">斷開連接</string>
-    <string name="remote_invalid_url">無效的伺服器 URL: %1$s, 應為 host:port、http://host:port 或 https://host:port</string>
+    <string name="remote_invalid_url">無效的伺服器 URL：%1$s，應為 host:port、http://host:port 或 https://host:port</string>
     <string name="remote_connect_failed">無法連接到遠端伺服器 %1$s</string>
     <string name="remote_disconnected_from">已斷開與遠端伺服器 %1$s 的連接</string>
     <string name="remote_checking">檢查中…</string>

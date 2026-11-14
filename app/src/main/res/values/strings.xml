@@ -41,7 +41,7 @@
     <string name="enabled">Enabled</string>
     <string name="disabled">Disabled</string>
     <string name="loading">Loading…</string>
-    <string name="calculating">Calculating...</string>
+    <string name="calculating">Calculating…</string>
     <string name="auto">Auto</string>
     <string name="success">Success</string>
     <string name="default_text">Default</string>
@@ -137,7 +137,7 @@
     <string name="import_from_file_description">Import configuration from a local file</string>
     <string name="scan_qr_code_description">Scan a configuration QR code</string>
     <string name="create_new_profile_description">Create a new profile from scratch</string>
-    <string name="icloud_profile_unsupported">iCloud profile is not support on current platform</string>
+    <string name="icloud_profile_unsupported">iCloud profile is not supported on current platform</string>
     <string name="profile_name">Name</string>
     <string name="profile_type">Type</string>
     <string name="profile_source">Source</string>
@@ -252,7 +252,7 @@
     <string name="per_app_proxy_manage">Manage</string>
     <string name="content_description_app_icon">App icon</string>
     <string name="per_app_proxy_managed_mode">Managed Mode</string>
-    <string name="per_app_proxy_managed_mode_description">Automatically Exclude China apps</string>
+    <string name="per_app_proxy_managed_mode_description">Automatically exclude China apps</string>
     <string name="per_app_proxy_package_query_mode">Mode</string>
     <string name="per_app_proxy_shizuku_required">When installed from the Play Store, per-app proxy requires Shizuku. Google Play refuses to allow us to use the QUERY_ALL_PACKAGES permission (while not prohibiting other similar apps from doing so), which is required for listing apps.</string>
     <string name="per_app_proxy_root_required">When installed from the Play Store, per-app proxy requires ROOT. Google Play refuses to allow us to use the QUERY_ALL_PACKAGES permission (while not prohibiting other similar apps from doing so), which is required for listing apps.</string>
@@ -402,7 +402,7 @@
     <string name="profile_icon">Profile Icon</string>
     <string name="select_icon">Select Icon</string>
     <string name="select_profile_icon">Select Profile Icon</string>
-    <string name="search_icons_placeholder">Search icons...</string>
+    <string name="search_icons_placeholder">Search icons…</string>
     <string name="search_icons">Search icons</string>
     <string name="close_search">Close search</string>
     <string name="current_icon_format">Current: %s</string>
@@ -614,7 +614,7 @@
     <string name="oom_report_description">When memory limit is enabled, you will receive a report if the service memory exceeds the limit. You can also manually trigger report collection.</string>
     <string name="oom_report_fetch">Fetch Memory Report</string>
     <string name="oom_report_enable_memory_limit">Enable Memory Limit</string>
-    <string name="oom_report_enable_memory_limit_description">Provide a soft memory limit for the service. The service will perform multiple processes to try to stay within this memory limit.</string>
+    <string name="oom_report_enable_memory_limit_description">Provide a soft memory limit for the service. The service will take multiple measures to try to stay within this memory limit.</string>
     <string name="oom_report_memory_limit">Memory Limit</string>
     <string name="oom_report_kill_connections">Kill Connections</string>
     <string name="oom_report_kill_connections_description">Kill all connections to free memory when the service memory exceeds the limit.</string>
