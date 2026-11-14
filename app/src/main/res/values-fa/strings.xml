@@ -265,6 +265,8 @@
     <string name="location_permission_title">مجوز موقعیت مکانی</string>
     <string name="location_permission_description">پروفایل شما شامل قوانین مسیریابی &lt;strong&gt;&lt;tt&gt;wifi_ssid&lt;/tt&gt; یا &lt;tt&gt;wifi_bssid&lt;/tt&gt;&lt;/strong&gt; است. برای کارکرد آن‌ها، sing-box از مجوز &lt;strong&gt;موقعیت مکانی&lt;/strong&gt; &lt;strong&gt;در پس‌زمینه&lt;/strong&gt; برای دریافت اطلاعات شبکه Wi-Fi متصل استفاده می‌کند. این اطلاعات &lt;strong&gt;فقط برای مسیریابی&lt;/strong&gt; استفاده می‌شوند.</string>
     <string name="location_permission_background_description">در Android 10 و بالاتر، مجوز &lt;strong&gt;موقعیت مکانی پس‌زمینه&lt;/strong&gt; لازم است. برای اعطای مجوز، گزینه &lt;strong&gt;اجازه دائمی&lt;/strong&gt; را انتخاب کنید.</string>
+    <string name="local_network_permission_title">مجوز شبکه محلی</string>
+    <string name="local_network_permission_description">در Android 17 و نسخه‌های بالاتر، برای دسترسی به شبکه Wi-Fi یا اترنت به مجوز شبکه محلی نیاز است. Android این مجوز را با عنوان «دستگاه‌های اطراف» درخواست می‌کند.</string>
     <string name="notification_permission_title">مجوز اعلان</string>
     <string name="notification_permission_required_description">بدون مجوز اعلان، sing-box نمی‌تواند سرعت لحظه‌ای شبکه را نمایش دهد. لطفا پیش از شروع سرویس، مجوز را بدهید یا اعلان سرعت لحظه‌ای شبکه را غیرفعال کنید.</string>
     <string name="root_access_required">دسترسی Root لازم است</string>
@@ -514,6 +516,8 @@
     <string name="terminal_session_ended">جلسه پایان یافت</string>
     <string name="terminal_press_any_key">هر کلیدی را فشار دهید</string>
     <string name="tailscale_ssh_new_session">جلسه جدید</string>
+    <string name="tailscale_ssh_close_session">بستن جلسه</string>
+    <string name="terminal_notification_channel">اعلان‌های ترمینال</string>
 
     <!-- Terminal Configuration -->
     <string name="tailscale_terminal_config">پیکربندی Ghostty</string>
@@ -646,8 +650,57 @@
     <string name="remote_checking">در حال بررسی…</string>
     <string name="remote_available">در دسترس</string>
     <string name="remote_unavailable">در دسترس نیست</string>
+    <string name="usbip_no_server">usbip-server پیدا نشد</string>
+    <string name="usbip_no_devices">یک دستگاه USB را انتخاب کنید تا از طریق این usbip-server به اشتراک گذاشته شود.</string>
+    <string name="usbip_no_usb_devices">هیچ دستگاه USB متصل نیست</string>
+    <string name="usbip_connect_device">اتصال دستگاه USB</string>
+    <string name="usbip_detach">جدا کردن</string>
+    <string name="usbip_state_attaching">در حال اتصال…</string>
+    <string name="usbip_state_ready">آماده</string>
+    <string name="usbip_state_error">خطا</string>
+    <string name="usbip_state_idle">بیکار</string>
+    <string name="usbip_state_attached">در حال استفاده</string>
+    <string name="usbip_state_unavailable">در دسترس نیست</string>
+    <string name="usbip_identity">شناسه</string>
+    <string name="usbip_connection">اتصال</string>
+    <string name="usbip_class_interfaces">کلاس و رابط‌ها</string>
+    <string name="usbip_product">محصول</string>
+    <string name="usbip_serial">شماره سریال</string>
+    <string name="usbip_version">نسخه</string>
+    <string name="usbip_bus_id">شناسه گذرگاه</string>
+    <string name="usbip_backend">بک‌اند</string>
+    <string name="usbip_speed">سرعت</string>
+    <string name="usbip_bus_device">گذرگاه / دستگاه</string>
+    <string name="usbip_device_class">کلاس دستگاه</string>
+    <string name="usbip_configuration">پیکربندی</string>
+    <string name="usbip_interface">رابط %1$d</string>
+    <string name="usbip_notification_title">اشتراک‌گذاری USB/IP</string>
+    <plurals name="usbip_notification_text">
+        <item quantity="one">در حال اشتراک‌گذاری %1$d دستگاه USB</item>
+        <item quantity="other">در حال اشتراک‌گذاری %1$d دستگاه USB</item>
+    </plurals>
+    <string name="endpoint_status">وضعیت</string>
+    <string name="endpoint_state">وضعیت</string>
+    <string name="endpoint_authentication">احراز هویت</string>
+    <string name="endpoint_open_auth_url">باز کردن لینک احراز هویت</string>
+    <string name="endpoint_open_auth_url_qr_code">نمایش QR کد لینک احراز هویت</string>
+    <string name="endpoint_server">سرور</string>
+    <string name="endpoint_network">شبکه</string>
+    <string name="endpoint_cipher">الگوریتم رمزنگاری</string>
+    <string name="endpoint_flavor">نوع پروتکل</string>
+    <string name="endpoint_transport">انتقال</string>
+    <string name="endpoint_connected">متصل</string>
+    <string name="endpoint_username">نام کاربری</string>
+    <string name="endpoint_password">گذرواژه</string>
+    <string name="endpoint_response">پاسخ</string>
+    <string name="endpoint_submit">ارسال</string>
+    <string name="endpoint_continue">ادامه</string>
+    <string name="endpoint_verifying">در حال تأیید</string>
     <string name="endpoint_globalprotect_sso_unsupported_android">احراز هویت مرورگر SAML در GlobalProtect در Android پشتیبانی نمی‌شود.</string>
     <string name="endpoint_browser_cookie_missing">احراز هویت مرورگر تکمیل شد، اما کوکی VPN موردنیاز دریافت نشد.</string>
+    <string name="endpoint_browser_navigation_failed">پیمایش مرورگر ناموفق بود: %1$s</string>
+    <string name="endpoint_browser_too_many_windows">صفحه احراز هویت پنجره‌های مرورگر زیادی باز کرد.</string>
+    <string name="endpoint_browser_profile_unavailable">احراز هویت مرورگر در این دستگاه در دسترس نیست.</string>
 
     <!-- Taildrop -->
     <plurals name="taildrop_file_count">

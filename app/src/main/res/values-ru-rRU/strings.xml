@@ -265,6 +265,8 @@
     <string name="location_permission_title">Разрешение на определение местоположения</string>
     <string name="location_permission_description">Ваш профиль содержит правила маршрутизации &lt;strong&gt;&lt;tt&gt;wifi_ssid&lt;/tt&gt; или &lt;tt&gt;wifi_bssid&lt;/tt&gt;&lt;/strong&gt;. Для их работы sing-box использует разрешение на &lt;strong&gt;определение местоположения&lt;/strong&gt; &lt;strong&gt;в фоновом режиме&lt;/strong&gt;, чтобы получить информацию о подключённой сети Wi-Fi. Эта информация будет использоваться &lt;strong&gt;исключительно для маршрутизации&lt;/strong&gt;.</string>
     <string name="location_permission_background_description">В Android 10 и новее требуется разрешение на &lt;strong&gt;определение местоположения в фоне&lt;/strong&gt;. Выберите &lt;strong&gt;«Разрешить всегда»&lt;/strong&gt; для предоставления этого разрешения.</string>
+    <string name="local_network_permission_title">Разрешение на доступ к локальной сети</string>
+    <string name="local_network_permission_description">В Android 17 и новее для доступа к сети Wi-Fi или Ethernet требуется разрешение на доступ к локальной сети. Android запрашивает его как разрешение «Устройства поблизости».</string>
     <string name="notification_permission_title">Разрешение на уведомления</string>
     <string name="notification_permission_required_description">Без разрешения на отправку уведомлений sing-box не сможет отображать скорость сети в реальном времени. Предоставьте разрешение или отключите уведомления о скорости перед запуском службы.</string>
     <string name="root_access_required">Требуются права ROOT</string>
@@ -520,6 +522,8 @@
     <string name="terminal_session_ended">Сеанс завершён</string>
     <string name="terminal_press_any_key">нажмите любую клавишу</string>
     <string name="tailscale_ssh_new_session">Новая сессия</string>
+    <string name="tailscale_ssh_close_session">Закрыть сессию</string>
+    <string name="terminal_notification_channel">Уведомления терминала</string>
 
     <!-- Terminal Configuration -->
     <string name="tailscale_terminal_config">Конфигурация Ghostty</string>
@@ -652,8 +656,59 @@
     <string name="remote_checking">Проверка…</string>
     <string name="remote_available">Доступно</string>
     <string name="remote_unavailable">Недоступно</string>
+    <string name="usbip_no_server">usbip-server не найден</string>
+    <string name="usbip_no_devices">Выберите USB-устройство, чтобы предоставить к нему доступ через этот usbip-server.</string>
+    <string name="usbip_no_usb_devices">Нет подключённых USB-устройств</string>
+    <string name="usbip_connect_device">Подключить USB-устройство</string>
+    <string name="usbip_detach">Отключить</string>
+    <string name="usbip_state_attaching">Подключение…</string>
+    <string name="usbip_state_ready">Готово</string>
+    <string name="usbip_state_error">Ошибка</string>
+    <string name="usbip_state_idle">Свободно</string>
+    <string name="usbip_state_attached">Используется</string>
+    <string name="usbip_state_unavailable">Недоступно</string>
+    <string name="usbip_identity">Идентификация</string>
+    <string name="usbip_connection">Подключение</string>
+    <string name="usbip_class_interfaces">Класс и интерфейсы</string>
+    <string name="usbip_product">Продукт</string>
+    <string name="usbip_serial">Серийный номер</string>
+    <string name="usbip_version">Версия</string>
+    <string name="usbip_bus_id">ID шины</string>
+    <string name="usbip_backend">Бэкенд</string>
+    <string name="usbip_speed">Скорость</string>
+    <string name="usbip_bus_device">Шина / устройство</string>
+    <string name="usbip_device_class">Класс устройства</string>
+    <string name="usbip_configuration">Конфигурация</string>
+    <string name="usbip_interface">Интерфейс %1$d</string>
+    <string name="usbip_notification_title">Общий доступ по USB/IP</string>
+    <plurals name="usbip_notification_text">
+        <item quantity="one">Общий доступ к %1$d USB-устройству</item>
+        <item quantity="few">Общий доступ к %1$d USB-устройствам</item>
+        <item quantity="many">Общий доступ к %1$d USB-устройствам</item>
+        <item quantity="other">Общий доступ к %1$d USB-устройства</item>
+    </plurals>
+    <string name="endpoint_status">Статус</string>
+    <string name="endpoint_state">Состояние</string>
+    <string name="endpoint_authentication">Аутентификация</string>
+    <string name="endpoint_open_auth_url">Открыть URL авторизации</string>
+    <string name="endpoint_open_auth_url_qr_code">Показать QR-код авторизации</string>
+    <string name="endpoint_server">Сервер</string>
+    <string name="endpoint_network">Сеть</string>
+    <string name="endpoint_cipher">Шифр</string>
+    <string name="endpoint_flavor">Вариант протокола</string>
+    <string name="endpoint_transport">Транспорт</string>
+    <string name="endpoint_connected">Подключено</string>
+    <string name="endpoint_username">Имя пользователя</string>
+    <string name="endpoint_password">Пароль</string>
+    <string name="endpoint_response">Ответ</string>
+    <string name="endpoint_submit">Отправить</string>
+    <string name="endpoint_continue">Продолжить</string>
+    <string name="endpoint_verifying">Проверка</string>
     <string name="endpoint_globalprotect_sso_unsupported_android">Браузерная аутентификация GlobalProtect SAML не поддерживается на Android.</string>
     <string name="endpoint_browser_cookie_missing">Аутентификация в браузере завершена, но необходимый VPN cookie не получен.</string>
+    <string name="endpoint_browser_navigation_failed">Ошибка перехода в браузере: %1$s</string>
+    <string name="endpoint_browser_too_many_windows">Страница аутентификации открыла слишком много окон браузера.</string>
+    <string name="endpoint_browser_profile_unavailable">Аутентификация в браузере недоступна на этом устройстве.</string>
 
     <!-- Taildrop -->
     <plurals name="taildrop_file_count">

@@ -681,8 +681,8 @@
     <string name="remote_unavailable">Unavailable</string>
 
     <string name="title_services">Services</string>
-    <string name="title_usbip">USB/IP</string>
-    <string name="usbip_with_tag">USB/IP: %1$s</string>
+    <string name="title_usbip" translatable="false">USB/IP</string>
+    <string name="usbip_with_tag" translatable="false">USB/IP: %1$s</string>
     <string name="usbip_no_server">No usbip-server found</string>
     <string name="usbip_no_devices">Pick a USB device to share it through this usbip-server.</string>
     <string name="usbip_no_usb_devices">No USB devices connected</string>
