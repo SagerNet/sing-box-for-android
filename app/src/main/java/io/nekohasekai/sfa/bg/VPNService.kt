@@ -83,14 +83,19 @@ class VPNService :
             builder.addAddress(address.address(), address.prefix())
         }
 
-        if (options.autoRoute) {
-            if (options.dnsMode.value != Libbox.DNSModeDisabled) {
-                val dnsServerAddress = options.dnsServerAddress
-                while (dnsServerAddress.hasNext()) {
-                    builder.addDnsServer(dnsServerAddress.next())
+        val dnsMode = options.dnsMode.value
+        if (dnsMode != Libbox.DNSModeDisabled && (options.autoRoute || dnsMode.isNotEmpty())) {
+            val dnsServerAddress = options.dnsServerAddress
+            while (dnsServerAddress.hasNext()) {
+                val address = dnsServerAddress.next()
+                builder.addDnsServer(address)
+                if (!options.autoRoute) {
+                    builder.addRoute(address, if (address.contains(':')) 128 else 32)
                 }
             }
+        }
 
+        if (options.autoRoute) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 val inet4RouteAddress = options.inet4RouteAddress
                 if (inet4RouteAddress.hasNext()) {
