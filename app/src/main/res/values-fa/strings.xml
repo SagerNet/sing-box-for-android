@@ -26,6 +26,7 @@
     <string name="action_deselect">لغو انتخاب</string>
     <string name="action_reload">بارگذاری مجدد</string>
     <string name="action_restart">راه‌اندازی مجدد</string>
+    <string name="action_toggle">تغییر وضعیت</string>
     <string name="expand">باز کردن</string>
     <string name="collapse">جمع کردن</string>
     <string name="expand_all">باز کردن همه</string>

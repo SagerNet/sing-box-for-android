@@ -26,6 +26,7 @@
     <string name="action_deselect">Отменить выбор</string>
     <string name="action_reload">Перезагрузить</string>
     <string name="action_restart">Перезапустить</string>
+    <string name="action_toggle">Переключить</string>
     <string name="expand">Развернуть</string>
     <string name="collapse">Свернуть</string>
     <string name="expand_all">Развернуть все</string>

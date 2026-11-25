@@ -26,6 +26,7 @@
     <string name="action_deselect">取消选择</string>
     <string name="action_reload">重载</string>
     <string name="action_restart">重启</string>
+    <string name="action_toggle">切换</string>
     <string name="expand">展开</string>
     <string name="collapse">收起</string>
     <string name="expand_all">全部展开</string>

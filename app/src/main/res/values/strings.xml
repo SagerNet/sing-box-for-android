@@ -26,6 +26,7 @@
     <string name="action_deselect">Deselect</string>
     <string name="action_reload">Reload</string>
     <string name="action_restart">Restart</string>
+    <string name="action_toggle">Toggle</string>
     <string name="expand">Expand</string>
     <string name="collapse">Collapse</string>
     <string name="expand_all">Expand All</string>
