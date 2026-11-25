@@ -1452,10 +1452,6 @@ class MainActivity :
                 }
             }
 
-            BackHandler(enabled = selectedConnectionId != null) {
-                selectedConnectionId = null
-            }
-
             ModalBottomSheet(
                 onDismissRequest = {
                     showConnectionsSheet = false
@@ -1471,6 +1467,9 @@ class MainActivity :
                         .fillMaxHeight(),
                 ) {
                     if (displayConnection != null) {
+                        BackHandler {
+                            selectedConnectionId = null
+                        }
                         ConnectionDetailsScreen(
                             connection = displayConnection,
                             onBack = { selectedConnectionId = null },
