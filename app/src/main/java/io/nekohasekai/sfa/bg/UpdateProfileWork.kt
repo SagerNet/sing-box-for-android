@@ -40,20 +40,15 @@ class UpdateProfileWork {
                 return
             }
 
-            var minDelay =
-                remoteProfiles.minByOrNull { it.typed.autoUpdateInterval }!!.typed.autoUpdateInterval.toLong()
-            val nowSeconds = System.currentTimeMillis() / 1000L
-            val minInitDelay =
-                remoteProfiles.minOf { (it.typed.autoUpdateInterval * 60) - (nowSeconds - (it.typed.lastUpdated.time / 1000L)) }
-            if (minDelay < 15) minDelay = 15
+            val updateInterval = remoteProfiles.minOf { it.typed.autoUpdateInterval }.toLong()
+            val nextUpdateTime =
+                remoteProfiles.minOf { it.typed.lastUpdated.time + TimeUnit.MINUTES.toMillis(it.typed.autoUpdateInterval.toLong()) }
             WorkManager.getInstance(Application.application).enqueueUniquePeriodicWork(
                 WORK_NAME,
                 ExistingPeriodicWorkPolicy.UPDATE,
-                PeriodicWorkRequest.Builder(UpdateTask::class.java, minDelay, TimeUnit.MINUTES)
-                    .apply {
-                        if (minInitDelay > 0) setInitialDelay(minInitDelay, TimeUnit.SECONDS)
-                        setBackoffCriteria(BackoffPolicy.LINEAR, 15, TimeUnit.MINUTES)
-                    }
+                PeriodicWorkRequest.Builder(UpdateTask::class.java, updateInterval, TimeUnit.MINUTES)
+                    .setNextScheduleTimeOverride(nextUpdateTime)
+                    .setBackoffCriteria(BackoffPolicy.LINEAR, 15, TimeUnit.MINUTES)
                     .build(),
             )
         }
