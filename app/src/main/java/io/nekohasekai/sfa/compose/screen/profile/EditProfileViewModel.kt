@@ -8,7 +8,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
-import io.nekohasekai.sfa.bg.UpdateProfileWork
 import io.nekohasekai.sfa.database.Profile
 import io.nekohasekai.sfa.database.ProfileManager
 import io.nekohasekai.sfa.database.Settings
@@ -206,18 +205,11 @@ class EditProfileViewModel(application: Application) : AndroidViewModel(applicat
                 profile.icon = state.icon
                 profile.typed.remoteURL = state.remoteUrl
 
-                // Handle auto-update changes
-                val autoUpdateChanged = state.autoUpdate != state.originalAutoUpdate
                 profile.typed.autoUpdate = state.autoUpdate
                 profile.typed.autoUpdateInterval = state.autoUpdateInterval
 
                 // Save to database
                 ProfileManager.update(profile)
-
-                // Reconfigure updater if auto-update was enabled
-                if (autoUpdateChanged && state.autoUpdate) {
-                    UpdateProfileWork.reconfigureUpdater()
-                }
 
                 // Update UI state with new original values
                 _uiState.update {

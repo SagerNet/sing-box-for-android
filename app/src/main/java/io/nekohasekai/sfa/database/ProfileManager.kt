@@ -2,6 +2,7 @@ package io.nekohasekai.sfa.database
 
 import androidx.room.Room
 import io.nekohasekai.sfa.Application
+import io.nekohasekai.sfa.bg.UpdateProfileWork
 import io.nekohasekai.sfa.constant.Path
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -46,9 +47,7 @@ object ProfileManager {
         if (andSelect) {
             Settings.selectedProfile = profile.id
         }
-        for (callback in callbacks.toList()) {
-            callback()
-        }
+        onProfilesChanged()
         return profile
     }
 
@@ -56,9 +55,7 @@ object ProfileManager {
         try {
             return instance.profileDao().update(profile)
         } finally {
-            for (callback in callbacks.toList()) {
-                callback()
-            }
+            onProfilesChanged()
         }
     }
 
@@ -66,9 +63,7 @@ object ProfileManager {
         try {
             return instance.profileDao().update(profiles)
         } finally {
-            for (callback in callbacks.toList()) {
-                callback()
-            }
+            onProfilesChanged()
         }
     }
 
@@ -76,9 +71,7 @@ object ProfileManager {
         try {
             return instance.profileDao().delete(profile)
         } finally {
-            for (callback in callbacks.toList()) {
-                callback()
-            }
+            onProfilesChanged()
         }
     }
 
@@ -86,13 +79,18 @@ object ProfileManager {
         try {
             return instance.profileDao().delete(profiles)
         } finally {
-            for (callback in callbacks.toList()) {
-                callback()
-            }
+            onProfilesChanged()
         }
     }
 
     suspend fun list(): List<Profile> = instance.profileDao().list()
+
+    private suspend fun onProfilesChanged() {
+        UpdateProfileWork.reconfigureUpdater()
+        for (callback in callbacks.toList()) {
+            callback()
+        }
+    }
 
     fun remoteServerDao(): RemoteServer.Dao = instance.remoteServerDao()
 }
